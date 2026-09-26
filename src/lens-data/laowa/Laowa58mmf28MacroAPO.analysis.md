@@ -210,7 +210,16 @@ The G2 travel from infinity to 1× is 24.85 mm; from infinity to 2× it is 46.97
 
 G3's auxiliary motion is considerably smaller (8.1 mm vs. 47.0 mm for G2) but is critical for maintaining image quality across the magnification range. As G2 advances and the conjugate ratio changes dramatically (from $m = 0$ at infinity to $m = -2$ at 2×), the spherical aberration balance, field curvature, and chromatic state all shift. G3's compensating motion — coupled with the changing BFD — rebalances these aberrations without requiring aspheric surfaces or exotic glass not already present.
 
-The production lens specifies a minimum focusing distance of 18.5 cm (measured from the sensor plane). At 2× magnification, the object-to-image distance is approximately $\text{MFD} + \text{flange distance} \approx 185$ mm, placing the object roughly 60–70 mm from the front vertex — very close, consistent with the macro working distances reported in reviews.
+The production minimum focusing distance is specified from the sensor plane; a flange distance
+must not be added to it. It does not establish a source conjugate for this prescription.
+The MTF selector enables the authored infinity and nominal maximum configurations. The latter's
+object distance is **calculated** as 57.836692 mm ahead of the first surface (182.717992 mm
+object-to-image). Independent small-height exact rays confirm this distance and magnification
+-1.959051661. That magnitude rounds to the patent's one-decimal **2.0×** label, but is not exact
+2× and differs by 2.0474%. The default 1% audit comparison reports the discrepancy; the state
+is qualified at the printed label's precision. No source geometry is adjusted. The published
+1× column is not an authored station and cannot be selected through interpolated movement.
+Unresolved spectral glass data and estimated apertures remain limitations.
 
 
 ## Aspherical Surfaces

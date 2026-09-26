@@ -2,6 +2,41 @@
 
 Patent: CN 116520542 A, Example 2
 
+## 2026-09-26 — Source-state review
+
+Source-state review outcome: verified. Both authored endpoints enabled, with the close endpoint
+qualified as nominal 2.0× at the source label's printed precision. Finite distance is calculated.
+
+Visually inspected local `patents/CN116520542A.pdf`, PDF pages 7–8, Example 2 ¶0051–0060.
+All 26 source rows reproduce retained radii, thicknesses and d-line indices (source stop row 17
+maps to STO). Infinity/maximum gaps are D4=47.7715/0.8000 mm,
+D17=1.4000/40.2782 mm and D26=14.9285/23.0218 mm, matching focusT=0/1 exactly.
+The retained scale is the 59.21 mm patent design, not a rescaling to marketed 58 mm.
+The published 1.0× column is unauthored; its three gaps do not share a single coordinate on
+the current two-endpoint interpolation. No new travel or intermediate configuration is invented.
+
+At maximum, the fixed-plane matrix gives A=-1.9590516582779163 and
+B=113.30506768663439 mm, hence s=-B/A=57.83669216065186 mm before the first surface,
+or 182.71799216065182 mm object-to-image. Independent exact roots at
+0.01/0.005/0.0025 mm first-vertex heights give
+57.836691036228/57.836691879546/57.836692089955 mm, with axial residuals below
+3.81e-10 mm. Exact magnification tends to -1.959051661189; the fixed geometry establishes
+a physical source without relying on the production minimum-distance specification.
+
+The default published-magnification check fails: 1.959051658 differs from 2 by 2.0474%,
+exceeding 1%. Preserve that diagnostic. The table labels the column **2.0×**, not 2.0000×;
+1.959051658 lies within its nearest-one-decimal interval [1.95, 2.05). The manual review
+therefore accepts a nominal-maximum label at that precision. An explicit evidence-only
+comparison at half the printed step (0.05/2 = 2.5%) passes; no default or exact-ray tolerance
+is changed. This does not prove the source's intended magnification was exactly the computed
+value or identify the cause of the discrepancy. The selector's source and derivation retain
+the qualification; no prescription is tuned to force exact 2×.
+
+Infinity retains matrix A=-0.0006673920756584129; the corresponding very distant finite
+root is a residual of the stored model, not a source-backed finite state. Unresolved glass
+spectra, inferred apertures and ordinary MTF eligibility/convergence restrictions remain.
+No geometry, aperture, image plane or glass changes.
+
 ## 2026-05-20 - Glass relabel pass
 
 - Opened the data, analysis, and local patent PDF `patents/CN116520542A.pdf`; local text extraction was spotty but confirmed the relevant nd/vd values.

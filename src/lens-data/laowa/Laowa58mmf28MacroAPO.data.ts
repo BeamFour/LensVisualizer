@@ -51,6 +51,32 @@ const LENS_DATA = {
   elementCount: 14,
   groupCount: 11,
 
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity · patent scale",
+      focusT: 0,
+      zoomT: 0,
+      source: "CN 116520542 A, Example 2 paragraphs 0051–0060, infinity column; retained 59.21 mm patent design.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "closest",
+      label: "Nominal maximum",
+      focusT: 1,
+      zoomT: 0,
+      source: "CN 116520542 A, Example 2 paragraphs 0057–0060, nominal 2.0× column. Calculated magnification 1.95905× rounds to the printed one-decimal label; not exact 2× (see audit).",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 57.83669216065186,
+        distanceReference: "first-surface",
+        distanceProvenance: "calculated",
+        derivation: "Fixed-plane ABCD s=-B/A; independent small-height exact rays confirm distance and model magnification -1.959051661. Published 2.0× is checked at its printed one-decimal precision; the default 1% comparison fails and is retained in the audit. No geometry adjustment.",
+        magnification: 2,
+      },
+    },
+  ],
+
   /* ── Elements ── */
   elements: [
     // ── G1 (fixed front corrector, near-afocal) ──
