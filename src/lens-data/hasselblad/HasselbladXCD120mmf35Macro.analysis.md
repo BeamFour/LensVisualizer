@@ -201,6 +201,14 @@ G4 dominates the focus adjustment, traveling 40.4 mm forward (THI 11 compresses 
 
 G5's motion is non-monotonic: it first moves toward the image (THI 16 decreases from 11.24 to 9.60 at 2.0 m), then reverses toward the object (THI 16 increases to 10.23 at 0.43 m). The net displacement of −1.01 mm is toward the image, satisfying the patent's Condition (6): $PB2 < 0$ (¶0058). This reversal allows G5 to fine-tune aberrations at different conjugates without requiring excessive travel from G2.
 
+The MTF Lens state selector uses the three published columns exactly, including the nonuniform
+intermediate slider coordinate. Finite distances are 2000.0000 and 429.9341 mm **from the image
+plane**, as defined in ¶0041. The retained d-line model has residual defocus at these published
+sources: its fixed-plane paraxial solutions are 2011.2850 and 430.9681 mm, respectively. The
+published distances remain authoritative; neither element spacing nor the diagram image plane is
+adjusted to eliminate the discrepancy. Best axial focus is a separate MTF diagnostic. Intermediate
+finite-focus slider positions remain unverified.
+
 ### Effective focal length variation
 
 The EFL changes significantly with focus distance due to the inner-focus architecture:
@@ -266,7 +274,7 @@ Independent paraxial verification (y-nu ray trace, ABCD matrix) confirms the fol
 | Total track (to cover glass, constant) | 152.12 mm | — | ±0.00 mm |
 | Petzval sum | +0.00115 mm⁻¹ | — | — |
 
-All computed values agree with the patent's stated values within rounding tolerance. The data file stores the patent's 31.256 mm gap from surface 18 to the cover glass and models the cover glass itself (Flat, d = 1.80 mm, nd = 1.51633, νd = 64.14, S-BSL7 class) with its 0.10 mm trailing air gap in `rearPlates`: every analysis traces the plate, but it is not drawn. Its paraxial air-equivalent back focus is $31.256 + 1.800/1.51633 + 0.100 = 32.543$ mm.
+The source spacings are reproduced, but not all computed optical quantities reproduce the published values. The finite fixed-plane d-line distances differ by 0.5643% and 0.2405%; this review does not establish rounding as the cause. The patent plots multiple wavelengths (¶0044), but that alone does not establish the reference wavelength of every listed design metric. The data file stores the patent's 31.256 mm gap from surface 18 to the cover glass and models the cover glass itself (Flat, d = 1.80 mm, nd = 1.51633, νd = 64.14, S-BSL7 class) with its 0.10 mm trailing air gap in `rearPlates`: every analysis traces the plate, but it is not drawn. Its paraxial air-equivalent back focus is $31.256 + 1.800/1.51633 + 0.100 = 32.543$ mm.
 
 ## Sources
 

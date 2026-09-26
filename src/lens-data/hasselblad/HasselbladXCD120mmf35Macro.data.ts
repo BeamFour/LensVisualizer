@@ -47,6 +47,44 @@ const LENS_DATA = {
   patentYear: 2020,
   elementCount: 10,
   groupCount: 7,
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "US 2020/0192060 A1, Example 2 Figures 6–7, infinity column.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "two-metres",
+      label: "Intermediate",
+      focusT: 0.21386551368720905,
+      zoomT: 0,
+      source: "US 2020/0192060 A1, Example 2 Figures 6–7, 2.0 m column; image-plane distance convention in paragraph 0041. Retained d-line model has residual defocus (see audit).",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 2000,
+        distanceReference: "image-plane",
+        distanceProvenance: "published",
+        magnification: 0.065,
+      },
+    },
+    {
+      id: "closest",
+      label: "Closest focus",
+      focusT: 1,
+      zoomT: 0,
+      source: "US 2020/0192060 A1, Example 2 Figures 6–7, 0.43 m column (429.9341 mm); image-plane distance convention in paragraph 0041. Retained d-line model has residual defocus (see audit).",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 429.9341,
+        distanceReference: "image-plane",
+        distanceProvenance: "published",
+        magnification: 0.5,
+      },
+    },
+  ],
 
   /* ── Elements ── */
   elements: [
