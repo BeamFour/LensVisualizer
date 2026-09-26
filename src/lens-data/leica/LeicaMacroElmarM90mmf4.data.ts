@@ -52,6 +52,17 @@ const LENS_DATA = {
   elementCount: 4,
   groupCount: 4,
 
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity · scaled patent design",
+      focusT: 0,
+      zoomT: 0,
+      source: "DE 2 246 966 A1, Example 1 / claim 3, normalized f=1.0 and rear focal distance s'=0.5102f; retained 90× dimensional scale and native e-line indices. Stop station and aperture remain inferred (see audit).",
+      conjugate: { kind: "infinity" },
+    },
+  ],
+
   elements: [
     {
       id: 1,

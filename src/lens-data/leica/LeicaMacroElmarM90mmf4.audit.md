@@ -1,5 +1,28 @@
 # Audit Log — LEICA MACRO-ELMAR-M 90mm f/4
 
+## 2026-09-26 — Source-state review
+
+Source-state review outcome: verified. The single authored candidate (focusT=0, zoomT=0)
+is the scaled patent infinity design. No additional eligible finite configuration is published
+for this retained fixed prescription; production macro capability does not supply focus travel.
+
+Visually checked local `patents/DE_2246966_A1.pdf`, PDF pages 4–6, especially claim 3 on
+page 6 (printed page -5-). All eight radii and seven separations reproduce the normalized
+source at the retained 90× scale. The source defines s' as rear focal distance from the last
+surface to the image; 0.5102×90=45.918 mm is retained. Native ne/ve glass coordinates remain
+unchanged. The inferred stop splits source d6=0.2543×90=22.887 mm into
+7.459+15.428 mm; neither its station nor calibrated physical diameter is claimed as published.
+
+The native-e fixed-plane matrix gives A=-0.000757312987409664,
+B=90.03305131629116 mm and C=-0.011116334266940172 mm^-1. Its EFL is
+89.957712317 mm, consistent with the existing rounded-source model. The formal finite root
+118884.86373942021 mm is residual defocus, not evidence for a finite source state; preserve
+the source infinity conjugate and published rear gap. Best axial focus remains a diagnostic.
+
+This review certifies the stated scaled prescription configuration, not a measured production
+construction. Inferred apertures, coordinate-compatible spectral proxies and the unconfirmed
+patent-to-product correlation remain. No geometry, glass, aperture or image-plane changes.
+
 ## 2026-09-15 — Patent figure, glass and integration review
 
 ### Source and semi-diameters

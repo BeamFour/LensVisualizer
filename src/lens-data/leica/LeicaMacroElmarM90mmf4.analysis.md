@@ -15,6 +15,13 @@ contains eight spherical refracting surfaces forming four air-separated singlets
 therefore the claim-2-only thickness and narrower stop-space conditions do not govern this example. The prescription is
 transcribed from PDF page 6 (printed page -5-), with the stop ordering confirmed by Fig. 1 on PDF page 7.
 
+The MTF Lens state selector enables this single authored infinity configuration at the retained
+90× dimensional scale. The patent's rear focal distance defines the infinity image plane; the
+small residual of the rounded prescription is preserved. No close-focus geometry is authored.
+The production macro name, adapter specifications, or a calculated finite root cannot establish
+an additional selectable state. The inferred stop and aperture, spectral proxies, and uncertain
+production association remain qualifications of the simulation.
+
 The association with the Leica Macro-Elmar-M 90 mm f/4 is a research correlation rather than a manufacturer-confirmed
 patent attribution. Leica's current technical specification gives a 90 mm f/4 Leica M lens for the 24 × 36 mm format with
 a 27° diagonal field and a 4-element / 4-group optical construction. Those values converge directly with the patent's
