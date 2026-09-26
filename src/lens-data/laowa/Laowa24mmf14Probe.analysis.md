@@ -21,7 +21,7 @@ Chinese Utility Model patent CN 210573001 U, titled "一种细长微距镜头" (
 
 1. **Element and group count.** The prescription yields 27 glass elements in 19 air-separated groups — exactly matching the production lens specification published by Laowa.
 2. **Focal length and f-number.** The patent states f = 23.70 mm, F/14.0, half-angle ω = 44.6° (2ω ≈ 89.2°). The production lens is marketed as 24 mm, f/14, with 84.1–85° diagonal angle of view on a 135 full-frame sensor. The small focal-length discrepancy (23.7 vs. 24 mm) is within normal rounding for marketing purposes. The wider patent field angle (89.2° vs. 84.8°) reflects the design image circle (Ymax = 23.38 mm half-height, ≈ 46.8 mm diameter), which intentionally exceeds the 135-format half-diagonal of 21.65 mm; the production FOV of ~84.8° corresponds to arctan(21.65 / 23.7) ≈ 42.4° half-angle, confirming that the optical design covers the sensor with margin.
-3. **Macro capability.** The patent prescription includes variable-gap data from infinity to 1.0× magnification, consistent with the production lens's 2:1 maximum reproduction ratio. The focusing element travels 3.25 mm to reach 1.0× from infinity; an extended version of the same mechanism reaches the marketed 2:1.
+3. **Macro capability.** The patent prescription includes variable-gap data from infinity to 1.0× magnification, distinct from the production lens's 2:1 maximum reproduction ratio. The focusing element travels 3.25 mm to reach the published 1.0× configuration; this embodiment does not establish the production 2:1 prescription.
 4. **Three-section architecture.** Laowa describes the production lens as comprising three functional sub-systems — Objective + Relay + Macro (Magnification) group — which matches the patent's description of 物镜 (Objective) + 接力镜头 (Relay) + 放大镜头 (Magnification lens) exactly (¶0044).
 5. **Special glass count.** Laowa markets the lens as having "2 Extra-Low Dispersion elements and 1 Extra Refractive Index element." The prescription contains exactly two elements made of nd = 1.49700 / νd = 81.61 glass (H-FK61-class ED fluorophosphate) and two elements of nd = 1.92286 / νd = 20.88 glass (N-SF66 / E-FDS1 class), the latter being the "Extra Refractive Index" glass. The marketing claim of "1 ERI element" likely refers to the glass type rather than the individual element count.
 6. **Patent timing.** Filing date August 2019 aligns with the period after the production lens's 2018 launch; the patent documents the optical formula behind the already-shipping product.
@@ -245,9 +245,9 @@ The variable-gap data confirms this:
 
 Key observations about the focus mechanism:
 
-- **Conservation:** D(44) + Foc thickness (3.0 mm) + D(46) = 82.101 mm at infinity and 1.0× — conserved to four decimal places. At the intermediate 0.025× position, the patent table yields 82.056 mm (Δ = 0.045 mm), which is a rounding artifact in the published table rather than a genuine non-conservation; a single-element translating focus mechanism conserves this sum by construction.
+- **Conservation:** D(44) + Foc thickness (3.0 mm) + D(46) = 82.101 mm at infinity and 1.0× — conserved to four decimal places. At the intermediate 0.025× position, the patent table yields 82.056 mm (Δ = 0.045 mm), which is inconsistent with pure translation of a single element. The cause is unresolved; this intermediate column is not represented by the current model.
 - **Constant BFD:** D(50) = 39.154 mm at all positions, meaning the flange distance does not change during focusing. This is essential for an interchangeable-lens camera system.
-- **Travel:** The focus element moves 3.250 mm from infinity to 1.0× magnification. For the production lens's 2:1 maximum magnification, the travel would be somewhat greater.
+- **Travel:** The focus element moves 3.250 mm from infinity to 1.0× magnification. The production lens's 2:1 specification does not establish additional authored travel here.
 - **Focus type:** This is an **inner focus** design with a single moving element — the simplest possible inner-focus mechanism, consistent with the lens's manual-focus-only operation.
 
 The choice of a weakly positive element (f = +69.3 mm) for the focus group means focus-induced aberration change is small, preserving image quality across the entire focus range from infinity to 1× or beyond.
@@ -270,7 +270,7 @@ L25 is the last optical element before the image plane, a plano-convex lens with
 
 The lens uses a single-element inner-focus mechanism. The focusing element is L23 (Foc), a weak positive meniscus (f = +69.3 mm) located behind the aperture stop and before the rear corrector pair L24–L25.
 
-During focusing from infinity to close distance, L23 translates axially toward the object side. The air gap D(44) before L23 decreases while D(46) after L23 increases by the same amount. The sum D(44) + D(46) + element thickness is conserved at 82.10 mm (the patent's 0.025× data point shows a 0.045 mm deviation due to table rounding), and the BFD (D50) is fixed at 39.154 mm.
+During focusing from infinity to close distance, L23 translates axially toward the object side. The air gap D(44) before L23 decreases while D(46) after L23 increases by the same amount. The sum D(44) + D(46) + element thickness is conserved at 82.10 mm (the patent's unauthored 0.025× column differs by 0.045 mm; rounding is not established as the cause), and the BFD (D50) is fixed at 39.154 mm.
 
 | Parameter | Infinity | 1.0× magnification |
 |---|---|---|
@@ -279,7 +279,14 @@ During focusing from infinity to close distance, L23 translates axially toward t
 | D(50) | 39.154 mm | 39.154 mm |
 | Focus element travel | — | 3.250 mm (toward object) |
 
-The patent describes the system as achieving magnifications from infinity to 1.0× (¶0046–0052). The production lens extends this to 2:1, which requires additional focus travel beyond what the patent's published three-position data covers. The drive system is purely mechanical (manual focus ring).
+The MTF Lens state selector enables the two authored Example 1 endpoints: infinity and the
+published life-size geometry. The life-size source distance is **calculated** as 20.996996 mm
+before the first surface (470.220896 mm object-to-image), with independent exact-ray verification.
+The model's paraxial magnification is -0.996848874, differing by 0.3151% from the published
+life-size condition; the source geometry and image plane are retained. The 0.025× source column
+is not an authored station and does not lie on the current two-gap interpolation. Neither that
+column, intermediate finite-focus positions, nor the production 2:1 specification is certified.
+These states use the explicitly straight path in Example 1, not the folded alternatives.
 
 ---
 

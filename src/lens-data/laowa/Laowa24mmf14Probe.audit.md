@@ -2,6 +2,38 @@
 
 Patent: CN 210573001 U, Example 1
 
+## 2026-09-26 — Source-state review
+
+Source-state review outcome: verified. Both existing authored endpoints enabled; calculated
+life-size distance with a qualified source/model magnification discrepancy. Additional source
+0.025× column is unauthored; production 2:1 is not inferred.
+
+Visually inspected local `patents/CN210573001U.pdf`, PDF pages 6–8, Example 1 ¶0050–0052,
+and read the explicit straight-path description in ¶0044. Retained radii, gaps and d-line indices
+match after the documented model reductions: source P1 rows 3–5 are one uniform-glass 12 mm
+translation; source blank row 43 is omitted. Source rows 44/46/50 map to model labels 41/43/47.
+P2/P3 remain physical plane-parallel glass in this source example, not reflected paths. The
+source STOP's 29.7891 mm translation and all downstream spacings are retained.
+
+Paragraph 0052 gives D44=11.8183/8.5685 mm, D46=67.2829/70.5327 mm and
+D50=39.1540/39.1540 mm for the two authored endpoints. Paragraph 0045 identifies infinity
+and equal-size aberrations. The intervening 0.025× column has D44=11.6860 and D46=67.3702 mm:
+its 0.045 mm sum difference cannot be reproduced by the existing constant-sum two-gap movement.
+It is neither declared at an interpolated coordinate nor silently added to the prescription.
+
+At life-size, fixed-plane ABCD gives A=-0.9968488739010855, B=20.930831990495463 mm,
+s=-B/A=20.99699617313544 mm before the first surface and 470.2208961731354 mm
+object-to-image. Independent exact roots at 0.01/0.005/0.0025 mm first-vertex heights give
+20.996800881846/20.996947334695/20.996983962282 mm, with axial residuals below
+9.272e-8 mm at the paraxial source. Exact magnification tends to -0.996848870231.
+The 0.3151% difference from published life-size is within the audit's default 1% comparison
+allowance, but the cause is not established as rounding. Distance is a verified calculation
+for this retained model, not a published or measured production distance.
+
+The infinity matrix has A=0.0015944826025662273; its residual is retained rather than corrected.
+No source radii, thicknesses, glass, aperture or image plane are changed. Existing estimated
+rims and spectral proxies remain limitations; ordinary MTF support/convergence guards remain.
+
 ## 2026-05-20 — Glass relabel audit
 
 ### Phase 1 — Glass corrections

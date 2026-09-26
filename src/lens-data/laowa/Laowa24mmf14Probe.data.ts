@@ -69,6 +69,32 @@ const LENS_DATA = {
   elementCount: 27,
   groupCount: 19,
 
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity · straight path",
+      focusT: 0,
+      zoomT: 0,
+      source: "CN 210573001 U, Example 1 paragraphs 0044–0052, first spacing column and infinity aberration figure; unfolded straight path.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "life-size",
+      label: "Life-size · straight path",
+      focusT: 1,
+      zoomT: 0,
+      source: "CN 210573001 U, Example 1 paragraph 0052, 1.0× column; D44=8.5685 mm, D46=70.5327 mm, D50=39.1540 mm. Calculated model magnification differs by 0.3151% (see audit).",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 20.99699617313544,
+        distanceReference: "first-surface",
+        distanceProvenance: "calculated",
+        derivation: "Fixed authored straight-path geometry and image plane, ABCD s=-B/A; independent small-height exact rays verify source distance and magnification -0.996848870 versus published life-size. Retained source/model discrepancy is qualified in the audit; not production 2:1.",
+        magnification: 1,
+      },
+    },
+  ],
+
   /* ── Elements ── */
   elements: [
     // ── Objective Section (OBJ) ──
