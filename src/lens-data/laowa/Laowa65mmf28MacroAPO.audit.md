@@ -2,6 +2,33 @@
 
 Patent: CN 110161666A, Example 2
 
+## 2026-09-26 — Source-state review
+
+Source-state review outcome: verified. Both authored candidates enabled: infinity and the
+published 1.95× geometry. Finite distance calculated; no additional production 2:1 state.
+
+Visually inspected local `patents/CN110161666A.pdf`, PDF pages 7–9, Example 2 ¶0054–0070.
+Source radii, glass thicknesses, d-line indices and variable gaps match the retained model.
+Source flat air spacer row 16 is combined with row 15 as 1.0+0.2 mm; post-stop rows 18–26
+map to model labels 16–24. Physical cover rows 27–28 remain a 2.0 mm plate
+(nd=1.51680, vd=64.20) after 12.3 mm air, followed by 1.0 mm air, expanded once.
+Paragraph 0070 gives D3=36.0482/1.0481 mm and D17=1.3000/36.3001 mm at infinity/1.95×,
+matching focusT=0/1. The two columns are the complete authored candidate set. Retained design
+scale is 66.0242 mm; neither marketed 65 mm nor 2:1 is substituted for the source values.
+
+At close focus the fixed-plane matrix gives A=-1.9457457728066632 and
+B=114.5598771718969 mm, hence s=-B/A=58.87710448762723 mm ahead of the first surface
+or 170.45200448762722 mm object-to-image. Independent exact roots at
+0.01/0.005/0.0025 mm first-vertex heights give
+58.877103953428/58.877104353970/58.877104453356 mm, with axial residuals below
+1.766e-10 mm and exact magnification approaching -1.945745779167. Magnitude differs from
+1.95 by 0.2182%, within the default comparison bound and the half-step of the printed
+hundredth (0.005). Precision supports repeatability, not measured production accuracy.
+
+No geometry, source plate, aperture, glass or image-plane adjustment. Estimated rims and
+unresolved/proxy dispersion remain explicit limitations. Ordinary field, spectral and numerical
+MTF eligibility checks remain active; intermediate finite-focus slider positions are unverified.
+
 ## 2026-05-20 — Glass relabel audit
 
 ### Phase 1 — Glass corrections

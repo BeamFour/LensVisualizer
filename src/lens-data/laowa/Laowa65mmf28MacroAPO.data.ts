@@ -68,6 +68,32 @@ const LENS_DATA = {
   elementCount: 14,
   groupCount: 10,
 
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity · patent scale",
+      focusT: 0,
+      zoomT: 0,
+      source: "CN 110161666 A, Example 2 paragraphs 0054–0070, infinity column at retained 66.0242 mm design scale.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "closest",
+      label: "Closest patent state",
+      focusT: 1,
+      zoomT: 0,
+      source: "CN 110161666 A, Example 2 paragraph 0070, 1.95× column; D3=1.0481 mm, D17=36.3001 mm, D28=1.0000 mm.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 58.87710448762723,
+        distanceReference: "first-surface",
+        distanceProvenance: "calculated",
+        derivation: "Fixed-plane ABCD s=-B/A including the source 2 mm rear plate; independent small-height exact rays verify source distance and magnification -1.945745779, agreeing with the printed 1.95× precision. See audit sidecar; not a production-distance measurement.",
+        magnification: 1.95,
+      },
+    },
+  ],
+
   /* ── Elements ── */
   elements: [
     {

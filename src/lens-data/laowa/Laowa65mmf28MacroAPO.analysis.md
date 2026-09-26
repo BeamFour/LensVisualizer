@@ -217,7 +217,15 @@ Several features are evident:
 
 **Conservation.** The sum D(3) + D(17) = 37.348 mm at both infinity and close focus, confirming that G2's forward travel is exactly compensated by the opening gap behind it. The overall optical length remains constant — a requirement for the internal-focus mechanism to maintain a fixed barrel length.
 
-**Travel.** G2 moves 35.0 mm forward (toward the object) to achieve 1.95× magnification from infinity. This is an exceptionally large focus travel for an internal-focus design, driven by the need to reach beyond 2:1 reproduction. The production lens specifies a minimum focus distance of 170 mm (6.7 inches) at 2:1.
+**Travel.** G2 moves 35.0 mm forward (toward the object) to achieve 1.95× magnification from infinity. This is an exceptionally large focus travel for an internal-focus design, used to reach the published 1.95× configuration. The production lens specifies a minimum focus distance of 170 mm (6.7 inches) at 2:1.
+
+The MTF Lens state selector enables the authored infinity and closest patent states. The
+finite distance is **calculated** as 58.877104 mm before the first surface (170.452004 mm
+object-to-image), including the physical rear cover glass. Independent small-height exact rays
+confirm the source and magnification -1.945745779, which rounds to the printed 1.95× value.
+The retained model uses the patent's 66.0242 mm design scale, with estimated apertures and
+unresolved spectral glass where applicable. Production 2:1 and intermediate finite-focus
+positions are not additional certified configurations.
 
 **Constant BFD.** The back focal distance D(28) = 1.0 mm (from the rear of the cover glass to the sensor plane) does not change during focus. Combined with the fixed G3, this means the image-side telecentricity and field correction from G3 remain undisturbed across the entire focus range.
 
