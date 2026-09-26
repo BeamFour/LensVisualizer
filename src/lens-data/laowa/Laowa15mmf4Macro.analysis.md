@@ -12,7 +12,7 @@ The patent presents three numerical embodiments. **Example 2** (第二实施例,
 1. **Element and group count.** Example 2 has 12 elements in 9 groups, matching the production specification exactly.
 2. **Focal length and aperture.** The patent states $f = 16.00$ mm and $F/4.1$. The production lens is marketed at 15 mm and $f/4$, implying a modest scale factor of $15/16 = 0.9375$ and a slight aperture rounding — both within normal patent-to-production tolerances.
 3. **Half-field angle.** $\omega = 55.199°$, yielding a full field of $110.4°$ — consistent with the marketed $110°$ angle of view.
-4. **Focus mechanism.** Example 2 employs two moving positive groups (SF and MF) achieving a maximum magnification of $0.7836\times$ at closest focus (¶0065). The production lens extends this to $1{:}1$ magnification through greater mechanical focus travel. The patent's dual-group floating focus architecture matches the production description of "internal focusing."
+4. **Focus mechanism.** Example 2 employs two moving positive groups (SF and MF) achieving a maximum magnification of $0.7836\times$ at closest focus (¶0065). The production lens specifies $1{:}1$ magnification, but its corresponding prescription and focus travel are not established by this embodiment. The patent's dual-group floating focus architecture matches the production description of "internal focusing."
 5. **Patent timing.** Filed April 2015, with the production lens announced in mid-2015 and shipping from late 2015 — consistent with the utility model patent being filed during the pre-production engineering phase.
 6. **Special glass count.** Example 2 uses three distinct high-refractive-index coordinate families (904313, 911353, and 847238) and one low-dispersion crown family. Catalog-equivalent names support dispersion modeling but do not establish production melts.
 
@@ -140,7 +140,13 @@ The MF group provides the primary focus extension ($12.41$ mm travel), while the
 
 The total optical track increases by $2.71$ mm during focusing, corresponding to a physical extension of the lens barrel. Reviewers have noted approximately $\sim 10$ mm of barrel extension at closest focus.
 
-The patent states a maximum magnification of $0.7836\times$ for Example 2 (¶0065). The production lens extends the focus travel beyond the patent values to achieve true $1{:}1$ magnification at a minimum focus distance of $0.122$ m ($4.7''$) with a working distance of approximately $5$ mm ($0.2''$) at $1{:}1$. This additional travel is a mechanical extension of the same optical principle, with expected degradation in off-axis performance at the extreme close end — consistent with reviewer observations that the lens is optimized for close-focus rather than infinity performance.
+The patent states a maximum magnification of $0.7836\times$ for Example 2 (¶0065).
+The production 1:1 specification does not establish additional source-backed focus travel. The
+MTF Lens state selector enables infinity and the published 0.7836× geometry at the retained
+16 mm patent scale. Its finite object distance is **calculated** as 9.320173 mm ahead of the
+first surface (120.816073 mm object-to-image), independently checked with small-height exact
+rays and the source magnification. Neither the production 1:1 state nor intermediate finite
+slider positions are certified. Estimated apertures and qualified glass remain model limitations.
 
 ### Conditional Expressions
 

@@ -49,6 +49,31 @@ const LENS_DATA = {
   elementCount: 12,
   groupCount: 9,
   apertureBlades: 14,
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity · patent scale",
+      focusT: 0,
+      zoomT: 0,
+      source: "CN 205427291 U, Example 2, paragraphs 0056–0065, infinity column; retained 16 mm design scale.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "closest",
+      label: "Closest patent state",
+      focusT: 1,
+      zoomT: 0,
+      source: "CN 205427291 U, Example 2, paragraphs 0064–0065, 0.7836× column; D13=1.1015 mm and D22=51.3022 mm at the retained patent scale.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 9.320172964740479,
+        distanceReference: "first-surface",
+        distanceProvenance: "calculated",
+        derivation: "Fixed authored geometry and image plane: ABCD s=-B/A; independent decreasing-height exact rays verify source distance and magnification -0.783589405 against published 0.7836×. See audit sidecar; not the production 1:1 configuration.",
+        magnification: 0.7836,
+      },
+    },
+  ],
 
   /* ── Elements ── */
   elements: [
@@ -241,7 +266,7 @@ const LENS_DATA = {
    *  D(22): BFD — increases during macro focus.
    *  SF travel = 2.711 mm toward object.
    *  MF travel = 12.406 mm toward object.
-   *  Patent max magnification: 0.7836×; production extends to 1:1.
+   *  Patent max magnification: 0.7836×; production 1:1 is not an authored state.
    */
   var: {
     "13": [10.7961, 1.1015],
@@ -269,7 +294,7 @@ const LENS_DATA = {
   closeFocusM: 0.122,
   focusDescription:
     "Dual-group floating focus: SF (L1–L6) moves 2.71 mm and MF (stop + L7–L9) moves 12.41 mm toward object. " +
-    "Patent max 0.78×; production extends to 1:1 at MFD 0.122 m (~5 mm working distance).",
+    "Patent max 0.78×; production specifies 1:1 at MFD 0.122 m, without a source-backed 1:1 prescription here.",
 
   /* ── Aperture configuration ── */
   nominalFno: 4.1,

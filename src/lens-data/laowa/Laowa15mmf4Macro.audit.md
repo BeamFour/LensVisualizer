@@ -2,6 +2,33 @@
 
 Patent: CN 205427291 U, Example 2
 
+## 2026-09-26 — Source-state review
+
+Source-state review outcome: verified. Both authored candidates enabled: infinity and the
+published 0.7836× configuration. Finite distance is calculated; no production 1:1 extrapolation.
+
+Visually checked local `patents/CN205427291U.pdf`, PDF pages 7–9, Example 2 ¶0053–0065.
+All 22 surface rows reproduce the tabulated radii, thicknesses and d-line indices. Source stop
+row 14 is model label STO. Paragraph 0065 gives D13=10.7961/1.1015 mm and
+D22=38.8967/51.3022 mm at infinity/0.7836×, matching focusT=0/1 exactly. The retained
+16 mm design scale differs from the marketed 15 mm; no scaling is introduced. The source
+publishes no finite object distance or additional authored intermediate column.
+
+At close focus, the fixed first-vertex-to-image matrix gives A=-0.7835894637731164 and
+B=7.3031893357136894 mm, hence s=-B/A=9.320172964740479 mm before the first surface
+or 120.81607296474048 mm object-to-image. Independent exact roots at
+0.005/0.0025/0.00125 mm first-vertex heights give
+9.32012647062633/9.320161341032824/9.3201700590821 mm. Their axial residuals at the
+paraxial source are below 1.96e-8 mm; exact magnification approaches -0.783589405440,
+within 0.0014% of the published reproduction ratio. The initial 0.01 mm sample residual
+(1.5634e-7 mm) exceeds the unchanged bound; three smaller samples satisfy it without
+relaxing tolerances. The source is in front of the first surface and physical clear apertures.
+
+Infinity retains its small stored-precision residual (matrix A=1.6201869872389807e-6).
+Estimated rims, physical iris and qualified glass proxies remain unchanged. Ultra-wide fields
+still use the shared projection/chief-ray path and ordinary MTF domain restrictions. This review
+does not equate the patent's 0.7836× geometry with the production 1:1 specification.
+
 ## 2026-05-20 — Glass relabel audit
 
 ### Phase 1 — Glass corrections
