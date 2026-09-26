@@ -2,6 +2,33 @@
 
 Patent: JP 2004-302170 A, Example 4 / Table 4
 
+## 2026-09-26 — Source-state review
+
+Source-state review outcome: verified. Both authored candidates reviewed; scaled-design infinity and
+life-size are enabled. The finite distance is calculated; intermediate movement is not certified.
+
+Visually inspected local `patents/JP2004302170A.pdf` page 13, Example 4 Table 4. The source publishes
+19 surface rows, f=100 mm, FNo=4.10 and infinity/life-size D13=2.52643/51.78443 mm. All retained
+radii and published gaps reproduce the existing 1.187 model scale within their storage rounding
+(maximum radius difference 0.0000435 mm; gap difference 0.00000464 mm). Model D13 remains
+2.99887/61.46812 mm at focusT=0/1. No scaling or movement is changed.
+
+Table 4 leaves D19 blank. The existing 83.678 mm rear image gap is calculated, not a source value;
+the infinity matrix implies an additional 0.000173 mm paraxial image displacement at the stored
+precision. That small residual is retained. The model's nominal f/4 and inferred physical iris are
+unchanged; neither the source's f/4.10 nor the production label establishes a published stop diameter.
+
+At life-size, the fixed first-vertex-to-image matrix gives A=-1.0001696667580529 and
+B=144.36236590258054 mm. Thus s=-B/A=144.33787656299987 mm before the first surface,
+or 387.9987165629999 mm object-to-image. Independent exact-ray roots at 0.01/0.005/0.0025 mm
+first-vertex heights give 144.337875649329/144.337876336158/144.337876504189 mm. Axial residuals
+stay below 6.33e-11 mm; signed exact magnification approaches -1.000169666821, within 0.0170%
+of the source's life-size condition. Numeric precision supports repeatability, not source accuracy.
+
+The declaration identifies the retained scaled model, not a measured production construction or
+object distance. Estimated rims, qualified glass counterparts and the calculated image gap remain
+limitations. No geometry, image-plane, physical aperture or glass changes.
+
 ## 2026-05-20 - Catalog-mismatch queue audit
 
 ### Patent evidence

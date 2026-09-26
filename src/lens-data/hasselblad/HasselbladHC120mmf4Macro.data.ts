@@ -49,6 +49,31 @@ const LENS_DATA = {
   patentYear: 2004,
   elementCount: 9,
   groupCount: 9,
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity · scaled design",
+      focusT: 0,
+      zoomT: 0,
+      source: "JP 2004-302170 A, Example 4 Table 4, infinity column; retained model scale 1.187 and calculated rear image gap (see audit).",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "life-size",
+      label: "Life-size · scaled design",
+      focusT: 1,
+      zoomT: 0,
+      source: "JP 2004-302170 A, Example 4 Table 4, life-size column; D13=51.78443 mm at source scale, 61.46812 mm in the retained 1.187-scale model.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 144.33787656299987,
+        distanceReference: "first-surface",
+        distanceProvenance: "calculated",
+        derivation: "Fixed-plane ABCD s=-B/A at retained model scale with the existing calculated 83.678 mm rear image gap; independent exact rays verify distance and magnification -1.000169667 against source life-size. See audit sidecar; not a measured production distance.",
+        magnification: 1,
+      },
+    },
+  ],
 
   /* ── Elements ── */
   elements: [
@@ -189,7 +214,7 @@ const LENS_DATA = {
     { label: "16", R: -161.5489, d: 2.99887, nd: 1.8044, elemId: 8, sd: 18.0 },
     { label: "17", R: 48.9845, d: 7.19727, nd: 1.0, elemId: 0, sd: 17.8 },
     { label: "18", R: 54.3385, d: 7.1842, nd: 1.48749, elemId: 9, sd: 19.0 },
-    { label: "19", R: 192.8971, d: 83.678, nd: 1.0, elemId: 0, sd: 19.0 },
+    { label: "19", R: 192.8971, d: 83.678, nd: 1.0, elemId: 0, sd: 19.0 }, // retained calculated infinity image gap; Table 4 omits D19
   ],
 
   /* ── Aspherical coefficients ── */

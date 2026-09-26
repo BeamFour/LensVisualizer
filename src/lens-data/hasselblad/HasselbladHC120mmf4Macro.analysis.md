@@ -147,6 +147,14 @@ At infinity focus, the front group sits close to the rear group ($D_{13} = 3.0\t
 
 The patent does not employ a floating-element mechanism. The inventor states (¶0004–¶0006) that while floating focus can further reduce aberration variation across the focus range, it adds mechanical complexity. The present design instead achieves uniform performance from infinity to 1:1 through the quasi-symmetric power distribution around the aperture stop — the patent's core innovation.
 
+The MTF Lens state selector enables the published infinity and life-size configurations at the retained
+1.187 model scale. The life-size object distance is **calculated** as 144.337877 mm ahead of the first
+surface (387.998717 mm object-to-image). Table 4 omits the final image gap; the existing calculated
+83.678 mm gap is retained. Independent small-height exact rays confirm the finite distance and source
+life-size magnification. Intermediate finite-focus positions remain unverified. These states describe
+the scaled prescription, with inferred apertures and qualified glass proxies, rather than measured
+production performance.
+
 ## Aspherical Surfaces
 
 The design is entirely spherical. None of the four patent examples include aspherical surfaces, and no aspherical coefficient table is presented. All aberration correction is achieved through the choice of glass types, surface curvatures, element spacing, and the quasi-symmetric power distribution around the aperture stop. For a moderate-aperture (f/4) macro lens designed in 2003, this is not unusual — aspherical surfaces were not yet standard in medium-format optics of this era, and the relatively slow aperture keeps higher-order spherical aberration manageable with spherical surfaces alone.
