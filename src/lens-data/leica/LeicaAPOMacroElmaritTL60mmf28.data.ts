@@ -33,6 +33,9 @@ import type { LensDataInput } from "../../types/optics.js";
  * ╚══════════════════════════════════════════════════════════════════════╝
  */
 
+// Source-state certification is blocked: rendered ¶0112 places 6.7595e-6 under A10,
+// whereas retained surface 4A uses an inferred A4 reconstruction. Preserve the existing
+// model pending authoritative clarification; see the source-state review in the audit.
 const LENS_DATA = {
   /* ── Identity ── */
   key: "leica-apo-macro-elmarit-tl-60-f28",

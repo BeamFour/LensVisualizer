@@ -200,7 +200,16 @@ R = −103.089 mm. A₄ = +5.4249 × 10⁻⁶, A₆ = +6.0883 × 10⁻⁹, A₈ 
 
 R = −38.467 mm. A₄ = +6.7595 × 10⁻⁶; all higher-order coefficients are zero. Departure at h = 10 mm: approximately +68 µm. This is the simplest aspherical profile in the design — only A₄ is used, producing a smooth fourth-order correction that is straightforward to manufacture by CNC polishing. The surface similarly reduces effective concavity at the margin.
 
-Note: The OCR of the patent document for surface 4's aspheric table (¶0112) contains formatting artifacts; the coefficient values were reconstructed from the tabular layout and cross-checked for physical consistency with the surface shape described in ¶0054. The same surface in Examples 10 and 11 (¶0119, ¶0126) shows the same pattern — only A₄ non-zero — confirming the reconstruction.
+**Source limitation:** the rendered patent's ¶0112 table places 6.7595 × 10⁻⁶ under A₁₀,
+while this model retains it as A₄. This is an inferred reconstruction, not merely an OCR correction.
+Physical plausibility does not establish the intended coefficient order, and another embodiment
+cannot certify this one. The existing surface remains unchanged pending authoritative clarification.
+
+Both authored focus positions have been reviewed, but neither is offered as a verified MTF source
+state because this unresolved coefficient affects their geometry. The source does publish infinity
+and a life-size object distance of 67.497 mm before the first surface (¶0115); its agreement with
+first-order calculations cannot verify the higher-order asphere. Existing simulations remain
+qualified estimates of the retained reconstruction.
 
 ### Surface 12 (L23 front, nearly flat, concave to object)
 

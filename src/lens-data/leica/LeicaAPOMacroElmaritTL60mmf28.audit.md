@@ -2,6 +2,38 @@
 
 Patent: JP 2016-090725 A, Example 9
 
+## 2026-09-26 — Source-state review
+
+Source-state review outcome: blocked. Both authored candidates (focusT=0/1, zoomT=0) reviewed;
+neither is certified because an aspheric coefficient order is inferred rather than source-verified.
+Existing viewer behavior and prescription values are preserved; no sourceStates declaration added.
+
+Visually inspected local `patents/JP2016090725A.pdf`, PDF pages 25–26, Example 9 ¶0110–0115.
+Surface spacings, radii, indices and the physical rear plate reproduce the table. Source rows
+21–22 remain 1.500 mm glass (nd=1.52249, vd=59.48), after 13.369 mm air and before
+0.800 mm air, expanded once. Source d7=23.096/3.050 and d13=2.561/22.608 mm match
+STO/12A. Paragraph 0115 publishes infinity and beta=-1.0 with object distance 67.497 mm.
+The surface table places the object row immediately before surface 1; its variable translation
+is the first-surface distance, independently supported by the optical calculation below.
+
+Blocker: the rendered continuation of ¶0112 on page 26 places 6.7595e-6 in the **A10**
+column, while retained surface 4A assigns it to **A4**. The nonzero entry is under the
+A8/A10/A12 header; this is visible in the PDF, not solely a text-extraction issue. The existing
+analysis asserted reconstruction from physical consistency and comparison with other examples.
+Those arguments do not establish the intended coefficient order for Example 9. At 10 mm height,
+that coefficient contributes 67595 mm as A10 versus 0.067595 mm as A4, explaining why a
+physical reconstruction might have been chosen, but not proving it is source-backed.
+Authoritative clarification of the coefficient order is required before either state is certified.
+Do not replace the retained coefficient with the physically implausible printed interpretation
+or use another embodiment as a substitute under this metadata-only review.
+
+For comparison only, the retained model's close matrix gives A=-1.0005609848958108,
+B=67.52894884655241 mm and s=-B/A=67.49108736593827 mm before surface 1.
+Independent exact roots at 0.01/0.005/0.0025 mm heights converge to 67.491087374 mm
+(axial residual below 2.40e-11 mm). This agrees with the published distance within 0.0088%,
+but near-axis agreement cannot validate the disputed higher-order coefficient. Good numerical
+convergence is not source verification. No optical data, apertures, glass or image plane changed.
+
 ## 2026-05-19 — Glass relabel audit
 
 ### Phase 1 — Glass corrections
