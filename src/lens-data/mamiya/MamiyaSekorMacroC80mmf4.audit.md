@@ -3,6 +3,38 @@
 Patent: JP S55-24081 B2, Example 1 / Figure 1
 Catalog version: local working tree, 2026-08-07
 
+## 2026-09-26 — Source-state review
+
+Source-state review outcome: verified. Both authored bare-lens candidates enabled: infinity and
+published beta=-1/2 internal geometry with calculated image and object distances. No accessory
+or intermediate finite configuration is added.
+
+Visually checked local `patents/JPB 1980024081-000000.pdf`, PDF pages 2–3 and Figure 5
+on page 7. Page 3 publishes the ten powered surface radii, thicknesses and d-line glass
+coordinates, including r2=658.4 mm; all match the retained prescription. Infinity spacings are
+d3=1.93, d5=9.38 and d7=0.50 mm. Page 2 right column explicitly gives
+beta=-1/2, d3=3.53, d5=7.78 and d7=2.1 mm; these are printed values, not readings
+estimated from the motion graph. Model d5 is split at the inferred stop: 2.345+7.035 mm
+at infinity and 2.345+5.435 mm at close. Both focusT=0/1 stations reproduce the source.
+
+The source does not publish the final image gap. Existing calculated gaps
+62.698154758552214/102.88463637235272 mm are retained. At close, the fixed matrix gives
+A=-0.49999999999999944 and B=105.40665212893427 mm; s=-B/A is
+210.81330425786877 mm before the first surface, or 358.0979406302215 mm object-to-image.
+Independent exact roots at 0.01/0.005/0.0025 mm first-vertex heights are
+210.813298594826/210.813302834439/210.813303914282 mm, with axial residuals below
+1.343e-10 mm. Exact magnification tends to -0.499999999996. The original rear-gap
+solution used the published beta=-1/2 condition: the ratio match is a consistency check,
+not independent evidence of a published object distance. Exact tracing verifies that the
+retained model has the stated physical source without changing its image plane.
+
+The beta=-1 internal-gap row is not authored in this bare-lens file. Its prose/gap disagreement
+(t1=t2=2.3 versus d3 implying 2.2 mm) is irrelevant to the verified half-life-size row and is
+not resolved by inventing movement. Production barrel working distance is also not substituted
+for the first-vertex distance. Stop position, physical diameter and rims remain inferred;
+coordinate-compatible glass models do not establish production melts. No geometry or optical
+reference values changed; ordinary MTF field, spectral and convergence restrictions remain.
+
 ## 2026-08-07 - Patent-figure semi-diameter audit
 
 ### Figure evidence

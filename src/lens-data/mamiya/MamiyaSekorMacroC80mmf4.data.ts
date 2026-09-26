@@ -60,6 +60,32 @@ const LENS_DATA = {
   elementCount: 6,
   groupCount: 4,
 
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "JP S55-24081 B2, Example 1, PDF page 3 numerical prescription at beta=0; retained calculated rear image gap (see audit).",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "half-life-size",
+      label: "Half life-size",
+      focusT: 1,
+      zoomT: 0,
+      source: "JP S55-24081 B2, Example 1, PDF page 2 right column, beta=-1/2: d3=3.53 mm, d5=7.78 mm, d7=2.10 mm. Retained rear image gap is calculated, not published.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 210.81330425786877,
+        distanceReference: "first-surface",
+        distanceProvenance: "calculated",
+        derivation: "Fixed authored geometry with retained 102.88463637235272 mm calculated rear image gap; ABCD s=-B/A and independent small-height exact rays agree. Published beta=-1/2 constrained the original image-gap solution, so magnification agreement is not an independent source-distance measurement. See audit.",
+        magnification: -0.5,
+      },
+    },
+  ],
+
   elements: [
     {
       id: 1,

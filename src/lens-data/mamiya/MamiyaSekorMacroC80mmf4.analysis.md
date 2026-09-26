@@ -94,6 +94,14 @@ The focus status is **PUBLISHED**. The bare-lens data model uses the patent's $\
 
 From infinity to 1:2, the front cemented group moves 1.60mm objectward relative to fixed L3, and L4 moves 1.60mm objectward within the fixed L3-to-D2 backbone. The stop is modeled as fixed with L3. The last spacing represents the computed extension needed to place the finite conjugate on the image plane; it is not a patent-published internal gap.
 
+The MTF Lens state selector enables these two authored configurations. The finite source is
+**calculated** as 210.813304 mm ahead of the first surface (358.097941 mm object-to-image).
+Small-height exact rays independently confirm the fixed-geometry calculation. The published
+1:2 magnification was already used to solve the retained rear image gap, so agreement with
+that ratio is not a separate measurement of object distance. Intermediate finite slider positions
+and the unmodeled accessory state remain unavailable; inferred apertures and glass proxies
+continue to qualify the simulation.
+
 The manufacturer's close-up table gives 18.3cm from the front of the lens barrel to the subject at 1:2. That working-distance reference is not interchangeable with the model's 0.358098m object-to-image-plane distance. The patent's $\beta=-1$ state is not included in this bare-lens file because the manufacturer assigns 1:1 operation to the optional Auto Macro Spacer.
 
 ## Conditional Expressions
