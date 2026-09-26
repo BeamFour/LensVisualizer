@@ -2,6 +2,36 @@
 
 Patent: US 3,552,833, sole numerical prescription / claim table
 
+## 2026-09-26 — Source-state review
+
+Source-state review outcome: partial. Both authored candidates reviewed: infinity (focusT=0)
+is enabled; close (focusT=1) is blocked because its 30.7 mm image-gap extension is inferred
+from production 1:2 magnification, not published source geometry. ZoomT=0 for both.
+
+Visually inspected local `patents/US3552833.pdf`, PDF page 2, the sole numerical claim table.
+Retained eleven radii, glass thicknesses and ne/ve coordinates reproduce that table at the
+existing 61.45317155 scale to stored rounding. The claim uses r3=0.2895 and d3=0.0331;
+the upper description table differs (r3=0.2815 and d3=0.0339). The retained claim-table
+choice is explicit; do not silently combine the two. The inferred stop divides source
+a2=0.2234 into model gaps 5.6058+8.1228 mm. No physical stop diameter is tabulated.
+
+Source s'=0.6838 identifies the normalized infinity rear focal distance. The retained
+42.0224 mm image gap was calculated from the scaled paraxial prescription; it differs by
+about 0.000721 mm from directly scaling the rounded source s'. The native-e model matrix
+has A=2.2895634846920032e-6 and C=-0.016286622382016717 mm^-1. Preserve that
+stored geometry and residual rather than tuning the image plane.
+
+The close endpoint's 72.7224 mm gap equals 42.0224+0.5×61.4 mm by construction.
+Its derived source is 157.78286501828796 mm ahead of the first surface, with
+magnification -0.4999970175644285; independent small-height exact rays agree. This is
+consistent optical behavior of the inferred extension, not source verification. The patent
+claims use over infinity-to-1:1 but does not give that endpoint's 1:2 spacing or object distance.
+Neither the derivation nor the production minimum distance certifies invented movement.
+
+Only the infinity state is declared. Existing close movement, geometry, apertures, glass and
+image plane remain unchanged. Production-scale normalization, inferred stop/rims and unresolved
+native-e spectral data remain qualifications; ordinary MTF eligibility checks still apply.
+
 ## 2026-06-24 — Folder audit
 
 - Rechecked local `patents/US3552833.pdf` OCR for the sole prescription and claim table.

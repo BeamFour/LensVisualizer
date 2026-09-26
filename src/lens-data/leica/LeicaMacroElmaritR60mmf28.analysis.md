@@ -17,6 +17,13 @@ The production identification is strong but not treated as a literal production 
 
 The patent prescription is normalized to a nominal focal length of 1. Independent paraxial tracing of the corrected prescription gives EFL = 0.999134763 in patent units and BFD = 0.683811950, matching the patent's stated $s' = 0.6838$ within the precision expected from four-decimal prescription data. The data file scales the prescription by 61.45317155, so the computed EFL equals Leica's published 61.4 mm focal length rather than the rounded 60 mm marketing designation.
 
+The MTF Lens state selector enables only the scaled claim-table infinity configuration. The
+existing close-focus slider endpoint adds 30.7 mm of inferred unit extension; it is not a
+published finite prescription. Its optical consistency with approximately 1:2 does not establish
+source evidence for that travel, so it remains unavailable for finite-state MTF. The patent's
+broad infinity-to-1:1 use claim and production adapter specifications do not supply missing
+focus-station spacings. The existing viewer movement is retained without certification.
+
 A transcription correction is necessary. The upper table on the patent page prints $d_3 = 0.0339$, but the claim table prints $d_3 = 0.0331$. The claim-table value is the consistent value: with $d_3 = 0.0331$, the axial sum is exactly $\Sigma(d+a)=0.5871$ and the paraxial BFD is 0.683812; with $d_3 = 0.0339$, the axial sum becomes 0.5879 and the BFD shifts to 0.679949. The corrected analysis and data file therefore use $d_3 = 0.0331$.
 
 The patent labels its glass columns as $n_e$ and $\nu_e$. That label is credible. Several patent glass pairs match modern HOYA/OHARA catalog e-line values closely or exactly. The TypeScript schema still stores the patent indices in fields named `nd` and `vd`, because that is the viewer's required field naming, but the underlying prescription values are treated as the patent's e-line reference data.

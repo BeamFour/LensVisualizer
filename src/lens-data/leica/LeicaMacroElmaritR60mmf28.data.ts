@@ -19,6 +19,7 @@ import type { LensDataInput } from "../../types/optics.js";
  * inferred from f/2.8 marginal rays plus the patent's ±18° design half-field, then trimmed where
  * necessary to satisfy spherical-rim, edge-thickness, and thin-air-gap constraints. Native close focus
  * is modeled as unit focusing by increasing the final BFD by 0.5 × 61.4 mm for the production 1:2 limit.
+ * That extension is inferred, not a published spacing; only infinity is a certified source state.
  */
 
 const LENS_DATA = {
@@ -49,6 +50,17 @@ const LENS_DATA = {
   groupCount: 5,
   focusDescription:
     "Unit focus. The production lens focuses from infinity to 0.27 m / 1:2 natively, and reaches 1:1 with the Macro-Adapter-R.",
+
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity · scaled claim prescription",
+      focusT: 0,
+      zoomT: 0,
+      source: "US 3,552,833, sole claim table, normalized infinity prescription; retained scale 61.45317155 and calculated image gap. Claim-table d3=0.0331 and r3=0.2895 retained; stop/aperture inferred (see audit).",
+      conjugate: { kind: "infinity" },
+    },
+  ],
 
   elements: [
     {
