@@ -235,3 +235,8 @@ Within Sigma's macro line, the OS HSM lens is a more complex design than the old
 - HOYA optical glass catalog data, including M-BACD5N for the E16 589613 code.
 - HOYA GROUP Optics Division, official optical-glass data download page: https://www.hoya-opticalworld.com/english/datadownload/index.html
 - Schott and Hoya catalog-class equivalents used only where the nd/νd pair is a closer match than a current Ohara S-catalog glass; uncertain vendor provenance is stated as class-level identification rather than as a procurement claim.
+
+
+## Source-state availability
+
+Infinity, half life-size and life-size are selectable at the three exact authored focus positions. The finite states use **calculated image-plane object distances** of 396.1977 and 312.3867 mm, independently checked against small-height exact rays and the published magnification ratios. All five published variable gaps, including the 0.0001 mm back-focus difference, are retained. The nominal f/2.8 control, inferred apertures and glass spectral proxies remain qualifications; the source lists infinity FNO 2.91 and finite working FNO 4.38 / 5.83. Intermediate finite positions are not enabled for MTF.

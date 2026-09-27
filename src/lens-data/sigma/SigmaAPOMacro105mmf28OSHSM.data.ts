@@ -293,6 +293,47 @@ const LENS_DATA = {
 
   asph: {},
 
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "JP 2012-058682 A, Example 4, paragraphs 0090–0091 and prescription/variable-spacing tables (PDF pp. 17–18), INF column including Bf = 53.3000 mm. Physical iris and clear apertures remain inferred.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "half-life-size",
+      label: "Half life-size",
+      focusT: 0.7874856150695161,
+      zoomT: 0,
+      source: "JP 2012-058682 A, Example 4 (PDF pp. 17–18), published 1:2 column: d7/d12/d15/d20 = 10.4099/12.6086/12.4801/15.7240 mm and Bf = 53.3001 mm. Distance is calculated with this source geometry fixed.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 396.1977133670662,
+        distanceReference: "image-plane",
+        distanceProvenance: "calculated",
+        derivation: "Fixed-plane first-order s = -B/A gives 228.0975133670662 mm before surface 1. The 168.1002 mm physical image track gives 396.1977133670662 mm from the image plane. Independent exact-ray roots agree; magnification -0.4999906217582646 differs in magnitude from published 1:2 by 0.001876%.",
+        magnification: 0.5,
+      },
+    },
+    {
+      id: "life-size",
+      label: "Life-size",
+      focusT: 1,
+      zoomT: 0,
+      source: "JP 2012-058682 A, Example 4 (PDF pp. 17–18), published 1:1 column: d7/d12/d15/d20 = 18.6188/4.3997/3.3614/24.8427 mm and Bf = 53.3001 mm. The production 0.312 m minimum focus is not an input to the calculated distance.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 312.3866847880091,
+        distanceReference: "image-plane",
+        distanceProvenance: "calculated",
+        derivation: "Fixed-plane first-order s = -B/A gives 144.28648478800906 mm before surface 1. The 168.1002 mm physical image track gives 312.3866847880091 mm from the image plane. Independent exact-ray roots agree; magnification -0.9999916077612647 differs in magnitude from published 1:1 by 0.0008393%.",
+        magnification: 1,
+      },
+    },
+  ],
+
   focusPositions: [0, 0.7874856150695161, 1],
   var: {
     "7": [2.9138, 10.4099, 18.6188],
