@@ -2,6 +2,42 @@
 
 Patent: US 7,218,457 B2, Example 3 / Table 3
 
+## 2026-09-26 — Source-state review
+
+Source-state review outcome: partial. All three authored candidates reviewed; infinity
+enabled, both finite rows blocked by inconsistent published conjugate evidence.
+
+Visually checked local `patents/US7218457.pdf`, PDF page 24, Example 3 / Table 3.
+All 27 source rows, glass values and variable intervals match the retained file. Source
+surface 15 is a neutral air reference plane, not a cover plate. The table publishes
+D0=240.7350/151.4870 mm, beta=-0.50000/-1.00000 and the retained five variable
+gaps. Bf=53.12017/52.48194/52.48113 mm explicitly varies despite the text's fixed
+G1/G4 narrative. No spacing is flattened to resolve that contradiction.
+
+At the fixed authored image plane, independent ABCD and exact small-height rays agree,
+but disagree with published conjugate evidence:
+
+| Candidate | Published first-vertex distance | Derived distance | Published beta | Derived beta | Evidence result |
+|---|---:|---:|---:|---:|---|
+| focusT=0.7763697575697683 | 240.7350 mm | 243.769745840361 mm | -0.5 | -0.492211780626 | Distance differs 1.2606%; magnitude differs 1.5576% |
+| focusT=1 | 151.4870 mm | 152.417453045142 mm | -1.0 | -0.987863175901 | Distance differs 0.6142%; magnitude differs 1.2137% |
+
+Both fail the standard 1% published-magnification check; the middle state also fails
+published distance. Exact first-vertex roots at 0.01/0.005/0.0025 mm heights are
+243.769745187654/243.769745670089/243.769745783603 and
+152.417452628164/152.417452938680/152.417453018526 mm, with axial residuals
+below 2.704e-11 mm. Numerical stability does not resolve the source contradiction.
+The discrepancy is not certified as rounding, and calculated distances are not used
+to bypass the conflicting published magnifications. Enabling either finite state needs
+source evidence that resolves the conjugate/reference-plane inconsistency; no tolerance,
+prescription or optical reference value was changed.
+
+Infinity remains a verified source configuration. Its tiny matrix residual produces a
+formal finite root near 53.9 km, which is not another source-backed state. The patent's
+focus-dependent iris and finite NA=0.14/0.11 are not modeled as a physical iris schedule;
+the existing inferred stop remains. Lateral VR stays centered. The movement slider
+continues to reproduce all authored rows, while finite MTF remains unavailable.
+
 ## 2026-05-20 - Catalog-mismatch queue audit
 
 ### Patent evidence

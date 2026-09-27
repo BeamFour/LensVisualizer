@@ -3,6 +3,8 @@
  * Fourteen elements, eleven air-separated components, three cemented doublets.
  * All three focus stations retained. Source varying BF conflicts slightly with
  * its fixed G1/G4 narrative; camera anchoring exposes that source difference.
+ * Finite source states remain uncertified: exact-ray magnification checks
+ * disagree with the printed ratios beyond the standard evidence allowance.
  * No cover glass or filter rows occur in this selected prescription.
  */
 import type { LensDataInput } from "../../types/optics.js";
@@ -34,6 +36,17 @@ const LENS_DATA = {
   groupCount: 11,
   focusDescription:
     "Source infinity, 0.5× and 1× focus stations: G2 moves imageward and G3 objectward. Published BF changes by 0.63904 mm despite the fixed-group description, producing that common camera-relative offset. The source varying iris diameter and lateral VR motion are not simulated.",
+
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "US 7,218,457 B2, Example 3, Table 3, PDF page 24: infinity column, D8=3, D13=21.449, D14=14.484, D20=2 and D27=53.12017 mm. Centered VR model with inferred iris diameter. Finite rows remain uncertified; see source-state audit.",
+      conjugate: { kind: "infinity" },
+    },
+  ],
 
   elements: [
     // ── G1: Front collecting group (fixed) ──────────────────

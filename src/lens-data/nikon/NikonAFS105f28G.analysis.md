@@ -61,6 +61,14 @@ Relative to G1, G2 moves 18.289 mm imageward and G3 moves 14.484 mm objectward. 
 
 Independent paraxial evaluation gives EFL 103.99888, 96.02557 and 75.85044 mm across the three stations. Evaluating the source object distances gives magnifications approximately −0.49221 and −0.98786, rather than exactly −0.5 and −1. Solving the stored prescription for exact conjugacy instead gives total distances 0.40213019 and 0.31077608 m. These differences remain source/model limitations; the published distances and gaps are retained.
 
+The MTF Lens state selector currently certifies **infinity only**. Both finite source
+rows were reviewed: their fixed-geometry magnifications differ from the printed ratios
+by 1.5576% and 1.2137%, beyond the standard evidence allowance. The middle state's
+object distance also differs by 1.2606%. Small-height exact rays independently confirm
+the calculation, so increasing sampling does not resolve the source inconsistency.
+The published movement remains available in the diagram, but finite MTF is withheld
+pending source clarification; no calculated replacement distance is silently substituted.
+
 The patent explicitly varies stop diameter with focus and gives finite-conjugate NA values 0.14 and 0.11, but no physical iris schedule. The viewer does not model that focus-dependent iris diameter. Its finite-focus aperture and related analyses therefore cannot be read as reproductions of the patent NA. Lateral stabilization motion is also not simulated; the displayed VR doublet is centered. There is no zoom control.
 
 ## Semi-diameter notes
