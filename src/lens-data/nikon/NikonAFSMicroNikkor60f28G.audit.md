@@ -39,3 +39,40 @@ Patent: US 7,898,744 B2
 - Source f/2.88 retained; corrected first shortcut2.8→2.88 and removed unreachable22/32. Twelve elements/nine air components/four movement groups retained.
 - Live production baseline and local infinity/near/approximately half-size/f16 verified. Near reads18cm with correct opposing group movements; middle23cm and EFL45.34mm; D17 correctly labeled; f16 physical stop4.13mm.
 - Four source regressions pass; `audit:surface` passes and `audit:image-circle` finds no undersized lens. Full batch21–30 gates and commit remain pending.
+
+## 2026-09-26 — Source-state review
+
+Source-state review outcome: verified. All three authored candidates enabled: infinity,
+half life-size and life-size. Both finite object distances are calculated, not published.
+
+Rechecked local `patents/US7898744.pdf`: Example 2 / Table 2, PDF pages 22–23, and
+asphere equation on page 21. All 22 surface rows, glass coordinates and eight polynomial
+coefficients match. The retained conversion from source kappa to standard K=kappa-1
+is correct. Table 2 gives unscaled f=58.0, FNO=2.88 and Bf=37.45 mm. No rear plate occurs.
+
+| Source beta | Focus coordinate | D6 | D11 | D12 (STO) | D17 | Rear gap |
+|---|---:|---:|---:|---:|---:|---:|
+| 0 | 0 | 2.62569 | 12.29619 | 23.27238 | 4.49094 | 37.45 |
+| -0.5 | 0.7722923478757724 | 6.63506 | 8.28682 | 12.33659 | 15.42810 | 37.45 |
+| -1 | 1 | 13.83349 | 1.08839 | 1.87196 | 25.89136 | 37.45 |
+
+Dimensions are mm. The middle source track is 0.00137 mm longer than the endpoints;
+that printed discrepancy remains, without adjusting gaps to enforce the fixed-group
+narrative. The two finite source distances follow s=-B/A at this authored image plane:
+
+| Source beta | First-surface distance (mm) | Image-plane distance (mm) | Calculated beta |
+|---|---:|---:|---:|
+| -0.5 | 105.281751777160 | 229.449421777160 | -0.499954523705 |
+| -1 | 53.035732663021 | 177.202032663021 | -0.999978527611 |
+
+Independent exact-ray source solves at 0.01/0.005/0.0025 mm heights give
+105.281750955981 / 105.281751568801 / 105.281751728135 mm for the middle state and
+53.035733104475 / 53.035732774157 / 53.035732690805 mm for life-size. All axial residuals
+are below 8.330e-11 mm. Published magnification relative errors are 0.00910% and 0.00215%,
+within the unchanged 1% source allowance. The infinity row does not establish a finite
+real object at its rounded image plane and remains explicitly infinity.
+
+The calculations independently check the published magnifications; they do not establish
+production focus distances or iris geometry. Existing figure-derived/conservative rims,
+physical-stop inference and supplier-neutral spectral proxies remain qualified. No
+prescription, aperture, slider coordinate or optical reference value changed in this review.

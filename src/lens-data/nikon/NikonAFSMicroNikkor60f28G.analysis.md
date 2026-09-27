@@ -18,6 +18,17 @@
 
 The viewer reproduces the unscaled 58.0 mm, f/2.88 patent example. The catalog associates this 12-element, nine-component, internally focusing macro design with the 60 mm product. The patent alone does not establish production identity, a uniform rescaling, glass suppliers, coating locations or manufacturing processes. Marketing focal length and aperture remain separate from the numerical prescription.
 
+## Selectable MTF source states
+
+Infinity, half life-size and life-size reproduce the three Table 2 configurations.
+The finite distances, approximately 229.449 mm and 177.202 mm from the image plane,
+are **calculated** from the fixed source geometry and published 37.45 mm rear gap.
+Independent small-height exact rays confirm both physical sources and the published
+magnifications. The selector preserves the exact nonuniform middle coordinate and
+labels calculated-distance provenance. No intermediate finite position is certified.
+Existing inferred rims, iris size, glass counterparts and numerical MTF limits remain
+qualifications; these are simulations of the patent example, not production measurements.
+
 ## Optical Architecture
 
 Four optical groups have positive–negative–positive–negative power. G1 (L1–L3), G4 (L10–L12) and the stop remain fixed. G2 (L4–L6) moves imageward and G3 (L7–L9) moves objectward during focusing. Nine air-separated components comprise six singlets and three cemented doublets; this count differs from the four motion groups.

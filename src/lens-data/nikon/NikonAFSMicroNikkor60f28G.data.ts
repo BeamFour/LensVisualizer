@@ -37,6 +37,47 @@ const LENS_DATA = {
   elementCount: 12,
   groupCount: 9,
 
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "US 7,898,744 B2, Example 2, Table 2, PDF pages 22-23: beta=0 column, unscaled 58 mm prescription, Bf=37.45 mm.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "half-life-size",
+      label: "Half life-size",
+      focusT: 0.7722923478757724,
+      zoomT: 0,
+      source: "US 7,898,744 B2, Example 2, Table 2, PDF pages 22-23: beta=-0.5 column; D6=6.63506, D11=8.28682, D12=12.33659, D17=15.42810 mm; source Bf=37.45 mm. Object distance is calculated, not published.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 229.4494217771603,
+        distanceReference: "image-plane",
+        distanceProvenance: "calculated",
+        derivation: "Fixed source geometry and Bf: first-order s=-B/A gives 105.281751777160 mm before the first surface, plus 124.16767 mm to the image plane. Independent exact rays at 0.01/0.005/0.0025 mm converge to that source; calculated magnification -0.499954523705 agrees with published -0.5. Source middle-track discrepancy of 0.00137 mm is preserved; see audit.",
+        magnification: -0.5,
+      },
+    },
+    {
+      id: "life-size",
+      label: "Life-size",
+      focusT: 1,
+      zoomT: 0,
+      source: "US 7,898,744 B2, Example 2, Table 2, PDF pages 22-23: beta=-1 column; D6=13.83349, D11=1.08839, D12=1.87196, D17=25.89136 mm; source Bf=37.45 mm. Object distance is calculated, not published.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 177.20203266302147,
+        distanceReference: "image-plane",
+        distanceProvenance: "calculated",
+        derivation: "Fixed source geometry and Bf: first-order s=-B/A gives 53.035732663021 mm before the first surface, plus 124.1663 mm to the image plane. Independent exact rays at 0.01/0.005/0.0025 mm converge to that source; calculated magnification -0.999978527611 agrees with published -1. See audit for residuals and qualifications.",
+        magnification: -1,
+      },
+    },
+  ],
+
   /* ── Elements ── */
   elements: [
     {
