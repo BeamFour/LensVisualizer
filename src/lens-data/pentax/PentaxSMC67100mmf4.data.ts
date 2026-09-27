@@ -160,6 +160,20 @@ const LENS_DATA = {
 
   asph: {},
 
+  // Only the standalone main-lens infinity setting is verified. The second
+  // d11 value is source-backed, but its stored rear gap is an infinity BFD,
+  // not the unpublished finite-focus extension of the main lens.
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Main lens at infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "US 6,002,533, Embodiment 1 / Table 1 (PDF p. 10), main-lens surfaces 7–16, d11 = 13.30 mm. The text identifies the lower spacing as the main lens's infinity setting and locates the stop 4 mm before surface 12. The retained 77.425842 mm rear gap is calculated paraxial infinity back focus, not a printed dimension; the close-up attachment is omitted.",
+      conjugate: { kind: "infinity" },
+    },
+  ],
+
   var: {
     "11": [9.3, 11.58],
     "16": [77.425842, 76.823842],

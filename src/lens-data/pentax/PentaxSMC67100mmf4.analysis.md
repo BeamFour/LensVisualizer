@@ -177,3 +177,8 @@ The design is conservative by late-1990s 35 mm macro standards: it has no aspher
 - B&H product description for Pentax SMCP-67 100mm f/4 Macro: direct focusing to 1:2 and 1:1 with the included Life Size Adapter.
 - OHARA Corporation glass datasheets for S-LAM52, S-LAL12, S-TIM2, S-LAM2, and S-TIH13.
 - HOYA Glass Cross Reference Index and HOYA optical-glass data download for cross-vendor equivalent checks.
+
+
+## Source-state availability
+
+Only **Main lens at infinity** is selectable. Its surface spacings are source-backed; the existing image plane is a calculated paraxial infinity plane. The second authored d11 value is published for the main lens used with the close-up attachment, but its stored rear gap is also an infinity back focus. It therefore does not establish a finite-focus state of the standalone model. The patent's −0.455 to −1.087 magnifications apply to the combined system, whose attachment elements are omitted here. Neither those values nor the production 0.443 m specification can certify the standalone close state; finite-focus MTF remains unavailable.
