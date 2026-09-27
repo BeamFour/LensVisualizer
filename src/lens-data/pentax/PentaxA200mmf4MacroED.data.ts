@@ -196,6 +196,45 @@ const LENS_DATA = {
   ],
 
   asph: {},
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "US 4,666,260, Example 1 (PDF p. 11), infinity d13 = 7.53 mm and fB = 76.9 mm. The retained inferred stop splits the published d13 into gap 13 plus 1 mm; clear apertures remain inferred.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "half-life-size",
+      label: "Half life-size",
+      focusT: 0.765303983447137,
+      zoomT: 0,
+      source: "US 4,666,260, Example 1 (PDF p. 11), d13 = 35.05 mm and fB = 76.9 mm; drawing definitions on PDF p. 10 identify Figure 2(b) as half magnification. Object distance is calculated with the authored geometry and image plane held fixed.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 718.6686753185977,
+        distanceReference: "image-plane",
+        distanceProvenance: "calculated",
+        derivation: "Fixed Example 1 intermediate geometry gives first-order s = -B/A = 502.1086753185977 mm before surface 1; the physical track is 216.56 mm, giving 718.6686753185977 mm from the image plane. Independent exact-ray roots agree and magnification -0.5000512940312648 differs from published half-size by 0.01026%.",
+        magnification: 0.5,
+      },
+    },
+    {
+      id: "life-size",
+      label: "Life-size",
+      focusT: 1,
+      zoomT: 0,
+      source: "US 4,666,260, Example 1 (PDF p. 11), WD = 302.2 mm, d13 = 62.58 mm and fB = 76.9 mm. The same page defines WD from the object to the first lens surface; drawing definitions on PDF p. 10 identify Figure 2(c) as unity magnification.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 302.2,
+        distanceReference: "first-surface",
+        distanceProvenance: "published",
+        magnification: 1,
+      },
+    },
+  ],
   focusPositions: [0, 0.765303983447137, 1],
   var: {
     "13": [6.53, 34.05, 61.58],

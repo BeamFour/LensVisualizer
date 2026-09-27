@@ -187,3 +187,8 @@ The patent is explicitly a response to the limitations of ordinary telephoto len
 - Lens-DB, “smc Pentax-A\* 200mm F/4 ED Macro,” production focal length, aperture, lens construction, mount, and field angle.
 - OHARA Corporation product tables and datasheets for S-FSL5, S-FPL51, S-LAL14, S-LAL59, S-TIH6, S-LAL8, and S-BSL7.
 - OHARA legacy / optical-glass index data for BPM4 and S-TIM3 where the patent values predate direct modern S-prefix equivalents.
+
+
+## Source-state availability
+
+Infinity, half life-size and life-size are selectable at the three authored focus coordinates. The intermediate station uses a **calculated 718.6687 mm image-plane object distance**; its small-height exact-ray solution and magnification independently agree with the source's half-size configuration. The close station instead uses the **published 302.2 mm distance from the first surface**, whose reference is explicitly defined by the patent. These distance conventions are shown separately in MTF and diagram focus readouts. The inferred stop split and lens clear apertures remain modeling assumptions; intermediate finite slider positions are not enabled for MTF.
