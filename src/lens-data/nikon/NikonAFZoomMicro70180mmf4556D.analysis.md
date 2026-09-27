@@ -1,5 +1,19 @@
 # Nikon AF Zoom-Micro Nikkor ED 70–180mm f/4.5–5.6D — Optical Analysis
 
+## Selectable MTF source states
+
+The Lens state selector groups six configurations by the three patent zoom stations:
+infinity and closest focus at 82.4, 135 and 194 mm. All close rows publish **391.9 mm
+object-to-image distance**, with respective magnifications 0.31850×, 0.52182× and
+0.74988×. Independent small-height exact rays verify those retained configurations.
+Intermediate finite combinations remain unavailable. The source's inconsistent TL
+summary is preserved as a qualification; surface/gap rows govern the model.
+
+The existing aperture model uses the viewer's 4.5/5.3/5.6 nominal schedule and inferred
+physical iris. It does not reproduce the patent's 4.14/5.10/5.73 aperture schedule.
+State selection preserves aperture and therefore certifies the geometry and conjugate,
+not equivalence to the source's wide-open aberration plots.
+
 ## Patent Reference and Design Identification
 
 **Patent:** US 5,717,527  

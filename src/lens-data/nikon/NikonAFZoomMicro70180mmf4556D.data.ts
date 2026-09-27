@@ -73,6 +73,75 @@ const LENS_DATA = {
   yScFill: 0.72,
   maxAspectRatio: 2.1,
 
+  sourceStates: [
+    {
+      id: "wide-infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "US 5,717,527, seventh embodiment, Table 8, PDF page 69: 82.4 mm infinity-photographing column. Source spacing rows define this infinity zoom station. The retained iris model is inferred and does not reproduce the printed patent f-number schedule (see audit).",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "wide-closest",
+      label: "Closest published",
+      focusT: 1,
+      zoomT: 0,
+      source: "US 5,717,527, seventh embodiment, Table 8, PDF page 69: 82.4 mm closest-photographing column. R=391.90000 mm is object-to-image distance (printed column 23); source spacing rows govern despite the telephoto TL discrepancy. The retained iris model is inferred and does not reproduce the printed patent f-number schedule (see audit).",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 391.9,
+        distanceReference: "image-plane",
+        distanceProvenance: "published",
+        magnification: -0.3185,
+      },
+    },
+    {
+      id: "middle-infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0.5,
+      source: "US 5,717,527, seventh embodiment, Table 8, PDF page 69: 135 mm infinity-photographing column. Source spacing rows define this infinity zoom station. The retained iris model is inferred and does not reproduce the printed patent f-number schedule (see audit).",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "middle-closest",
+      label: "Closest published",
+      focusT: 1,
+      zoomT: 0.5,
+      source: "US 5,717,527, seventh embodiment, Table 8, PDF page 69: 135 mm closest-photographing column. R=391.90000 mm is object-to-image distance (printed column 23); source spacing rows govern despite the telephoto TL discrepancy. The retained iris model is inferred and does not reproduce the printed patent f-number schedule (see audit).",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 391.9,
+        distanceReference: "image-plane",
+        distanceProvenance: "published",
+        magnification: -0.52182,
+      },
+    },
+    {
+      id: "tele-infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 1,
+      source: "US 5,717,527, seventh embodiment, Table 8, PDF page 69: 194 mm infinity-photographing column. Source spacing rows define this infinity zoom station. The retained iris model is inferred and does not reproduce the printed patent f-number schedule (see audit).",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "tele-closest",
+      label: "Closest published",
+      focusT: 1,
+      zoomT: 1,
+      source: "US 5,717,527, seventh embodiment, Table 8, PDF page 69: 194 mm closest-photographing column. R=391.90000 mm is object-to-image distance (printed column 23); source spacing rows govern despite the telephoto TL discrepancy. The retained iris model is inferred and does not reproduce the printed patent f-number schedule (see audit).",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 391.9,
+        distanceReference: "image-plane",
+        distanceProvenance: "published",
+        magnification: -0.74988,
+      },
+    },
+  ],
+
   elements: [
     {
       id: 1,
