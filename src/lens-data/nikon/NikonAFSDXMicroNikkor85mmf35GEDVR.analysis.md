@@ -1,5 +1,14 @@
 # NIKON AF-S DX MICRO-NIKKOR 85mm f/3.5G ED VR
 
+## Selectable MTF source states
+
+Infinity, half life-size and life-size are selectable at the exact three authored
+positions. The published finite source distances are **206.1164 mm** and
+**133.0597 mm before the first surface**. Independent small-height exact rays verify
+the retained geometry with small residuals documented in the audit. These states use
+the centered VR group; neither shifted VR performance nor intermediate finite-focus
+positions are certified. Inferred apertures and catalog dispersion still qualify MTF.
+
 ## Patent Reference and Design Identification
 
 **Patent:** US 2009/0190220 A1\

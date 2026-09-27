@@ -73,6 +73,45 @@ const LENS_DATA = {
   groupCount: 10,
 
   /* ── Elements ── */
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "US 2009/0190220 A1, Example 1, Table 1, PDF page 55, Infinite distance column. D0=0 is the table's infinity placeholder; Bf=41.97225 mm is retained.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "half-life-size",
+      label: "Half life-size",
+      focusT: 0.7833746615766991,
+      zoomT: 0,
+      source: "US 2009/0190220 A1, Example 1, Table 1, PDF page 55: beta=-0.50000, D0=206.1164 mm, d7=10.52739, d12=9.35781, d13=9.51488, d18=11.66338 mm. D0 is the object-side first-vertex distance, independently checked against fixed-geometry exact rays (see audit). Centered VR group only.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 206.1164,
+        distanceReference: "first-surface",
+        distanceProvenance: "published",
+        magnification: -0.5,
+      },
+    },
+    {
+      id: "life-size",
+      label: "Life-size",
+      focusT: 1,
+      zoomT: 0,
+      source: "US 2009/0190220 A1, Example 1, Table 1, PDF page 55: beta=-1.00000, D0=133.0597 mm, d7=17.78094, d12=2.10426, d13=3.18873, d18=17.98953 mm. D0 is the object-side first-vertex distance, independently checked against fixed-geometry exact rays (see audit). Centered VR group only.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 133.0597,
+        distanceReference: "first-surface",
+        distanceProvenance: "published",
+        magnification: -1,
+      },
+    },
+  ],
+
   elements: [
     {
       id: 1,
