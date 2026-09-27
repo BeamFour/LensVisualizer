@@ -72,6 +72,17 @@ const LENS_DATA = {
     },
   },
 
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "US 7,656,591 B2, Example 1, Table 1, PDF page 12: infinity d4=1.00, d9=6.50 mm, unscaled f=41.2 mm design. Retained Bf=56.50 mm is calculated, not tabulated. Patent f/2.89 differs from the nominal f/2.8 control; inferred apertures remain qualified. Close-focus magnification is unresolved; active tilt/shift remains unsupported for MTF (see audit).",
+      conjugate: { kind: "infinity" },
+    },
+  ],
+
   /* ── Elements ── */
   elements: [
     {

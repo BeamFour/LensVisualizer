@@ -7,6 +7,17 @@
 
 ---
 
+## Selectable MTF source states
+
+Only infinity is verified for the Lens state selector. The retained close-focus image
+plane yields magnification -0.505112 against the source's -0.50, a 1.022% difference,
+just outside the unchanged 1% source-audit allowance. Its first-surface object distance
+agrees closely with the source, but source rounding and the calculated rear image gap
+still require reconciliation before finite MTF can be certified. No source spacing or
+tolerance was changed. Selecting infinity preserves tilt/shift settings; active movement
+continues to block MTF. Inferred apertures and the patent f/2.89 versus nominal f/2.8
+control remain qualifications.
+
 ## 1. Overview and Identification
 
 US 7,656,591 B2 discloses a retrofocus lens system designed for single-lens reflex and digital cameras. The patent describes a three-group architecture — negative, negative, positive — with a floating focus mechanism that moves all three groups toward the object while differentially varying the inter-group separations. The design achieves a maximum reproduction ratio of 1:2 at a close focus distance of approximately 0.253 m (Nikon specification), and an image circle large enough to support the tilt-shift movements of a perspective control lens.
@@ -184,7 +195,7 @@ This equal-and-opposite gap change means that G1 and G3 move as a **mechanically
 
 The mechanical simplicity of this arrangement is significant. Only two independent motions are needed: one helicoid for the G1+G3 unit and one for G2, rather than three independent cams. The patent notes that this simplification reduces the aberrations caused by decentering and mechanical tolerance errors.
 
-The BFD increases from 56.50 mm at infinity to approximately 78.14 mm at close focus (β = −0.50). This 21.64 mm increase reflects the combined effect of the lens barrel extension and the finite conjugate shift. With d₀ = 72.3 mm (object to first surface at maximum magnification), the total optical path from object to image is approximately 225 mm — the difference between this and the Nikon-specified MFD of 0.253 m is attributable to the physical overhang of the lens barrel beyond the first optical surface and measurement convention differences (the MFD is measured from the camera body's focal plane mark, not from the front element).
+The retained calculated BFD increases from 56.50 mm at infinity to 78.14 mm at close focus; Table 1 labels Bf but does not publish these values. With source d₀ = 72.3 mm before the first surface, the modeled object-to-image distance is about 225.43 mm. Both that distance and the production 253 mm specification use the image-plane reference, so barrel overhang does not explain the difference. The unscaled patent example is a separate optical model from the marketed lens. Its calculated magnification is about −0.5051, leaving the close-focus source-state qualification unresolved as described above.
 
 The floating focus achieves close-focus correction through differential movement of the groups. As the object comes closer:
 
@@ -224,7 +235,7 @@ The front element semi-diameter (20.0 mm, diameter ≈ 40 mm) is consistent with
 |---|---|---|
 | EFL (paraxial) | 41.196 mm | Matches patent f = 41.2 ✓ |
 | BFD (infinity) | 56.50 mm | Retrofocus ratio 1.37 ✓ |
-| BFD (close focus, β = −0.50) | 78.14 mm | Computed from finite conjugate ✓ |
+| BFD (close focus) | 78.14 mm | Calculated; source magnification check remains unresolved |
 | Retrofocus ratio | 1.371 | Confirms retrofocus character ✓ |
 | Group focal lengths | G1: −1023 mm, G2: −162 mm, G3: +50 mm | G1 neg, G2 neg, G3 pos ✓ |
 | f1/f2 ratio | 6.30 | Matches patent value 6.30 ✓ |
