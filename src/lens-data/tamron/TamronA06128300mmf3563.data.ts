@@ -421,6 +421,24 @@ const LENS_DATA = {
   },
 
   /* ── Zoom and constrained focus reconstruction ── */
+  sourceStates: [
+    {
+      id: "wide-infinity", label: "Wide infinity", focusT: 0, zoomT: 0,
+      source: "US 2003/0156333 A1, sole numerical embodiment, Table 1 and paragraphs 0037–0046 (PDF p. 9): d5/d14/d22 = 1.698/20.845/6.685 mm. Final image gap 40.05546244570265 mm is the existing calculated infinity BFD, not a published distance. Fixed physical iris is inferred; finite travel is reconstructed and not certified.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "middle-infinity", label: "Middle infinity", focusT: 0, zoomT: 0.5,
+      source: "US 2003/0156333 A1, sole numerical embodiment, Table 1 and paragraphs 0037–0046 (PDF p. 9): d5/d14/d22 = 32.301/10.646/2.574 mm. Final image gap 71.2038768029127 mm is the existing calculated infinity BFD, not a published distance. Fixed physical iris is inferred; finite travel is reconstructed and not certified.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "tele-infinity", label: "Tele infinity", focusT: 0, zoomT: 1,
+      source: "US 2003/0156333 A1, sole numerical embodiment, Table 1 and paragraphs 0037–0046 (PDF p. 9): d5/d14/d22 = 57.566/0.991/1.117 mm. Final image gap 89.64889775397039 mm is the existing calculated infinity BFD, not a published distance. Fixed physical iris is inferred; finite travel is reconstructed and not certified.",
+      conjugate: { kind: "infinity" },
+    },
+  ],
+
   zoomPositions: [29, 92.21, 289.53],
   zoomLabels: ["Wide", "Tele"],
   var: {
