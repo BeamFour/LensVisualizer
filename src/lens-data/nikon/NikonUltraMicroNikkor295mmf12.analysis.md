@@ -14,9 +14,23 @@ GB 1,050,055 describes a high-aperture photographic objective for precision copy
 
 The production identification rests on convergent evidence rather than on an explicit product name in the patent. The applicant is Nippon Kogaku K.K.; Nikon's historical material identifies the Ultra Micro-NIKKOR 29.5mm F1.2 as a photolithography lens; Example 1 has F/1.2, β = −0.04, nine elements in six groups, and a CaF₂ element at L8. The β = −0.04 value is a 1/25× reduction ratio, matching the published production specification for the 29.5mm F1.2 Ultra-Micro-NIKKOR.
 
-The data file scales the patent prescription by 0.295, using the production 29.5 mm designation divided by the patent's nominal f = 100. Independent paraxial tracing of Example 1 gives an e-line Gaussian EFL of 98.678 patent units, so the scaled design EFL is 29.110 mm. The difference between 29.110 mm and the 29.5 mm product designation is a normalization and rounding issue, not a prescription error.
+The data file scales the patent prescription by 0.295, using the production 29.5 mm designation divided by the patent's nominal f = 100. Independent paraxial tracing of Example 1 gives an e-line Gaussian EFL of 98.678 patent units, so the scaled design EFL is 29.110 mm. The nominal normalization and the computed focal length differ. That alone does not resolve the finite-conjugate magnification discrepancy recorded in the source-state review.
 
 The patent prose describes the resolving-power test as being for the “e-line of the spectrum (5270 Å).” The prescription table, however, labels the refractive indices as n_e, and the tabulated glass values match ordinary e-line catalog values near 546 nm rather than d-line values. The analysis and data file therefore preserve the patent's n_e values while explicitly treating the 5270 Å text as a wavelength-description ambiguity in the patent prose.
+
+## Selectable MTF source states
+
+No source state is currently certified. The published operating conjugate is finite,
+with beta=-0.04 and an object distance of 2006.767 normalized units before the first
+surface. At the retained rounded 0.295-scale geometry and 3.578 mm calculated rear
+image gap, the independent audit gives beta=-0.0394184, a 1.454% difference from the
+published target. This exceeds the unchanged 1% source-audit allowance and remains an
+explicit blocker. A calculated object distance cannot bypass that discrepancy.
+
+The slider's infinity-equivalent 2.431 mm rear gap is a calculated diagnostic geometry,
+not another source-published operating configuration. It is not added to the selector
+as infinity. Existing diagram controls remain available; the source review does not
+invent focus travel or change the prescription to improve agreement.
 
 ## Optical Architecture
 
@@ -108,7 +122,7 @@ The lens is a fixed-conjugate reduction objective. There is no internal focusing
 
 The patent object distance is d0 = 2006.767 in normalized units, or 591.996 mm after scaling. For that object distance, paraxial tracing gives a finite-conjugate image distance of 12.129 normalized units from r15, or 3.578 mm after scaling, and a transverse magnification of −0.039405. The resulting object-to-image distance is 809.901 mm after scaling.
 
-The data file also records the infinity-equivalent Gaussian BFD, 8.240 normalized units or 2.431 mm scaled. This is exposed as the first value of the BF variable because LensVisualizer's ordinary sequential lens model is built around an infinity-focus base state. The second BF value, 3.578 mm, is the patent β = −0.04 conjugate image distance. This should not be read as an internal focus mechanism.
+The data file also records the infinity-equivalent Gaussian BFD, 8.240 normalized units or 2.431 mm scaled. This is exposed as the first value of the BF variable because LensVisualizer's ordinary sequential lens model is built around an infinity-focus base state. The second BF value, 3.578 mm, is a calculated image distance using the source finite object distance; it is not a printed patent spacing and does not exactly reproduce the target β = −0.04. This should not be read as an internal focus mechanism.
 
 ## Conditional Expressions
 

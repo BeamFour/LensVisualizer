@@ -31,3 +31,38 @@ Patent: GB 1,050,055, Example 1
   `ne` / `νe` values.
 - The runtime and generated reports now reject d-line catalog substitution structurally rather than relying on annotation wording.
 - No source values or prescription geometry changed.
+
+## 2026-09-26 — Source-state review
+
+Source-state review outcome: blocked. Both authored candidates reviewed: the finite
+operating conjugate has an unresolved magnification discrepancy; the infinity-equivalent
+endpoint is a calculated diagnostic, not a published source configuration. No state is added.
+
+Visually checked local `patents/GB_1050055_A.pdf`, PDF page 2 definitions and page 3
+Example 1. The source explicitly defines d0 from object to first lens, gives d0=2006.767,
+beta=-0.04 and f=100, and describes 1/25 reduction. Refractive indices are n_e; Abbe
+numbers are labeled v_d. The retained model uses e-line reference indices, a 0.295 scale,
+rounded dimensions and an inferred stop splitting d4. The source does not give a stop
+location, clear apertures or the rear image gap. No source infinity operating row exists.
+
+The finite source distance scales to 591.996265 mm before the first surface. At the
+retained 3.578 mm rear gap, the fixed-geometry audit derives 591.739986461192 mm,
+809.644986461192 mm from the image plane, and beta=-0.039418399552. The distance
+relative error is 0.04329%; the magnification relative error is 1.45400%, beyond the
+unchanged 1% published-evidence allowance. The source's nominal 1/25 description does
+not supply independent evidence for relaxing the check.
+
+Independent exact-ray roots at heights 0.01/0.005/0.0025 mm are
+591.739980123532 / 591.739984807889 / 591.739986461192 mm. Axial residuals are below
+4.272e-12 mm, demonstrating internal agreement for the authored model but not agreement
+with the published magnification. The existing analysis's unrounded-prescription values
+are distinguished from this check of the actual rounded data. Source precision, the
+normalization and the calculated rear plane need reconciliation before certification;
+no geometry or numerical bound is adjusted to make the check pass.
+
+At focusT=0, the 2.431 mm rear gap is the separately calculated infinity-equivalent BFD.
+Its formal approximately 1.82 km finite root from rounded data is not a published source
+either. Neither a manufactured infinity state nor a replacement calculated finite distance
+is enabled. Native e-line support, high-NA diffraction restrictions, inferred apertures
+and spectral availability remain independent limitations. No prescription, reference
+wavelength, slider coordinate or calculation eligibility changed during this review.
