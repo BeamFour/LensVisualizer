@@ -150,6 +150,13 @@ Taking infinity as the zero position, independent kinematic calculation gives G2
 
 The runtime focus control stores INF, MID, and CLD as exact keyframes. The published MID pair does not lie on a single endpoint interpolation: its normalized position is 0.104954 along `d1a` but 0.496392 along `d2`. At `focusT = 0.9106579317813288`, both gaps now reach the source row together. Recalculation at the published MID spacings gives lateral magnification −0.500004; the published CLD endpoint gives −0.999991.
 
+The MTF Lens state selector enables these three exact configurations. Published finite
+object distances are **80.4055 mm** and **38.9287 mm ahead of the first surface**.
+Small-height exact rays verify the retained geometry, including the physical rear filter,
+with small residual differences recorded in the audit. The TL-derived rear image gap and
+the source's Bf/ACBf reference inconsistency remain explicit qualifications. Intermediate
+finite positions remain unavailable.
+
 Product and patent close-distance numbers are intentionally separated. Nikon specifies a production minimum focus distance of **0.163 m from the focal plane**.[^nikon-spec] The patent's CLD geometry gives an object-to-image-plane distance of **0.15264661 m** after the source reference planes are normalized. The 10.35 mm difference is one of the reasons the selected embodiment is treated as a strong production correlate rather than silently equated with every production dimension.
 
 Nikon's retrospective says the production first group moves “just over 3 cm.”[^nikon-story] Example 1's independently derived G1 travel is 26.8627 mm. This is another direct production-to-patent difference and is not corrected in the model.

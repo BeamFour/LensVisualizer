@@ -2,6 +2,42 @@
 
 Patent: US 2011/0170195 A1, Example 1
 
+## 2026-09-26 — Source-state review
+
+Source-state review outcome: verified. All three authored candidates enabled: infinity,
+half life-size and life-size, with the existing rear-plane qualification retained.
+
+Visually checked local `patents/US20110170195A1.pdf`, PDF pages 26–27, Example 1,
+Table 1 and equation (a). All radii, thicknesses and d-line glass rows agree with the
+retained data. Source surface 9 is the moving stop. Equation (a) uses k directly in
+sqrt(1-k*y²/r²), so printed k=0.3210 correctly maps to engine K=-0.679. The four
+printed A4/A6/A8/A10 coefficients match; no optical data changed.
+
+The INF/MID/CLD d1a/d2 rows are 2.96840/1.21000, 3.21650/13.37100 and
+5.33230/25.70880 mm; d1b stays 4.00000 mm. The nonuniform intermediate keyframe
+focusT=0.9106579317813288 reproduces both gaps. Corrected the stale data header
+that described endpoint-only interpolation. Paragraph 0104 defines d0 from object
+to G1; its finite 80.4055/38.9287 mm values are first-vertex distances, not image-plane
+MFDs. These published values are retained exactly.
+
+Surface 18's 0.100 mm gap, 2.000 mm P1 (nd=1.51680, vd=64.12) and retained
+37.65276 mm trailing gap remain unchanged. The last value is calculated from printed
+infinity TL=86.85516 mm, not published at that precision. Printed Bf=37.65 and
+ACBf=36.97047 use internally inconsistent references when compared with the physical
+plate/track; the earlier rear-plate audit explains the retained TL-based convention.
+Selection does not resolve that ambiguity or independently certify a production stack.
+
+With this fixed image plane, ABCD derives 80.408626336170/38.931676860313 mm,
+0.0031263/0.0029769 mm above the printed d0 values (0.00389%/0.00765%). Independent
+exact roots at 0.01/0.005/0.0025 mm heights are
+80.408621342185/80.408625086504/80.408626017903 and
+38.931673901891/38.931676120424/38.931676674491 mm. Axial residuals remain below
+7.600e-10 mm; magnifications tend to -0.500004272562/-0.999990827542.
+These pass standard evidence checks without adjusting the source. Residual differences
+are retained, not attributed conclusively to rounding. The formal finite root near
+2.27 km at nominal infinity is not another source state. Inferred clear apertures,
+catalog dispersion and all normal MTF support/convergence restrictions remain.
+
 ## 2026-08-18 — Initial integration audit
 
 - Reviewed the untracked local patent PDF `patents/US20110170195A1.pdf`; the infinity section of Figure 1 on PDF page 2 is the controlling optical section.

@@ -12,11 +12,10 @@ import type { LensDataInput } from "../../types/optics.js";
  * ║ No scale is applied; the patent is already a 40.00 mm design.              ║
  * ║                                                                            ║
  * ║ FOCUS-STATE STATUS: PUBLISHED                                               ║
- * ║   Example 1 publishes INF, β=-0.5 MID, and β=-1.0 CLD states. The runtime ║
- * ║   `var` uses the source-exact INF/CLD endpoints: d1a 2.96840→5.33230 mm   ║
- * ║   and d2 1.21000→25.70880 mm; d1b remains 4.00000 mm. Because the      ║
- * ║   runtime uses one linear focus parameter for both gaps, the published MID ║
- * ║   pair is verified separately rather than represented exactly by `var`.     ║
+ * ║   Example 1 publishes INF, β=-0.5 MID, and β=-1.0 CLD states.             ║
+ * ║   All three rows are exact focus keyframes, including the nonuniform MID. ║
+ * ║   d1a = 2.96840/3.21650/5.33230 and d2 = 1.21000/13.37100/25.70880 mm; ║
+ * ║   d1b remains 4.00000 mm. Intermediate finite states are not certified.  ║
  * ║   The patent CLD object-to-physical-focal-plane distance is 0.15264661 m;  ║
  * ║   closeFocusM retains Nikon's 0.163 m marketed MFD as product metadata.    ║
  * ║                                                                            ║
@@ -82,6 +81,45 @@ const LENS_DATA = {
   patentYear: 2011,
   elementCount: 9,
   groupCount: 8,
+
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "US 2011/0170195 A1, Example 1, Table 1 INF column, PDF page 27. Retained physical rear filter and TL-derived image gap preserve the documented Bf/ACBf convention qualification (see audit).",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "half-life-size",
+      label: "Half life-size",
+      focusT: 0.9106579317813288,
+      zoomT: 0,
+      source: "US 2011/0170195 A1, Example 1, Table 1 MID column, PDF page 27: beta=-0.5, d0=80.4055, d1a=3.21650, d1b=4.00000, d2=13.37100 mm. Paragraph 0104 defines d0 from object to G1; retained TL-derived rear gap is qualified in the audit.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 80.4055,
+        distanceReference: "first-surface",
+        distanceProvenance: "published",
+        magnification: -0.5,
+      },
+    },
+    {
+      id: "life-size",
+      label: "Life-size",
+      focusT: 1,
+      zoomT: 0,
+      source: "US 2011/0170195 A1, Example 1, Table 1 CLD column, PDF page 27: beta=-1.0, d0=38.9287, d1a=5.33230, d1b=4.00000, d2=25.70880 mm. Paragraph 0104 defines d0 from object to G1; retained TL-derived rear gap is qualified in the audit.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 38.9287,
+        distanceReference: "first-surface",
+        distanceProvenance: "published",
+        magnification: -1,
+      },
+    },
+  ],
 
   elements: [
     {
