@@ -302,6 +302,23 @@ const LENS_DATA = {
    * Values are [infinity, 1:2, 1:1].
    * STO is the axial D(14) spacing after the fixed stop, not stop diameter.
    */
+  sourceStates: [
+    {
+      id: "infinity", label: "Infinity", focusT: 0, zoomT: 0,
+      source: "US 9,063,253 B2, Embodiment 7 (PDF pp. 84–85), INF column. Source dummy air plane 27 is omitted and its 2.1644 mm air distance is added to the 44.5749 mm final gap. The published infinity prescription retains its documented residual defocus.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "life-size", label: "Life-size", focusT: 1, zoomT: 0,
+      source: "US 9,063,253 B2, Embodiment 7 (PDF pp. 84–85), X1.0 column: D7/D13/D14/D16/D19/D27 = 19.2488/2.0012/1.7000/1.4506/19.3690/2.1892 mm. Distance is calculated from this exact geometry and the source image plane; production MFD is not an input.",
+      conjugate: {
+        kind: "finite", objectDistanceMm: 299.3063767908229,
+        distanceReference: "image-plane", distanceProvenance: "calculated", magnification: 1,
+        derivation: "Fixed-plane s = -B/A gives 140.54677679082292 mm before surface 1; adding the physical 158.7596 mm image track gives 299.3063767908229 mm. Independent exact-ray roots agree within 6.6e-8 mm with axial residual below 4.607e-12 mm. Derived magnitude 1.0003303107769639 differs from published 1.0 by 0.0330311%, within the unchanged 1% allowance.",
+      },
+    },
+  ],
+
   focusPositions: [0, 0.7976078358456278, 1],
   var: {
     "7": [1.2, 9.8415, 19.2488],

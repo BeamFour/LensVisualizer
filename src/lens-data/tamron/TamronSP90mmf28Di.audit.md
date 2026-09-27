@@ -9,3 +9,15 @@ The terminal surface 27 is a zero-power air reference. D26=44.5749 plus D27=2.16
 **Cause/action:** source contradiction; retain the repeated prescription and published image path. Runtime offset **+0.293897 → +0.293897 mm**. Section E row deleted; continued census inclusion is expected. No user-visible numerical change or changelog entry.
 
 Validation: focused runtime/paraxial check; full corpus gates at the ten-lens checkpoint.
+
+
+## 2026-09-27 — Source-state review
+
+Source-state review outcome: partial.
+
+- Visually rechecked exact local `patents/US9063253.pdf`, Embodiment 7, PDF pages 84–85 (printed columns 20–21). The twenty-five refractive rows, fourteen nd/vd pairs, stop row 14 and all six variable rows match the source. Surface 27 is a dummy air plane, not glass: its D27 is added to the fixed 44.5749 mm air gap. No hidden plate is invented.
+- Infinity at focus 0 / zoom 0 is enabled, retaining the previously documented +0.293897 mm paraxial image-plane discrepancy and the source EFL discrepancy. Published geometry is not tuned to remove those residuals.
+- Life-size at focus 1 / zoom 0 is enabled with a calculated image-plane distance of 299.3063767908229 mm: first-surface distance 140.54677679082292 mm plus physical track 158.7596 mm. Independent exact-ray roots at heights 0.01 / 0.005 / 0.0025 mm are 140.54677672537574 / 140.54677677446114 / 140.54677679082295 mm, with axial residual at most 4.607e-12 mm. Derived magnitude 1.0003303107769639 agrees with source X1.0 within 0.0330311%.
+- The intermediate candidate at focus 0.7976078358456278 remains blocked. Its fixed-plane root is 217.34989000124418 mm before surface 1 (376.1246900012442 mm from the image plane), and independent exact rays agree. However, derived magnitude 0.49428081630433757 differs from the printed X0.5 by **1.1438367%**, beyond the unchanged 1% source rounding allowance. Numerical consistency alone does not validate this state; no distance or spacing is adjusted to force a pass.
+- Source FNO 2.89 / 4.06 / 5.75 and the existing inferred physical iris remain qualified. The production 0.3 m MFD is not a derivation input. All three inventory candidates have an explicit disposition.
+- Validation: shared source-state/conjugate/script checks, full quality gate, center/off-axis MTF at both enabled states and live selection/closed-diagram persistence. No per-lens test was added.

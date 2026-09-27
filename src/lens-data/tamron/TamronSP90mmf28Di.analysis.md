@@ -298,3 +298,8 @@ all stored prescription values but not its own printed infinity focal length.
 EFL = 92.556419 mm versus 92.74; paraxial BFL = 47.033197 mm versus
 the published air path 44.5749 + 2.1644 = 46.7393 mm (offset +0.293897 mm).
 Surface 27 is a dummy air plane, not a plate. Preserve the source image plane.
+
+
+## Verified source configurations
+
+The MTF Lens state selector offers infinity and life-size. Life-size uses a **calculated 299.3064 mm object distance from the image plane**, independently checked with exact rays against the patent's X1.0 magnification. Half life-size remains unavailable: its fixed-plane magnitude differs from the published X0.5 by 1.1438%, beyond the existing 1% allowance. The source image plane and its known infinity residual defocus are preserved; best-focus offsets remain MTF diagnostics. Selecting a verified state retains its element positions and source rays after MTF closes.
