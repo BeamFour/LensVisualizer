@@ -288,3 +288,7 @@ The inferred geometry also remains within the current project limits in all six 
 7. HIKARI GLASS CO., LTD., **Optical Glass Catalog Download**, official HIKARI catalog data used for coordinate cross-checking. `https://www.hikari-g.co.jp/optical_glass/catalog/`
 8. CDGM, **Colourless Optical Glass**, official product/catalog material used in the Stage-1 coordinate audit. `https://www.cdgmgd.com/go.htm?k=Colourless_Optical_Glass&url=goods`
 9. SUMITA OPTICAL GLASS, Inc., **Optical Glass Data Book / Downloads**, official catalog data used for coordinate cross-checking. `https://www.sumita-opt.co.jp/en/download/`
+
+## Source-state review limitation
+
+No configuration is certified for the MTF Lens state selector. The exact patent prints a positive surface-30 radius and two Abbe values that the existing reconstruction replaces; a numerical focal-length fit does not independently verify those corrections. Close-focus spacing also comes from production 0.33 m MFD rather than a published finite table. These source blockers are recorded without changing the existing prescription or weakening validation.
