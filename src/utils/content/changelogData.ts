@@ -19,6 +19,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-09-27",
+    type: "lens",
+    summary: "Added Fujinon XC 15–45mm OIS PZ, XC 16–50mm OIS II, and XF 8–16mm R LM WR",
+  },
+  {
+    date: "2026-09-27",
+    type: "lens",
+    summary: "Added Minolta Auto Tele Rokkor-PF 100mm f/2, MD 135mm f/2.8, and MD 50mm f/2",
+  },
+  {
     date: "2026-09-26",
     type: "lens",
     summary: "Added Miranda Auto EC 35mm f/2.8, 135mm f/2.8, and 200mm f/3.5",

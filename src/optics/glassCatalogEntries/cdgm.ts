@@ -500,4 +500,14 @@ export const CDGM_GLASS_ENTRIES: readonly GlassEntry[] = [
     source:
       "CDGM vendor Zemax catalog, https://refractiveindex.info/download/data/2022/CDGM-ZEMAX202206new.AGF; accessed 2026-09-11 via refractiveindex.info vendor-data mirror.",
   },
+  {
+    name: "F13",
+    vendor: "CDGM",
+    nd: 1.625884,
+    vd: 35.713679,
+    polynomial: [2.56957078, -0.00760403138, 0.0249680705, 0.000334501945, 0.000056815438, 0.000000607326285],
+    code6: "626357",
+    source:
+      "CDGM Zemax catalog 2022-06 via refractiveindex.info, specs/cdgm/optical/F13.yml; formula 3 polynomial, 0.365-1.014 um.",
+  },
 ];
