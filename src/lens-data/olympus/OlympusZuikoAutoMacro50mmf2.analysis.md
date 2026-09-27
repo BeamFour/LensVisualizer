@@ -8,6 +8,17 @@
 
 ---
 
+## Selectable MTF source states
+
+Infinity and half life-size use the published Embodiment 6 configurations at the
+retained rounded scale. The close-focus object distance is **calculated**: approximately
+229.932 mm from the image plane, rather than a published patent distance or the
+production 0.24 m specification. Independent small-height exact rays verify the common
+source for the authored geometry. Its rear image gap is also calculated from the
+source magnification, so matching that magnification is a consistency check, not an
+independent validation of the rear plane. Stop position, apertures and catalog glass
+counterparts remain inferred; intermediate finite positions are not certified.
+
 ## 1. Overview
 
 The Olympus Zuiko Auto-Macro 50mm f/2 is a nine-element, seven-group macro lens designed for the Olympus OM bayonet mount. Introduced in 1985 and produced until 2002, it was marketed by Olympus as the fastest macro lens on the market at the time of its release — though the Kern-Macro-Switar 50mm f/1.9 for the Alpa system, produced in small numbers, was marginally faster. The f/2 aperture was a notable achievement for a 50mm macro design intended to deliver high image quality from infinity to 1:2 magnification. The lens employs an all-spherical optical design with a floating-element focus mechanism based on variable group separation.

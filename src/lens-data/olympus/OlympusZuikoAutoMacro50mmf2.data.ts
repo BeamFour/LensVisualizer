@@ -54,6 +54,32 @@ const LENS_DATA = {
   elementCount: 9,
   groupCount: 7,
 
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "US 4,708,445, Embodiment 6, PDF page 31: f=1, F/2.0 infinity prescription at the retained approximately 50.016 scale; d4=0.0024 normalized units. Retained rear gap 38.37 mm and physical stop are calculated/inferred, not source-tabulated (see audit).",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "half-life-size",
+      label: "Half life-size",
+      focusT: 1,
+      zoomT: 0,
+      source: "US 4,708,445, Embodiment 6, PDF page 31: published beta=0.50 and d4=0.0802 normalized units, retained scaled gap 4.01 mm. Rear image gap 63.47 mm is calculated from the published magnification; object distance is calculated, not published.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 229.93247140154637,
+        distanceReference: "image-plane",
+        distanceProvenance: "calculated",
+        derivation: "At the fixed authored gaps and calculated rear plane, first-order s=-B/A gives 122.432471401546 mm before the first surface, plus 107.5 mm to the image plane. Independent exact rays at 0.01/0.005/0.0025 mm converge to this source. Calculated beta=-0.500056825179 agrees with the source's unsigned 0.50, but is not independent evidence for the rear plane because that plane was derived from the same target; see audit.",
+        magnification: 0.5,
+      },
+    },
+  ],
+
   /* ── Elements ── */
   elements: [
     {

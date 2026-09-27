@@ -58,3 +58,38 @@ Patent: US 4,708,445, Embodiment 6
 - HOYA's obsolete BAF22 row (`1.682496 / 44.671672`) is the exact coefficient-backed catalog equivalent. The
   production supplier remains unspecified.
 - Strict and trusted catalog coverage are now complete at `9/9`; no geometry changed.
+
+## 2026-09-26 — Source-state review
+
+Source-state review outcome: verified. Both authored candidates enabled: infinity and
+half life-size; finite distance is calculated and the rear image plane remains qualified.
+
+Visually checked local `patents/US4708445.pdf`, Embodiment 6 on PDF page 31. The
+source gives 16 refractive surfaces, nine glass coordinates, f=1, F/2.0, half-field
+22.8 degrees and d4=0.0024 at infinity / 0.0802 at unsigned beta=0.50. The retained
+approximately 50.016 scale and rounded dimensions reproduce those rows: maximum
+radius difference from multiplication by 50.016 is 0.001735 mm; maximum internal
+thickness/gap difference is 0.004628 mm, within the authored rounding precision.
+The source stop-containing d8=0.2032 becomes the retained 6.00+4.16 mm split; its exact
+position and physical aperture are inferred. No rear cover/filter plate is present.
+
+The source does not tabulate the rear image distance or object distance. Existing
+rear gaps 38.37/63.47 mm are calculated; the close gap uses the published half-size
+magnification with the source d4 endpoint. No new movement or image-plane fit was made.
+At focusT=1, d4=4.01 and rear gap=63.47 mm, the first-order audit derives a source
+122.432471401546 mm before the first surface, 229.932471401546 mm from the image
+plane, with beta=-0.500056825179. The source ratio is stored as the published unsigned 0.5.
+
+Independent exact rays at 0.01/0.005/0.0025 mm heights solve
+122.432468504621 / 122.432470674643 / 122.432471216257 mm; axial residuals stay below
+1.183e-10 mm. The 0.01137% magnification difference meets the unchanged 1% source
+allowance. Because the rear gap was originally derived from the same magnification,
+this agreement is not independent evidence for that plane; the exact-ray solve checks
+the fixed authored model. Calculated-distance provenance carries that qualification.
+The source infinity configuration remains explicitly infinity; its formal approximately
+248 m finite root from rounded/calculated spacing is not another source state.
+
+The production 0.24 m minimum-focus label is not substituted for the model conjugate.
+Existing stop/rim and spectral approximations, physical clipping and numerical-domain
+restrictions continue to apply. No prescription, image-plane gap, aperture, slider
+coordinate or optical reference value changed in this review.
