@@ -257,6 +257,23 @@ const LENS_DATA = {
     },
   },
 
+  sourceStates: [
+    {
+      id: "infinity", label: "Infinity", focusT: 0, zoomT: 0,
+      source: "JP 2012-159613 A, Example 1, paragraphs 0054–0056 (PDF pp. 9–10), infinity column: D11 1.51 mm, D14 12.43 mm, back focus 27.30 mm. Apertures remain inferred.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "closest", label: "Closest authored focus", focusT: 1, zoomT: 0,
+      source: "JP 2012-159613 A, Example 1, paragraphs 0054–0056 (PDF pp. 9–10), closest-focus column: D11 7.57 mm, D14 6.36 mm and fixed 27.30 mm back focus. No full-system magnification or object distance is tabulated; production specifications are not derivation inputs.",
+      conjugate: {
+        kind: "finite", objectDistanceMm: 94.8644559228124,
+        distanceReference: "image-plane", distanceProvenance: "calculated",
+        derivation: "Fixed-plane first-order s = -B/A gives 23.56445592281238 mm before surface 1. Adding the physical 71.30 mm image track gives 94.8644559228124 mm. Three independent small-height exact-ray roots agree within 0.000010 mm with axial residual below 4.062e-9 mm. Derived magnification -0.9911134409214337 is not a published whole-system value; paragraph 0060's 2.0 is group G12 magnification only.",
+      },
+    },
+  ],
+
   var: {
     "11A": [1.51, 7.57],
     "14A": [12.43, 6.36],

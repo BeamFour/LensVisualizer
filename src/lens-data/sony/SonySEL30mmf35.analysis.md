@@ -196,3 +196,8 @@ No patent prescription inconsistency was found in Example 1. The corrections nee
 **Glass catalog references:** OHARA S-PHM52, S-TIM22, S-TIH4, S-FPL51, S-FSL5, and S-TIL6 catalog data; OHARA cross-reference table for S-FPL51/FCD1, S-FSL5/N-FK5, and S-TIL6/E-FEL6; HOYA M-PCD51 catalog data for nd = 1.59201 and νd = 67.02.
 
 **Verification method:** Independent paraxial ABCD/y-nu trace of the patent surface prescription; finite-conjugate object-distance solve at the patent closest-focus spacing; aspheric polynomial evaluation using the patent's k and A4-A10 coefficients; surface-by-surface Petzval computation using φ/(n n').
+
+
+## Verified source configurations
+
+The MTF Lens state selector offers Example 1's infinity and closest-focus geometry. Closest focus uses a **calculated 94.8645 mm distance from the image plane**, independently checked with exact small-height rays. The patent does not publish a whole-system magnification for this column; its group G12 magnification is not substituted. Production 0.095 m and 1:1 specifications are not derivation inputs. Selecting either state preserves its element positions and source rays when MTF closes. These are qualified prescription simulations, with inferred apertures and existing glass approximations; intermediate finite focus remains unavailable.
