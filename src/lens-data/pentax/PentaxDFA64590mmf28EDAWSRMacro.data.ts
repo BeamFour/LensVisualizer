@@ -229,6 +229,32 @@ const LENS_DATA = {
     },
   },
 
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "US 2013/0222925 A1, Numerical Embodiment 4, Tables 13–15 (PDF p. 145), d15 = 5.680 mm and fB = 69.09 mm. The physical stop radius and lens clear apertures remain inferred.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "half-life-size",
+      label: "Half life-size",
+      focusT: 1,
+      zoomT: 0,
+      source: "US 2013/0222925 A1, Numerical Embodiment 4, Tables 13–15 (PDF p. 145), published close magnification -0.50:1, d15 = 11.958 mm and fB = 98.18 mm. Object distance is calculated from the fixed authored geometry and image plane, not the production 0.413 m specification.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 412.8439961088574,
+        distanceReference: "image-plane",
+        distanceProvenance: "calculated",
+        derivation: "Fixed-plane first-order s = -B/A gives 205.5959961088574 mm before surface 1. Adding the physical image track 207.248 mm gives 412.8439961088574 mm from the image plane. Independent exact-ray roots agree; derived magnification -0.5000140291758332 differs from published -0.5 by 0.002806%.",
+        magnification: -0.5,
+      },
+    },
+  ],
+
   /* Published infinity and -0.50:1 endpoint spacings. */
   var: {
     "15A": [5.68, 11.958],

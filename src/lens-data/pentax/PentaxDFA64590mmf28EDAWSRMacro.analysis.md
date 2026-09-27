@@ -303,3 +303,8 @@ The prescription’s correspondence with the patent tables is therefore quantita
 7. SCHOTT optical-glass catalog resources. https://www.schott.com/en-gb/products/optical-glass-p1000267/downloads
 8. CDGM optical-glass catalog resources. https://www.cdgmgd.com/
 9. SUMITA optical-glass catalog resources. https://www.sumita-opt.co.jp/en/download/
+
+
+## Source-state availability
+
+The two published focus endpoints are selectable: infinity and half life-size. The latter uses a **calculated 412.8440 mm object distance from the image plane**, independently checked with small-height exact rays and the published −0.50:1 magnification. The production 0.413 m minimum focus is a comparison rather than an input. Published group travel and back focus are retained exactly; intermediate finite slider positions are not enabled for MTF. Clear apertures, the physical stop radius and spectral glass identities retain their existing qualifications.
