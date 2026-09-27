@@ -247,7 +247,7 @@ The final TypeScript arrays were independently parsed and traced rather than che
 | Middle | 144.902030mm | 43.902154mm | 195.604490mm | 21.629634mm |
 | Tele | 288.233075mm | 61.369440mm | 225.233090mm | 21.631974mm |
 
-The patent image height is 21.633mm. The largest chief-ray residual is 0.003366mm. Exact spherical tracing recovers the authored f-numbers and gives entrance-pupil semi-diameters of 8.011855, 13.338503, and 24.616748mm. The corresponding physical stop semi-diameters are 9.698704, 10.276258, and 10.888078mm.
+The patent image height is 21.633mm. The largest chief-ray residual is 0.003366mm. Exact spherical tracing recovers the authored f-numbers and gives entrance-pupil semi-diameters of 8.011855, 13.338503, and 24.616748mm. The corresponding physical stop semi-diameters are approximately 9.698704, 10.276258, and 10.888078mm. The data explicitly enables `zoomApertureModel: "from-nominal-fno"` so the runtime retains the calculated physical iris for each source zoom station. These radii are inferred from the published f-numbers, not published iris measurements.
 
 The patent publishes no clear apertures. All surface semi-diameters are modeling inferences derived from marginal and chief-ray envelopes at the three zoom positions, the patent image height and field angles, and the modeled wide-open stop. Geometry checks on the final arrays give a minimum element edge thickness of 0.623086mm, a maximum spherical rim-slope angle of 29.848879°, and a minimum physical cross-gap clearance of 0.022318mm. No conic check is applicable because the design is all-spherical, and no hidden render trim is required.
 
@@ -260,3 +260,8 @@ The normalized surface-by-surface Petzval sum, evaluated as $\phi/(n n')$, is +0
 3. Panasonic, [S-R70300 official features and specifications](https://help.na.panasonic.com/answers/features-and-specifications-lumix-lens-model-s-r70300/).
 4. Panasonic Optical Design Department, [Fourth Edition: LUMIX S 70-300mm F4.5-5.6 MACRO O.I.S.](https://www.panasonic.com/in/consumer/cameras-camcorders/lenses-learn/article/this-is-the-optical-design-department-fourth-edition.html).
 5. HOYA Group Optics Division, [Optical Glass Data Download](https://www.hoya-opticalworld.com/english/datadownload/index.html), Excel catalog updated June 1, 2026.
+
+
+## Source-state availability
+
+All three authored infinity configurations are selectable at zoom coordinates 0, 0.5, and 1. The published gap and rear-image-distance rows define these stations; intermediate zoom geometry remains interpolated. No additional finite configuration is enabled: the patent names G5 as the focusing group but supplies no close-focus gap row or travel. Identical focus endpoints and the product's minimum-focus distance do not establish finite geometry. The retained adhesive-layer normalization, calculated iris schedule, inferred clear apertures and catalog spectral proxies qualify every simulated curve.

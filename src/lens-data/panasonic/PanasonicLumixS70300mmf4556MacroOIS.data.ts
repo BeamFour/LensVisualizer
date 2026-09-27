@@ -70,11 +70,40 @@ const LENS_DATA = {
   focusDescription:
     "NO_INTERNAL_RECONSTRUCTION. The patent publishes infinity-focus zoom spacings and states that G5 moves imageward for close focus, but it provides no close-focus spacing row or travel. The production minimum-focus distance is retained only as catalog metadata; every authored var pair is identical between infinity and close.",
 
+  sourceStates: [
+    {
+      id: "wide-infinity",
+      label: "Wide infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "JP 2022-125453 A, Numerical Example 1, Tables 1–3A (PDF pp. 24–25), explicitly published infinity-focus zoom stations. Cement-layer normalization is retained; physical iris radii are calculated from source f-numbers and lens clear apertures are inferred. No finite-focus geometry is published.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "middle-infinity",
+      label: "Middle infinity",
+      focusT: 0,
+      zoomT: 0.5,
+      source: "JP 2022-125453 A, Numerical Example 1, Tables 1–3A (PDF pp. 24–25), explicitly published infinity-focus zoom stations. Cement-layer normalization is retained; physical iris radii are calculated from source f-numbers and lens clear apertures are inferred. No finite-focus geometry is published.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "tele-infinity",
+      label: "Tele infinity",
+      focusT: 0,
+      zoomT: 1,
+      source: "JP 2022-125453 A, Numerical Example 1, Tables 1–3A (PDF pp. 24–25), explicitly published infinity-focus zoom stations. Cement-layer normalization is retained; physical iris radii are calculated from source f-numbers and lens clear apertures are inferred. No finite-focus geometry is published.",
+      conjugate: { kind: "infinity" },
+    },
+  ],
+
   /* ── Zoom and aperture ── */
   zoomPositions: [72.8, 144.7974, 287.997],
   zoomStep: 0.004,
   zoomLabels: ["Wide", "Tele"],
   nominalFno: [4.54605, 5.43172, 5.85441],
+  // Calculated physical iris schedule from Table 3A f-numbers, not published radii.
+  zoomApertureModel: "from-nominal-fno",
   closeFocusM: 0.54,
   fstopSeries: [4.5, 5.6, 8, 11, 16, 22],
   maxFstop: 22,
