@@ -409,6 +409,47 @@ const LENS_DATA = {
 
   asph: {},
 
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "JP 2012-063403 A, Numerical Example 2, paragraphs 0085–0087 (PDF pp. 13–14), INF prescription and four variable spacings. The retained 54.019889 mm rear gap is calculated paraxial infinity back focus, not a printed source dimension; physical iris and clear apertures remain inferred.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "half-life-size",
+      label: "Half life-size",
+      focusT: 0.7573770485166879,
+      zoomT: 0,
+      source: "JP 2012-063403 A, Numerical Example 2 (PDF pp. 13–14), published |beta| = 0.5 column: d8/d15/d16/d21 = 10.5359/16.5441/12.0489/13.0211 mm. The existing calculated infinity image plane is held fixed for this internal-focus configuration.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 501.7316021712363,
+        distanceReference: "image-plane",
+        distanceProvenance: "calculated",
+        derivation: "With the retained 54.019889 mm calculated rear gap fixed, first-order s = -B/A gives 309.24171317123626 mm before surface 1. Adding the physical 192.489889 mm image track gives 501.7316021712363 mm from the image plane. Independent exact-ray roots agree; magnification -0.49998959526395376 differs in magnitude from published 0.5 by 0.002081%.",
+        magnification: 0.5,
+      },
+    },
+    {
+      id: "life-size",
+      label: "Life-size",
+      focusT: 1,
+      zoomT: 0,
+      source: "JP 2012-063403 A, Numerical Example 2 (PDF pp. 13–14), published |beta| = 1 column: d8/d15/d16/d21 = 20.1009/6.9791/2.5000/22.5700 mm. The existing calculated infinity image plane stays fixed; production minimum focus is not a derivation input.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 378.6746874330808,
+        distanceReference: "image-plane",
+        distanceProvenance: "calculated",
+        derivation: "With the retained 54.019889 mm calculated rear gap fixed, first-order s = -B/A gives 186.18479843308077 mm before surface 1. Adding the physical 192.489889 mm image track gives 378.6746874330808 mm from the image plane. Independent exact-ray roots agree; magnification -0.9999797587863613 differs in magnitude from published 1 by 0.002025%.",
+        magnification: 1,
+      },
+    },
+  ],
+
   focusPositions: [0, 0.7573770485166879, 1],
   var: {
     "8": [2.42, 10.5359, 20.1009],

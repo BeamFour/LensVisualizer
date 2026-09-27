@@ -256,3 +256,8 @@ The solution is not merely to decenter a strong rear group. Sigma inserts L4, a 
 - Sigma Corporation, "APO MACRO 150mm F2.8 EX DG OS HSM," official product page. Used for production hard specifications: full-frame DG coverage, 19 elements / 13 groups, 16.4° angle of view, 9 rounded blades, F22 minimum aperture, 38 cm MFD, 1:1 maximum magnification, 72 mm filter size, dimensions, weight, and listed mounts.
 - HOYA Group Optics Division, HOYA optical-glass data download, HOYA20260401.xlsx. Used for catalog glass matching, C/F/g-line indices, and $\Delta P_{g,F}$ values.
 - HOYA Group Optics Division, technical information on glass type naming and six-digit glass codes. Used to verify Hoya family names and refractive-index/Abbe-number code interpretation.
+
+
+## Source-state availability
+
+All three source configurations are selectable: infinity, half life-size and life-size. The two finite states use **calculated image-plane object distances** of 501.7316 and 378.6747 mm. Their derivations retain the existing calculated infinity back focus of 54.019889 mm; the patent publishes the internal focus spacings and magnification magnitudes, but does not give that rear-gap number. Small-height exact rays and the published magnifications independently check the resulting finite conjugates. The nominal f/2.8 control, inferred clear apertures and spectral glass proxies remain qualifications. Intermediate finite positions are not enabled for MTF.
