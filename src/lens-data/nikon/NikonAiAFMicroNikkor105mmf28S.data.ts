@@ -67,6 +67,45 @@ const LENS_DATA = {
   elementCount: 9,
   groupCount: 8,
 
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "JP H02-19814 A, Example 5, Table 5, PDF page 7: d6=22.982, d11=3.807, d15=10.000 and Bf=43.966 mm.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "half-life-size",
+      label: "Half life-size",
+      focusT: 0.8113045208264971,
+      zoomT: 0,
+      source: "JP H02-19814 A, Example 5, Table 5, PDF page 7: d6=19.805, d11=31.432, d15=7.238 and Bf=43.966 mm. D0=240.890 mm is the first-vertex object distance, independently verified against fixed-geometry exact rays (see audit).",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 240.89,
+        distanceReference: "first-surface",
+        distanceProvenance: "published",
+        magnification: -0.5,
+      },
+    },
+    {
+      id: "life-size",
+      label: "Life-size",
+      focusT: 1,
+      zoomT: 0,
+      source: "JP H02-19814 A, Example 5, Table 5, PDF page 7: d6=17.682, d11=56.809, d15=10.000 and Bf=43.966 mm. D0=141.864 mm is the first-vertex object distance, independently verified against fixed-geometry exact rays (see audit).",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 141.864,
+        distanceReference: "first-surface",
+        distanceProvenance: "published",
+        magnification: -1,
+      },
+    },
+  ],
+
   elements: [
     {
       id: 1,
