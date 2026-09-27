@@ -226,6 +226,32 @@ const LENS_DATA = {
   /* ── Aspherical coefficients ── */
   asph: {},
 
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "US 6,154,324, first embodiment, Table 1 (PDF p. 18), published infinity spacings and fB = 76.00 mm. Source F/3.8 differs from the retained nominal F/4 aperture model; clear apertures are inferred.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "life-size",
+      label: "Life-size",
+      focusT: 1,
+      zoomT: 0,
+      source: "US 6,154,324, first embodiment, Table 1 (PDF p. 18), d10 = 18.98 mm, stop gap = 32.27 mm, fB = 91.75 mm and unsigned magnification 1.000. Object distance is calculated from this fixed published geometry, not the production minimum-focus specification.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 394.22511437134506,
+        distanceReference: "image-plane",
+        distanceProvenance: "calculated",
+        derivation: "Fixed Table 1 close geometry and published 91.75 mm rear image distance give s = -B/A = 170.79511437134508 mm before the first surface; adding the 223.43 mm physical track gives 394.22511437134506 mm from the image plane. Independent small-height exact rays reproduce the source distance and magnification -0.999979226991021 agrees with the published unsigned 1.000 (0.00208% error).",
+        magnification: 1,
+      },
+    },
+  ],
+
   /* ── Variable air spacings ── */
   var: {
     "10": [1.5, 18.98],

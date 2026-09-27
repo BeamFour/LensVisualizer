@@ -140,7 +140,7 @@ The patent's focus mechanism is a three-component floating system. Group 1, the 
 
 A point of terminology is important. The patent's close-focus `fB = 91.75 mm` is the final-surface-to-image distance for the finite-conjugate 1:1 configuration. It is not the Gaussian back focal length for collimated input through the close-focus spacing. If the close-focus spacing is traced at infinite conjugate, the rear focal point lies on the object side of the final surface; that value is not the patent's finite-conjugate `fB` and should not be used to describe the working close-focus condition.
 
-The computed close-focus object distance in front of surface 1 is 170.80 mm. Adding the 223.43 mm optical track from surface 1 to the image plane gives 394.23 mm, which confirms the production 0.395 m minimum focusing distance at the level of rounding expected from mechanical datum differences.
+The computed close-focus object distance in front of surface 1 is 170.80 mm. Adding the 223.43 mm optical track from surface 1 to the image plane gives 394.23 mm, which is close to the production 0.395 m minimum focusing distance. The production specification is not the derivation input, and a mechanical-datum explanation for the difference has not been established.
 
 ## Aspherical Surfaces
 
@@ -216,3 +216,8 @@ The semi-diameters in the data file are not patent-published values. They are co
 2. Ricoh Imaging Americas, “smc PENTAX-FA645 120mm F4 Macro,” official product page, https://us.ricoh-imaging.com/product/smc-pentax-fa645-120mm-f4-macro/ . Source for production specifications including 120 mm marketed focal length, F4 maximum aperture, 0.395 m minimum focusing distance, 1.00× maximum magnification, 9 elements in 7 groups, ED glass, floating / independently moving aperture description, 67 mm filter, 8 diaphragm blades, and 735 g mass.
 3. Ricoh Imaging global lens archive, “smc PENTAX-FA645 120mm F4 Macro,” official product page, https://www.ricoh-imaging.co.jp/english/products/645/lens/standard/smcpentax-fa645macro120/ . Cross-check for production specifications.
 4. OHARA INC / OHARA Corporation optical glass data sheets for S-LAH51, S-PHM52, S-TIL2, S-FSL5, S-TIM22, S-LAL59, S-LAH66, and S-LAL12. These catalog entries were used to verify the glass identifications against the patent's $n_d$ and $\nu_d$ values; S-TIM22 is retained from the OHARA legacy data sheet matching the 648/338 glass code.
+
+
+## Source-state availability
+
+Infinity and life-size configurations are selectable. The life-size state uses a **calculated 394.2251 mm object distance from the image plane**, derived with every source gap and the published 91.75 mm rear image distance held fixed. Small-height exact-ray solutions independently reproduce the first-surface distance, and the resulting −0.999979 magnification agrees with the source's unsigned 1.000 within 0.00208%. The viewer retains nominal F/4 rather than the patent's F/3.8 infinity aperture; its physical iris remains constant through focus while the published stop position moves. Interpolated finite positions remain unavailable for MTF. These are qualified prescription simulations, not measurements of the production lens.
