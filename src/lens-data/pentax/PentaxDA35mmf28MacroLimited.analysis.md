@@ -199,3 +199,8 @@ The HD Pentax-DA 35 mm F2.8 Macro Limited introduced in 2013 is best treated as 
 - Ricoh Imaging Americas, "HD PENTAX DA 35mm F2.8 Macro Limited," current product specifications.
 - Ricoh Imaging Company, Ltd., "Five HD PENTAX-DA Limited interchangeable lenses for K-mount lens-interchangeable digital cameras, featuring high-grade HD coating and round-shaped diaphragm," August 28, 2013.
 - Hoya Group Optics Division, "Glass Cross Reference Index," used for Hoya, Schott, Ohara, Hikari, Sumita, and CDGM glass-code cross-checks.
+
+
+## Source-state availability
+
+Infinity, half life-size and life-size are selectable at the three exact authored focus coordinates. The finite stations use **calculated image-plane object distances** of 161.8553 and 138.9920 mm, independently checked with small-height exact rays and the patent's signed magnifications. The production 0.139 m specification is a comparison, not an input or a substitute for source evidence. The physical stop radius and clear apertures remain inferred, and the retained nominal f/2.8 control differs from the patent's 1:2.88. Intermediate finite slider positions are not enabled for MTF.

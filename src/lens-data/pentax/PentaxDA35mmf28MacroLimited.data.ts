@@ -188,6 +188,46 @@ const LENS_DATA = {
   ],
 
   asph: {},
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "US 7,715,118 B2, Embodiment 1 / Table 1 (PDF pp. 15–16), d13 = 1 mm and fB = 38.72 mm. The source specifies the stop 4.425 mm before surface 8; clear apertures remain inferred.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "half-life-size",
+      label: "Half life-size",
+      focusT: 0.858792011850653,
+      zoomT: 0,
+      source: "US 7,715,118 B2, Embodiment 1 / Table 1 (PDF pp. 15–16), d13 = 12.57 mm at published magnification -0.5 and fB = 38.72 mm. Object distance is calculated from this fixed authored geometry.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 161.8552549184314,
+        distanceReference: "image-plane",
+        distanceProvenance: "calculated",
+        derivation: "Fixed-plane first-order s = -B/A gives 64.04525491843141 mm before the first surface. Adding the physical 97.81 mm image track gives 161.8552549184314 mm. Independent exact-ray roots agree; derived magnification -0.499783176798856 differs from published -0.5 by 0.04337%.",
+        magnification: -0.5,
+      },
+    },
+    {
+      id: "life-size",
+      label: "Life-size",
+      focusT: 1,
+      zoomT: 0,
+      source: "US 7,715,118 B2, Embodiment 1 / Table 1 (PDF pp. 15–16), d13 = 24.13 mm at published magnification -1 and fB = 38.72 mm. Object distance is calculated from the patent geometry; production minimum focus is not an input.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 138.99199064421168,
+        distanceReference: "image-plane",
+        distanceProvenance: "calculated",
+        derivation: "Fixed-plane first-order s = -B/A gives 29.621990644211685 mm before the first surface. Adding the physical 109.37 mm image track gives 138.99199064421168 mm. Independent exact-ray roots agree; derived magnification -0.9994091604185922 differs from published -1 by 0.05909%.",
+        magnification: -1,
+      },
+    },
+  ],
   focusPositions: [0, 0.858792011850653, 1],
   var: {
     "13": [1.0, 12.57, 24.13],
