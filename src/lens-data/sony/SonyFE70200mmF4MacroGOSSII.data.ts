@@ -382,6 +382,72 @@ const LENS_DATA = {
     },
   },
 
+  sourceStates: [
+    {
+      id: "wide-infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "WO 2024/247472 A1, Example 2, Tables 6–9 (PDF pp. 35–36), wide infinity column; d6/d14/d18/d22/d27/d30 = 2.08/16.82/7.75/9.6/5.29/13.76 mm and rear gap 31.32 mm. The zoom iris schedule is inferred from source FNO, not a published physical diameter.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "wide-finite",
+      label: "Finite (2.119 m from first surface)",
+      focusT: 1,
+      zoomT: 0,
+      source: "WO 2024/247472 A1, Example 2, Tables 6–9 (PDF pp. 35–36), wide finite column: d0 = 2119.38 mm from object row 0 to first surface 1; d27/d30 = 5.84/13.21 mm. Other zoom gaps and rear gap 31.32 mm remain as tabulated. Rounded-source residual defocus is retained; the source distance is not replaced by a fixed-plane derived root.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 2119.38,
+        distanceReference: "first-surface",
+        distanceProvenance: "published",
+      },
+    },
+    {
+      id: "middle-infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0.5,
+      source: "WO 2024/247472 A1, Example 2, Tables 6–9 (PDF pp. 35–36), middle infinity column; d6/d14/d18/d22/d27/d30 = 27.85/2.61/10.79/6.12/8.33/25.37 mm and rear gap 31.32 mm. The zoom iris schedule is inferred from source FNO, not a published physical diameter.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "middle-finite",
+      label: "Finite (3.513 m from first surface)",
+      focusT: 1,
+      zoomT: 0.5,
+      source: "WO 2024/247472 A1, Example 2, Tables 6–9 (PDF pp. 35–36), middle finite column: d0 = 3513.49 mm from object row 0 to first surface 1; d27/d30 = 9.09/24.61 mm. Other zoom gaps and rear gap 31.32 mm remain as tabulated. Rounded-source residual defocus is retained; the source distance is not replaced by a fixed-plane derived root.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 3513.49,
+        distanceReference: "first-surface",
+        distanceProvenance: "published",
+      },
+    },
+    {
+      id: "tele-infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 1,
+      source: "WO 2024/247472 A1, Example 2, Tables 6–9 (PDF pp. 35–36), tele infinity column; d6/d14/d18/d22/d27/d30 = 75.53/1.5/9.59/5.81/2.8/33.52 mm and rear gap 31.32 mm. The zoom iris schedule is inferred from source FNO, not a published physical diameter.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "tele-finite",
+      label: "Finite (5.570 m from first surface)",
+      focusT: 1,
+      zoomT: 1,
+      source: "WO 2024/247472 A1, Example 2, Tables 6–9 (PDF pp. 35–36), tele finite column: d0 = 5570.44 mm from object row 0 to first surface 1; d27/d30 = 3.9/32.42 mm. Other zoom gaps and rear gap 31.32 mm remain as tabulated. Rounded-source residual defocus is retained; the source distance is not replaced by a fixed-plane derived root.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 5570.44,
+        distanceReference: "first-surface",
+        distanceProvenance: "published",
+      },
+    },
+  ],
+
   zoomPositions: [72.15, 119.7, 192.89],
   zoomLabels: ["Wide", "Tele"],
 

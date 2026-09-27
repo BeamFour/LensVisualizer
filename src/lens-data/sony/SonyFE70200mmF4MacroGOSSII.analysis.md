@@ -286,3 +286,8 @@ The integration audit retains every patent index and Abbe value. The following a
 L2/L3/L12/L14 receive qualified inferred APD coloring from FCD1/FCD705/S-FPM2 curves. Seven remaining custom coordinates have no further compatible catalog/HOYA candidate; e-line near-matches remain rejected.
 
 Glass-family/APD inferences are display annotations, not additional patent measurements. No catalog-derived line indices or partial-dispersion numbers are authored as patent evidence.
+
+
+## Source-state availability
+
+All six tabulated configurations are selectable: infinity and one finite source at each authored zoom station. Finite launches use **published d0 distances from the object to the first surface**: 2119.38, 3513.49 and 5570.44 mm. The patent separately rounds photography distances to 2.289, 3.709 and 5.814 m; these are not interchangeable with d0. The source values remain authoritative even though rounded prescriptions retain residual paraxial defocus of approximately −0.0111, −0.0402 and −0.0276 mm at the stored image plane. In particular, the middle station's calculated fixed-plane object root differs by 1.0200% from its published d0; it is not substituted for the explicitly published source. These configurations do not represent the production lens's much closer macro endpoints. Intermediate finite positions remain unavailable, and the existing inferred zoom iris schedule remains qualified.
