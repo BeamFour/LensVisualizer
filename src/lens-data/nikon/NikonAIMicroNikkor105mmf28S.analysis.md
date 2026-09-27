@@ -136,6 +136,12 @@ The average spacing-variation rate is $\Delta y/\Delta x = 6.6954/26.2408 = 0.25
 
 With the close-focus spacings, the fixed 43.1068 mm back focal distance, and an object point 254.996 mm in front of the first surface, the paraxial matrix gives lateral magnification $\beta = -0.49996$. This independently verifies the patent's $d_0 = 254.9907$ and $\beta=-0.5$ values to the precision expected from the rounded prescription. Adding the close-focus vertex-to-image distance of 155.005 mm gives an object-to-image-plane distance of 409.996 mm, reconciling the patent close-focus condition with Nikon's 0.41 m minimum focus specification.
 
+The MTF Lens state selector enables infinity and the authored half-life-size endpoint.
+Its finite distance is the published **254.9907 mm before the first surface**. Independent
+small-height exact rays verify the retained geometry, including the calculated rear image
+gap; the residual differences are recorded in the audit. Intermediate finite positions
+remain unavailable, with existing aperture and glass-model qualifications unchanged.
+
 The infinite-conjugate equivalent focal length of the close-focus configuration is 82.308 mm. That number should not be confused with the 105 mm infinity focal length; it is a useful paraxial diagnostic of the floating configuration, not the marketed focal length.
 
 ## Conditional Expressions

@@ -2,6 +2,35 @@
 
 Patent: US 4,392,724, Example 1
 
+## 2026-09-26 — Source-state review
+
+Source-state review outcome: verified. Both authored candidates enabled: infinity and
+half life-size. No intermediate finite configuration or accessory extension is certified.
+
+Visually checked local `patents/US4392724.pdf`, PDF page 21, Table 1 / First Embodiment.
+All nineteen powered-interface radii, source glass rows and internal spacings match the
+retained file. The source publishes d6=13.9866/20.6820 and d11=8.1258/34.3666 mm.
+It places the diaphragm 1.5 mm ahead of L22, matching the retained 1.5+1.5 mm split
+of d9=3.0 mm. The physical iris radius and clear apertures remain inferred.
+
+The table gives d0=254.9907 mm at close; printed column 7 (PDF page 20) identifies
+this state as beta=-0.5. The first-vertex distance convention is independently confirmed
+by the retained fixed-geometry calculation, rather than substituting Nikon's production
+0.41 m object-to-film specification. Rear image gap 43.1068 mm is the existing calculated
+infinity image distance; the source does not tabulate it. It is retained unchanged.
+
+At close, ABCD gives a first-vertex distance of 254.995956699800 mm and magnification
+-0.499957316562. Independent exact roots at 0.01/0.005/0.0025 mm first-vertex heights
+are 254.995954221066/254.995956076405/254.995956551372 mm, with axial residuals
+below 4.863e-11 mm. The distance differs from the printed value by 0.0052567 mm
+(0.002062%) and magnification magnitude by 0.008537%; standard evidence checks pass.
+The source distance remains authoritative, and no spacing is adjusted to erase residuals.
+
+At infinity, the small residual matrix A produces a formal finite root near 759 km;
+this is not a source-backed finite configuration. The selected states preserve all ordinary
+MTF numerical and optical-domain checks. Catalog dispersion and inferred clear apertures
+remain model qualifications, not evidence of production accuracy.
+
 ## 2026-06-24 - Patent glass and retained-data audit
 
 ### Phase 1 - Glass review

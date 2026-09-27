@@ -58,6 +58,31 @@ const LENS_DATA = {
   elementCount: 10,
   groupCount: 9,
 
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "US 4,392,724, Example 1, Table 1, PDF page 21: d6=13.9866, d11=8.1258 mm. Retained 43.1068 mm rear image gap is calculated, not source-tabulated.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "half-life-size",
+      label: "Half life-size",
+      focusT: 1,
+      zoomT: 0,
+      source: "US 4,392,724, Example 1, Table 1, PDF page 21 and printed column 7 on PDF page 20: d0=254.9907 mm, beta=-0.5, d6=20.6820, d11=34.3666 mm. First-vertex distance convention independently checked; retained rear image gap is calculated (see audit).",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 254.9907,
+        distanceReference: "first-surface",
+        distanceProvenance: "published",
+        magnification: -0.5,
+      },
+    },
+  ],
+
   elements: [
     {
       id: 1,
