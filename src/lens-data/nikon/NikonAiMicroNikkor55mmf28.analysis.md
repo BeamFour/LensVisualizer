@@ -24,6 +24,14 @@ The dimensional prescription is stored at 0.55× the patent scale. Radii, center
 
 No cover plate, filter, inactive dummy surface, flare-cutter plane, or other optical plate occurs in the selected Example 1 prescription. Accordingly, no plate was removed from the sequential model and no air-equivalent rear-spacing correction was required. The image plane itself is not tabulated by the patent and is computed from conjugacy.
 
+## Selectable MTF source states
+
+The Lens state selector certifies **infinity only**, at the retained 0.55 scale. The
+current half-life-size endpoint is a constrained reconstruction from production
+specifications, not the patent's published life-size geometry. Although its exact rays
+are consistent with the reconstruction targets, that does not supply source evidence
+for its movement. Finite MTF remains unavailable; existing diagram movement is retained.
+
 ## Optical Architecture
 
 The design is a modified Gaussian, or Gauss-derived macro lens. The patent's G1/G2 notation refers to two positive **functional moving groups**, whereas the data file's `groupCount: 5` records the five **air-separated glass groups**: L1, L2, L3, the cemented L4a/L4b pair, and L5. This distinction is important because the six physical elements are mechanically coordinated as two larger focusing groups.

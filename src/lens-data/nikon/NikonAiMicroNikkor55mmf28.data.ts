@@ -64,6 +64,17 @@ const LENS_DATA = {
   groupCount: 5,
 
   /* ── Elements ── */
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "US 4,260,223 A, Example 1, Table 1, PDF page 11: normalized f=100 infinity prescription scaled by 0.55, d6=13.301 x 0.55 mm. Retained rear image gap is calculated; the reconstructed production 1:2 endpoint is not certified (see audit).",
+      conjugate: { kind: "infinity" },
+    },
+  ],
+
   elements: [
     {
       id: 1,
