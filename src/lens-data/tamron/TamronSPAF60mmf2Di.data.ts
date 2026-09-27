@@ -326,6 +326,23 @@ const LENS_DATA = {
   asph: {},
 
   /* Patent table keyframes: infinity, 5:1, and 1:1. */
+  sourceStates: [
+    {
+      id: "infinity", label: "Infinity", focusT: 0, zoomT: 0,
+      source: "US 2011/0286116 A1, Embodiment 1, paragraph 0046 (PDF p. 12), infinity column. The existing 41.7724 mm final image gap is a calculated infinity BFD, not a published distance. Iris and clear apertures remain inferred.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "life-size", label: "Life-size", focusT: 1, zoomT: 0,
+      source: "US 2011/0286116 A1, Embodiment 1, paragraph 0046 (PDF p. 12), Up to 1:1 Mag. column: D9/D14/D15/D22 = 17.4252/1.4470/1.5000/13.5384 mm. Object distance is calculated with the existing fixed 41.7724 mm infinity-derived image gap; production MFD is not an input.",
+      conjugate: {
+        kind: "finite", objectDistanceMm: 230.0682816558945,
+        distanceReference: "image-plane", distanceProvenance: "calculated", magnification: 1,
+        derivation: "Fixed-plane s = -B/A gives 106.83938165589451 mm before surface 1. Adding physical image track 123.2289 mm gives 230.0682816558945 mm. Three independent small-height exact-ray roots agree; derived magnitude 0.996790290713385 differs from published 1.0 by 0.320971%, within the unchanged 1% allowance. The image gap remains calculated and fixed.",
+      },
+    },
+  ],
+
   focusPositions: [0, 0.5039200468308941, 1],
   var: {
     "9": [1.5848, 4.6948, 17.4252],

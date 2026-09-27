@@ -324,3 +324,7 @@ For Embodiment 1, this produces a 61.5 mm, f/2.06, 1:1 design using only spheric
 - Tamron Co., Ltd. **G005 Optical Construction Diagram.** https://www.tamron.com/product/pc_file/file/g005_lens-construction_en.svg
 - OHARA Inc. **Optical Glass Lineup and individual glass data sheets.** https://www.ohara-inc.co.jp/product/01001/
 - HOYA Corporation. **Optical Glass Catalog / nd–νd Map and legacy catalog data.** https://www.hoya-opticalworld.com/
+
+## Verified source configurations
+
+The MTF Lens state selector offers infinity and life-size, with a **calculated 230.0683 mm object distance from the image plane** at life-size. The fixed image gap remains the existing calculated infinity BFD. Independent exact rays and the published 1:1 magnification support the finite source. The intermediate column remains unavailable: its ratio label and calculated magnitude do not agree within the existing tolerance, even under the object-to-image interpretation of 5:1. No source spacing is changed to force agreement. Verified selections retain their positions and source rays when MTF closes.
