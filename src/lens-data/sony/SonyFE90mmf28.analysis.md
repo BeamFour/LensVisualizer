@@ -365,3 +365,8 @@ The fact that Example 2 satisfies *all four* conditional expressions, with the t
 ---
 
 *Analysis prepared 27 April 2026. All paraxial computations use a 2 × 2 ABCD‑matrix ray‑trace formulation in Python; verification source available on request. The single aspheric surface at S7 is evaluated using the patent's stated formula (see §4) without truncation of higher‑order terms.*
+
+
+## Source-state availability
+
+Infinity, half life-size and life-size are selectable at the three exact authored focus positions. The finite states use **calculated image-plane object distances** of 347.5826 and 275.1728 mm, with the source filter FL included exactly once in the physical optical track. Small-height exact rays independently verify these solutions; calculated magnifications differ from the source's −0.5× / −1× by 0.3154% / 0.4282%, within the existing 1% allowance. Those differences and the departure from the production 0.28 m specification are retained rather than tuned away. Inferred apertures, retained rounded glass dispersion and nominal f/2.8 versus source FNO 2.88 remain qualifications. Intermediate finite positions are not enabled for MTF.

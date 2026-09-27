@@ -61,3 +61,21 @@ as that bound.
 The validator accepts the new values, the traced edge now reaches 21.65 mm at 13.3° with every rim clear, and the
 image-circle floor still reports nothing undersized. No aspheric surface changed (the S7 departure the analysis quotes
 is untouched), and the analysis quotes none of the changed rims.
+
+
+## 2026-09-27 — Source-state review
+
+Source-state review outcome: verified.
+
+- Visually rechecked exact local `patents/WO2016136352A1.pdf`, Example 2, Tables 5–8 on PDF pages 24–25 (printed pages 22–23). All twenty-six refractive lens radii/thicknesses and fifteen refractive indices match the unscaled source; source stop row 16 is STO. Existing lens Abbe values retain two-decimal rounding of the source's four decimals. Table 6's surface-7 K = 0 and A4/A6/A8/A10 coefficients match the retained asphere.
+- All three inventory candidates are enabled at exact focus 0 / 0.8075766830717322 / 1, zoom 0. Source magnifications 0 / −0.5 / −1 pair with d7 = 2.80 / 11.89 / 22.17; d12 = 22.92 / 13.83 / 3.54; d16 = 23.22 / 13.23 / 5.00; and d21 = 7.49 / 17.48 / 25.71 mm. The source's 0.01 mm track-rounding difference at close focus is preserved.
+- The existing source filter FL remains physical: gap from surface 27 is 22.747 mm, plate thickness 2.5 mm with nd 1.5168 / vd 64.1983, then 1 mm air to the image. The shared `rearPlates` path includes it exactly once in source derivation and MTF; it is not drawn as a lens element. No plate or gap changes are made.
+
+| State | First-surface distance (mm) | Physical image track including FL (mm) | Calculated image-plane distance (mm) | Derived magnification | Published signed-magnification error |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Half life-size | 202.57759224286826 | 145.005 | 347.58259224286826 | −0.4984232420088314 | 0.315352% |
+| Life-size | 130.17779081248614 | 144.995 | 275.17279081248614 | −0.9957179219271312 | 0.428208% |
+
+- Independent exact-ray roots at heights 0.01 / 0.005 / 0.0025 mm are 202.577591682769 / 202.577592101369 / 202.577592195702 mm and 130.177790552962 / 130.177790748079 / 130.177790797331 mm. Maximum axial residual is below 1.987e−11 mm. Both finite states pass the unchanged exact-ray limits and 1% signed-magnification allowance. The production 0.28 m distance is not an input, and the source/model magnitude differences remain explicit.
+- Source FNO is 2.88, versus retained nominal f/2.8. The physical iris, clear apertures and spectral glass proxies retain their qualifications. No optical values, reference values or tolerances are changed to improve MTF.
+- Validation: shared source-state/conjugate/script checks, worker/rear-plate regression coverage, full repository quality gate, per-state center/off-axis MTF checks and live exact-station/closed-diagram persistence. No per-lens tests were added.

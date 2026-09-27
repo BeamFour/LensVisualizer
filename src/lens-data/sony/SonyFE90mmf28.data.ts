@@ -326,10 +326,51 @@ const LENS_DATA = {
   /* ── Variable air spacings (floating dual-group inner focus) ──
    *  GR2 (1st focus) moves toward image: d7 grows, d12 shrinks.
    *  GR4 (2nd focus) moves toward object: d16 shrinks, d21 grows.
-   *  Total variable-gap sum is conserved (118.76 mm optical track, ±0.01 mm rounding).
+   *  Variable-gap sums are 56.43 / 56.43 / 56.42 mm, retaining source rounding.
    *  Patent Table 8: magnification 0.0 (infinity), −0.5×, −1.0× (1:1).
    *  Close focus distance: d_close column uses the −1.0× (1:1) values.
    */
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "WO 2016/136352 A1, Example 2, Tables 5–8 (PDF pp. 24–25), magnification 0.0 column. The physical filter FL from source surfaces 28–29 is included through rearPlates; iris and lens clear apertures remain inferred.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "half-life-size",
+      label: "Half life-size",
+      focusT: 0.8075766830717322,
+      zoomT: 0,
+      source: "WO 2016/136352 A1, Example 2, Tables 5–8 (PDF pp. 24–25), published -0.5 magnification: d7/d12/d16/d21 = 11.89/13.83/13.23/17.48 mm. Object distance is calculated from fixed authored geometry including the source filter FL and image plane.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 347.58259224286826,
+        distanceReference: "image-plane",
+        distanceProvenance: "calculated",
+        derivation: "Fixed-plane first-order s = -B/A gives 202.57759224286826 mm before surface 1. Adding the physical 145.005 mm image track, including the 2.5 mm source filter and 1 mm final air gap, gives 347.58259224286826 mm. Independent exact-ray roots agree; magnification -0.4984232420088314 differs from published -0.5 by 0.315352% within the unchanged 1% allowance.",
+        magnification: -0.5,
+      },
+    },
+    {
+      id: "life-size",
+      label: "Life-size",
+      focusT: 1,
+      zoomT: 0,
+      source: "WO 2016/136352 A1, Example 2, Tables 5–8 (PDF pp. 24–25), published -1.0 magnification: d7/d12/d16/d21 = 22.17/3.54/5.00/25.71 mm. The source filter FL and image plane remain fixed; production 0.28 m minimum focus is not a derivation input.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 275.17279081248614,
+        distanceReference: "image-plane",
+        distanceProvenance: "calculated",
+        derivation: "Fixed-plane first-order s = -B/A gives 130.17779081248614 mm before surface 1. Adding the physical 144.995 mm image track, including the 2.5 mm source filter and 1 mm final air gap, gives 275.17279081248614 mm. Independent exact-ray roots agree; magnification -0.9957179219271312 differs from published -1 by 0.428208% within the unchanged 1% allowance.",
+        magnification: -1,
+      },
+    },
+  ],
+
   focusPositions: [0, 0.8075766830717322, 1],
   var: {
     "7A": [2.8, 11.89, 22.17], // GR1 ↔ GR2 gap (d7)
