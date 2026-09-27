@@ -24,6 +24,17 @@ The transcribed prescription is Example 1 of US 5,257,137. The patent describes 
 
 Example 2 is also a 50 mm-class flat-port embodiment, so it cannot be excluded by element count and focal length alone. Example 1 is adopted because Claim 10 reproduces its numerical prescription directly and because it is the first fully worked 50 mm flat-port design in the patent.
 
+## Selectable MTF source states
+
+No underwater source state is certified. Table 1 supplies three focus configurations,
+but the patent uses water (n=1.3306, Abbe number 53.98) before the front port. The
+current source-launch and optical-path calculations start in air. Converting the field
+angle through the flat port does not verify finite-source intersections, wavelength
+dependence or launch phase in water. Calculated air-conjugate distances cannot be
+substituted for the published underwater distances. The existing diagram and infinity
+calculation remain qualified air-model approximations; the Lens state selector offers
+no verified configurations until incident-medium support is independently validated.
+
 ## Optical Architecture
 
 The lens is a four-unit water-contact macro design with the power sequence zero or very weak / weak / positive / negative. In front-to-rear order the units are G1, G2, G3, and G4.
