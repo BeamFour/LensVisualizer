@@ -19,7 +19,7 @@ import type { LensDataInput } from "../../types/optics.js";
  * ║                                                                                      ║
  * ║  Zoom gaps: 6, 14, 27A, 29A, and 33. G3-G4 and G4-G5 reverse between the middle   ║
  * ║  and tele positions. The aperture stop moves with G3. STO sd is the 10.893 mm      ║
- * ║  tele maximum; scalar nominalFno uses the normalized constant-aperture model.       ║
+ * ║  tele maximum; published iris radii follow the three source zoom stations.         ║
  * ║  The patent's 40.9808°-12.0606° values are half-field angles ω, not full fields.    ║
  * ║                                                                                      ║
  * ║  Normalization: the three 0.005 mm UV-adhesive planes are collapsed into the       ║
@@ -415,7 +415,36 @@ const LENS_DATA = {
     ["33", "D33"],
   ],
 
+  sourceStates: [
+    {
+      id: "wide-infinity",
+      label: "Wide infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "JP 2020-118738 A, Numerical Example 1, Tables 1–3A (PDF pp. 19–21), published infinity spacings and physical stop radii. Retained cement-layer normalization and inferred clear apertures qualify the model; reconstructed close-focus travel is excluded.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "middle-infinity",
+      label: "Middle infinity",
+      focusT: 0,
+      zoomT: 0.5,
+      source: "JP 2020-118738 A, Numerical Example 1, Tables 1–3A (PDF pp. 19–21), published infinity spacings and physical stop radii. Retained cement-layer normalization and inferred clear apertures qualify the model; reconstructed close-focus travel is excluded.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "tele-infinity",
+      label: "Tele infinity",
+      focusT: 0,
+      zoomT: 1,
+      source: "JP 2020-118738 A, Numerical Example 1, Tables 1–3A (PDF pp. 19–21), published infinity spacings and physical stop radii. Retained cement-layer normalization and inferred clear apertures qualify the model; reconstructed close-focus travel is excluded.",
+      conjugate: { kind: "infinity" },
+    },
+  ],
+
   zoomPositions: [25.0078, 50.1541, 100.5897],
+  // Table 3A CIR: published physical iris radii, independent of inferred lens rims.
+  zoomStopSemiDiameters: [7.27, 9.125, 10.893],
   zoomStep: 0.004,
   zoomLabels: ["Wide", "Tele"],
 

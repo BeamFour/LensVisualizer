@@ -74,7 +74,7 @@ The normalized infinity states are:
 
 The physical track includes plate P and matches the patent's printed total lengths of 136.5010, 148.5300, and 180.7900 mm; the air-equivalent track is 0.715506 mm shorter.
 
-The stop's physical open radius changes with zoom in the source prescription: 7.270, 9.125, and 10.893 mm. Because the marketed and modeled lens is constant-aperture, the data file uses the scalar modeled value `nominalFno: 4.1194`; the 10.893 mm stored stop semi-diameter is the telephoto maximum, and the runtime aperture model scales the opening with zoom.
+The stop's physical open radius changes with zoom in the source prescription: 7.270, 9.125, and 10.893 mm. The data file now supplies these published radii explicitly through `zoomStopSemiDiameters`. The scalar modeled `nominalFno: 4.1194` remains a nominal aperture reference; it is not used to invent the source iris schedule. Focus retains the iris for the current zoom, and the source stations use their published physical openings.
 
 The system is not a telephoto-form design under the strict $TL/EFL < 1$ definition at any of the three states. The wide state alone marginally satisfies the strict retrofocus test $BFD > EFL$ in the normalized model; the middle and telephoto states do not. These classifications are computed descriptors, not patent terminology.
 
@@ -315,3 +315,8 @@ The authored semi-diameters pass the local edge-thickness, actual aspherical rim
 3. Panasonic Optical Design Department, **Ninth Edition: LUMIX S 24-105mm F4 MACRO O.I.S.** Five-group architecture, single aspherical/ED focus lens, negative ED lens behind the focus lens, third-group O.I.S. element, 0.30 m minimum focus, and 0.5× telephoto magnification. <https://www.panasonic.com/au/consumer/lumix-cameras-video-cameras/lumix-s-series-full-frame-cameras-learn/article/this-is-the-optical-design-department-ninth-edition.html>
 4. Panasonic, **Panasonic Launches Three L-Mount Interchangeable Lenses for the LUMIX S Series**, 2019-02-01. Product release timing and S-R24105 identity. <https://na.panasonic.com/news/panasonic-launches-three-l-mount-interchangeable-lenses-for-the-lumix-s-series-full-frame-digital-single-lens-mirrorless-camera>
 5. Current official optical-glass catalogs from OHARA, HOYA, Schott, HIKARI, CDGM, and Sumita. Catalog comparisons are used only as class or near-match evidence; the patent's stored $n_d$ and $\nu_d$ remain authoritative.
+
+
+## Source-state availability
+
+The Lens state selector enables the three published infinity stations at zoom coordinates 0, 0.5, and 1. It excludes all three reconstructed close-focus positions: the patent gives rounded telephoto travel and conjugate checkpoints, but the retained movement was re-solved and is not the exact published travel. Wide and middle close-focus configurations have no published spacing rows. Optical convergence at the reconstructed 300 mm distance does not turn those positions into source-backed geometry. The physical rear plate is included once; cement normalization, inferred lens clear apertures, and supplier-neutral spectral proxies continue to qualify the simulation.
