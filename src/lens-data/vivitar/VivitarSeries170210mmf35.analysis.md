@@ -24,7 +24,7 @@ Table 1 on patent pages 3–4 defines a 15-element, four-principal-group zoom wi
 
 This is a high-confidence design match, not proof of the exact factory bill of materials. The patent does not identify production glass suppliers, clear apertures, coating details, tolerances, or mount-specific mechanical dimensions.
 
-No focal-length scale factor is applied. The marketed 70–210 mm and f/3.5 values are retained only as product metadata; every radius and axial thickness in the data file remains at the native Table 1 scale.
+No focal-length scale factor is applied. The marketed 70–210 mm and f/3.5 values are retained only as product metadata; the existing reconstruction remains at native scale, but the surface-19 source discrepancy documented below prevents certification as an exact Table 1 transcription.
 
 ## Optical Architecture
 
@@ -219,7 +219,7 @@ All three Japanese conditions are satisfied. The US claims preserve the lower di
 
 ## Verification Summary
 
-All results were recomputed from a literal transcription of Table 1 using a reduced-angle $[y,n\theta]$ ABCD trace. The patent values were not scaled.
+These existing results use the stored native-scale prescription and a reduced-angle $[y,n\theta]$ ABCD trace. The source-state review found an R19 transcription discrepancy; they must not be read as verification of literal agreement with Table 1.
 
 | Quantity | Patent statement | Independent result |
 |---|---:|---:|
@@ -274,3 +274,8 @@ The production owner’s manual specifies a 70–210mm f/3.5 lens with 15 elemen
 - Vivitar, *Vivitar Series 1 70mm–210mm f3.5 Macro Focusing Auto Zoom Lens — Owner’s Manual*, dated March 1975.
 - SUMITA Optical Glass, official all-glass Zemax catalog, including discontinued standard types SF1, SK5, BK1, SF11, BAF11, K5, F1, FK5, SF6, BAF9, LAFN2, and LF2.
 - HIKARI Glass Co., Ltd., official optical-glass catalog, used as an independent cross-check for current J-series equivalents where available.
+
+
+## Source-state review limitation
+
+No configuration is certified for the MTF Lens state selector. A high-resolution check of the exact Japanese Table 1 continuation (PDF page 4) reads **R19 = 38.35 mm**; the current model stores **38.55 mm**. Its calculated image-plane and optical results therefore describe that existing reconstruction, not a verified literal source transcription. Both finite endpoints also use solved travel rather than published spacing rows. The discrepancy is recorded without tuning the prescription or treating a close-focus mechanism and target distance as an authored finite configuration.

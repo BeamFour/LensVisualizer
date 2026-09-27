@@ -33,6 +33,12 @@ import type { LensDataInput } from "../../types/optics.js";
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
+/* Source-state review: exact JP S51-63635 A Table 1, PDF p. 4, prints
+ * R19 = 38.35 mm; the existing model below stores 38.55 mm. Its finite
+ * endpoints are solved travel, not published spacing rows. No source state
+ * is certified pending resolution; see the audit sidecar. Optical values
+ * and the existing inferred image plane are intentionally retained.
+ */
 const LENS_DATA = {
   /* ── Identity ── */
   key: "vivitar-series-1-70-210-f35",
