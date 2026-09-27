@@ -59,16 +59,16 @@ const LENS_DATA = {
   elements: [
     { id: 1, name: "L11", diagramLabel: "L11", label: "L11", type: "Negative Meniscus", nd: 1.92286, vd: 18.90, indexReference: "d", fl: -124.170608996, glass: "S-NPH2 class (OHARA coordinate match; supplier unconfirmed)", cemented: "D1" },
     { id: 2, name: "L12", diagramLabel: "L12", label: "L12", type: "Positive Meniscus", nd: 1.83481, vd: 42.73, indexReference: "d", fl: 51.7623621888, glass: "835427 lanthanum class (supplier unconfirmed)", cemented: "D1" },
-    { id: 3, name: "L21", diagramLabel: "L21", label: "L21", type: "Negative Meniscus", nd: 1.88300, vd: 40.76, indexReference: "d", fl: -15.4767307185, glass: "S-LAH58 class (OHARA coordinate match; supplier unconfirmed)", ng: 1.9105 },
-    { id: 4, name: "L22", diagramLabel: "L22", label: "L22", type: "Biconcave Negative (2× Asph)", nd: 1.58254, vd: 59.47, indexReference: "d", fl: -31.3596946845, glass: "Unmatched (nd 1.58254 / νd 59.47; near 583595/583594 crown class)" },
+    { id: 3, name: "L21", diagramLabel: "L21", label: "L21", type: "Negative Meniscus", nd: 1.88300, vd: 40.76, indexReference: "d", fl: -15.4767307185, glass: "S-LAH58 class (OHARA coordinate match; supplier unconfirmed)" },
+    { id: 4, name: "L22", diagramLabel: "L22", label: "L22", type: "Biconcave Negative (2× Asph)", nd: 1.58254, vd: 59.47, indexReference: "d", fl: -31.3596946845, glass: "Q-SK52S (HIKARI) — near-coordinate spectral proxy; supplier unspecified" },
     { id: 5, name: "L23", diagramLabel: "L23", label: "L23", type: "Positive Meniscus", nd: 1.94595, vd: 17.98, indexReference: "d", fl: 33.1124101486, glass: "FDS18 class (HOYA coordinate match; supplier unconfirmed)" },
     { id: 6, name: "L31", diagramLabel: "L31", label: "L31", type: "Biconvex Positive (2× Asph)", nd: 1.80348, vd: 40.44, indexReference: "d", fl: 21.1082453561, glass: "Unmatched (nd 1.80348 / νd 40.44; nearest audited S-LAH63 differs)" },
     { id: 7, name: "L32", diagramLabel: "L32", label: "L32", type: "Plano-Concave Negative", nd: 1.80000, vd: 29.84, indexReference: "d", fl: -16.3925, glass: "S-NBH55 class (OHARA coordinate match; supplier unconfirmed)", cemented: "D2" },
-    { id: 8, name: "L33", diagramLabel: "L33", label: "L33", type: "Biconvex Positive", nd: 1.49700, vd: 81.54, indexReference: "d", fl: 13.9900543714, glass: "497816 ED/low-dispersion crown class (S-FPL51 coordinate; supplier unconfirmed)", cemented: "D2" },
-    { id: 9, name: "L34", diagramLabel: "L34", label: "L34", type: "Biconcave Negative (2× Asph)", nd: 1.58517, vd: 59.41, indexReference: "d", fl: -36.7053650174, glass: "Unmatched (nd 1.58517 / νd 59.41; near 583594 crown class)" },
+    { id: 8, name: "L33", diagramLabel: "L33", label: "L33", type: "Biconvex Positive", nd: 1.49700, vd: 81.54, indexReference: "d", fl: 13.9900543714, glass: "497816 ED/low-dispersion crown class (S-FPL51 coordinate; supplier unconfirmed)", cemented: "D2", apd: "inferred", apdNote: "S-FPL51 catalog curve gives delta PgF about +0.0308 against the project normal line; inferred material class, not patent-listed APD or supplier identity." },
+    { id: 9, name: "L34", diagramLabel: "L34", label: "L34", type: "Biconcave Negative (2× Asph)", nd: 1.58517, vd: 59.41, indexReference: "d", fl: -36.7053650174, glass: "L-BAL43 (OHARA) — near-coordinate spectral proxy; supplier unspecified" },
     { id: 10, name: "L41", diagramLabel: "L41", label: "L41", type: "Biconvex Positive", nd: 1.61800, vd: 63.33, indexReference: "d", fl: 28.3300659199, glass: "618634 crown/phosphate-crown class (supplier unconfirmed)" },
-    { id: 11, name: "L42", diagramLabel: "L42", label: "L42", type: "Plano-Concave Negative", nd: 1.54072, vd: 47.23, indexReference: "d", fl: -33.5032919071, glass: "S-TIL2 class (OHARA coordinate match; supplier unconfirmed)", ng: 1.55522 },
-    { id: 12, name: "L5", diagramLabel: "L5", label: "L5", type: "Plano-Convex Positive", nd: 1.71299, vd: 53.87, indexReference: "d", fl: 91.212499474, glass: "S-LAL8 class (OHARA near-coordinate match; supplier unconfirmed)", ng: 1.72943 },
+    { id: 11, name: "L42", diagramLabel: "L42", label: "L42", type: "Plano-Concave Negative", nd: 1.54072, vd: 47.23, indexReference: "d", fl: -33.5032919071, glass: "S-TIL2 class (OHARA coordinate match; supplier unconfirmed)" },
+    { id: 12, name: "L5", diagramLabel: "L5", label: "L5", type: "Plano-Convex Positive", nd: 1.71299, vd: 53.87, indexReference: "d", fl: 91.212499474, glass: "S-LAL8 class (OHARA near-coordinate match; supplier unconfirmed)" },
   ],
 
   surfaces: [

@@ -82,11 +82,11 @@ The S-LAH58 designation is used only as a coordinate class. The runtime catalog 
 
 ### L22 — Biconcave Negative, bi-aspherical
 
-**$n_d$ = 1.58254, $\nu_d$ = 59.47. Glass: Unmatched (nd 1.58254 / νd 59.47; near 583595/583594 crown class). Standalone $f$ = -31.3597 mm.**
+**$n_d$ = 1.58254, $\nu_d$ = 59.47. Glass: Q-SK52S (HIKARI), near-coordinate spectral proxy; supplier unspecified. Standalone $f$ = -31.3597 mm.**
 
 L22 is the second negative member of G2 and is aspherical on both surfaces 6A and 7A. Its standalone focal length is negative, while G2 as a whole calculates to -14.4252 mm.
 
-No exact audited public-catalog match was accepted for $n_d=1.58254$, $\nu_d=59.47$. The data therefore keeps an explicit `Unmatched` annotation instead of assigning a speculative vendor glass.
+The Q-SK52S spectral proxy has catalog nd=1.58286 and vd=59.51, differing by +0.00032 and +0.04. This close coordinate match supports a qualified dispersion model without identifying the production supplier or melt.
 
 ### L23 — Positive Meniscus
 
@@ -110,7 +110,7 @@ The stored d-line coordinate is not assigned a named catalog glass: the nearest 
 
 L32 is the negative front member of the L32/L33 cemented pair. The pair has a calculated compound focal length of +57.3870 mm even though L32 by itself is -16.3925 mm, illustrating why isolated and cemented powers must be kept distinct.
 
-The S-NBH55 label is a coordinate-class match. The model includes class-derived C/F/g indices with supplier unconfirmed.
+The S-NBH55 label is a coordinate-class match. C/F/g indices resolve from the catalog curve at runtime with supplier unconfirmed.
 
 ### L33 — Biconvex Positive, rear member of D2
 
@@ -122,11 +122,11 @@ The final label is `497816 ED/low-dispersion crown class`, with an S-FPL51 coord
 
 ### L34 — Biconcave Negative, bi-aspherical OIS element
 
-**$n_d$ = 1.58517, $\nu_d$ = 59.41. Glass: Unmatched (nd 1.58517 / νd 59.41; near 583594 crown class). Standalone $f$ = -36.7054 mm.**
+**$n_d$ = 1.58517, $\nu_d$ = 59.41. Glass: L-BAL43 (OHARA), near-coordinate spectral proxy; supplier unspecified. Standalone $f$ = -36.7054 mm.**
 
 L34 is the single negative movable subgroup at the rear of G3. The patent explicitly assigns transverse motion of this lens to camera-shake correction (¶0129, ¶0221). Its two surfaces, 16A and 17A, carry the strongest modeled aspheric rim behavior in the final geometry.
 
-No exact accepted catalog match was found for $n_d=1.58517$, $\nu_d=59.41$, so the data keeps L34 `Unmatched`. The modeled stabilization section remains centered; no decentered LensVisualizer control is invented.
+L-BAL43 supplies a qualified spectral proxy at nd=1.58572941, vd=59.69698 (residuals +0.00055941 and +0.28698). This is a moldable crown family approximation, not a production-material identification. The modeled stabilization section remains centered; no decentered LensVisualizer control is invented.
 
 ### L41 — Biconvex Positive focusing element
 
@@ -142,7 +142,7 @@ The data labels its glass as a 618634 crown/phosphate-crown class with supplier 
 
 L42 follows L41 and is fixed along the optical axis during focusing according to ¶0134. Its isolated power is negative, while the actual spaced L41+L42 G4 assembly is net positive at +100.3469 mm.
 
-The S-TIL2 designation is a coordinate-class match; catalog C/F/g indices are retained in the data with supplier unconfirmed.
+The S-TIL2 designation is a coordinate-class match; C/F/g indices resolve from the catalog curve at runtime with supplier unconfirmed.
 
 ### L5 — Plano-Convex Positive rear group
 
@@ -156,24 +156,24 @@ The S-LAL8 label is a near-coordinate class match, differing only slightly in d-
 
 The patent provides d-line refractive indices and Abbe numbers, not manufacturer glass names. The final labels below are therefore catalog coordinate classes or explicit unmatched records. They should be read as optical-coordinate identifications, not procurement history.
 
-| Element | $n_d$ | $\nu_d$ | Final glass annotation | Explicit C/F/g indices in data? |
+| Element | $n_d$ | $\nu_d$ | Final glass annotation | Dispersion model |
 |---|---:|---:|---|---|
 | L11 | 1.92286 | 18.90 | S-NPH2 class (OHARA coordinate match; supplier unconfirmed) | Runtime catalog proxy |
-| L12 | 1.83481 | 42.73 | 835427 lanthanum class (supplier unconfirmed) | No |
+| L12 | 1.83481 | 42.73 | 835427 lanthanum class (supplier unconfirmed) | Runtime catalog proxy |
 | L21 | 1.88300 | 40.76 | S-LAH58 class (OHARA coordinate match; supplier unconfirmed) | Runtime catalog proxy |
-| L22 | 1.58254 | 59.47 | Unmatched (nd 1.58254 / νd 59.47; near 583595/583594 crown class) | No |
-| L23 | 1.94595 | 17.98 | FDS18 class (HOYA coordinate match; supplier unconfirmed) | No |
-| L31 | 1.80348 | 40.44 | Unmatched (nd 1.80348 / νd 40.44; nearest audited S-LAH63 differs) | No |
+| L22 | 1.58254 | 59.47 | Q-SK52S (HIKARI), near-coordinate spectral proxy; supplier unspecified | Runtime catalog proxy |
+| L23 | 1.94595 | 17.98 | FDS18 class (HOYA coordinate match; supplier unconfirmed) | Runtime catalog proxy |
+| L31 | 1.80348 | 40.44 | Unmatched (nd 1.80348 / νd 40.44; nearest audited S-LAH63 differs) | Abbe fallback |
 | L32 | 1.80000 | 29.84 | S-NBH55 class (OHARA coordinate match; supplier unconfirmed) | Runtime catalog proxy |
 | L33 | 1.49700 | 81.54 | 497816 ED/low-dispersion crown class (S-FPL51 coordinate; supplier unconfirmed) | Runtime catalog proxy |
-| L34 | 1.58517 | 59.41 | Unmatched (nd 1.58517 / νd 59.41; near 583594 crown class) | No |
-| L41 | 1.61800 | 63.33 | 618634 crown/phosphate-crown class (supplier unconfirmed) | No |
+| L34 | 1.58517 | 59.41 | L-BAL43 (OHARA), near-coordinate spectral proxy; supplier unspecified | Runtime catalog proxy |
+| L41 | 1.61800 | 63.33 | 618634 crown/phosphate-crown class (supplier unconfirmed) | Runtime catalog proxy |
 | L42 | 1.54072 | 47.23 | S-TIL2 class (OHARA coordinate match; supplier unconfirmed) | Runtime catalog proxy |
 | L5 | 1.71299 | 53.87 | S-LAL8 class (OHARA near-coordinate match; supplier unconfirmed) | Runtime catalog proxy |
 
-Catalog-derived line indices are not authored as measured evidence. Nine elements resolve to compatible catalog curves at runtime; L22, L31, and L34 remain explicitly unmatched because the available candidates do not uniquely establish a spectral equivalent. Production suppliers remain unspecified.
+Catalog-derived line indices are not authored as measured evidence. Eleven elements resolve to compatible catalog curves at runtime. L22 uses Q-SK52S (catalog nd=1.58286, vd=59.51; residuals +0.00032 and +0.04); L34 uses L-BAL43. Both are qualified near-coordinate spectral proxies. L31 remains explicitly unmatched. Production suppliers remain unspecified.
 
-The design spans a broad dispersion range, from L23 at $\nu_d=17.98$ to L33 at $\nu_d=81.54$. The product manual’s single-ED-element statement converges with L33’s very-high-Abbe coordinate, but the available evidence does not justify an APO label or an anomalous-partial-dispersion claim. No `dPgF` value is assigned to any element. Chromatic interpretation is therefore limited to the directly stored d-line coordinates and the catalog-derived line indices where a class assignment was accepted.
+The design spans a broad dispersion range, from L23 at $\nu_d=17.98$ to L33 at $\nu_d=81.54$. The product manual’s single-ED-element statement converges with L33’s very-high-Abbe coordinate, and the compatible S-FPL51 catalog curve supports an inferred APD material tag (project-normal-line ΔPgF ≈ +0.0308). This is not a patent-listed APD designation or a whole-lens APO claim. No catalog-derived `dPgF` or line indices override the runtime catalog curves.
 
 ## Focus Mechanism
 
@@ -356,7 +356,7 @@ Surface 16A is the limiting high-slope asphere in the modeled geometry evaluatio
 
 The strongest source-grounded statement about chromatic design is the material distribution rather than a claimed performance class. The patent supplies a very-high-Abbe L33 ($\nu_d=81.54$) cemented to the much lower-Abbe L32 ($\nu_d=29.84$), while the production manual specifies one ED element. This pairing gives a clear dispersion contrast inside the fixed part of G3, but the evidence does not by itself establish which residual color terms dominate or whether the production lens uses the exact same melt.
 
-The modeled prescription also spans high-index/low-Abbe materials such as L11 and L23 and moderate/high-Abbe crowns in later groups. Those coordinates are enough to define the paraxial d-line model and, for the nine catalog-resolved elements, to supply qualified dispersion curves. They are not enough to support a general apochromatic claim because no `dPgF` values are assigned and several elements remain Abbe-only or unmatched.
+The modeled prescription also spans high-index/low-Abbe materials such as L11 and L23 and moderate/high-Abbe crowns in later groups. Those coordinates are enough to define the paraxial d-line model and, for the eleven catalog-resolved elements, to supply qualified dispersion curves. L31 remains Abbe-only, and catalog matches do not establish production spectral performance or justify a general apochromatic claim.
 
 ## Conditional Expressions
 

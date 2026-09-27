@@ -172,7 +172,7 @@ L51 is the sole element of G5 and the final powered element in the active model.
 
 ## Glass Identification and Selection
 
-The patent supplies nd, νd, and θgF coordinates rather than commercial glass names. The names below are authoritative-catalog coordinate or class matches developed from OHARA, HOYA, HIKARI, CDGM, SUMITA, and SCHOTT sources; they are not evidence of the production supplier or melt. The final data file therefore uses `class` wording, preserves one explicit Unmatched element, and omits unsupported spectral substitutions.
+The patent supplies nd, νd, and θgF coordinates rather than commercial glass names. The names below are authoritative-catalog coordinate or class matches developed from OHARA, HOYA, HIKARI, CDGM, SUMITA, and SCHOTT sources; they are not evidence of the production supplier or melt. The final data file therefore uses `class` wording, preserves two spectrally unmatched elements, and omits unsupported spectral substitutions.
 
 | Elements | Patent nd / νd / θgF | Data-file glass disposition | Spectral support retained |
 |---|---|---|---|
@@ -197,7 +197,7 @@ The patent supplies nd, νd, and θgF coordinates rather than commercial glass n
 | L44 | 1.88300 / 39.22 / 0.57295 | H-ZLaF68N spectral proxy | Patent-derived dPgF=-0.00488196 |
 | L51 | 1.94595 / 17.98 / 0.65460 | FDS18 spectral proxy | Patent-derived dPgF=+0.04104236 |
 
-Table 1 publishes θgF for every element. The model preserves each ratio using `dPgF = θgF − (0.6438 − 0.001682 × νd)`. Catalog-derived C/F/g line indices have been removed from authored element data; compatible curves resolve at runtime with the patent partial-dispersion correction retained at g. L12 and L41 remain unresolved because of spectral ambiguity. None of these proxies establishes a production supplier or a whole-lens APO classification.
+Table 1 publishes θgF for every element. The model preserves each ratio using `dPgF = θgF − (0.6438 − 0.001682 × νd)`. Catalog-derived C/F/g line indices have been removed from authored element data; compatible curves resolve at runtime with the patent partial-dispersion correction retained at g. L12 and L41 remain unresolved because of spectral ambiguity. L14, L23, L32, L34, L35, and L43 carry inferred APD tags from their published ratios and compatible fluorophosphate catalog curves. The tags describe an inferred material property, not an explicit patent designation. None of these proxies establishes a production supplier or a whole-lens APO classification.
 
 ## Focus Mechanism
 

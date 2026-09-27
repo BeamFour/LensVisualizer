@@ -45,7 +45,7 @@ the negative middle section.
 
 ### L1 — Positive Meniscus, convex to object
 
-**nd = 1.6073, νd = 59.5. Glass: 607595 / SK7-class (supplier unspecified). f = +98.9 mm.**
+**nd = 1.6073, νd = 59.5. Glass: K-SK7 (SUMITA), coordinate-compatible spectral proxy; supplier unspecified. f = +98.9 mm.**
 
 L1 is the front positive meniscus and begins the converging front section. Its role can be stated securely at the level
 of system power: together with L2 it forms the strong positive front pair ahead of the divided negative section. The
@@ -98,7 +98,7 @@ The stored index convention is d-line (`nd`/`νd`) because the coordinates follo
 
 | Element | nd | νd | Authored glass label |
 |---|---:|---:|---|
-| L1 | 1.6073 | 59.5 | 607595 / SK7-class (supplier unspecified) |
+| L1 | 1.6073 | 59.5 | K-SK7 (SUMITA), coordinate-compatible spectral proxy; supplier unspecified |
 | L2 | 1.6700 | 57.1 | S-LAL52 — coordinate-compatible lanthanum-crown spectral proxy; supplier unspecified |
 | L3 | 1.6727 | 32.2 | 673322 / SF5-class (supplier unspecified) |
 | L4 | 1.7552 | 27.5 | 755275 / SF4-class (supplier unspecified) |

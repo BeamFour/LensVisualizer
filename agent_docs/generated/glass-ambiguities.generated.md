@@ -14,14 +14,14 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 - **831** lenses scanned
 - **9334** glass elements examined
-- **2830** elements have multiple coordinate-compatible candidates
-- **528** lens files are affected
+- **2829** elements have multiple coordinate-compatible candidates
+- **527** lens files are affected
 - **276** ambiguous elements retain authored dPgF at the runtime g-line, independent of the selected catalog row
 - **199** ambiguous elements provide complete C/F/g indices and bypass catalog dispersion entirely
 
 | Selection criterion | Elements |
 |---|---:|
-| Smallest reference-index residual | 1576 |
+| Smallest reference-index residual | 1575 |
 | Evidence-source priority | 972 |
 | Vendor context | 273 |
 | Stable canonical-name order | 7 |
@@ -687,7 +687,6 @@ resolves for. Per-candidate residuals are one `explainCompatibleGlassResolution`
 | `S-TIH13 / E-FD13 class (741278 coordinate)` | 1.74077 / 27.80 (d) | E-FD13 — smallest d-line \|Δn\| (2.3e-7 vs 1.2e-6) | S-TIH13 (Ohara, name) | 1 | [FUJIFILM TCL-X100 33mm f/2 (Fujifilm X100)](../../src/lens-data/fujifilm/FujifilmX100TCLX100.data.ts) L31 |
 | `S-LAH58 (OHARA; exact 883408 coordinate match)` | 1.88300 / 40.80 (d) | S-LAH58 — direct name evidence outranks six-digit code evidence. | TAFD30 (Hoya, code, vendor ✗, alternate code row) | 4 | [FUJIFILM TCL-X100 33mm f/2 (Fujifilm X100)](../../src/lens-data/fujifilm/FujifilmX100TCLX100.data.ts) L32 |
 | `S-NPH1 (OHARA; exact 808228 coordinate match)` | 1.80810 / 22.80 (d) | S-NPH1 — direct name evidence outranks six-digit code evidence. | FD225 (Hoya, code, vendor ✗, alternate code row) | 1 | [FUJIFILM TCL-X100 33mm f/2 (Fujifilm X100)](../../src/lens-data/fujifilm/FujifilmX100TCLX100.data.ts) L37 |
-| `N-PK52A-equivalent coordinate / 497816 low-dispersion class (SCHOTT; supplier unconfirmed)` | 1.49700 / 81.61 (d) | H-FK61 — smallest d-line \|Δn\| (1.1e-8 vs 1.6e-7) | FCD1 (Hoya, code, vendor ✗, alternate code row)<br>S-FPL51 (Ohara, code, vendor ✗, preferred code row)<br>M-FCD1 (Hoya, code, vendor ✗, alternate code row) | 1 | [Fujinon XC 15-45mm f/3.5-5.6 OIS PZ](../../src/lens-data/fujifilm/FujifilmFujinonXC1545mmf3556OISPZ.data.ts) L2e |
 | `835427 lanthanum class (supplier unconfirmed)` | 1.83481 / 42.73 (d) | S-LAH55 — smallest d-line \|Δn\| (2.9e-6 vs 3.0e-6) | TAFD5G (Hoya, code, alternate code row)<br>TAFD5F (Hoya, code, alternate code row) | 1 | [Fujinon XC 16-50mm f/3.5-5.6 OIS II](../../src/lens-data/fujifilm/FujifilmFujinonXC1650mmf3556OISII.data.ts) L12 |
 | `497816 ED/low-dispersion crown class (S-FPL51 coordinate; supplier unconfirmed)` | 1.49700 / 81.54 (d) | S-FPL51 — direct name evidence outranks six-digit code evidence. | H-FK61 (CDGM, code, alternate code row)<br>FCD1 (Hoya, code, alternate code row)<br>M-FCD1 (Hoya, code, alternate code row) | 1 | [Fujinon XC 16-50mm f/3.5-5.6 OIS II](../../src/lens-data/fujifilm/FujifilmFujinonXC1650mmf3556OISII.data.ts) L33 |
 | `618634 crown/phosphate-crown class (supplier unconfirmed)` | 1.61800 / 63.33 (d) | S-PHM52 — smallest d-line \|Δn\| (9.0e-8 vs 1.0e-7) | N-PSK53A (Schott, code, alternate code row)<br>PCD4 (Hoya, code, alternate code row)<br>K-PSKn2 (Sumita, code, alternate code row) | 1 | [Fujinon XC 16-50mm f/3.5-5.6 OIS II](../../src/lens-data/fujifilm/FujifilmFujinonXC1650mmf3556OISII.data.ts) L41 |

@@ -58,7 +58,7 @@ const LENS_DATA = {
       vd: 59.5,
       indexReference: "d",
       fl: 98.86421765127527,
-      glass: "607595 / SK7-class (supplier unspecified)",
+      glass: "K-SK7 (SUMITA) — coordinate-compatible crown spectral proxy; supplier unspecified",
       role: "Front positive meniscus, convex to the object side.",
     },
     {

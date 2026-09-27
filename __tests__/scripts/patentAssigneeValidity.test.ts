@@ -46,6 +46,8 @@ describe("patent assignee validity", () => {
     ["Voigtländer & Sohn Aktiengesellschaft", "Voigtländer & Sohn AG"],
     ["Voigtländer A.G.", "Voigtländer AG"],
     ["Firma Ernst Leitz GmbH", "Ernst Leitz GmbH"],
+    ["FUJIFILM Corporation", "Fujifilm Corporation"],
+    ["Minolta Camera Kabushiki Kaisha", "Minolta Camera Co., Ltd."],
   ])("rejects the spelling-only duplicate %s", (alias, canonical) => {
     expect(() => assertPatentAssigneeValidity([{ key: "alias", patentYear: 1953, patentAssignees: [alias] }])).toThrow(
       `use ${canonical} instead of ${alias}`,

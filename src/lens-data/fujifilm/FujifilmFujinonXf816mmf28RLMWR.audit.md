@@ -50,3 +50,13 @@ Table 1: restored 8.949 mm air + 2.850 mm PP (nd=1.51680, vd=64.20) + 1.000 mm a
 Normalized display capitalization and retained distinguishing product suffixes. Patent-to-production correlation remains qualified. Assignee spelling follows the existing catalog identity.
 
 Cemented membership now explicitly accompanies the source interface topology so the Element Inspector identifies the connected doublets/triplet, not just the diagram bracket.
+
+### Local-site re-review — 2026-09-27
+
+Compared the rendered local-site diagram directly with the exact local patent figure cited above, including optical rims, element order, aspheric marks, cemented membership, labels, and glass colors. Existing SDs are retained: no further optical-rim discrepancy warrants enlarging apertures into source blank shoulders, bevels, or constrained aspheric rims.
+
+Wide-to-tele remains 8.24 to 15.52 mm. Relative to fixed G5, G1 moves +16.782 mm imageward, while G2/G3/G4 move -9.763/-10.311/-5.810 mm objectward. Infinity-to-published-500 mm focus moves the entire G4 imageward +0.122 mm at wide and +0.299 mm at tele, preserving DD26+DD32 and the image plane. The displayed slider direction agrees with Fig. 2 and Table 2; no extrapolation to production MFD was introduced.
+
+L14/L23/L32/L34/L35/L43 receive inferred APD colors and inspector notes from the published theta_gF ratios and compatible fluorophosphate curves. Published ratios remain authoritative; the tags do not claim the source explicitly calls these elements APD. L12 and L41 remain unresolved because the examined candidates conflict spectrally.
+
+Validation: surface, image-circle, and traced field-coverage audits passed. The batch render sweep covered 918 zoom/focus states with zero hidden rim trim; catalog consistency and mismatch checks passed. Full typecheck, formatting, lint, 287 test files / 2,833 tests, and production build passed. The existing changelog is unchanged. Fuji capitalization and Minolta translated corporate-style aliases now have shared metadata regression guards; distinct historical entities remain separate.

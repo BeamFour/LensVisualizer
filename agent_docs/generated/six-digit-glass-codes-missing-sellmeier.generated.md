@@ -10,11 +10,11 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 ## Summary
 
 - **831** lenses scanned
-- **1837** total code-only elements found
-- **336** elements in this report
-- **124** distinct lens files affected
+- **1835** total code-only elements found
+- **334** elements in this report
+- **123** distinct lens files affected
 - **23** active unreviewed elements have no review-record hit or explicit disposition
-- **180** explicitly unmatched/unknown/proprietary/unidentified elements are self-recording review dispositions
+- **178** explicitly unmatched/unknown/proprietary/unidentified elements are self-recording review dispositions
 - **0** dispositions lack any review record
 
 ## Prioritized Unreviewed Queue
@@ -69,7 +69,6 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 514428 | 2 | 1 | patents/JP2016021011A.pdf | All rows have review records |
 | 531557 | 2 | 2 | patents/WO2022071249A1.pdf<br>patents/US8994842.pdf | All rows explicitly disposed |
 | 540473 | 2 | 1 | patents/GB_135853_A.pdf | All rows explicitly disposed |
-| 583594 | 2 | 1 | patents/US20140368925A1.pdf | All rows explicitly disposed |
 | 620586 | 2 | 1 | patents/US4303314.pdf | All rows have review records |
 | 621569 | 2 | 1 | patents/GB_135853_A.pdf | All rows explicitly disposed |
 | 622532 | 2 | 1 | patents/GB_135853_A.pdf | All rows explicitly disposed |
@@ -146,7 +145,6 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 580595 | 1 | 1 | patents/JP2015041012A.pdf | All rows explicitly disposed |
 | 581592 | 1 | 1 | patents/US20150131163A1.pdf | All rows explicitly disposed |
 | 583302 | 1 | 1 | patents/JP_2005092056_A.pdf | All rows explicitly disposed |
-| 583595 | 1 | 1 | patents/US20140368925A1.pdf | All rows explicitly disposed |
 | 585417 | 1 | 1 | Missing from untracked local patents/ references (US20150268449A1, US20150268449, 20150268449) | All rows have review records |
 | 595355 | 1 | 1 | patents/US5579169.pdf | All rows explicitly disposed |
 | 595686 | 1 | 1 | patents/WO_2025263124_A1.pdf | All rows have review records |
@@ -469,13 +467,6 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
 |---|---|---|---|---|---|---|---|
 | L1b (Element L1b) | 3A | `Unmatched (nd=1.53409, vd=55.89; 534559 coordinate class)` | 1.53409 / 55.89 | No catalog entry | abbe | patents/JP2021015312A.pdf | Explicit disposition in data |
-
-### [Fujinon XC 16-50mm f/3.5-5.6 OIS II](../../src/lens-data/fujifilm/FujifilmFujinonXC1650mmf3556OISII.data.ts) - US 2014/0368925 A1
-
-| Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
-|---|---|---|---|---|---|---|---|
-| L22 (L22) | 6A | `Unmatched (nd 1.58254 / νd 59.47; near 583595/583594 crown class)` | 1.58254 / 59.47 | No catalog entry | abbe | patents/US20140368925A1.pdf | Explicit disposition in data |
-| L34 (L34) | 16A | `Unmatched (nd 1.58517 / νd 59.41; near 583594 crown class)` | 1.58517 / 59.41 | No catalog entry | abbe | patents/US20140368925A1.pdf | Explicit disposition in data |
 
 ### [KINOPTIK SUPER-TEGEA 1.9mm f/1.9 FISHEYE](../../src/lens-data/kinoptik/KinoptikSuperTegea19mmf19Fisheye.data.ts) - US 3,037,426
 

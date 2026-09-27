@@ -10,11 +10,11 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 ## Summary
 
 - **831** lenses scanned (**819** visible)
-- **8661 / 9339** non-air surfaces use strict catalog Sellmeier data (92.7%)
-- **8676 / 9339** non-air surfaces use trusted chromatic data (Sellmeier or measured line indices, 92.9%)
+- **8663 / 9339** non-air surfaces use strict catalog Sellmeier data (92.8%)
+- **8678 / 9339** non-air surfaces use trusted chromatic data (Sellmeier or measured line indices, 92.9%)
 - **0** mismatch surfaces in Sweep 1 across **0** lens files
 - **0** Sweep 1 surfaces have a matching untracked local patent PDF
-- **336** code-only missing-Sellmeier elements in Sweep 2: **23** active unreviewed, **180** self-recording explicit dispositions, **0** dispositions missing any review record
+- **334** code-only missing-Sellmeier elements in Sweep 2: **23** active unreviewed, **178** self-recording explicit dispositions, **0** dispositions missing any review record
 - **1** unresolved named-token elements in Sweep 2B, producing **1** token occurrences across **1** distinct tokens
 - **21** Tier A proprietary backfill rows in Sweep 3
 
@@ -55,6 +55,7 @@ These lenses are missing trusted chromatic data only on glass elements. One or t
 | [NIKON AI ZOOM-NIKKOR 80-200mm f/4](../../src/lens-data/nikon/NikonAINikkor80200mmf4.data.ts) | US 4,452,513 | [PDF](../../patents/US4452513.pdf) | 92.3% (12/13) | 92.3% (12/13) | 1 | 19 [glass] (G4 rear negative: `797455 — dense lanthanum glass class (catalog unresolved)`) | abbe: 1 |
 | [SONY FE 24mm f/1.4 GM](../../src/lens-data/sony/SonyFE24mmf14GM.data.ts) | WO 2019/073744 A1 | [PDF](../../patents/JPWO2019073744A1.pdf) | 92.3% (12/13) | 92.3% (12/13) | 1 | 1A [glass] (L11 front XA element: `Unmatched (MC-TAF115-class; Hoya source nominal/polynomial conflict; patent nd=1.77002, νd=49.4)`) | abbe: 1 |
 | [NIKON NIKKOR Z 100-400mm f/4.5-5.6 VR S](../../src/lens-data/nikon/NikonNikkorZ100400f4556.data.ts) | JP 2022-092388 A | [PDF](../../patents/JP2022092388A.pdf) | 92.0% (23/25) | 92.0% (23/25) | 2 | 34 [glass] (Element 19: `603564 — inferred vd and unresolved identity; patent gives nd only`)<br>45 [glass] (Element 25: `738493 — inferred vd and unresolved identity; patent gives nd only`) | abbe: 2 |
+| [Fujinon XC 16-50mm f/3.5-5.6 OIS II](../../src/lens-data/fujifilm/FujifilmFujinonXC1650mmf3556OISII.data.ts) | US 2014/0368925 A1 | [PDF](../../patents/US20140368925A1.pdf) | 91.7% (11/12) | 91.7% (11/12) | 1 | 11A [glass] (L31: `Unmatched (nd 1.80348 / νd 40.44; nearest audited S-LAH63 differs)`) | abbe: 1 |
 | [FUJIFILM TCL-X100 33mm f/2 (Fujifilm X100)](../../src/lens-data/fujifilm/FujifilmX100TCLX100.data.ts) | US 2015/0226942 A1 | Missing from untracked local patents/ references (US20150226942A1, US20150226942, 20150226942) | 91.7% (11/12) | 91.7% (11/12) | 1 | 18A [glass] (Master L36: `Unmatched (nd=1.56865, νd=58.6; no authoritative catalog match)`) | abbe: 1 |
 | [NIKON AI AF ZOOM-NIKKOR 18-35mm f/3.5-4.5D IF-ED](../../src/lens-data/nikon/NikonAFZoomNikkor1835mmf3545DIFED.data.ts) | US 2001/0030812 A1 | [PDF](../../patents/US20010030812A1.pdf) | 91.7% (11/12) | 91.7% (11/12) | 1 | 3A [glass] (L12 compound layer: `Unmatched (compound-asphere layer; material not identified)`) | abbe: 1 |
 | [NIKON FISHEYE-NIKKOR 6mm f/2.8](../../src/lens-data/nikon/NikonFisheyeNikkor6mmf28.data.ts) | US 3,737,214 | [PDF](../../patents/US3737214.pdf) | 91.7% (11/12) | 91.7% (11/12) | 1 | 15 [glass] (Element 7: `534554 — crown glass (patent nd=1.53375, νd=55.4; no current HIKARI catalog match)`) | abbe: 1 |

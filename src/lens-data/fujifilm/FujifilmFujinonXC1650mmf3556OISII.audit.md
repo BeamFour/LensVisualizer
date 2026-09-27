@@ -60,3 +60,13 @@ Table 1: restored the source 11.95 mm air gap and 2.85 mm PP (nd=1.51680, vd=64.
 Normalized display capitalization and retained distinguishing product suffixes. Patent-to-production correlation remains qualified. Assignee spelling follows the existing catalog identity.
 
 Updated all quoted aspheric rim departures in the analysis to the revised SDs.
+
+### Local-site re-review — 2026-09-27
+
+Compared the rendered local-site diagram directly with the exact local patent figure cited above, including optical rims, element order, aspheric marks, cemented membership, labels, and glass colors. Existing SDs are retained: no further optical-rim discrepancy warrants enlarging apertures into source blank shoulders, bevels, or constrained aspheric rims.
+
+Wide/intermediate/tele order remains 16.49 / 27.98 / 48.56 mm. With G5 fixed, G1 starts at -62.29 / -74.44 / -95.43 mm; G2 at -55.02 / -59.20 / -66.65 mm; G3 at -28.29 / -39.33 / -51.10 mm; G4 at -9.70 / -20.74 / -32.51 mm. All move objectward toward tele, with G3 and G4 traveling together, agreeing with Fig. 1 and Table 2. The focus slider stays disabled: the source identifies L41 focusing, but supplies no finite-focus spacing law.
+
+L22 now uses HIKARI Q-SK52S as a qualified spectral proxy (catalog nd/vd=1.58286/59.51; residual +0.00032/+0.04). L34 uses OHARA L-BAL43 (1.58572941/59.69698; residual +0.00055941/+0.28698). Both vendor curves already exist in the catalog; no duplicate entry was needed. Catalog coverage improves from 9/12 to 11/12; L31 remains unresolved. Removed three remaining catalog-derived authored ng values on L21/L42/L5 so they cannot appear as source measurements. L33 gains an inferred APD tag from the S-FPL51 curve (delta PgF about +0.0308).
+
+Validation: surface, image-circle, and traced field-coverage audits passed. The batch render sweep covered 918 zoom/focus states with zero hidden rim trim; catalog consistency and mismatch checks passed. Full typecheck, formatting, lint, 287 test files / 2,833 tests, and production build passed. The existing changelog is unchanged. Fuji capitalization and Minolta translated corporate-style aliases now have shared metadata regression guards; distinct historical entities remain separate.

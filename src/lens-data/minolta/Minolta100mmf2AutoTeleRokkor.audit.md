@@ -32,3 +32,11 @@ The six vintage coordinates remain unresolved. Current LAC12-class candidates di
 Normalized display capitalization and retained distinguishing product suffixes. Patent-to-production correlation remains qualified. Assignee spelling follows the existing catalog identity.
 
 Restored the Auto Tele Rokkor-PF product suffix and romanized 仁藤 忠芳 as Tadayoshi Nito. The Japanese spelling remains in the analysis reference.
+
+### Local-site re-review — 2026-09-27
+
+Compared the rendered local-site diagram directly with the exact local patent figure cited above, including optical rims, element order, aspheric marks, cemented membership, labels, and glass colors. Existing SDs are retained: no further optical-rim discrepancy warrants enlarging apertures into source blank shoulders, bevels, or constrained aspheric rims.
+
+The static six-element/five-group silhouette, cemented D1 bracket, and numeric element labels agree with the shared Fig. 1 topology. No zoom applies; focus stays disabled at the published infinity prescription. The source does not supply a finite-focus spacing law. All six historical glasses remain unresolved; the reviewed HOYA current/obsolete catalog offers no sufficiently close, independently supported full spectral identification. Merely fitting the broad resolver tolerance was not treated as evidence.
+
+Validation: surface, image-circle, and traced field-coverage audits passed. The batch render sweep covered 918 zoom/focus states with zero hidden rim trim; catalog consistency and mismatch checks passed. Full typecheck, formatting, lint, 287 test files / 2,833 tests, and production build passed. The existing changelog is unchanged. Fuji capitalization and Minolta translated corporate-style aliases now have shared metadata regression guards; distinct historical entities remain separate.

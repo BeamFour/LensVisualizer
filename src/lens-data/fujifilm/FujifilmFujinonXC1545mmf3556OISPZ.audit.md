@@ -63,3 +63,13 @@ Normalized display capitalization and retained distinguishing product suffixes. 
 Updated all quoted aspheric rim departures in the analysis to the revised SDs.
 
 Cemented membership now explicitly accompanies the source interface topology so the Element Inspector identifies the connected doublets/triplet, not just the diagram bracket.
+
+### Local-site re-review — 2026-09-27
+
+Compared the rendered local-site diagram directly with the exact local patent figure cited above, including optical rims, element order, aspheric marks, cemented membership, labels, and glass colors. Existing SDs are retained: no further optical-rim discrepancy warrants enlarging apertures into source blank shoulders, bevels, or constrained aspheric rims.
+
+Wide, intermediate, and telephoto states retain the source ordering 15.33 / 25.78 / 43.72 mm. Relative to fixed G4, G1 starts at -63.75 / -58.56 / -60.65 mm (imageward then objectward); G2 at -26.59 / -35.71 / -47.72 mm and G3 at -7.88 / -14.05 / -19.00 mm move objectward. Infinity-to-1 m focus moves G3 imageward by +0.25 / +0.54 / +1.29 mm; other groups stay fixed at each zoom station. These signs agree with Fig. 3 and Table 11.
+
+The L2e inspector now names its actual H-FK61 runtime proxy instead of N-PK52A. L2b and L2e receive inferred APD tags based on the selected catalog curves (project-normal-line delta PgF +0.0212 / +0.0315). No supplier attribution or patent-listed APD tag is inferred.
+
+Validation: surface, image-circle, and traced field-coverage audits passed. The batch render sweep covered 918 zoom/focus states with zero hidden rim trim; catalog consistency and mismatch checks passed. Full typecheck, formatting, lint, 287 test files / 2,833 tests, and production build passed. The existing changelog is unchanged. Fuji capitalization and Minolta translated corporate-style aliases now have shared metadata regression guards; distinct historical entities remain separate.

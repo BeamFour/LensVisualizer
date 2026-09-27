@@ -114,11 +114,11 @@ The d-line coordinate matches OHARA S-BAL42 exactly. The `S-` prefix is retained
 
 ### L2e — Biconvex Positive OIS Element
 
-**nd = 1.49700, νd = 81.61. Glass: N-PK52A-equivalent coordinate / 497816 low-dispersion class (SCHOTT; supplier unconfirmed). f = +35.5054 mm.**
+**nd = 1.49700, νd = 81.61. Glass: H-FK61 (CDGM) — coordinate-compatible spectral proxy; supplier unspecified. f = +35.5054 mm.**
 
 L2e is the single positive lens identified with the OIS function in G2. The patent describes stabilization by moving an OIS lens group perpendicular to the optical axis and specifically favors a one-lens OIS group to reduce size and mass. (JP 2021-15312 A, ¶0042–¶0044.)
 
-The high Abbe number is also explicit in patent condition (7), for which Example 3 gives 81.61. The data file uses a coordinate-equivalent N-PK52A-class label with runtime catalog dispersion. This does not by itself establish anomalous partial dispersion, and no `dPgF` is authored.
+The high Abbe number is also explicit in patent condition (7), for which Example 3 gives 81.61. The data file names the actual H-FK61 runtime spectral proxy. Its catalog curve supports an inferred APD material tag (project-normal-line ΔPgF ≈ +0.0315); supplier identity remains unspecified. No catalog-derived `dPgF` is authored over the runtime curve.
 
 ### L3a — Biconcave Negative Focus Element, Two Aspherical Surfaces
 
@@ -149,12 +149,12 @@ The patent itself publishes d-line refractive indices and Abbe numbers, not glas
 | L2b | 1.53775 / 74.70 | S-FPM3-equivalent coordinate (OHARA; supplier unconfirmed) | runtime catalog curve |
 | L2c | 1.62588 / 35.70 | F13 (CDGM) spectral proxy; supplier unspecified | none stored |
 | L2d, L3a | 1.58313 / 59.38 | S-BAL42-equivalent coordinate (OHARA; supplier unconfirmed) | runtime catalog curve |
-| L2e | 1.49700 / 81.61 | N-PK52A-equivalent coordinate / 497816 low-dispersion class (SCHOTT; supplier unconfirmed) | runtime catalog curve |
+| L2e | 1.49700 / 81.61 | H-FK61 (CDGM) — coordinate-compatible spectral proxy; supplier unspecified | runtime catalog curve |
 | L4a | 1.80400 / 46.53 | S-LAH65VS-equivalent coordinate (OHARA; supplier unconfirmed) | runtime catalog curve |
 
 The production specification states that the marketed lens contains two ED elements. That is a manufacturer fact about the finished lens, not a patent statement that identifies which Example 3 elements correspond to those production ED elements. The patent’s strongest directly supported chromatic statements are instead its Abbe-number constraints, particularly the 39.00 Abbe difference across L2b+L2c and the 81.61 Abbe number of the OIS lens.
 
-No `dPgF` value is authored for any element. Accordingly, the prescription is not described here as apochromatic and no anomalous-partial-dispersion performance is inferred from the d-line coordinates alone.
+No `dPgF` value is authored over the runtime catalog curves. L2b and L2e carry inferred APD material tags based on the S-FPM3 and H-FK61 spectral curves (ΔPgF ≈ +0.0212 and +0.0315), not the d-line coordinates alone. This does not establish whole-lens apochromatic performance.
 
 ## Focus Mechanism
 
@@ -298,4 +298,4 @@ The patent publishes neither lens semi-diameters nor a physical stop diameter. F
 - OHARA, S-FPM / S-BAL glass types: https://oharacorp.com/glass-type/s-fpm-s-bal/
 - OHARA, S-LAH glass types: https://oharacorp.com/glass-type/optical-glass/s-lah/
 - CDGM, F13 optical-glass database entry: https://www.cdgmgd.com/database/toWebDatabase.htm?k=Products_Data&pageIndex=15&url=database
-- SCHOTT, N-PK52A optical-glass data sheet: https://media.schott.com/api/public/content/a2a92fcce8144b9eaa7f5dcd2666d258?v=09326c27
+- CDGM H-FK61 vendor catalog curve, mirrored at https://refractiveindex.info/database/data/specs/cdgm/optical/H-FK61.yml

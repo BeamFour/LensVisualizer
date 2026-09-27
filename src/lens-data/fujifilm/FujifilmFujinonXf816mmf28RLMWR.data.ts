@@ -81,6 +81,8 @@ const LENS_DATA = {
       label: "Element L14", type: "Biconcave Negative", nd: 1.43875,
       vd: 94.66, dPgF: 0.04943812, indexReference: "d", fl: -38.1014062040277,
       glass: "S-FPL55 (OHARA) class",
+      apd: "inferred",
+      apdNote: "Anomalous partial dispersion inferred from the Table 1 theta_gF ratio and compatible fluorophosphate catalog curve; the patent does not explicitly label this element APD.",
     },
     {
       id: 5, cemented: "C1", name: "L15", diagramLabel: "L15",
@@ -105,6 +107,8 @@ const LENS_DATA = {
       label: "Element L23", type: "Positive Meniscus", nd: 1.59522,
       vd: 67.73, dPgF: 0.01438186, indexReference: "d", fl: 38.2329837277195,
       glass: "S-FPM2 (OHARA) class",
+      apd: "inferred",
+      apdNote: "Anomalous partial dispersion inferred from the Table 1 theta_gF ratio and compatible fluorophosphate catalog curve; the patent does not explicitly label this element APD.",
     },
     {
       id: 9, cemented: "C3", name: "L24", diagramLabel: "L24",
@@ -129,6 +133,8 @@ const LENS_DATA = {
       label: "Element L32", type: "Biconvex Positive", nd: 1.59282,
       vd: 68.62, dPgF: 0.01575884, indexReference: "d", fl: 22.5422122928065,
       glass: "FCD505 (HOYA) class",
+      apd: "inferred",
+      apdNote: "Anomalous partial dispersion inferred from the Table 1 theta_gF ratio and compatible fluorophosphate catalog curve; the patent does not explicitly label this element APD.",
     },
     {
       id: 13, cemented: "C5", name: "L33", diagramLabel: "L33",
@@ -141,12 +147,16 @@ const LENS_DATA = {
       label: "Element L34", type: "Biconvex Positive", nd: 1.43875,
       vd: 94.66, dPgF: 0.04943812, indexReference: "d", fl: 32.1331658578013,
       glass: "S-FPL55 (OHARA) class",
+      apd: "inferred",
+      apdNote: "Anomalous partial dispersion inferred from the Table 1 theta_gF ratio and compatible fluorophosphate catalog curve; the patent does not explicitly label this element APD.",
     },
     {
       id: 15, name: "L35", diagramLabel: "L35",
       label: "Element L35", type: "Biconvex Positive", nd: 1.43875,
       vd: 94.66, dPgF: 0.04943812, indexReference: "d", fl: 30.4279548319615,
       glass: "S-FPL55 (OHARA) class",
+      apd: "inferred",
+      apdNote: "Anomalous partial dispersion inferred from the Table 1 theta_gF ratio and compatible fluorophosphate catalog curve; the patent does not explicitly label this element APD.",
     },
     {
       id: 16, name: "L41", diagramLabel: "L41",
@@ -165,6 +175,8 @@ const LENS_DATA = {
       label: "Element L43", type: "Biconvex Positive", nd: 1.497,
       vd: 81.54, dPgF: 0.03083028, indexReference: "d", fl: 23.2118273276956,
       glass: "S-FPL51 (OHARA) class",
+      apd: "inferred",
+      apdNote: "Anomalous partial dispersion inferred from the Table 1 theta_gF ratio and compatible fluorophosphate catalog curve; the patent does not explicitly label this element APD.",
     },
     {
       id: 19, cemented: "C6", name: "L44", diagramLabel: "L44",

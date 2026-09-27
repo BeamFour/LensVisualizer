@@ -28,3 +28,11 @@ L4: unresolved 655339 → SF9 proxy (catalog nd=1.65446, vd=33.855439), retainin
 ### Display and metadata
 
 Normalized display capitalization and retained distinguishing product suffixes. Patent-to-production correlation remains qualified. Assignee spelling follows the existing catalog identity.
+
+### Local-site re-review — 2026-09-27
+
+Compared the rendered local-site diagram directly with the exact local patent figure cited above, including optical rims, element order, aspheric marks, cemented membership, labels, and glass colors. Existing SDs are retained: no further optical-rim discrepancy warrants enlarging apertures into source blank shoulders, bevels, or constrained aspheric rims.
+
+The six-element/five-group silhouette and L4/L5 cemented bracket agree with Fig. 9 at 0.5x scale. The small source bevels are mechanical edge outlines, not additional optical surfaces. No zoom applies; focus stays disabled because Example 5 has no finite-focus spacing law. L3 (683321) and L5 (720521) remain unresolved; nearby old HOYA candidates do not support a confident spectral identification. Coverage remains 4/6.
+
+Validation: surface, image-circle, and traced field-coverage audits passed. The batch render sweep covered 918 zoom/focus states with zero hidden rim trim; catalog consistency and mismatch checks passed. Full typecheck, formatting, lint, 287 test files / 2,833 tests, and production build passed. The existing changelog is unchanged. Fuji capitalization and Minolta translated corporate-style aliases now have shared metadata regression guards; distinct historical entities remain separate.

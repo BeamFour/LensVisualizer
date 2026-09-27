@@ -117,7 +117,8 @@ const LENS_DATA = {
       indexReference: "d",
       fl: 15.8916787165,
       glass: "S-FPM3-equivalent coordinate (OHARA; supplier unconfirmed)",
-      apd: false,
+      apd: "inferred",
+      apdNote: "S-FPM3 catalog curve gives delta PgF about +0.0212 against the project normal line; inferred material class, not patent-listed APD or supplier identity.",
       role: "Positive member of the cemented L2b+L2c pair in G2.",
     },
     {
@@ -158,8 +159,9 @@ const LENS_DATA = {
       vd: 81.61,
       indexReference: "d",
       fl: 35.5054288237,
-      glass: "N-PK52A-equivalent coordinate / 497816 low-dispersion class (SCHOTT; supplier unconfirmed)",
-      apd: false,
+      glass: "H-FK61 (CDGM) — coordinate-compatible spectral proxy; supplier unspecified",
+      apd: "inferred",
+      apdNote: "H-FK61 catalog curve gives delta PgF about +0.0315 against the project normal line; inferred material class, not patent-listed APD or supplier identity.",
       role: "Single positive OIS element in G2; translated laterally for stabilization.",
     },
     {
