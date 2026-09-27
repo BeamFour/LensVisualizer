@@ -319,6 +319,24 @@ const LENS_DATA = {
 
   asph: {},
 
+  sourceStates: [
+    {
+      id: "wide-infinity", label: "Wide infinity", focusT: 0, zoomT: 0,
+      source: "US 2008/0212200 A1, Embodiment 1, prescription and altered-clearance table (PDF p. 13): d3/d8/d16/d21 = 20.101/1.196/32.139/12.812 mm, image gap 46.696 mm. Close-focus reconstruction is not certified; stop diameter and clear apertures remain inferred.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "middle-infinity", label: "Middle infinity", focusT: 0, zoomT: 0.5,
+      source: "US 2008/0212200 A1, Embodiment 1, prescription and altered-clearance table (PDF p. 13): d3/d8/d16/d21 = 20.101/23.894/20.845/1.408 mm, image gap 46.696 mm. Close-focus reconstruction is not certified; stop diameter and clear apertures remain inferred.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "tele-infinity", label: "Tele infinity", focusT: 0, zoomT: 1,
+      source: "US 2008/0212200 A1, Embodiment 1, prescription and altered-clearance table (PDF p. 13): d3/d8/d16/d21 = 20.101/37.806/2.041/6.300 mm, image gap 46.696 mm. Close-focus reconstruction is not certified; stop diameter and clear apertures remain inferred.",
+      conjugate: { kind: "infinity" },
+    },
+  ],
+
   zoomPositions: [71.5, 117.4, 194.0],
   zoomLabels: ["Wide", "Tele"],
 
