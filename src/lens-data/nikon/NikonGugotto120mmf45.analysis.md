@@ -17,11 +17,22 @@ The identification rests on several converging points. Table 4 gives $f = 100.00
 
 The design file transcribes the Gugutto Macro state only. The Fuwatto Soft reconfiguration is discussed below for context, but it is not included as a second optical state in the `.data.ts` file.
 
+## Selectable MTF source states
+
+Infinity is verified against Table 4 at the retained 1.2 scale. The source review
+corrected a transcription of the rear-element thickness from 5.6657 to the printed
+5.6667 normalized units (6.80004 mm in the model); no spacing was optimized for MTF.
+The production 0.64 m endpoint remains inferred unit extension, not a published
+mechanical configuration, so finite MTF remains unavailable. Its retained rear gap
+is unchanged; after the thickness correction its calculated object-to-image distance
+is 639.971 mm. The nominal f/4.5 control and inferred stop radii do not reproduce a
+source-published aperture schedule for the patent's f/4.60 design.
+
 ## Optical Architecture
 
 The Gugutto Macro is a classical positive-negative telephoto layout reduced to the minimum practical element count. The front group is the positive cemented doublet L12; the rear group is a single weak negative meniscus L3. This is the usual telephoto power distribution: a strong positive group forms the main image, while a separated negative rear group shortens the physical track relative to focal length.
 
-At the patent scale, the total track from the first surface vertex to the image plane is 91.8228 mm for a computed effective focal length of 100.0018 mm, giving $TL/EFL = 0.9182$. At the production scale, the same ratio gives a 110.187 mm track for an approximately 120 mm lens. This satisfies the strict telephoto criterion because the mechanical optical length is less than the effective focal length.
+At the patent scale, the total track from the first surface vertex to the image plane is 91.8238 mm for a computed effective focal length of 99.9999 mm, giving $TL/EFL = 0.9182$. At the production scale, the same ratio gives a 110.189 mm track for an approximately 120 mm lens. This satisfies the strict telephoto criterion because the mechanical optical length is less than the effective focal length.
 
 The aperture stop S and a separate fixed stop FS lie in the air gap between the cemented doublet and the rear meniscus. The patent describes the fixed stop as a light-limiting baffle that suppresses harmful upper-side flare from central to peripheral field angles. That detail matters in a three-element lens: the design has too few powered surfaces to correct edge-field aberrations without accepting some vignetting and mechanical light control.
 
@@ -51,7 +62,7 @@ The coefficient-backed historical Hikari E-LAFH2 row matches the patent's `80433
 
 ### L3 — Negative meniscus rear group, convex to image
 
-$n_d = 1.58913$, $\nu_d = 61.09$. Glass: same 589/611 crown class as L1. $f = -283.62$ mm production scale, or $-236.35$ mm at the patent scale.
+$n_d = 1.58913$, $\nu_d = 61.09$. Glass: same 589/611 crown class as L1. $f = -283.71$ mm production scale, or $-236.43$ mm at the patent scale.
 
 L3 is a weak negative meniscus separated from the cemented front component by the stop region. Both surfaces have negative radius values, so in this sign convention the element is concave toward the object and convex toward the image. That image-convex meniscus is not incidental; it is central to the patent's claimed geometry.
 
@@ -100,7 +111,7 @@ US 5,764,425 gives eight conditional expressions. Example 4 satisfies all of the
 |---|---|---:|---:|
 | (1) | $r_1/f$ | $0.23 < \cdot < 0.33$ | 0.269147 |
 | (2) | $r_4/f$ | $-0.13 < \cdot < -0.09$ | -0.108276 |
-| (3) | $(r_4-r_5)/d_4$ | $0.51 < \cdot < 0.70$ | 0.563125 |
+| (3) | $(r_4-r_5)/d_4$ | $0.51 < \cdot < 0.70$ | 0.563026 |
 | (4) | $d_3/f$ | $0.32 < \cdot < 0.45$ | 0.391667 |
 | (5) | $n_2-n_1$ | $> 0.05$ | 0.214710 |
 | (6) | $r_3 / \{f(n_2-n_1)^{1/2}\}$ | $1.8 < \cdot < 3.5$ | 2.787978 |
@@ -121,14 +132,14 @@ All prescription values in the data file were checked by an independent paraxial
 
 | Parameter | Patent Table 4 | Computed at patent scale | Scaled production model |
 |---|---:|---:|---:|
-| Effective focal length | 100.000 mm | 100.0018 mm | 120.0021 mm |
-| Back focal distance | 40.657 mm | 40.6572 mm | 48.7887 mm |
-| Total track | 91.8228 mm | 91.8228 mm | 110.1874 mm |
+| Effective focal length | 100.000 mm | 99.9999 mm | 119.9999 mm |
+| Back focal distance | 40.657 mm | 40.6569 mm | 48.7883 mm |
+| Total track | 91.8238 mm | 91.8238 mm | 110.1886 mm |
 | Tele-ratio | 0.918 | 0.9182 | 0.9182 |
 | Design f-number | 4.60 | 4.60 | 4.60 |
 | Full field angle | 20.2° | 20.2° basis retained | 20.2° basis retained |
 
-The front cemented component has a computed focal length of 73.207 mm at the patent scale, or 87.849 mm after scaling. The rear meniscus has a standalone in-air focal length of -236.347 mm at the patent scale, or -283.616 mm after scaling. The surface-by-surface Petzval sum is +0.00158263 mm⁻¹ at the patent scale, or $f \cdot P = +0.15826$ in normalized form.
+The front cemented component has a computed focal length of 73.207 mm at the patent scale, or 87.849 mm after scaling. The rear meniscus has a standalone in-air focal length of -236.427 mm at the patent scale, or -283.713 mm after scaling. The surface-by-surface Petzval sum is +0.00158263 mm⁻¹ at the patent scale, or $f \cdot P = +0.15826$ in normalized form.
 
 Semi-diameters were not published in the patent. The data file therefore uses conservative inferred values. The front doublet clear aperture is limited by edge-thickness feasibility rather than by the full unvignetted off-axis paraxial bundle, which is consistent with the patent's use of a fixed stop and Nikon's own comments about edge-field flare and reduced distant-scene edge performance.
 

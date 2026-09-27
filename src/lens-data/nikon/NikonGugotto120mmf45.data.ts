@@ -40,7 +40,7 @@ const LENS_DATA = {
   ],
 
   focalLengthMarketing: 120,
-  focalLengthDesign: 120.002,
+  focalLengthDesign: 120,
   apertureMarketing: 4.5,
   apertureDesign: 4.6,
   lensMounts: ["nikon-f"],
@@ -53,6 +53,17 @@ const LENS_DATA = {
   groupCount: 2,
   focusDescription:
     "Unit focus by whole optical assembly extension. Standard Gugutto Macro configuration focuses to about 0.64 m at approximately 1/3×; Sarani Gugutto close-up reassembly is not modeled here.",
+
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "US 5,764,425, fourth embodiment, Table 4, PDF page 28: f=100 infinity prescription scaled by 1.2, including Bf=40.657 x 1.2 mm. Source d6=5.6667 is retained; inferred production close-focus extension is not certified. Patent f/4.60 differs from the retained nominal f/4.5 control; stop radii remain inferred (see audit).",
+      conjugate: { kind: "infinity" },
+    },
+  ],
 
   elements: [
     {
@@ -88,7 +99,7 @@ const LENS_DATA = {
       type: "Negative Meniscus (convex to image)",
       nd: 1.58913,
       vd: 61.09,
-      fl: -283.62,
+      fl: -283.71,
       glass: "Q-SK55S / L-BAL35 class (589/611, uncertain 1995 melt)",
       apd: false,
       role: "Weak negative rear group; provides the telephoto ratio and acts as the field-flattening diverging component.",
@@ -102,7 +113,7 @@ const LENS_DATA = {
     { label: "STO", R: 1e15, d: 15.0, nd: 1.0, elemId: 0, sd: 9.18 },
     // Patent surface 5: fixed stop FS, positioned between the aperture stop and L3.
     { label: "5", R: 1e15, d: 12.0, nd: 1.0, elemId: 0, sd: 10.8 },
-    { label: "6", R: -12.99312, d: 6.79884, nd: 1.58913, elemId: 3, sd: 11.5 },
+    { label: "6", R: -12.99312, d: 6.80004, nd: 1.58913, elemId: 3, sd: 11.5 },
     { label: "7", R: -16.82172, d: 48.7884, nd: 1.0, elemId: 0, sd: 14.3 },
   ],
 
