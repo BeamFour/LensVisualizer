@@ -1,6 +1,6 @@
 /** Independent pane controls remain visible when analysis is closed. Aperture stays shared below both panes. */
 import SliderControl from "../components/controls/SliderControl.js";
-import { formatDist, eflAtZoom } from "../optics/optics.js";
+import { formatFocusStateDistance, eflAtZoom } from "../optics/optics.js";
 import { getGroupMovementAvailability } from "../optics/groupMovement.js";
 import type { RuntimeLens } from "../types/optics.js";
 import type { Theme } from "../types/theme.js";
@@ -32,11 +32,13 @@ export default function ComparisonPaneControls({ L, t, pane, coordinates, onChan
       <SliderControl
         {...common}
         label={`${pane.toUpperCase()} FOCUS`}
-        displayValue={formatDist(focusT, L, zoomT)}
+        displayValue={formatFocusStateDistance(focusT, L, zoomT)}
+        displayValueStyle={{ fontSize: 12, minWidth: 0 }}
+        valueOnNewLine={formatFocusStateDistance(focusT, L, zoomT).length > 18}
         value={focusT}
         step={L.focusStep}
-        minLabel="∞"
-        maxLabel={formatDist(1, L, zoomT)}
+        minLabel={formatFocusStateDistance(0, L, zoomT)}
+        maxLabel={formatFocusStateDistance(1, L, zoomT)}
         disabled={!getGroupMovementAvailability(L).focus}
         disabledReason="No focus movement is authored for this prescription."
         onChange={(value) => onChange({ ...coordinates, focusT: value })}

@@ -4,7 +4,7 @@
  */
 
 import { useCallback, useEffect } from "react";
-import { eflAtZoom, formatDist, formatFNumber } from "../../optics/optics.js";
+import { eflAtZoom, formatFocusStateDistance, formatFNumber } from "../../optics/optics.js";
 import { fisheyeProjectionFocalLengthAtZoom, isFisheyeProjection } from "../../optics/projection.js";
 import { getGroupMovementAvailability } from "../../optics/groupMovement.js";
 import { isMovementAxisEnabled, perspectiveControlSteps } from "../../optics/lensMovement.js";
@@ -271,14 +271,18 @@ export default function DiagramControls({
           useSideLayout={useSideLayout}
           label="FOCUS"
           labelMinWidth={85}
-          displayValue={formatDist(focusT, L, zoomT)}
+          displayValue={formatFocusStateDistance(focusT, L, zoomT, aberrationT)}
+          displayValueStyle={{ fontSize: 12, minWidth: 0 }}
+          valueOnNewLine={formatFocusStateDistance(focusT, L, zoomT, aberrationT).length > 18}
           value={focusT}
           step={L.focusStep}
           onPointerDown={beginInteraction}
           onChange={handleFocusChange}
           onPointerUp={handlePointerUp}
-          minLabel={"\u221e"}
-          maxLabel={groupMovementAvailability.focus ? formatDist(1, L, zoomT) : "Not modeled"}
+          minLabel={formatFocusStateDistance(0, L, zoomT, aberrationT)}
+          maxLabel={
+            groupMovementAvailability.focus ? formatFocusStateDistance(1, L, zoomT, aberrationT) : "Not modeled"
+          }
           disabled={!groupMovementAvailability.focus}
           disabledReason="No modeled focus travel data"
           flexBasis="260px"

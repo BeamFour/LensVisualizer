@@ -53,6 +53,13 @@ Key responsibilities:
 - Tracks slider interaction so heavy analysis can defer/freeze inputs while the user drags.
 - Surfaces build, shape, ray, and render errors through the panel error tiers.
 
+Focus readouts in single-lens controls, compact headers and comparison panes use `formatFocusStateDistance`.
+At an exact verified station they display its conjugate distance, reference plane and calculated provenance instead of
+substituting production `closeFocusM`. Perturbing a finite station with the aberration control makes its readout
+unverified, including a finite station at coordinate zero. Other finite positions on a migrated
+prescription are labeled estimated; unmigrated prescriptions retain their legacy readouts. This is presentation only:
+selecting a source station still owns the exact geometry update, and best-focus MTF offsets do not move the diagram.
+
 ## Computation Hooks
 
 Hooks live in `src/components/hooks/`. The ones with non-obvious contracts:

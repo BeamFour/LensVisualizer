@@ -6,6 +6,7 @@ import {
   doLayout,
   entrancePupilAtState,
   formatDist,
+  formatFocusStateDistance,
   traceRay,
   traceRayChromatic,
   computeChromaticRayFanSpread,
@@ -76,6 +77,57 @@ describe("formatDist", () => {
   it("formats cm for close distances", () => {
     // t=1.0 → d = 0.4/1 = 0.4 m = 40 cm
     expect(formatDist(1.0, mockL)).toBe("40 cm");
+  });
+});
+
+describe("source-state focus distance", () => {
+  const stationT = 0.7123456789;
+  function lens() {
+    const L = buildVariableStopGapLens([10, 11, 12], "focus-label", [0, stationT, 1]);
+    L.data.sourceStates = [
+      {
+        id: "finite",
+        label: "Finite",
+        focusT: stationT,
+        zoomT: 0,
+        source: "Synthetic source",
+        conjugate: {
+          kind: "finite",
+          objectDistanceMm: 229.93247,
+          distanceReference: "image-plane",
+          distanceProvenance: "calculated",
+          derivation: "Synthetic fixed-plane derivation",
+        },
+      },
+    ];
+    return L;
+  }
+  it("uses the exact conjugate and explains its reference and calculated provenance", () => {
+    const L = lens();
+    expect(formatFocusStateDistance(stationT, L)).toBe("Calculated 23.0 cm from image plane");
+    expect(formatFocusStateDistance(stationT + 0.0001, L)).toMatch(/^Estimated /);
+    expect(formatFocusStateDistance(stationT, L, 0, 0.1)).toBe("Unverified focus");
+    expect(formatFocusStateDistance(stationT, L, 0.5)).toMatch(/^Estimated /);
+  });
+  it("recognizes finite configurations at zero without mislabeling the reference plane", () => {
+    const L = lens();
+    L.data.sourceStates![0] = {
+      ...L.data.sourceStates![0],
+      focusT: 0,
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 125,
+        distanceReference: "first-surface",
+        distanceProvenance: "published",
+      },
+    };
+    expect(formatFocusStateDistance(0, L)).toBe("12.5 cm from first surface");
+    expect(formatFocusStateDistance(0, L, 0, 0.1)).toBe("Unverified focus");
+  });
+  it("preserves legacy labels for unmigrated prescriptions", () => {
+    const L = buildSimplePositiveElementLens();
+    expect(formatFocusStateDistance(0, L)).toBe("∞");
+    expect(formatFocusStateDistance(1, L)).toBe(formatDist(1, L));
   });
 });
 

@@ -30,7 +30,7 @@
 
 import { formatSharedFocusDist, sharedFNumber } from "./comparisonSliders.js";
 import type { FocusPairResult, AperturePairResult, ZoomPairResult, MovementPairResult } from "./comparisonSliders.js";
-import { formatDist, eflAtZoom } from "../optics/optics.js";
+import { formatFocusStateDistance, eflAtZoom } from "../optics/optics.js";
 import { getGroupMovementAvailability } from "../optics/groupMovement.js";
 import { isMovementAxisEnabled } from "../optics/lensMovement.js";
 import { snapToZeroStop } from "../utils/style/sliderStops.js";
@@ -354,13 +354,13 @@ export default function SharedSlidersBar({
             readouts={
               <>
                 <span>
-                  A: {formatDist(focusPair.focusA, LA, zoomPair?.zoomA)}
+                  A: {formatFocusStateDistance(focusPair.focusA, LA, zoomPair?.zoomA)}
                   {focusPair.focusA > 0.003 && focusedEflDiffersA && (
                     <span style={{ opacity: 0.7 }}> ({dynamicEflA.toFixed(1)} mm)</span>
                   )}
                 </span>
                 <span>
-                  B: {formatDist(focusPair.focusB, LB, zoomPair?.zoomB)}
+                  B: {formatFocusStateDistance(focusPair.focusB, LB, zoomPair?.zoomB)}
                   {focusPair.focusB > 0.003 && focusedEflDiffersB && (
                     <span style={{ opacity: 0.7 }}> ({dynamicEflB.toFixed(1)} mm)</span>
                   )}

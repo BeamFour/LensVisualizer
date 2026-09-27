@@ -8,6 +8,8 @@ import themes from "../../../../src/utils/theme/themes.js";
 import type { LensData, RuntimeLens } from "../../../../src/types/optics.js";
 import { LENS_CATALOG } from "../../../../src/utils/catalog/lensCatalog.js";
 
+import { buildVariableStopGapLens } from "../../optics/testLensFixtures.js";
+
 afterEach(() => cleanup());
 
 function renderControls(
@@ -16,6 +18,7 @@ function renderControls(
     focusExpanded?: boolean;
     apertureExpanded?: boolean;
     focusT?: number;
+    aberrationT?: number;
     dynamicEFL?: number;
     showEffectiveFocalLength?: boolean;
     shiftMm?: number;
@@ -41,7 +44,7 @@ function renderControls(
         useSideLayout={false}
         zoomT={0}
         onZoomChange={vi.fn()}
-        aberrationT={0}
+        aberrationT={options.aberrationT ?? 0}
         onAberrationChange={callbacks.onAberrationChange}
         focusT={options.focusT ?? 0}
         onFocusChange={callbacks.onFocusChange}
@@ -260,4 +263,31 @@ describe("DiagramControls", () => {
     fireEvent.click(within(zoomBox).getByText(/Show effective focal length/i));
     expect(callbacks.onToggleEffectiveFocalLength).toHaveBeenCalledTimes(1);
   });
+});
+
+it("keeps a calculated station distance visible when the analysis drawer is closed", () => {
+  const L = buildVariableStopGapLens([10, 11]);
+  L.data.sourceStates = [
+    {
+      id: "close",
+      label: "Close",
+      focusT: 1,
+      zoomT: 0,
+      source: "Synthetic source",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 229.93247,
+        distanceReference: "image-plane",
+        distanceProvenance: "calculated",
+        derivation: "Synthetic fixed-plane derivation",
+      },
+    },
+  ];
+  renderControls(L, { focusT: 1 });
+  expect(screen.getAllByText("Calculated 23.0 cm from image plane")).not.toHaveLength(0);
+  expect((screen.getByRole("slider", { name: "FOCUS" }) as HTMLInputElement).value).toBe("1");
+  cleanup();
+  renderControls(L, { focusT: 1, aberrationT: 0.2 });
+  expect(screen.queryByText("Calculated 23.0 cm from image plane")).toBeNull();
+  expect(screen.getAllByText("Unverified focus")).not.toHaveLength(0);
 });

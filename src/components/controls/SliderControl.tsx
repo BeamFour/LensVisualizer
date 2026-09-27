@@ -15,6 +15,8 @@ interface SliderControlProps {
   labelMinWidth: number;
   displayValue: string;
   displayValueStyle?: React.CSSProperties;
+  /** Give a qualified value its own row while keeping the label and actions together. */
+  valueOnNewLine?: boolean;
   value: number;
   step: number;
   min?: number;
@@ -46,6 +48,7 @@ export default function SliderControl({
   labelMinWidth,
   displayValue,
   displayValueStyle,
+  valueOnNewLine = false,
   value,
   step,
   min = 0,
@@ -126,9 +129,26 @@ export default function SliderControl({
             }
       }
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: valueOnNewLine ? "wrap" : undefined,
+          alignItems: "center",
+          gap: 10,
+          marginBottom: 8,
+        }}
+      >
         <span style={{ ...SLIDER_LABEL, color: t.label, minWidth: labelMinWidth }}>{label}</span>
-        <span style={{ ...SLIDER_VALUE_BASE, color: t.focusDist, ...displayValueStyle }}>{displayValue}</span>
+        <span
+          style={{
+            ...SLIDER_VALUE_BASE,
+            color: t.focusDist,
+            ...(valueOnNewLine ? { order: 1, flexBasis: "100%" } : {}),
+            ...displayValueStyle,
+          }}
+        >
+          {displayValue}
+        </span>
         {action && <span style={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>{action}</span>}
         {collapsible && (
           <CollapseButton

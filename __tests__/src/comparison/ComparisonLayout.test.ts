@@ -155,7 +155,23 @@ describe("ComparisonLayout", () => {
 });
 
 it("keeps exact independent focus controls below both diagram panels", () => {
-  const LA = buildVariableStopGapLens([10, 11], "pane-a");
+  const LA = buildVariableStopGapLens([10, 11, 12], "pane-a", [0, 0.7123456789, 1]);
+  LA.data.sourceStates = [
+    {
+      id: "finite",
+      label: "Finite",
+      focusT: 0.7123456789,
+      zoomT: 0,
+      source: "Synthetic source",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 229.93247,
+        distanceReference: "image-plane",
+        distanceProvenance: "calculated",
+        derivation: "Synthetic fixed-plane derivation",
+      },
+    },
+  ];
   const LB = buildVariableStopGapLens([10, 12], "pane-b");
   const onPaneCoordinates = vi.fn();
   render(
@@ -186,6 +202,7 @@ it("keeps exact independent focus controls below both diagram panels", () => {
   const a = screen.getByRole("slider", { name: "A FOCUS" }) as HTMLInputElement;
   const b = screen.getByRole("slider", { name: "B FOCUS" }) as HTMLInputElement;
   expect(a.value).toBe("0.7123456789");
+  expect(screen.getByText("Calculated 23.0 cm from image plane")).toBeTruthy();
   expect(b.value).toBe("0.4");
   fireEvent.change(a, { target: { value: "0.8" } });
   expect(onPaneCoordinates).toHaveBeenCalledExactlyOnceWith("a", LA.data.key, { focusT: 0.8, zoomT: 0 });

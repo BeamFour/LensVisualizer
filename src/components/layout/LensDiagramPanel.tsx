@@ -495,6 +495,7 @@ export default function LensDiagramPanel({
                 isWide={isWide}
                 focusT={focusT}
                 zoomT={zoomT}
+                aberrationT={aberrationT}
                 fNumber={fNumber}
                 showOnAxis={showOnAxis}
                 onShowOnAxisChange={adapters.onShowOnAxisChange}
