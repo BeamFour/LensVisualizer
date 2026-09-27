@@ -64,3 +64,22 @@ Patent: US 4,792,219, Embodiment 3
 - OHARA S-LAM2 (`1.743997 / 44.79`) reproduces the index and differs by only `+0.06` in Abbe number.
 - Relabeled L5 as the coefficient-backed S-LAM2 optical equivalent while leaving the production supplier
   unspecified. No prescription, focus, aperture, APD, or semi-diameter values changed.
+
+
+## 2026-09-26 — Source-state review
+
+Source-state review outcome: blocked.
+
+- Reviewed the exact local `patents/US4792219.pdf`, Embodiment 3 on PDF page 16 and the repeated prescription in Claim 6 on PDF page 18. Both print r₆ = 271.1363, whereas retained surface `6` is 24.4227 mm at ×0.9 scale, corresponding to 27.1363. This is visible in the source, not merely an OCR discrepancy. No radius correction is inferred from the computed focal length or intended negative-element description. All three authored positions remain uncertified pending resolution.
+- The printed d₆ = 11.8882 agrees with the retained scaled 10.6994 mm. Corrected the explanatory comment to cite the visible value. The source's ΣDIII = 21.153 also differs from the sum of its individual d₁₄–d₁₈ rows, 20.9544; retained those rows and removed the unsupported OCR explanation.
+- Source d₁₃ is 0.8888 / 5.283 / 20.277 at infinity / unsigned 0.1× / 0.5×. Retained scaled gap `12` is 0.7999 / 4.7547 / 18.2493 at focus coordinates 0 / 0.42200636994498253 / 1. Source F/2.06 differs from the nominal F/2 physical-aperture model.
+- Rear image distances 39.8578 / 46.59164864864865 / 69.56894054054054 mm are calculated from the retained infinity plane and an assumed constant α = 0.370 differential-motion ratio; they are not tabulated source image planes.
+
+| Authored focus | Derived first-surface distance (mm) | Derived image-plane distance (mm) | Derived magnification | Published magnitude | Relative error |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 0.42200636994498253 | 825.6554424143744 | 947.8529910630231 | −0.1175347101175448 | 0.1 | 17.5347% |
+| 1 | 237.5508324381382 | 396.22027297867874 | −0.5059752180370831 | 0.5 | 1.19504% |
+
+- Independently solved exact rays at heights 0.01 / 0.005 / 0.0025 mm give middle-state source roots 825.655437223951 / 825.655441260947 / 825.655442029899 mm and close-state roots 237.550831636156 / 237.550832244556 / 237.550832382829 mm. Maximum axial residual is below 1.71e−11 mm. Both published-magnification checks fail the unchanged 1% allowance; numerical agreement between model methods does not resolve the source discrepancy.
+- The infinity position's formal approximately 22.4 km finite root is a residual of the retained calculated plane, not an additional source state. No source states or optical values were changed. All three inventory candidates have a reviewed blocked outcome; production focus specifications do not substitute for missing configuration evidence.
+- Validation: shared source-state/conjugate/script suites and the complete repository quality gate. No per-lens tests or optical-reference changes.

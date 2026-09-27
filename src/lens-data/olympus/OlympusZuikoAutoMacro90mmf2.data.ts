@@ -163,8 +163,10 @@ const LENS_DATA = {
 
   /* ── Surface prescription ──
    *  Patent f=100 values scaled ×0.9 to production f≈90 mm.
-   *  d₆ corrected from OCR "1.8882" to 11.8882 (confirmed by cross-embodiment
-   *  comparison and production barrel length match: 71.7 mm computed vs 71 mm spec).
+   *  Source-state blocker: Embodiment 3 and Claim 6 print r₆ = 271.1363,
+   *  whereas retained surface "6" corresponds to 27.1363 before scaling.
+   *  Do not certify any source state until this discrepancy is resolved.
+   *  The printed d₆ = 11.8882 is visually confirmed; no optical values changed.
    *  Stop position from patent: r₇ = ∞, between Groups I and II.
    */
   surfaces: [
@@ -198,7 +200,9 @@ const LENS_DATA = {
    *    ∞  → d₁₃ = 0.8888 mm
    *    1/10× → d₁₃ = 5.283 mm
    *    1/2× → d₁₃ = 20.277 mm
-   *  Scaled ×0.9 for production.
+   *  Scaled ×0.9 for production. Rear image distances are calculated from
+   *  the retained infinity plane and an assumed constant motion ratio;
+   *  they are not tabulated source image planes. See the source-state audit.
    *  Focus type: unit focus + floating element (whole lens advances,
    *  Group III at 63% of subsystem speed → single variable gap).
    */
