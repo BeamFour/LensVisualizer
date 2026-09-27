@@ -232,11 +232,38 @@ const LENS_DATA = {
    *  Groups 1 and 2 extend forward; Group 3 is fixed.
    *  D13: Group 1 rear → Group 2 front (dominant extension, +61.0 mm travel at ×1.25)
    *  D15: Group 2 rear → Group 3 front (differential compensator, +6.7 mm travel)
-   *  Close focus values at 1:1 magnification (MFD = 0.38 m).
+   *  Exact infinity / half life-size / life-size source rows at the existing ×1.25 scale.
+   *  Production MFD 0.38 m is not an input to the source-distance derivation.
    */
+  sourceStates: [
+    {
+      id: "infinity", label: "Infinity", focusT: 0, zoomT: 0,
+      source: "JP 2002-090622 A, Example 2, Table 2 and paragraph 0022 (PDF p. 4), infinity D13/D15 = 3.96/4.83 mm before the existing uniform 1.25 scale. The model retains an inferred stop and a calculated fixed 46.662 mm image gap.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "half-life-size", label: "Half life-size", focusT: 0.5, zoomT: 0,
+      source: "JP 2002-090622 A, Example 2, paragraph 0022 (PDF p. 4), published half life-size D13/D15 = 27.38/9.67 mm. Exact model-scale gaps are 34.225/12.0875 mm after the existing uniform 1.25 scale; the fixed image gap remains calculated.",
+      conjugate: {
+        kind: "finite", objectDistanceMm: 509.615161732056,
+        distanceReference: "image-plane", distanceProvenance: "calculated", magnification: 0.5,
+        derivation: "At the existing 1.25 model scale, fixed-plane s = -B/A gives 343.815661732056 mm before surface 1. Adding physical track 165.7995 mm gives 509.615161732056 mm. Three independent exact-ray roots agree within 0.000001 mm; magnitude 0.49995253611435686 differs from published 0.5 by 0.0094928%, within the unchanged 1% allowance. Production MFD is not an input.",
+      },
+    },
+    {
+      id: "life-size", label: "Life-size", focusT: 1, zoomT: 0,
+      source: "JP 2002-090622 A, Example 2, paragraph 0022 (PDF p. 4), published life-size D13/D15 = 52.78/10.22 mm. Existing model-scale gaps are 65.975/12.775 mm after uniform 1.25 scaling. Distance describes the scaled patent model, not a manufacturer measurement.",
+      conjugate: {
+        kind: "finite", objectDistanceMm: 413.5601862185473,
+        distanceReference: "image-plane", distanceProvenance: "calculated", magnification: 1,
+        derivation: "At the existing 1.25 model scale, fixed-plane s = -B/A gives 215.32318621854725 mm before surface 1. Adding physical track 198.237 mm gives 413.5601862185473 mm. Three independent exact-ray roots agree within 0.000001 mm; magnitude 0.9998327184606646 differs from published 1 by 0.0167282%, within the unchanged 1% allowance. Production 0.38 m is not an input.",
+      },
+    },
+  ],
+  focusPositions: [0, 0.5, 1],
   var: {
-    "13": [4.95, 65.975],
-    "15": [6.0375, 12.775],
+    "13": [4.95, 34.225, 65.975],
+    "15": [6.0375, 12.0875, 12.775],
   },
   varLabels: [
     ["13", "D13"],

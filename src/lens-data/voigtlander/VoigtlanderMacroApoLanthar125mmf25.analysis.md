@@ -197,3 +197,8 @@ Note: Example 1 of the same patent yields EFL = 99.975 mm and BFD = 42.26 mm at 
 4. OHARA Optical Glass Catalog — nd/νd values and Sellmeier coefficients for S-FPL51, S-BAL35, S-BSL7, S-LAL8, S-LAH60.
 5. Schott Optical Glass Catalog — nd/νd values for FK5, SF5-class references, N-BAF10, N-LAK8.
 6. HOYA and Sumita Optical Glass Catalogs — nd/νd values for E-FD5, K-FK5, K-FPL51, K-BAF10, K-LASH60, K-BAL14, K-BK7, K-LaL8.
+
+
+## Verified source configurations
+
+The MTF Lens state selector offers infinity, half life-size and life-size from Example 2. The half life-size pair is now an exact diagram keyframe at focus 0.5, using **34.225 / 12.0875 mm** gaps at the existing ×1.25 scale, rather than endpoint interpolation. The finite object distances are **calculated 509.6152 / 413.5602 mm from the image plane**, verified with independent exact rays and the published magnifications. These describe the scaled patent model; the production 0.38 m specification is not a derivation input. The inferred stop and calculated fixed image gap remain qualified. Selecting a state retains its exact positions and source rays after MTF closes; neighboring finite positions remain unavailable.
