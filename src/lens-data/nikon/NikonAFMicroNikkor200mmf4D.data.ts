@@ -53,6 +53,45 @@ const LENS_DATA = {
   elementCount: 13,
   groupCount: 8,
 
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "US 5,402,268, Table 1 / First Embodiment, PDF page 7: infinity column, d5=6.6432, d8=5.1405, d14=45.1242 and Bf=58.9638 mm. The table's d0=0 is its infinity placeholder, not a zero-distance source.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "half-life-size",
+      label: "Half life-size",
+      focusT: 0.7028911318620283,
+      zoomT: 0,
+      source: "US 5,402,268, Table 1 / First Embodiment, PDF page 7: beta=-0.5000, d0=480.7237, d5=14.2044, d8=17.7426, d14=32.5222 and Bf=58.9638 mm. Column 8 defines d0 from the object to the first-surface apex.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 480.7237,
+        distanceReference: "first-surface",
+        distanceProvenance: "published",
+        magnification: -0.5,
+      },
+    },
+    {
+      id: "life-size",
+      label: "Life-size",
+      focusT: 1,
+      zoomT: 0,
+      source: "US 5,402,268, Table 1 / First Embodiment, PDF page 7: beta=-1.0000, d0=272.5885, d5=6.6432, d8=37.1142, d14=13.1506 and Bf=58.9638 mm. Column 8 defines d0 from the object to the first-surface apex.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 272.5885,
+        distanceReference: "first-surface",
+        distanceProvenance: "published",
+        magnification: -1,
+      },
+    },
+  ],
+
   /* ── Elements ── */
   elements: [
     {
@@ -269,7 +308,7 @@ const LENS_DATA = {
 
   /* ── Published focus keyframes ──
    * Source d8 = S8.d + STO.d, so total d8 is 5.1405 mm at infinity and 37.1142 mm at 1:1.
-   * The published beta=-0.5000 state is retained in the audit: d5=14.2044, d8=17.7426, d14=32.5222 mm.
+   * The published beta=-0.5000 keyframe has: d5=14.2044, d8=17.7426, d14=32.5222 mm.
    */
   focusPositions: [0, 0.7028911318620283, 1],
   var: {

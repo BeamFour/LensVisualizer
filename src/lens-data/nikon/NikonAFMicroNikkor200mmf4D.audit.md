@@ -1,5 +1,36 @@
 # NikonAFMicroNikkor200mmf4D — Patent and Repository Integration Audit
 
+## 2026-09-26 — Source-state review
+
+Source-state review outcome: verified. All three authored candidates enabled: infinity,
+half life-size and life-size. Intermediate finite positions remain uncertified.
+
+Rechecked local `patents/US5402268.pdf`, PDF page 7, Table 1 / First Embodiment.
+The source explicitly defines d0 as object-to-first-surface-apex distance in printed
+column 8. Its d0=0 infinity entry is a placeholder, not a physical zero-distance source.
+All 21 radii, glass rows and spacings match the retained file, using the more precise
+focus subtable rather than the two-decimal overview. The three d5/d8/d14 rows are
+6.6432/5.1405/45.1242, 14.2044/17.7426/32.5222 and 6.6432/37.1142/13.1506 mm;
+Bf remains 58.9638 mm. The inferred stop splits d8 after a fixed 2.57025 mm.
+The middle focusT=0.7028911318620283 keyframe represents G1's published reversal
+exactly; earlier historical statements that this reversal is unrepresentable predate
+that keyframe and do not describe the current data.
+
+Published finite d0 values 480.7237/272.5885 mm are retained. At the fixed image
+plane, ABCD derives 480.714714226313/272.586673573178 mm, differing by
+0.0089858/0.0018264 mm (0.001869%/0.000670%). Independent exact roots at
+0.01/0.005/0.0025 mm heights are 480.714714128379/480.714714198332/480.714714226313
+and 272.586673422445/272.586673533512/272.586673573178 mm; axial residuals
+stay below 5.547e-12 mm. Magnifications tend to -0.500004099708/-0.999998254310.
+These small residuals are documented rather than removed by adjusting the published
+spacing or distance. They pass the standard evidence check; the calculation does not
+establish the cause of the difference from the printed source.
+
+At infinity, matrix A=-0.000010272850138 and B=200.147521236940 mm produce a
+formal finite root near 19.48 km. This residual does not authorize another finite state.
+No optical values changed. Aperture placement, clear diameters and supplier-neutral
+dispersion assignments retain their existing qualifications and normal MTF restrictions.
+
 ## Job card
 
 - **PATENT:** US 5,402,268

@@ -359,3 +359,14 @@ finite-focus results within floating-point noise.
   https://nij.nikon.com/support/manual/nikkor/AFMCED200mm_f4D_02.pdf
 - Nikon USA, **AF Micro-Nikkor 200mm f/4D IF-ED**, official specifications and technology notes:
   https://www.nikonusa.com/p/af-micro-nikkor-200mm-f4d-if-ed/1989/overview
+
+
+## Selectable MTF source states
+
+Infinity, half life-size and life-size are selectable at the three exact authored
+focus coordinates. The finite distances are the patent's **480.7237 mm** and
+**272.5885 mm from the first-surface apex**, not production object-to-image distances.
+Independent small-height exact rays verify the retained fixed geometry, with the small
+source/model residuals preserved in the audit. Intermediate finite slider positions
+remain unavailable. Inferred stop dimensions and catalog-based dispersion continue to
+qualify these prescription simulations.
