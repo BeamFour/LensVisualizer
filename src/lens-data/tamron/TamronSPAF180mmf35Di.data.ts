@@ -306,6 +306,49 @@ const LENS_DATA = {
   asph: {},
 
   /* Patent infinity, −1/2×, and −1× keyframes, uniformly scaled to 180 mm. */
+  sourceStates: [
+    {
+        "id": "infinity",
+        "label": "Infinity",
+        "focusT": 0,
+        "zoomT": 0,
+        "source": "JP 2003-329924 A, Example 2, paragraph 0019 (PDF p. 4), infinity column. Existing model uniformly scales published radii and distances by 1.0171864961 to 180 mm, retaining the source magnifications. Apertures remain inferred.",
+        "conjugate": {
+            "kind": "infinity"
+        }
+    },
+    {
+        "id": "half-life-size",
+        "label": "Half life-size",
+        "focusT": 0.7387189937888587,
+        "zoomT": 0,
+        "source": "JP 2003-329924 A, Example 2, paragraph 0019 (PDF p. 4), published -0.5 magnification column. Existing model uniformly scales source geometry by 1.0171864961; distance is calculated at that model scale. Printed D20 names the gap after surface 22. Production 0.47 m is not a derivation input.",
+        "conjugate": {
+            "kind": "finite",
+            "objectDistanceMm": 636.2365174738364,
+            "distanceReference": "image-plane",
+            "distanceProvenance": "calculated",
+            "magnification": -0.5,
+            "derivation": "Fixed-plane s = -B/A gives 424.0198844738364 mm before surface 1; adding physical model-scale track 212.21663300000003 mm gives 636.2365174738364 mm. Three independent small-height exact-ray roots agree. Derived magnification -0.4999992846415252 agrees with source -0.5 within the unchanged 1% allowance. All distances use the existing uniform 1.0171864961 scale, not original patent millimetres."
+        }
+    },
+    {
+        "id": "life-size",
+        "label": "Life-size",
+        "focusT": 1,
+        "zoomT": 0,
+        "source": "JP 2003-329924 A, Example 2, paragraph 0019 (PDF p. 4), published -1 magnification column. Existing model uniformly scales source geometry by 1.0171864961; distance is calculated at that model scale. Printed D20 names the gap after surface 22. Production 0.47 m is not a derivation input.",
+        "conjugate": {
+            "kind": "finite",
+            "objectDistanceMm": 468.63003997779043,
+            "distanceReference": "image-plane",
+            "distanceProvenance": "calculated",
+            "magnification": -1,
+            "derivation": "Fixed-plane s = -B/A gives 256.4133039777904 mm before surface 1; adding physical model-scale track 212.21673600000003 mm gives 468.63003997779043 mm. Three independent small-height exact-ray roots agree. Derived magnification -0.9999989997817453 agrees with source -1 within the unchanged 1% allowance. All distances use the existing uniform 1.0171864961 scale, not original patent millimetres."
+        }
+    }
+],
+
   focusPositions: [0, 0.7387189937888587, 1],
   var: {
     "11": [4.800307, 21.360001, 37.375399],

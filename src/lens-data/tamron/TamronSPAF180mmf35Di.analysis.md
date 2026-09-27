@@ -276,3 +276,7 @@ Tamron's official product page identifies B01 as a 2003 model with 180 mm focal 
 - Tamron Co., Ltd., official Lens History, 2003 model listing: https://www.tamron.com/global/consumer/brandsite/history/
 - OHARA GmbH, official “Glass data 5 decimal places,” April 2026, plus the official special-order glass catalog for S-BAH10: https://www.ohara-gmbh.com/en/dialog/downloads.html
 - HOYA Optics Europe, official Glass Cross Reference Index: https://www.hoyaoptics.eu/glass-cross-reference-index
+
+## Verified source configurations
+
+The MTF Lens state selector offers the authored infinity, half life-size and life-size configurations. The prescription already uses a uniform ×1.0171864961 scale; calculated object distances therefore describe that **scaled model**, not original patent millimetres: 636.2365 mm and 468.6300 mm from the image plane. Independent exact rays reproduce the first-order source and published magnifications. Production 0.47 m is not a solve input. Selection retains the exact element positions and source rays when MTF closes; intermediate finite focus remains unavailable and existing aperture/glass qualifications still apply.
