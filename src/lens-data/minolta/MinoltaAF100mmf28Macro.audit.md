@@ -2,6 +2,35 @@
 
 Patent: US 4,764,000, Example 8 / claim 9
 
+## 2026-09-26 — Source-state review
+
+Source-state review outcome: verified. All three authored candidates enabled: infinity,
+half life-size and life-size. Intermediate finite slider positions remain uncertified.
+
+Visually checked local `patents/US4764000.pdf`, PDF page 21, Table 8 / Embodiment 8
+(printed column 12). The sixteen radii, fifteen internal spacings and eight d-line glass
+rows match the retained file; notably r12=-26.167 mm, not the OCR reading -26.67.
+The source gives d8/d12=5.00/24.00 at infinity, 18.36/10.64 at beta=-0.5 and
+27.50/1.50 mm at beta=-1.0, with object distances -266.4/-171.0 mm. These are
+object-side first-vertex distances, not the production object-to-film MFD. The existing
+stop split 4.35+4.35 mm preserves source d10=8.70 mm. Stop placement and rims remain inferred.
+
+Existing rear image gaps 43.1530002237/76.5518/113.4895036789 mm are calculated,
+not printed source spacings, and are retained without adjustment. At the two finite states,
+fixed-geometry ABCD gives first-surface distances 266.400017275939/171.000000000040 mm
+and magnifications -0.500049554198/-1.000277483438. Independent exact roots at
+0.01/0.005/0.0025 mm heights are 266.400015740793/266.400016888276/266.400017182900 mm
+and 170.999998974828/170.999999741249/170.999999940319 mm; axial residuals stay below
+6.001e-11 mm. Magnification differences from the published ratios are 0.00991%/0.02775%.
+These verify consistency of the retained image-gap solution, not independent measurements
+of that gap. Source distances are retained exactly rather than replaced by calculated values.
+
+The intermediate authored coordinate is exactly focusT=0.853009797094441, not a uniform
+midpoint. Its source geometry and identity must survive URL restoration without slider-step
+rounding. Infinity is explicitly declared even though its near-zero matrix A has no finite
+real source. No optical values changed; unresolved L7 dispersion and supplier-neutral glass
+proxies remain qualified, and all ordinary MTF support and convergence checks still apply.
+
 ## 2026-05-19 - Missing-Sellmeier queue audit
 
 ### Patent evidence

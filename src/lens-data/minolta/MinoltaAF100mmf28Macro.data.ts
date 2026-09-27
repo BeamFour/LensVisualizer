@@ -57,6 +57,45 @@ const LENS_DATA = {
   groupCount: 8,
   apertureBlades: 9,
 
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "US 4,764,000, Table 8 / Embodiment 8, PDF page 21: f=100, d8=5.00 mm, d12=24.00 mm. Retained rear image gap is calculated.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "half-life-size",
+      label: "Half life-size",
+      focusT: 0.853009797094441,
+      zoomT: 0,
+      source: "US 4,764,000, Table 8 / Embodiment 8, PDF page 21: beta=-0.5, object distance=-266.4 mm, d8=18.36 mm, d12=10.64 mm. Object distance is before the first surface; retained rear image gap is calculated from this conjugate (see audit).",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 266.4,
+        distanceReference: "first-surface",
+        distanceProvenance: "published",
+        magnification: -0.5,
+      },
+    },
+    {
+      id: "life-size",
+      label: "Life-size",
+      focusT: 1,
+      zoomT: 0,
+      source: "US 4,764,000, Table 8 / Embodiment 8, PDF page 21: beta=-1.0, object distance=-171.0 mm, d8=27.50 mm, d12=1.50 mm. Object distance is before the first surface; retained rear image gap is calculated from this conjugate (see audit).",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 171,
+        distanceReference: "first-surface",
+        distanceProvenance: "published",
+        magnification: -1,
+      },
+    },
+  ],
+
   elements: [
     {
       id: 1,

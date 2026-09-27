@@ -173,6 +173,14 @@ The values reproduce the patent’s printed AA/AB ratios of **1.67** at β = −
 
 Sony’s first-party specifications for the successor SAL100M28 list 0.35 m minimum focus and 1.0× maximum magnification; its lens guide describes double-floating lens elements for the 100mm f/2.8 Macro.[^sony-specs][^sony-guide] That first-party description is consistent with the patent’s relative-shift prescription, though it does not prove that every production detail is identical to Example 8.
 
+The MTF Lens state selector exposes infinity, half life-size and life-size at the exact
+three authored positions. Finite object distances are the patent's **266.4 mm** and
+**171.0 mm before the first surface**; the rear image gaps remain calculated. Independent
+small-height exact rays confirm those retained conjugates. The nonuniform intermediate
+slider coordinate is preserved by shared state links. Intermediate finite positions remain
+unavailable, and unresolved dispersion, inferred apertures and glass proxies continue to
+qualify the simulation.
+
 ## Aspherical Surfaces
 
 Example 8 is an **all-spherical design**.
