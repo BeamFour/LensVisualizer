@@ -207,3 +207,8 @@ The prescription was rechecked independently by paraxial matrix trace and y-u ra
 ---
 
 *Conventions.* Surface numbers follow JP 2013-104994 A, Numerical Example 2. Element focal lengths are standalone in-air thick-lens values. Group focal lengths are isolated-group paraxial EFLs in air. Partial-dispersion deviation ΔPgF is referenced to $P_{g,F} = 0.6438 - 0.001682\nu_d$.
+
+
+## Source-state availability
+
+Infinity, half life-size and life-size are selectable at the three exact authored focus coordinates. The finite states use **calculated image-plane object distances** of 609.5480 and 468.2905 mm, checked independently with small-height exact rays and the source magnification ratios. The intermediate calculated magnitude is 0.501326×, a 0.2653% difference from the printed 1:2 ratio; it passes the existing 1% source-precision allowance without adjusting the prescription. Source back focus remains 53.29 mm. Inferred apertures, the nominal f/2.8 versus design FNO 2.92, and unresolved spectral identities remain qualifications. Intermediate finite slider positions are not enabled for MTF.

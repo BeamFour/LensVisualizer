@@ -350,6 +350,47 @@ const LENS_DATA = {
 
   asph: {},
 
+  sourceStates: [
+    {
+      id: "infinity",
+      label: "Infinity",
+      focusT: 0,
+      zoomT: 0,
+      source: "JP 2013-104994 A, Numerical Example 2, paragraphs 0061–0063 and tables (PDF pp. 15–16), INF column with Bf = 53.29 mm. Source surface 12's zero-radius notation is modeled as a plane; physical iris and clear apertures remain inferred.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "half-life-size",
+      label: "Half life-size",
+      focusT: 0.7710631530319496,
+      zoomT: 0,
+      source: "JP 2013-104994 A, Numerical Example 2 (PDF pp. 15–16), published 1:2 column: d9/d14/d19 = 20.5289/39.9411/24.2585 mm and Bf = 53.29 mm. Distance is calculated with the authored geometry and image plane held fixed.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 609.5479963630492,
+        distanceReference: "image-plane",
+        distanceProvenance: "calculated",
+        derivation: "Fixed-plane first-order s = -B/A gives 368.8000963630492 mm before surface 1. Adding the physical 240.7479 mm image track gives 609.5479963630492 mm from the image plane. Independent exact-ray roots agree; magnification -0.501326398543399 differs in magnitude from published 1:2 by 0.26528% within the unchanged 1% source-precision allowance.",
+        magnification: 0.5,
+      },
+    },
+    {
+      id: "life-size",
+      label: "Life-size",
+      focusT: 1,
+      zoomT: 0,
+      source: "JP 2013-104994 A, Numerical Example 2 (PDF pp. 15–16), published 1:1 column: d9/d14/d19 = 37.6004/6.3155/40.8127 mm and Bf = 53.29 mm. The production 0.47 m specification is not an input to the calculated distance.",
+      conjugate: {
+        kind: "finite",
+        objectDistanceMm: 468.29051538466547,
+        distanceReference: "image-plane",
+        distanceProvenance: "calculated",
+        derivation: "Fixed-plane first-order s = -B/A gives 227.54251538466548 mm before surface 1. Adding the physical 240.748 mm image track gives 468.29051538466547 mm from the image plane. Independent exact-ray roots agree; magnification -1.0001026988081605 differs in magnitude from published 1:1 by 0.010270%.",
+        magnification: 1,
+      },
+    },
+  ],
+
   focusPositions: [0, 0.7710631530319496, 1],
   var: {
     "9": [4.9234, 20.5289, 37.6004],
