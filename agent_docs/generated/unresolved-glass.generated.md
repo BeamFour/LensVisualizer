@@ -8,11 +8,11 @@ or per-lens patent backfills.
 
 ## Summary
 
-- **825** lenses scanned
-- **9280** non-air surfaces examined
-- **9290** element glass declarations examined
-- **245** non-explicit-unmatched annotations did not resolve
-- **132** distinct unresolved glass-like tokens found
+- **831** lenses scanned
+- **9339** non-air surfaces examined
+- **9349** element glass declarations examined
+- **251** non-explicit-unmatched annotations did not resolve
+- **136** distinct unresolved glass-like tokens found
 
 ## Tokens by Frequency
 
@@ -29,7 +29,9 @@ or per-lens patent backfills.
 | 620586 | 2 | 1 | |
 | 627376 | 2 | 2 | |
 | 633315 | 2 | 2 | |
+| 680557 | 2 | 1 | |
 | 682419 | 2 | 1 | |
+| 683315 | 2 | 2 | |
 | 690570 | 2 | 2 | |
 | 691530 | 2 | 1 | |
 | 720521 | 2 | 2 | |
@@ -58,6 +60,7 @@ or per-lens patent backfills.
 | 570481 | 1 | 1 | |
 | 570575 | 1 | 1 | |
 | 571560 | 1 | 1 | |
+| 575391 | 1 | 1 | |
 | 576388 | 1 | 1 | |
 | 585417 | 1 | 1 | |
 | 593348 | 1 | 1 | |
@@ -79,6 +82,7 @@ or per-lens patent backfills.
 | 656277 | 1 | 1 | |
 | 658397 | 1 | 1 | |
 | 667311 | 1 | 1 | |
+| 668358 | 1 | 1 | |
 | 670266 | 1 | 1 | |
 | 672323 | 1 | 1 | |
 | 672388 | 1 | 1 | |
@@ -86,12 +90,12 @@ or per-lens patent backfills.
 | 680312 | 1 | 1 | |
 | 681472 | 1 | 1 | |
 | 682366 | 1 | 1 | |
-| 683315 | 1 | 1 | |
 | 683330 | 1 | 1 | |
 | 683548 | 1 | 1 | |
 | 694312 | 1 | 1 | |
 | 700555 | 1 | 1 | |
 | 701301 | 1 | 1 | |
+| 704408 | 1 | 1 | |
 | 721234 | 1 | 1 | |
 | 721334 | 1 | 1 | |
 | 729364 | 1 | 1 | |
@@ -219,10 +223,20 @@ or per-lens patent backfills.
 - [NIKON AF-S NIKKOR 180-400mm f/4E TC1.4 FL ED VR](../../src/lens-data/nikon/NikonAFSNikkor180400mmf4ETC14.data.ts) 36: `633315 flint class (catalog unresolved)`
 - [NIKON AF-S NIKKOR 180-400mm f/4E TC1.4 FL ED VR — TC 1.4x Engaged](../../src/lens-data/nikon/NikonAFSNikkor180400mmf4ETC14TCIn.data.ts) 36: `633315 flint class (catalog unresolved)`
 
+### 680557 — 2 occurrences
+
+- [Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) 1: `680557 — supplier unresolved`
+- [Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) 4: `680557 — supplier unresolved`
+
 ### 682419 — 2 occurrences
 
 - [CARL ZEISS JENA FLEKTOGON 50mm f/4](../../src/lens-data/carl-zeiss-jena/ZeissFlektogon50mmf4.data.ts) 4: `682419 class (supplier unresolved)`
 - [CARL ZEISS JENA FLEKTOGON 50mm f/4](../../src/lens-data/carl-zeiss-jena/ZeissFlektogon50mmf4.data.ts) 6: `682419 class (supplier unresolved)`
+
+### 683315 — 2 occurrences
+
+- [Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) 3: `683315 — supplier unresolved`
+- [MINOLTA AF 20mm f/2.8](../../src/lens-data/minolta/MinoltaAF20mmf28.data.ts) 7: `683315 — flint class (catalog unresolved)`
 
 ### 690570 — 2 occurrences
 
@@ -352,6 +366,10 @@ or per-lens patent backfills.
 
 - [SONY FE 28-70mm f/2 GM](../../src/lens-data/sony/SonyFE2870mmf2GM.data.ts) 17: `571560 — barium crown (patent nd=1.57125, νd=56.0)`
 
+### 575391 — 1 occurrence
+
+- [Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) 8: `575391 — supplier unresolved`
+
 ### 576388 — 1 occurrence
 
 - [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) 37: `576388 — catalog unresolved (supplier unconfirmed)`
@@ -436,6 +454,10 @@ or per-lens patent backfills.
 
 - [FUJIFILM FUJINON XF 60mm f/2.4 R Macro](../../src/lens-data/fujifilm/FujifilmXF60mmf24R.data.ts) 6: `667311 - dense flint (patent nd=1.66680, vd=31.1; no exact public catalog match)`
 
+### 668358 — 1 occurrence
+
+- [Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) 6: `668358 — supplier unresolved`
+
 ### 670266 — 1 occurrence
 
 - [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) 29: `670266 — catalog unresolved (supplier unconfirmed)`
@@ -464,10 +486,6 @@ or per-lens patent backfills.
 
 - [MINOLTA AF APO TELE 300mm f/2.8](../../src/lens-data/minolta/MinoltaAF300mmf28.data.ts) 5: `682366 - dense flint class (catalog unresolved)`
 
-### 683315 — 1 occurrence
-
-- [MINOLTA AF 20mm f/2.8](../../src/lens-data/minolta/MinoltaAF20mmf28.data.ts) 7: `683315 — flint class (catalog unresolved)`
-
 ### 683330 — 1 occurrence
 
 - [LEICA SUMMILUX 28mm f/1.7 ASPH. (Leica Q, Q2, Q3)](../../src/lens-data/leica/Leica28mmf17.data.ts) 20A: `683330 — dense flint (catalog unresolved; patent nd=1.68250, νd=33.0; prior H-ZF52A label rejected)`
@@ -487,6 +505,10 @@ or per-lens patent backfills.
 ### 701301 — 1 occurrence
 
 - [MINOLTA MD ROKKOR 45mm f/2](../../src/lens-data/minolta/MinoltaRokkor45mmf2MD.data.ts) 5: `701301 - dense flint (catalog unresolved)`
+
+### 704408 — 1 occurrence
+
+- [Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) 10: `704408 — supplier unresolved`
 
 ### 721234 — 1 occurrence
 

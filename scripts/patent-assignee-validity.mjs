@@ -37,6 +37,10 @@ const ASSIGNEE_START_YEAR_OVERRIDES = new Map([
 // https://patents.google.com/patent/US2646721A/en (front page: Aktiengesellschaft)
 // DE 1 157 000 names Jenoptik Jena G.m.b.H.; normalize punctuation only, not legal identity.
 const ASSIGNEE_ALIASES = [
+  // JP 2021-15312 A / US 2014/0368925 A1 and US 4,214,816 / US 4,444,473:
+  // capitalization and translated corporate style, not separate legal entities.
+  { alias: "FUJIFILM Corporation", canonical: "Fujifilm Corporation" },
+  { alias: "Minolta Camera Kabushiki Kaisha", canonical: "Minolta Camera Co., Ltd." },
   // US 2024/0134166 A1 and US 3,536,379: translated corporate style / "Firma"
   // prefix, not new entities. Keep Canon Camera and later Leica entities distinct.
   { alias: "Canon Kabushiki Kaisha", canonical: "Canon Inc.", fromYear: 1969 },

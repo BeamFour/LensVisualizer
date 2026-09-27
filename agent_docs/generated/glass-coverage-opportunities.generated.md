@@ -9,12 +9,12 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 ## Summary
 
-- **825** lenses scanned (**813** visible)
-- **8616 / 9280** non-air surfaces use strict catalog Sellmeier data (92.8%)
-- **8631 / 9280** non-air surfaces use trusted chromatic data (Sellmeier or measured line indices, 93.0%)
+- **831** lenses scanned (**819** visible)
+- **8663 / 9339** non-air surfaces use strict catalog Sellmeier data (92.8%)
+- **8678 / 9339** non-air surfaces use trusted chromatic data (Sellmeier or measured line indices, 92.9%)
 - **0** mismatch surfaces in Sweep 1 across **0** lens files
 - **0** Sweep 1 surfaces have a matching untracked local patent PDF
-- **325** code-only missing-Sellmeier elements in Sweep 2: **17** active unreviewed, **175** self-recording explicit dispositions, **0** dispositions missing any review record
+- **334** code-only missing-Sellmeier elements in Sweep 2: **23** active unreviewed, **178** self-recording explicit dispositions, **0** dispositions missing any review record
 - **1** unresolved named-token elements in Sweep 2B, producing **1** token occurrences across **1** distinct tokens
 - **21** Tier A proprietary backfill rows in Sweep 3
 
@@ -55,6 +55,7 @@ These lenses are missing trusted chromatic data only on glass elements. One or t
 | [NIKON AI ZOOM-NIKKOR 80-200mm f/4](../../src/lens-data/nikon/NikonAINikkor80200mmf4.data.ts) | US 4,452,513 | [PDF](../../patents/US4452513.pdf) | 92.3% (12/13) | 92.3% (12/13) | 1 | 19 [glass] (G4 rear negative: `797455 — dense lanthanum glass class (catalog unresolved)`) | abbe: 1 |
 | [SONY FE 24mm f/1.4 GM](../../src/lens-data/sony/SonyFE24mmf14GM.data.ts) | WO 2019/073744 A1 | [PDF](../../patents/JPWO2019073744A1.pdf) | 92.3% (12/13) | 92.3% (12/13) | 1 | 1A [glass] (L11 front XA element: `Unmatched (MC-TAF115-class; Hoya source nominal/polynomial conflict; patent nd=1.77002, νd=49.4)`) | abbe: 1 |
 | [NIKON NIKKOR Z 100-400mm f/4.5-5.6 VR S](../../src/lens-data/nikon/NikonNikkorZ100400f4556.data.ts) | JP 2022-092388 A | [PDF](../../patents/JP2022092388A.pdf) | 92.0% (23/25) | 92.0% (23/25) | 2 | 34 [glass] (Element 19: `603564 — inferred vd and unresolved identity; patent gives nd only`)<br>45 [glass] (Element 25: `738493 — inferred vd and unresolved identity; patent gives nd only`) | abbe: 2 |
+| [Fujinon XC 16-50mm f/3.5-5.6 OIS II](../../src/lens-data/fujifilm/FujifilmFujinonXC1650mmf3556OISII.data.ts) | US 2014/0368925 A1 | [PDF](../../patents/US20140368925A1.pdf) | 91.7% (11/12) | 91.7% (11/12) | 1 | 11A [glass] (L31: `Unmatched (nd 1.80348 / νd 40.44; nearest audited S-LAH63 differs)`) | abbe: 1 |
 | [FUJIFILM TCL-X100 33mm f/2 (Fujifilm X100)](../../src/lens-data/fujifilm/FujifilmX100TCLX100.data.ts) | US 2015/0226942 A1 | Missing from untracked local patents/ references (US20150226942A1, US20150226942, 20150226942) | 91.7% (11/12) | 91.7% (11/12) | 1 | 18A [glass] (Master L36: `Unmatched (nd=1.56865, νd=58.6; no authoritative catalog match)`) | abbe: 1 |
 | [NIKON AI AF ZOOM-NIKKOR 18-35mm f/3.5-4.5D IF-ED](../../src/lens-data/nikon/NikonAFZoomNikkor1835mmf3545DIFED.data.ts) | US 2001/0030812 A1 | [PDF](../../patents/US20010030812A1.pdf) | 91.7% (11/12) | 91.7% (11/12) | 1 | 3A [glass] (L12 compound layer: `Unmatched (compound-asphere layer; material not identified)`) | abbe: 1 |
 | [NIKON FISHEYE-NIKKOR 6mm f/2.8](../../src/lens-data/nikon/NikonFisheyeNikkor6mmf28.data.ts) | US 3,737,214 | [PDF](../../patents/US3737214.pdf) | 91.7% (11/12) | 91.7% (11/12) | 1 | 15 [glass] (Element 7: `534554 — crown glass (patent nd=1.53375, νd=55.4; no current HIKARI catalog match)`) | abbe: 1 |
@@ -68,10 +69,12 @@ These lenses are missing trusted chromatic data only on glass elements. One or t
 | [PENTAX HD D FA 21mm f/2.4 ED Limited DC WR](../../src/lens-data/pentax/PentaxHDDFA21mmf24Limited.data.ts) | JP 2022-117775 A | [PDF](../../patents/JP2022117775A.pdf) | 90.9% (10/11) | 90.9% (10/11) | 1 | 3A [glass] (Element 2: `Unmatched (BAL/SK moldable crown; nearest S-BAL42/M-BACD12-type catalog glasses are about 1.583/59.4)`) | abbe: 1 |
 | [NIKON AF-S NIKKOR 500mm f/5.6E PF ED VR](../../src/lens-data/nikon/NikonAFSNikkor500mmf56EPFEDVR.data.ts) | JP 2018-017857 A | [PDF](../../patents/JP2018017857A.pdf) | 90.5% (19/21) | 90.5% (19/21) | 2 | 7 [glass] (PF bonded material A: `Unmatched (bonded PF material A; patent nd=1.52780, vd=33.41)`)<br>8 [glass] (PF bonded material B: `Unmatched (bonded PF material B; patent nd=1.55710, vd=49.74)`) | abbe: 2 |
 | [TAMRON 70-180mm f/2.8 Di III VXD](../../src/lens-data/tamron/TamronA05670180mmf28.data.ts) | JP 2021-43375 A | [PDF](../../patents/JP2021043375A.pdf) | 90.5% (19/21) | 90.5% (19/21) | 2 | 13A [glass] (Element 8 bonded aspheric layer: `Unmatched (bonded aspheric optical layer; physical material not identified by patent)`)<br>30A [glass] (Element 17 bonded aspheric layer: `Unmatched (bonded aspheric optical layer; physical material not identified by patent)`) | abbe: 2 |
+| [Fujinon XC 15-45mm f/3.5-5.6 OIS PZ](../../src/lens-data/fujifilm/FujifilmFujinonXC1545mmf3556OISPZ.data.ts) | JP 2021-15312 A | [PDF](../../patents/JP2021015312A.pdf) | 90.0% (9/10) | 90.0% (9/10) | 1 | 3A [glass] (Element L1b: `Unmatched (nd=1.53409, vd=55.89; 534559 coordinate class)`) | abbe: 1 |
 | [FUJIFILM FUJINON XF 23mm f/2 R WR](../../src/lens-data/fujifilm/FujifilmXF23mmf2RWR.data.ts) | US 2017/0351051 A1 | [PDF](../../patents/US20170351051A1.pdf) | 90.0% (9/10) | 90.0% (9/10) | 1 | 13A [glass] (L21 — moving focus asphere: `803405 - high-index lanthanum flint (likely PGM aspheric melt; no exact public catalog match)`) | abbe: 1 |
 | [MINOLTA AF 20mm f/2.8](../../src/lens-data/minolta/MinoltaAF20mmf28.data.ts) | JP 1987-249119 A | [PDF](../../patents/JPA 1987249119-000000.pdf) | 90.0% (9/10) | 90.0% (9/10) | 1 | 7 [glass] (Element 4: `683315 — flint class (catalog unresolved)`) | abbe: 1 |
 | [MINOLTA AF APO TELE 300mm f/2.8](../../src/lens-data/minolta/MinoltaAF300mmf28.data.ts) | US 4,518,229 | Missing from untracked local patents/ references (US4518229, 4518229) | 90.0% (9/10) | 90.0% (9/10) | 1 | 5 [glass] (Element 3: `682366 - dense flint class (catalog unresolved)`) | abbe: 1 |
 | [NIKON R-UW AF FISHEYE-NIKKOR 13mm f/2.8](../../src/lens-data/nikon/NikonRUWAFNikkor13mmf28.data.ts) | US 5,579,169 | [PDF](../../patents/US5579169.pdf) | 90.0% (9/10) | 90.0% (9/10) | 1 | 7 [glass] (G41 positive doublet element: `Unmatched dense flint (595355)`) | abbe: 1 |
+| [Fujinon XF 8-16mm f/2.8 R LM WR](../../src/lens-data/fujifilm/FujifilmFujinonXf816mmf28RLMWR.data.ts) | US 2019/0302431 A1 | [PDF](../../patents/US20190302431A1.pdf) | 90.0% (18/20) | 90.0% (18/20) | 2 | 3A [glass] (Element L12: `Unmatched (nd=1.69259, vd=53.07, theta_gF=0.54955)`)<br>27A [glass] (Element L41: `853406 class (spectrally unmatched to D-ZLaF85LS-25)`) | abbe: 2 |
 | [CARL ZEISS JENA VARIO-PRAKTICAR 35-70mm f/2.7-3.5 MC](../../src/lens-data/carl-zeiss-jena/ZeissVarioPrakticar3570mmf2735.data.ts) | DE 3602859 A1 | [PDF](../../patents/DE_3602859_A1.pdf) | 88.9% (8/9) | 88.9% (8/9) | 1 | 10 [glass] (Element 6: `Unmatched (Jena melt, n_e 1.66640 / ν_e 56.14; no verified compatible catalog dispersion)`) | abbe: 1 |
 | [NIKON NIKKOR-N AUTO 28mm f/2](../../src/lens-data/nikon/NikonNikkorN28mmf2.data.ts) | US 3,736,049 | [PDF](../../patents/US3736049.pdf) | 88.9% (8/9) | 88.9% (8/9) | 1 | 14 [glass] (Element 8: `744479 — lanthanum flint (catalog unresolved; nd = 1.74443, νd = 47.9)`) | abbe: 1 |
 | [PENTAX FA 31mm f/1.8 AL Limited](../../src/lens-data/pentax/PentaxFA31mmf18ALLtd.data.ts) | US 6,560,042 B2 | [PDF](../../patents/US6560042.pdf) | 88.9% (8/9) | 88.9% (8/9) | 1 | 13 [glass] (Element 8: `Unmatched (728403 lanthanum flint; no public coefficient row inside the d-line safety window)`) | abbe: 1 |
@@ -190,15 +193,19 @@ Add catalog entries only when public coefficient-backed vendor data is available
 
 | Code | Active elements | Lens files | localPatentStatus | Representative rows |
 |---|---:|---:|---|---|
+| 683315 | 2 | 2 | patents/JPB 1963011590-000000.pdf<br>patents/JPA 1987249119-000000.pdf | [Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) Element 2 (1.68287 / 31.50)<br>[MINOLTA AF 20mm f/2.8](../../src/lens-data/minolta/MinoltaAF20mmf28.data.ts) Element 4 (1.68300 / 31.52) |
+| 680557 | 2 | 1 | patents/JPB 1963011590-000000.pdf | [Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) Element 1 (1.67975 / 55.70)<br>[Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) Element 3 (1.67975 / 55.70) |
 | 682419 | 2 | 1 | patents/DE_1157000_B.pdf | [CARL ZEISS JENA FLEKTOGON 50mm f/4](../../src/lens-data/carl-zeiss-jena/ZeissFlektogon50mmf4.data.ts) Element 3 (1.68169 / 41.90)<br>[CARL ZEISS JENA FLEKTOGON 50mm f/4](../../src/lens-data/carl-zeiss-jena/ZeissFlektogon50mmf4.data.ts) Element 4 (1.68169 / 41.90) |
+| 575391 | 1 | 1 | patents/JPB 1963011590-000000.pdf | [Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) Element 5 (1.57526 / 39.10) |
 | 576388 | 1 | 1 | patents/WO2024154461A1.pdf | [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) Element L77 (1.57567 / 38.80) |
 | 634299 | 1 | 1 | patents/WO2024154461A1.pdf | [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) Element L75 (1.63362 / 29.90) |
 | 646287 | 1 | 1 | patents/WO2024154461A1.pdf | [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) Element L711 (1.64579 / 28.70) |
 | 656277 | 1 | 1 | patents/WO2024154461A1.pdf | [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) Element L79 (1.65611 / 27.70) |
+| 668358 | 1 | 1 | patents/JPB 1963011590-000000.pdf | [Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) Element 4 (1.66797 / 35.80) |
 | 670266 | 1 | 1 | patents/WO2024154461A1.pdf | [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) Element L72 (1.66961 / 26.60) |
 | 673343 | 1 | 1 | patents/WO2024154461A1.pdf | [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) Element L52 (1.67300 / 34.30) |
 | 681472 | 1 | 1 | patents/DE_1157000_B.pdf | [CARL ZEISS JENA FLEKTOGON 50mm f/4](../../src/lens-data/carl-zeiss-jena/ZeissFlektogon50mmf4.data.ts) Element 7 (1.68078 / 47.20) |
-| 683315 | 1 | 1 | patents/JPA 1987249119-000000.pdf | [MINOLTA AF 20mm f/2.8](../../src/lens-data/minolta/MinoltaAF20mmf28.data.ts) Element 4 (1.68300 / 31.52) |
+| 704408 | 1 | 1 | patents/JPB 1963011590-000000.pdf | [Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) Element 6 (1.70442 / 40.80) |
 | 721234 | 1 | 1 | patents/WO2024154461A1.pdf | [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) Element L61 (1.72146 / 23.40) |
 | 729364 | 1 | 1 | patents/WO2024154461A1.pdf | [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) Element L22 (1.72884 / 36.40) |
 | 827336 | 1 | 1 | patents/WO2024154461A1.pdf | [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) Element L76 (1.82673 / 33.60) |
