@@ -315,3 +315,8 @@ The data file follows the patent's physical rear stack: PP is stored in `rearPla
 - OHARA optical glass catalog pages for S-TIH53, S-FPM2, S-TIH13, S-PHM52, S-LAL18, S-TIM35, S-NSL36, and S-BAH10.
 - HOYA optical glass catalog/cross-reference material for BSC7, M-NBF1 / MP-NBF1 class, M-LAF81 / MP-LAF81 class, and E-FDS1 / MP-FDS1 class glass matches.
 - SCHOTT N-BK7 datasheet used as a cross-check for the 517/642 BK7-class L22 assignment.
+
+
+## Verified source configurations
+
+The MTF Lens state selector offers infinity, half life-size and the patent's **0.98× near life-size** configuration. Finite distances are **calculated 197.8074 / 154.1758 mm from the image plane**, including the physical PP plate, and independently checked with exact rays and published magnifications. The source odd-order aspheres and non-monotonic focus gap remain intact. These are qualified prescription simulations with inferred apertures and existing glass approximations. Selecting a state preserves its exact element positions and source rays after closing MTF or restoring a shared link; intermediate finite focus remains unavailable.

@@ -31,3 +31,21 @@ Catalog version: local working tree, 2026-06-25
 - Paraxial check against the previous data: EFL and defocus identical at all three focus keyframes (the old fold was
   stored unrounded). Physical track grows by 1.22 × (1 − 1/1.51680) = 0.416 mm, to the 95.37 mm first-surface-to-image
   length the analysis already quotes.
+
+
+## 2026-09-27 — Source-state review
+
+Source-state review outcome: verified.
+
+- Retrieved the exact JP2015161792A PDF into local `patents/JP2015161792A.pdf` and visually rechecked Example 1, Tables 1–4, PDF pages 15–17. All twenty-five refractive lens rows, fourteen nd/vd pairs, stop row 13 and physical plate PP reproduce the source. Table 4's full odd/even coefficients for surfaces 4 and 7 and even coefficients for surface 6 match the stored aspheres; KA = 1 maps to K = 0.
+- All three inventory candidates are enabled at exact focus 0 / 0.7599103882848731 / 1, zoom 0, using published signed magnifications 0 / -0.5 / -0.98. Source DD5 = 1.60 / 5.25 / 9.61; DD10 = 9.10 / 5.45 / 1.10; DD13 = 12.68 / 6.82 / 2.47; DD18 = 1.52 / 2.54 / 1.51; DD20 = 1.85 / 6.69 / 12.08 mm. The non-monotonic DD18 and source-rounded track differences are preserved.
+- The existing rear plate remains physical: surface 26 has 1.00 mm air to PP, which is 1.22 mm thick with nd 1.51680 / vd 64.20, followed by 22.81 mm air to the image. The shared rear-plate path traces it without drawing it, and worker regression coverage retains exactly-once expansion. No plate or gap is changed.
+
+| State | First-surface distance (mm) | Physical image track including PP (mm) | Calculated image-plane distance (mm) | Derived magnification | Source-magnitude error |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Half life-size | 102.43737064279449 | 95.37 | 197.80737064279447 | -0.4990764425130808 | 0.184711% |
+| Near life-size | 58.78577153748488 | 95.39 | 154.17577153748488 | -0.9844621127062071 | 0.455318% |
+
+- Independent exact-ray checks use the existing adaptive small-height procedure. The initial 0.01 mm samples have axial residuals 1.547e-7 / 2.062e-7 mm, so they do not pass the 1e-7 mm limit. The next three consecutive heights 0.005 / 0.0025 / 0.00125 mm pass all unchanged bounds, resolving the odd-asphere paraxial limit. Their roots are 102.43896427249524 / 102.43816892722316 / 102.43777016506552 mm and 58.786389627356066 / 58.78608115908306 / 58.78592648988099 mm; maximum accepted axial residual is 5.176e-8 mm. Both source magnifications pass the unchanged 1% allowance.
+- The closest state is labeled 0.98×, not silently rounded to 1×. Source FNO 2.88 / 3.06 / 3.59, inferred physical iris, clear apertures and glass approximations retain their qualifications. Production minimum focus is not a derivation input; no reference values or tolerances are changed.
+- Validation: shared source-state/conjugate/inventory and worker/rear-plate regressions, full repository quality gate, per-state center/off-axis MTF, desktop/mobile exact-state/closed-diagram/shared-URL persistence, and production build. No per-lens test was added.

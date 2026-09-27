@@ -318,6 +318,32 @@ const LENS_DATA = {
     },
   },
 
+  sourceStates: [
+    {
+      id: "infinity", label: "Infinity", focusT: 0, zoomT: 0,
+      source: "JP 2015-161792 A, Example 1, Tables 1–4 (PDF pp. 15–17), beta 0 column. Physical PP plate: d26 1.00 mm, thickness 1.22 mm, nd 1.51680, vd 64.20, then 22.81 mm air. The existing rearPlates path traces it without drawing it.",
+      conjugate: { kind: "infinity" },
+    },
+    {
+      id: "half-life-size", label: "Half life-size", focusT: 0.7599103882848731, zoomT: 0,
+      source: "JP 2015-161792 A, Example 1, Tables 1–4 (PDF pp. 15–17), beta -0.5 column: DD5/DD10/DD13/DD18/DD20 = 5.25/5.45/6.82/2.54/6.69 mm. Distance is calculated from fixed authored geometry including physical PP and the source image plane.",
+      conjugate: {
+        kind: "finite", objectDistanceMm: 197.80737064279447,
+        distanceReference: "image-plane", distanceProvenance: "calculated", magnification: -0.5,
+        derivation: "Fixed-plane s = -B/A gives 102.43737064279449 mm before surface 1. Adding physical track 95.37 mm including PP gives 197.80737064279447 mm. Independent exact rays at heights 0.005/0.0025/0.00125 mm pass unchanged consistency limits after resolving the odd-asphere paraxial limit. Magnification -0.4990764425130808 differs from published -0.5 by 0.184711%, within the unchanged 1% allowance.",
+      },
+    },
+    {
+      id: "near-life-size", label: "Near life-size", focusT: 1, zoomT: 0,
+      source: "JP 2015-161792 A, Example 1, Tables 1–4 (PDF pp. 15–17), beta -0.98 column: DD5/DD10/DD13/DD18/DD20 = 9.61/1.10/2.47/1.51/12.08 mm. Physical PP and the source image plane remain fixed; production MFD is not a derivation input.",
+      conjugate: {
+        kind: "finite", objectDistanceMm: 154.17577153748488,
+        distanceReference: "image-plane", distanceProvenance: "calculated", magnification: -0.98,
+        derivation: "Fixed-plane s = -B/A gives 58.78577153748488 mm before surface 1. Adding physical track 95.39 mm including PP gives 154.17577153748488 mm. Independent exact rays at heights 0.005/0.0025/0.00125 mm pass unchanged consistency limits. Magnification -0.9844621127062071 differs from published -0.98 by 0.455318%, within the unchanged 1% allowance. No optical geometry, plate spacing or tolerance is adjusted.",
+      },
+    },
+  ],
+
   focusPositions: [0, 0.7599103882848731, 1],
   var: {
     "5": [1.6, 5.25, 9.61],
