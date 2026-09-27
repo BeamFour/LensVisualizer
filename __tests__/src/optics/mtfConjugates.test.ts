@@ -140,6 +140,25 @@ describe("documented finite MTF", () => {
     expect(deriveSourceDistance({ ...state, aberrationT: 0.1 }).status).toBe("unavailable");
     expect(deriveSourceDistance({ ...state, imgZ: state.surfaces.at(-1)!.z - 1 }).status).toBe("unavailable");
   });
+  it("aims finite chiefs when an oversized infinity-pupil seed skips the physical entrance", () => {
+    const rearStop = build({
+      ...base.data,
+      surfaces: [base.data.surfaces[1], { ...base.data.surfaces[2], d: 10 }, { ...base.data.surfaces[0], d: 40 }],
+    });
+    const aimedState = prepareRuntimeState(rearStop, 0, 0);
+    const reference = prepareSourceFieldLaunch(aimedState, 0.5, 1, conjugate)!;
+    const launch = prepareSourceFieldLaunch(aimedState, 0.5, 1e6, conjugate);
+    expect(launch).not.toBeNull();
+    expect(launch!.centerY).toBeCloseTo(reference.centerY, 6);
+    expect(launch!.objectPoint).toEqual(reference.objectPoint);
+    const trace = traceEngineRay2(aimedState, sourceLaunchRay(launch!, 0, 0), {
+      stopAt: aimedState.lens.stop.surfaceIndex + 1,
+      checkSemiDiameter: false,
+      directionNormalized: true,
+    });
+    expect(trace.status).toBe("ok");
+    expect(Math.abs(trace.terminalPoint[1])).toBeLessThan(1e-8);
+  });
   it("traces a fixed finite source at coordinate zero and skips infinity diagnostics", () => {
     const fixed = build({
       ...L.data,

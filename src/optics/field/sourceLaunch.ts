@@ -92,18 +92,26 @@ export function prepareSourceFieldLaunch(
     directionNormalized: true,
     ...spectral,
   };
-  const aim = solveScalarRoot(
-    (y) => {
-      const trace = traceEngineRay2(state, sourceLaunchRay(launch, 0, y - seedY), aimOptions);
-      return trace.status === "ok" ? trace.terminalPoint[1] : null;
-    },
-    {
-      initialGuess: seedY,
-      initialHalfWidth: Math.max(1, pupilSemiDiameterMm),
+  const residual = (y: number) => {
+    const trace = traceEngineRay2(state, sourceLaunchRay(launch, 0, y - seedY), aimOptions);
+    return trace.status === "ok" ? trace.terminalPoint[1] : null;
+  };
+  let aim = solveScalarRoot(residual, {
+    initialGuess: seedY,
+    initialHalfWidth: Math.max(1, pupilSemiDiameterMm),
+    residualTolerance: 1e-8,
+    scanSamples: 16,
+  });
+  if (aim.status !== "converged" || aim.root === null) {
+    // An infinity pupil near a caustic can dwarf the finite beam. Rescan around the
+    // physical entrance so widely spaced trials do not skip its valid ray domain.
+    aim = solveScalarRoot(residual, {
+      initialGuess: 0,
+      initialHalfWidth: Math.max(1, state.surfaces[0].sd),
       residualTolerance: 1e-8,
       scanSamples: 16,
-    },
-  );
+    });
+  }
   if (aim.status !== "converged" || aim.root === null) return null;
   return { ...launch, centerY: aim.root };
 }

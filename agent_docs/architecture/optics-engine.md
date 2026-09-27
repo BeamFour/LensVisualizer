@@ -53,6 +53,8 @@ separate optional evaluation-plane shift.
 Physical finite sources and stop-aimed chief rays live in `src/optics/field/sourceLaunch.ts`.
 MTF delegates its launch geometry there, preserving one source point across wavelength and pupil samples.
 The helper accepts the reference wavelength/index resolver; spectral policy stays with the analysis caller.
+If an infinity-pupil seed misses a finite chief, aiming retries at the physical entrance scale;
+this changes only the search bracket and retains exact tracing, stop residuals and domain checks.
 When diagram rays follow focus at a verified state, `prepareSourceDiagramFan` uses the same physical source and
 chief aiming for axial, off-axis and chromatic fans. It translates rays into the diagram's fixed-image frame
 and keeps the visible lead segment between source and lens. Unverified, folded, fisheye and moved diagrams retain
