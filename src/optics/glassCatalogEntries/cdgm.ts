@@ -6,6 +6,18 @@ import type { GlassEntry } from "../glassCatalogTypes.js";
 
 export const CDGM_GLASS_ENTRIES: readonly GlassEntry[] = [
   {
+    name: "H-ZK1",
+    vendor: "CDGM",
+    B: [1.06131555, 0.365740168, 1.03466756],
+    C: [0.00543666583, 0.0187659148, 97.5169702],
+    nd: 1.56888,
+    vd: 62.96,
+    PgF: 0.5374,
+    code6: "569630",
+    source:
+      "CDGM H-ZK1 Optical Glass Data Sheet, Sellmeier K1/L1 through K3/L3; https://www.cdgmgd.com/webapp/pdf/H-ZK1.pdf (accessed 2026-09-28).",
+  },
+  {
     name: "H-QK1",
     vendor: "CDGM",
     B: [0.841944073, 0.991785467, 0.146213376],

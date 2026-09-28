@@ -9,12 +9,12 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 ## Summary
 
-- **831** lenses scanned
-- **1835** total code-only elements found
-- **334** elements in this report
-- **123** distinct lens files affected
+- **837** lenses scanned
+- **1840** total code-only elements found
+- **335** elements in this report
+- **124** distinct lens files affected
 - **23** active unreviewed elements have no review-record hit or explicit disposition
-- **178** explicitly unmatched/unknown/proprietary/unidentified elements are self-recording review dispositions
+- **179** explicitly unmatched/unknown/proprietary/unidentified elements are self-recording review dispositions
 - **0** dispositions lack any review record
 
 ## Prioritized Unreviewed Queue
@@ -110,6 +110,7 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 479587 | 1 | 1 | patents/US4773745.pdf | All rows explicitly disposed |
 | 497816 | 1 | 1 | patents/CN211955963U.pdf | All rows explicitly disposed |
 | 507589 | 1 | 1 | patents/JPA 1999231209-000000.pdf | All rows have review records |
+| 510619 | 1 | 1 | patents/DE_1980417_U.pdf | All rows explicitly disposed |
 | 514530 | 1 | 1 | patents/JP2016021011A.pdf | All rows have review records |
 | 515500 | 1 | 1 | patents/US8169718.pdf | All rows explicitly disposed |
 | 516499 | 1 | 1 | patents/US7307794.pdf | All rows explicitly disposed |
@@ -557,6 +558,12 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | L1 (Element 4) | 6 | `Unmatched (622532 — historical D-line SSK/BSM-class coordinate; supplier unresolved)` | 1.62230 / 53.20 | No catalog entry | abbe | patents/GB_135853_A.pdf | Explicit disposition in data |
 | L2 (Element 5) | 8 | `Unmatched (540473 — historical D-line low-index flint / LLF-FEL-class coordinate; supplier unresolved)` | 1.53980 / 47.30 | No catalog entry | abbe | patents/GB_135853_A.pdf | Explicit disposition in data |
 | L3 (Element 6) | 9 | `Unmatched (621569 — historical D-line crown-class coordinate; supplier unresolved)` | 1.62070 / 56.90 | No catalog entry | abbe | patents/GB_135853_A.pdf | Explicit disposition in data |
+
+### [MEYER-OPTIK GÖRLITZ ORESTEGOR 500mm f/5.6](../../src/lens-data/meyer-optik-goerlitz/MeyerOptikGorlitz500mmf56Orestegor.data.ts) - DE 1 980 417
+
+| Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
+|---|---|---|---|---|---|---|---|
+| L1 (Element 1) | 1 | `Unmatched (510619 crown-class coordinate; supplier unresolved)` | 1.50977 / 61.90 | No catalog entry | abbe | patents/DE_1980417_U.pdf | Explicit disposition in data |
 
 ### [MINOLTA AF 100mm f/2](../../src/lens-data/minolta/MinoltaAF100mmf2.data.ts) - JP 1987-244010 A
 

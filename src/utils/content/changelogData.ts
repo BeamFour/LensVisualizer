@@ -19,6 +19,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-09-28",
+    type: "lens",
+    summary: "Added Meyer-Optik Lydith 30mm f/3.5, Primagon 35mm f/4.5, and Orestegor 500mm f/5.6",
+  },
+  {
+    date: "2026-09-28",
+    type: "lens",
+    summary: "Added Schneider Xenar 50mm f/2.8, Xenon 50mm f/1.9, and Retina-Xenon C 50mm f/2",
+  },
+  {
     date: "2026-09-27",
     type: "lens",
     summary: "Added Fujinon XC 15–45mm OIS PZ, XC 16–50mm OIS II, and XF 8–16mm R LM WR",

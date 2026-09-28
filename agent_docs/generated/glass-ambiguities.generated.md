@@ -12,17 +12,17 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 ## Summary
 
-- **831** lenses scanned
-- **9334** glass elements examined
-- **2829** elements have multiple coordinate-compatible candidates
-- **527** lens files are affected
+- **837** lenses scanned
+- **9364** glass elements examined
+- **2834** elements have multiple coordinate-compatible candidates
+- **531** lens files are affected
 - **276** ambiguous elements retain authored dPgF at the runtime g-line, independent of the selected catalog row
 - **199** ambiguous elements provide complete C/F/g indices and bypass catalog dispersion entirely
 
 | Selection criterion | Elements |
 |---|---:|
-| Smallest reference-index residual | 1575 |
-| Evidence-source priority | 972 |
+| Smallest reference-index residual | 1579 |
+| Evidence-source priority | 973 |
 | Vendor context | 273 |
 | Stable canonical-name order | 7 |
 | Smallest Abbe residual | 2 |
@@ -861,6 +861,7 @@ resolves for. Per-candidate residuals are one `explainCompatibleGlassResolution`
 | `773496 — lanthanum high-index class (vendor unresolved)` | 1.77250 / 49.60 (d) | J-LASF016 — smallest d-line \|Δn\| (1.7e-8 vs 6.4e-8) | N-LAF34 (Schott, code, alternate code row)<br>S-LAH66 (Ohara, code, preferred code row)<br>S-LAH66N (Ohara, code, alternate code row) | 2 | [MAMIYA-SEKOR ZOOM E 28-50mm f/3.5-4.5](../../src/lens-data/mamiya/MamiyaSekorZoomE2850mmf3545.data.ts) L5 |
 | `755275 — dense flint class (vendor unresolved)` | 1.75520 / 27.50 (d) | E-FD4 — smallest d-line \|Δn\| (2.6e-7 vs 3.8e-7) | H-ZF6 (CDGM, code, alternate code row) | 1 | [MAMIYA-SEKOR ZOOM E 28-50mm f/3.5-4.5](../../src/lens-data/mamiya/MamiyaSekorZoomE2850mmf3545.data.ts) L8 |
 | `699301 class (supplier unconfirmed)` | 1.69895 / 30.10 (d) | E-FD15 — smallest d-line \|Δn\| (2.0e-7 vs 3.2e-6) | S-TIM35 (Ohara, code, preferred code row) | 2 | [MEYER OPTIK GÖRLITZ ORESTOR 135mm f/2.8](../../src/lens-data/meyer-optik-goerlitz/MeyerOptikGorlitz135mmf28Orestor.data.ts) L3 |
+| `658509-class barium crown / short-flint coordinate (supplier unresolved)` | 1.65844 / 50.80 (d) | N-SSK5 — smallest d-line \|Δn\| (5.9e-8 vs 8.8e-7) | S-BSM25 (Ohara, code, alternate code row)<br>BACED5 (Hoya, code, alternate code row) | 1 | [MEYER-OPTIK GÖRLITZ ORESTEGOR 500mm f/5.6](../../src/lens-data/meyer-optik-goerlitz/MeyerOptikGorlitz500mmf56Orestegor.data.ts) L4 |
 | `713539 — optical-glass coordinate class (vendor unresolved)` | 1.71300 / 53.93 (d) | LAC8 — smallest d-line \|Δn\| (1.8e-7 vs 3.0e-4) | MP-LAC8-30 (Hoya, code, alternate code row) | 1 | [MINOLTA AF 100mm f/2](../../src/lens-data/minolta/MinoltaAF100mmf2.data.ts) L1 |
 | `720503 — optical-glass coordinate class (vendor unresolved)` | 1.72000 / 50.31 (d) | LAC10 — smallest d-line \|Δn\| (1.7e-6 vs 1.0e-5) | J-LAK10 (Hikari, code, preferred code row) | 1 | [MINOLTA AF 100mm f/2](../../src/lens-data/minolta/MinoltaAF100mmf2.data.ts) L7 |
 | `S-NSL3-class crown (OHARA 518590; inferred)` | 1.51823 / 58.96 (d) | S-NSL3 — direct name evidence outranks six-digit code evidence. | E-C3 (Hoya, code, vendor ✗, alternate code row) | 1 | [MINOLTA AF 100mm f/2.8 Macro](../../src/lens-data/minolta/MinoltaAF100mmf28Macro.data.ts) L1 |
@@ -1656,6 +1657,7 @@ resolves for. Per-candidate residuals are one `explainCompatibleGlassResolution`
 | `744449 — N-LAF2 class (supplier unproven)` | 1.74400 / 44.90 (d) | N-LAF2 — direct name evidence outranks six-digit code evidence. | H-LaF3B (CDGM, code, preferred code row) | 1 | [SCHNEIDER-KREUZNACH CINEGON 10mm f/1.8](../../src/lens-data/schneider-kreuznach/SchneiderCinegon1810.data.ts) L1 |
 | `501564 — K10 class (supplier unproven)` | 1.50140 / 56.50 (d) | K10 — direct name evidence outranks six-digit code evidence. | S-FTL10 (Ohara, code, alternate code row) | 1 | [SCHNEIDER-KREUZNACH CINEGON 10mm f/1.8](../../src/lens-data/schneider-kreuznach/SchneiderCinegon1810.data.ts) L2 |
 | `673322 — SF5 class (supplier unproven)` | 1.67270 / 32.20 (d) | SF5 — direct name evidence outranks six-digit code evidence. | H-ZF2 (CDGM, code, alternate code row)<br>E-FD5 (Hoya, code, preferred code row) | 1 | [SCHNEIDER-KREUZNACH CINEGON 10mm f/1.8](../../src/lens-data/schneider-kreuznach/SchneiderCinegon1810.data.ts) L5 |
+| `569631 — H-ZK1 / PSK2 class (supplier unproven)` | 1.56870 / 63.10 (d) | H-ZK1 — direct name evidence outranks six-digit code evidence. | PCD2 (Hoya, code, preferred code row) | 1 | [SCHNEIDER-KREUZNACH CINEGON 10mm f/1.8](../../src/lens-data/schneider-kreuznach/SchneiderCinegon1810.data.ts) L6 |
 | `728284 — SF10 class (supplier unproven)` | 1.72820 / 28.30 (d) | SF10 — direct name evidence outranks six-digit code evidence. | J-SF10 (Hikari, code, alternate code row) | 1 | [SCHNEIDER-KREUZNACH CINEGON 10mm f/1.8](../../src/lens-data/schneider-kreuznach/SchneiderCinegon1810.data.ts) L9 |
 | `673322 flint class (supplier unresolved)` | 1.67270 / 32.20 (d) | H-ZF2 — smallest d-line \|Δn\| (1.8e-7 vs 2.0e-7) | E-FD5 (Hoya, code, preferred code row)<br>SF5 (Schott, code, alternate code row) | 2 | [SCHNEIDER-KREUZNACH CINEGON 6.5mm f/1.9](../../src/lens-data/schneider-kreuznach/SchneiderCinegon1965.data.ts) L1 |
 | `620603 crown class (supplier unresolved)` | 1.62040 / 60.30 (d) | N-SK16 — smallest d-line \|Δn\| (1.0e-5 vs 1.0e-5) | J-SK16 (Hikari, code, alternate code row)<br>S-BSM16 (Ohara, code, alternate code row) | 2 | [SCHNEIDER-KREUZNACH CINEGON 6.5mm f/1.9](../../src/lens-data/schneider-kreuznach/SchneiderCinegon1965.data.ts) L5 |
@@ -1664,6 +1666,7 @@ resolves for. Per-candidate residuals are one `explainCompatibleGlassResolution`
 | `SF15 — 699301 coordinate; compatible spectral proxy (supplier unconfirmed)` | 1.69900 / 30.10 (d) | SF15 — direct name evidence outranks six-digit code evidence. | E-FD15 (Hoya, code, alternate code row)<br>S-TIM35 (Ohara, code, preferred code row) | 1 | [SCHNEIDER-KREUZNACH RETINA-CURTAGON 28mm f/4](../../src/lens-data/schneider-kreuznach/SchneiderCurtagon428.data.ts) L5 |
 | `SF5 — 673322 coordinate; compatible spectral proxy (supplier unconfirmed)` | 1.67270 / 32.20 (d) | SF5 — direct name evidence outranks six-digit code evidence. | H-ZF2 (CDGM, code, alternate code row)<br>E-FD5 (Hoya, code, preferred code row) | 1 | [SCHNEIDER-KREUZNACH RETINA-CURTAGON 28mm f/4](../../src/lens-data/schneider-kreuznach/SchneiderCurtagon428.data.ts) L6 |
 | `S-LAL12 — 678553 coordinate; compatible spectral proxy (supplier unconfirmed)` | 1.67790 / 55.30 (d) | S-LAL12 — direct name evidence outranks six-digit code evidence. | S-LAL12Q (Ohara, code, alternate code row) | 1 | [SCHNEIDER-KREUZNACH RETINA-CURTAGON 28mm f/4](../../src/lens-data/schneider-kreuznach/SchneiderCurtagon428.data.ts) L7 |
+| `640346 — SF7-class (supplier unresolved)` | 1.63980 / 34.60 (d) | J-SF7 — smallest d-line \|Δn\| (2.1e-8 vs 1.6e-7) | E-FD7 (Hoya, code, preferred code row) | 1 | [SCHNEIDER-KREUZNACH RETINA-XENON C 50mm f/2 (Kodak Retina IIIc)](../../src/lens-data/schneider-kreuznach/SchneiderXenon250.data.ts) L4 |
 | `LaF3 (Schott 717479) / S-LAM3 optical equivalent` | 1.71700 / 47.90 (d) | LAF3 — smallest d-line \|Δn\| (2.6e-8 vs 3.9e-6) | S-LAM3 (Ohara, name, vendor ✗) | 1 | [SCHNEIDER-KREUZNACH SUPER-ANGULON 75mm f/5.6](../../src/lens-data/schneider-kreuznach/SchneiderSuperAngulon75mmf56.data.ts) L2 |
 | `BaSF-class barium dense flint (Schott 702411; S-BAH27 / BAFD7 optical equivalent)` | 1.70181 / 41.10 (d) | BAFD7 — smallest d-line \|Δn\| (2.7e-4 vs 2.7e-4) | S-BAH27 (Ohara, name, vendor ✗)<br>BASF7 (Sumita, code, vendor ✗, preferred code row) | 1 | [SCHNEIDER-KREUZNACH SUPER-ANGULON 75mm f/5.6](../../src/lens-data/schneider-kreuznach/SchneiderSuperAngulon75mmf56.data.ts) L7 |
 | `625/356 flint (CDGM H-F6 optical equivalent; historical supplier unverified)` | 1.62540 / 35.56 (d) | H-F6 — direct name evidence outranks six-digit code evidence. | F7 (Hoya, code, vendor ✗, alternate code row) | 1 | [SCHNEIDER-KREUZNACH SUPER-SYMMAR HM 120mm f/5.6](../../src/lens-data/schneider-kreuznach/SchneiderSuperSymmarHM120mmf56.data.ts) L2b |
@@ -1678,6 +1681,8 @@ resolves for. Per-candidate residuals are one `explainCompatibleGlassResolution`
 | `517642 — BK7-class crown (supplier unproven)` | 1.51680 / 64.20 (d) | N-BK7 — alias evidence outranks six-digit code evidence. | H-K9L (CDGM, code, alternate code row)<br>H-K9LGT (CDGM, code, alternate code row) | 1 | [SCHNEIDER-KREUZNACH VARIOGON 8-40mm f/1.8](../../src/lens-data/schneider-kreuznach/SchneiderVariogon18840.data.ts) P |
 | `744449 — lanthanum-flint class (supplier unproven)` | 1.74400 / 44.90 (d) | H-LaF3B — smallest d-line \|Δn\| (1.0e-7 vs 2.8e-5) | N-LAF2 (Schott, code, alternate code row) | 1 | [SCHNEIDER-KREUZNACH VARIOGON 8-40mm f/1.8](../../src/lens-data/schneider-kreuznach/SchneiderVariogon18840.data.ts) L10 |
 | `713539 — lanthanum-crown class (supplier unproven)` | 1.71300 / 53.89 (d) | LAC8 — smallest d-line \|Δn\| (1.8e-7 vs 3.0e-4) | MP-LAC8-30 (Hoya, code, alternate code row) | 1 | [SCHNEIDER-KREUZNACH VARIOGON 8-40mm f/1.8](../../src/lens-data/schneider-kreuznach/SchneiderVariogon18840.data.ts) L12 |
+| `589612-class crown (supplier/melt unresolved)` | 1.58900 / 61.20 (d) | S-BAL35 — smallest d-line \|Δn\| (1.3e-4 vs 1.3e-4) | SK5 (Sumita, code, alternate code row) | 1 | [SCHNEIDER-KREUZNACH XENAR 50mm f/2.8](../../src/lens-data/schneider-kreuznach/SchneiderXenar2850.data.ts) L1 |
+| `640346 — TIM27/FD7/F51 dense-flint class (supplier not identified by patent)` | 1.63980 / 34.60 (d) | J-SF7 — smallest d-line \|Δn\| (2.1e-8 vs 1.6e-7) | E-FD7 (Hoya, code, preferred code row) | 1 | [SCHNEIDER-KREUZNACH XENON 50mm f/1.9](../../src/lens-data/schneider-kreuznach/SchneiderXenon1950.data.ts) L4 |
 | `BACED5 (Hoya) / N-SSK5 class` | 1.65844 / 50.85 (d) | BACED5 — Annotation vendor context matches Hoya. | N-SSK5 (Schott, name, vendor ✗) | 1 | [SIGMA 105mm f/1.4 DG HSM \| Art](../../src/lens-data/sigma/Sigma105mmf14DGHSMArt.data.ts) L1 |
 | `FCD100 (Hoya) / S-FPL53 class (fluorite-class FLD)` | 1.43700 / 95.10 (d) | FCD100 — Annotation vendor context matches Hoya. | S-FPL53 (Ohara, name, vendor ✗) | 3 | [SIGMA 105mm f/1.4 DG HSM \| Art](../../src/lens-data/sigma/Sigma105mmf14DGHSMArt.data.ts) L2 |
 | `E-ADF10 (Hoya) / N-KZFS4 class` | 1.61310 / 44.36 (d) | E-ADF10 — Annotation vendor context matches Hoya. | N-KZFS4 (Schott, name, vendor ✗) | 1 | [SIGMA 105mm f/1.4 DG HSM \| Art](../../src/lens-data/sigma/Sigma105mmf14DGHSMArt.data.ts) L4 |
