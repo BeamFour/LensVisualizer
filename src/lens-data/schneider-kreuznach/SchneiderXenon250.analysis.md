@@ -161,12 +161,10 @@ The modeled stop semi-diameter is 8.83346026 mm. Paraxial pupil imaging gives an
 12.500778 mm and a modeled f-number of 2.0000000001. This agreement is a calibration to the published f/2 target, not an
 independent measurement or recovery of the manufactured diaphragm.
 
-The surface semi-diameters are likewise modeled rather than source-published. They were derived from exact spherical-ray
-envelopes with a documented clearance policy. On the final geometry the minimum modeled element edge thickness is
-0.685887 mm and the largest spherical rim angle is 49.204735°. The portable exact-ray check covers the complete on-axis
-f/2 marginal bundle, the default ±0.6-field visible bundle, and a central half-pupil sample at both signs of the full
-36×24 mm diagonal field. It does not establish full-pupil transmission at the extreme frame corner, so corner vignetting
-is not excluded by that test.
+The surface semi-diameters are estimated rather than source-published. Fig. 1 supplies the optical rim proportions,
+with 12.0 mm front cemented rims and 10.7 mm rear cemented rims; the smaller stop-facing apertures exclude drawn
+bevels. Exact spherical-ray and rendered-boundary checks validate the modeled geometry. This does not establish
+full-pupil transmission at the extreme frame corner, so corner vignetting is not excluded.
 
 The parsed final prescription gives a Petzval sum of `+0.003875252611 1/mm` using `φ/(n·n′)` surface by surface. This is a
 first-order curvature quantity from the modeled prescription; it is not a measured field-curvature result for a production

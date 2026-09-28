@@ -160,7 +160,7 @@ const LENS_DATA = {
 
   closeFocusM: 0.75,
   focusDescription:
-    "NO_INTERNAL_RECONSTRUCTION: static patent prescription only; closeFocusM is secondary Exakta-variant metadata and is not used to infer focus motion.",
+    "Only the fixed patent prescription is modeled; the closest-focus distance is secondary Exakta-variant metadata and is not used to infer focus motion.",
 
   nominalFno: 2.9,
   fstopSeries: [2.9, 4, 5.6, 8, 11, 16],

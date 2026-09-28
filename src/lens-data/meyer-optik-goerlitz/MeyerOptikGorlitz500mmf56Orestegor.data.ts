@@ -109,7 +109,7 @@ const LENS_DATA = {
       vd: 50.8,
       indexReference: "d",
       fl: -115.084381300245,
-      glass: "658509-class barium crown / short-flint coordinate (supplier unresolved)",
+      glass: "658509 — dense crown; N-SSK5 compatible spectral proxy (historical supplier/melt unresolved)",
       apd: false,
       role: "Negative rear element completing the diverging rear main part.",
     },
@@ -137,7 +137,7 @@ const LENS_DATA = {
   doublets: [],
 
   focusDescription:
-    "NO_INTERNAL_RECONSTRUCTION — the patent provides one fixed prescription; 6.0 m is the marketed closest-focus distance, but no internal focus spacing law is modeled.",
+    "Focus travel is not modeled. The patent provides one fixed prescription; 6.0 m is the marketed closest-focus distance, but no internal focus spacing law is modeled.",
   closeFocusM: 6,
   nominalFno: 5.6,
   fstopSeries: [5.6, 8, 11, 16, 22],

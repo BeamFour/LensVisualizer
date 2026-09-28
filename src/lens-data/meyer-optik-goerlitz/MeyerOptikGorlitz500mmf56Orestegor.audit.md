@@ -30,3 +30,9 @@ L1 remains on Abbe fallback: searches for 510619 and the exact 1.50977 / 61.9 co
 ### Metadata and display
 
 Canonical maker is Meyer Optik Görlitz; display retains the historical hyphenated branding.
+
+### Local diagram follow-up
+
+Rechecked the local-site SVG against the exact patent figure cited above, including optical rims, element order, labels and glass colors. Retained the reviewed SDs: the optical silhouette is consistent within drawing/measurement uncertainty, excluding bevels, leaders and mechanical extensions. All elements are spherical; there is no source evidence for ED or anomalous-dispersion tags. The focus control is disabled and no focal-length zoom slider is present. This fixed prescription supplies no focus/zoom endpoints whose direction could be reversed. User-facing focus text now states the modeling limit in plain language.
+
+Corrected L4 from a crown/short-flint description to dense crown (N-SSK5 compatible spectral proxy), verified in the local element inspector. L1 remains unresolved: the [astrograph paper, p. 18](https://gymarkiv.sdu.dk/MFM/kdvs/mfm%2020-29/mfm-23-9.pdf) gives the same nd = 1.50977 crown coordinate and line indices, but no named glass or catalog dispersion coefficients. Those data do not establish the Orestegor's production material and were not copied into its prescription.

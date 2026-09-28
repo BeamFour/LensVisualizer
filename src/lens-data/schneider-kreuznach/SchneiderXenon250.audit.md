@@ -28,3 +28,9 @@ Resolved catalog curves are qualified spectral proxies. They do not identify his
 Canonical assignee spelling is Jos. Schneider & Co., Optische Werke. The missing comma caused pretest metadata generation to abort. Retina-Xenon C and Kodak Retina IIIc display qualifiers are retained separately from manufacturer and assignee.
 
 The derived L1 focal-length literal was normalized from 61.406279864072494 to 61.406279864072495, its existing IEEE-754 runtime value, to remove the no-loss-of-precision lint error. Published prescription values are unaffected.
+
+### Local diagram follow-up
+
+Compared the local-site SVG directly with the exact Fig. 1 optical outlines at 600 dpi. Flattened the front doublet's S3/S4 rims to 12.0 mm and the rear doublet's S7/S8 rims to 10.7 mm; retained S5 = 9.8 and S6 = 9.2 mm below the bevels. These are figure-derived estimates, not published clear apertures. This follow-up specifically refines visible taper at the user's request, despite the small percentage change in overall diameter. Published curvatures and spacings are unchanged.
+
+Both patents describe exchanging optical subsystems, not continuously zooming them. This Table A model is fixed: no zoom positions or focus-motion endpoints exist to reverse. Local controls correctly disable focus and provide no focal-length zoom slider. Diagram L1–L6, D1/D2, subsystem I/II and STO labels match the selected prescription. Glass remains ordinary spherical crown/flint; no unsupported ED, aspheric or anomalous-dispersion tags were added.

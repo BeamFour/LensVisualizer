@@ -34,3 +34,7 @@ Added H-ZK1 from the official CDGM datasheet, https://www.cdgmgd.com/webapp/pdf/
 ### Metadata and display
 
 Canonical maker is Meyer Optik Görlitz. The source explicitly records registration on 3 September 1959; the shared analysis-date contract now recognizes Registered without mislabeling that event.
+
+### Local diagram follow-up
+
+Rechecked the local-site SVG against the exact patent figure cited above, including optical rims, element order, labels and glass colors. Retained the reviewed SDs: the optical silhouette is consistent within drawing/measurement uncertainty, excluding bevels, leaders and mechanical extensions. All elements are spherical; there is no source evidence for ED or anomalous-dispersion tags. The focus control is disabled and no focal-length zoom slider is present. This fixed prescription supplies no focus/zoom endpoints whose direction could be reversed. User-facing focus text now states the modeling limit in plain language.

@@ -10,9 +10,9 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 ## Summary
 
 - **837** lenses scanned
-- **1840** total code-only elements found
-- **1840** elements in this report
-- **296** distinct lens files affected
+- **1838** total code-only elements found
+- **1838** elements in this report
+- **295** distinct lens files affected
 
 ## Codes by Frequency
 
@@ -90,7 +90,6 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 517522 | 5 | 5 | patents/JP2016090725A.pdf<br>patents/JP2014209144A.pdf<br>patents/US9538088.pdf<br>patents/US10545321.pdf | 2/5 rows have review records |
 | 541472 | 5 | 5 | patents/US4826301.pdf<br>patents/US20130308041A1.pdf<br>patents/US20210033835A1.pdf<br>patents/JP2012181525A.pdf | No review-record hit |
 | 593353 | 5 | 5 | patents/US20150146044A1.pdf<br>patents/JPA 1997211319-000000.pdf<br>patents/US20190113711A1.pdf<br>patents/US20170242219A1.pdf | No review-record hit |
-| 658509 | 5 | 4 | patents/US20160327774A1.pdf<br>patents/JPA 1982019708-000000.pdf<br>patents/DE_1980417_U.pdf<br>patents/US4812022.pdf | No review-record hit |
 | 673321 | 5 | 5 | patents/US20210263286A1.pdf<br>patents/JPA 1982108817-000000.pdf<br>patents/JPA 1981119109-000000.pdf<br>patents/US7106520.pdf | No review-record hit |
 | 702412 | 5 | 4 | patents/JP_2000047107_A.pdf<br>patents/US20110090576A1.pdf<br>patents/US20120063011A1.pdf<br>patents/JPA 1982108817-000000.pdf | No review-record hit |
 | 720437 | 5 | 4 | patents/US6115188.pdf<br>patents/JPA 1980017129-000000.pdf<br>patents/JPA 1982108817-000000.pdf<br>patents/US3459469.pdf | No review-record hit |
@@ -108,6 +107,7 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 623581 | 4 | 3 | patents/DE_1170157_B.pdf<br>patents/US4158482.pdf<br>patents/US3442573.pdf | No review-record hit |
 | 640602 | 4 | 3 | patents/US3459469.pdf<br>patents/US20080212200A1.pdf<br>patents/JPA 1975110330-000000.pdf | No review-record hit |
 | 652585 | 4 | 4 | patents/US20130308041A1.pdf<br>patents/JPA 1989189622-000000.pdf<br>patents/US20200166730A1.pdf | No review-record hit |
+| 658509 | 4 | 3 | patents/US20160327774A1.pdf<br>patents/JPA 1982019708-000000.pdf<br>patents/US4812022.pdf | No review-record hit |
 | 662561 | 4 | 1 | patents/GB_850117_A.pdf | All rows have review records |
 | 673322 | 4 | 3 | patents/JP_H0219814_A.pdf<br>patents/DE_927540_C.pdf<br>patents/JP2012181525A.pdf | No review-record hit |
 | 678555 | 4 | 3 | patents/US3442573.pdf<br>patents/CN_121091494_A.pdf<br>patents/JPA 1975110330-000000.pdf | No review-record hit |
@@ -191,7 +191,6 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 658508 | 2 | 2 | patents/US2968221.pdf<br>patents/US3482900.pdf | No review-record hit |
 | 661204 | 2 | 1 | patents/US20210149156A1.pdf | All rows explicitly disposed |
 | 668419 | 2 | 2 | patents/US2968221.pdf<br>patents/JPA 1994082698-000000.pdf | No review-record hit |
-| 670472 | 2 | 2 | patents/CH_346706_A.pdf<br>patents/CN_121091494_A.pdf | No review-record hit |
 | 670473 | 2 | 2 | patents/JPA 1979030821-000000.pdf<br>patents/JPA 1982108817-000000.pdf | No review-record hit |
 | 678553 | 2 | 2 | patents/US6115188.pdf<br>patents/JPA 1979030821-000000.pdf | No review-record hit |
 | 680557 | 2 | 1 | patents/JPB 1963011590-000000.pdf | No review-record hit |
@@ -335,6 +334,7 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 667484 | 1 | 1 | patents/JPA 1975110330-000000.pdf | No review-record hit |
 | 668358 | 1 | 1 | patents/JPB 1963011590-000000.pdf | No review-record hit |
 | 670266 | 1 | 1 | patents/WO2024154461A1.pdf | No review-record hit |
+| 670472 | 1 | 1 | patents/CN_121091494_A.pdf | No review-record hit |
 | 670573 | 1 | 1 | patents/JPB 1969024068-000000.pdf | No review-record hit |
 | 672323 | 1 | 1 | patents/GB_850117_A.pdf | All rows have review records |
 | 672388 | 1 | 1 | patents/JP_S5357028_A.pdf | All rows have review records |
@@ -1789,7 +1789,6 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 |---|---|---|---|---|---|---|---|
 | L1 (Element 1) | 1 | `Unmatched (510619 crown-class coordinate; supplier unresolved)` | 1.50977 / 61.90 | No catalog entry | abbe | patents/DE_1980417_U.pdf | Explicit disposition in data |
 | L2 (Element 2) | 3 | `740282 - dense-flint class (supplier unresolved)` | 1.74000 / 28.20 | FD3 (trusted Sellmeier) | sellmeier | patents/DE_1980417_U.pdf | No review-record hit |
-| L4 (Element 4) | 7 | `658509-class barium crown / short-flint coordinate (supplier unresolved)` | 1.65844 / 50.80 | N-SSK5 (trusted Sellmeier) | sellmeier | patents/DE_1980417_U.pdf | No review-record hit |
 
 ### [MINOLTA AF 100mm f/2](../../src/lens-data/minolta/MinoltaAF100mmf2.data.ts) - JP 1987-244010 A
 
@@ -3107,12 +3106,6 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
 |---|---|---|---|---|---|---|---|
 | L1 (Element 1) | 1 | `589612-class crown (supplier/melt unresolved)` | 1.58900 / 61.20 | S-BAL35 (trusted Sellmeier) | sellmeier | patents/DE_753329_C.pdf | No review-record hit |
-
-### [SCHNEIDER-KREUZNACH XENON 50mm f/1.9](../../src/lens-data/schneider-kreuznach/SchneiderXenon1950.data.ts) - CH 346706
-
-| Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
-|---|---|---|---|---|---|---|---|
-| L1 (Element 1) | 1 | `670472 — barium-flint/high-index crown class (supplier not identified by patent)` | 1.67003 / 47.20 | H-ZBaF52 (trusted Sellmeier) | sellmeier | patents/CH_346706_A.pdf | No review-record hit |
 
 ### [SMC PENTAX-A ZOOM 35-70mm f/4](../../src/lens-data/pentax/PentaxA3570mmf4.data.ts) - US 4,812,022
 

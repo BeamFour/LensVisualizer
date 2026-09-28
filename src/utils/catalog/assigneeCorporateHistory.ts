@@ -295,6 +295,16 @@ export const ASSIGNEE_CORPORATE_HISTORY: Partial<Record<string, AuthoredCorporat
       },
     ],
   },
+  "Jos. Schneider & Co., Optotechnische Gesellschaft": {
+    corporateFamily: [
+      {
+        family: "Schneider-Kreuznach",
+        effectiveFrom: "1913",
+        sourceUrl: "https://schneiderkreuznach.com/en/industrial-optics/knowledge-hub/patents",
+        note: "Schneider-Kreuznach lists DE 753329 among its own patents. Its title sheet names this historical Berlin legal style, which is retained separately from Optische Werke. The date marks the company's documented lineage, not the first use of this exact name.",
+      },
+    ],
+  },
   "Jos. Schneider & Co., Optische Werke": {
     corporateFamily: [
       {
@@ -856,6 +866,16 @@ export const ASSIGNEE_CORPORATE_HISTORY: Partial<Record<string, AuthoredCorporat
         effectiveFrom: "1997-07",
         sourceUrl: SOURCES.tamronHistory,
         note: "Established as Tamron's Foshan manufacturing company; retained as a distinct patent assignee, not an alias of the Japanese company.",
+      },
+    ],
+  },
+  "VEB Feinoptisches Werk Görlitz": {
+    corporateFamily: [
+      {
+        family: "Meyer Optik Görlitz",
+        effectiveFrom: "1957",
+        sourceUrl: "https://www.meyer-optik-goerlitz.com/en/history/",
+        note: "The manufacturer's history identifies VEB Feinoptisches Werk Görlitz as its postwar name, before integration into Pentacon. This window begins with the earliest catalog patent under this name, not the establishment of the enterprise. Later Pentacon legal entities remain separate.",
       },
     ],
   },

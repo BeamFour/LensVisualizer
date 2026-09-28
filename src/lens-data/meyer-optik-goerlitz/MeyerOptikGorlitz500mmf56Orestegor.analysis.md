@@ -60,7 +60,7 @@ The patent coordinate is consistent with the 617366 optical-glass class, includi
 
 ### L4 / L IV — Biconcave Negative
 
-**nd = 1.65844, νd = 50.8. Glass: 658509-class barium crown / short-flint coordinate (supplier unresolved). f = −115.084 mm.**
+**nd = 1.65844, νd = 50.8. Glass: 658509 dense-crown coordinate; N-SSK5 compatible spectral proxy (historical supplier/melt unresolved). f = −115.084 mm.**
 
 L4 is the rear biconcave negative element and completes the diverging rear main part. It has the strongest negative standalone power of the four elements in the implemented scale. The distinction between this element power and the net rear-group power is important: the L3+L4 main part has an equivalent focal length of −408.509 mm after their spacing is included.
 

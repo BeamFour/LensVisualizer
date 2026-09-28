@@ -29,3 +29,9 @@ The source says only “yellow ray.” Catalog comparisons use the existing d-li
 ### Metadata and display
 
 Existing display name retained; product correlation remains qualified in the analysis.
+
+### Local diagram follow-up
+
+Rechecked the local-site SVG against the exact patent figure cited above, including optical rims, element order, labels and glass colors. Retained the reviewed SDs: the optical silhouette is consistent within drawing/measurement uncertainty, excluding bevels, leaders and mechanical extensions. All elements are spherical; there is no source evidence for ED or anomalous-dispersion tags. The focus control is disabled and no focal-length zoom slider is present. This fixed prescription supplies no focus/zoom endpoints whose direction could be reversed. User-facing focus text now states the modeling limit in plain language.
+
+Retained the source-title-sheet assignee Jos. Schneider & Co., Optotechnische Gesellschaft rather than merging a distinct historical legal style into Optische Werke. A sourced Schneider-Kreuznach corporate-family link consolidates their lineage in the assignee catalog.

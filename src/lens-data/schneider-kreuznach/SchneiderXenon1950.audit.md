@@ -28,3 +28,9 @@ Image-circle floor audit is skipped because imageFormat is unset; production-var
 ### Metadata and display
 
 Display name now includes SCHNEIDER-KREUZNACH consistently with the catalog. Marketed f/1.9 remains distinct from the patent f/2 design.
+
+### Local diagram follow-up
+
+Compared the local-site SVG directly with the exact Fig. 1 optical outlines at 600 dpi. Flattened the front doublet's S3/S4 rims to 12.0 mm and the rear doublet's S7/S8 rims to 10.7 mm; retained S5 = 9.8 and S6 = 9.2 mm below the bevels. These are figure-derived estimates, not published clear apertures. This follow-up specifically refines visible taper at the user's request, despite the small percentage change in overall diameter. Published curvatures and spacings are unchanged.
+
+Both patents describe exchanging optical subsystems, not continuously zooming them. This Table A model is fixed: no zoom positions or focus-motion endpoints exist to reverse. Local controls correctly disable focus and provide no focal-length zoom slider. Diagram L1–L6, D1/D2, subsystem I/II and STO labels match the selected prescription. Glass remains ordinary spherical crown/flint; no unsupported ED, aspheric or anomalous-dispersion tags were added.

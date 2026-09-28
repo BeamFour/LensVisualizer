@@ -20,11 +20,10 @@ import type { LensDataInput } from "../../types/optics.js";
  * ║ the published/model target f/2. This does not independently recover a production   ║
  * ║ diaphragm diameter.                                                                ║
  * ║                                                                                    ║
- * ║ Semi-diameters: not published. Modeled SDs contain the full on-axis f/2 marginal   ║
- * ║ bundle plus the default LensVisualizer 0.6-field off-axis visible bundle, using   ║
- * ║ exact spherical ray intersections/refraction. An 8% clear-aperture allowance was  ║
- * ║ applied and rounded upward to 0.05 mm; surface 10 receives one additional 0.05 mm ║
- * ║ to contain the tested full-format central bundle. STO retains its calibrated sd.   ║
+ * ║ Semi-diameters: estimated, not published. Fig. 1 supplies optical rim             ║
+ * ║ proportions, checked against exact spherical ray envelopes. Front and rear       ║
+ * ║ cemented rims use 12.0 and 10.7 mm, with reduced stop-facing apertures below      ║
+ * ║ the drawn bevels. See the audit log. STO retains its calibrated sd.               ║
  * ║                                                                                    ║
  * ║ Focus: NO_INTERNAL_RECONSTRUCTION. The manufacturer 0.762 m close-focus value is   ║
  * ║ retained as product metadata, but no finite-focus internal spacing law is invented.║
@@ -148,14 +147,14 @@ const LENS_DATA = {
   surfaces: [
     { label: "1", R: 27.415, d: 3.355, nd: 1.67003, elemId: 1, sd: 14.1 },
     { label: "2", R: 78.125, d: 0.635, nd: 1, elemId: 0, sd: 13.65 },
-    { label: "3", R: 19.835, d: 4.465, nd: 1.69347, elemId: 2, sd: 12.55 },
-    { label: "4", R: 84.16, d: 1.76, nd: 1.66446, elemId: 3, sd: 11.9 },
+    { label: "3", R: 19.835, d: 4.465, nd: 1.69347, elemId: 2, sd: 12 },
+    { label: "4", R: 84.16, d: 1.76, nd: 1.66446, elemId: 3, sd: 12 },
     { label: "5", R: 12.945, d: 5.3025, nd: 1, elemId: 0, sd: 9.8 },
     // STO position is a Stage-2 model inference: midpoint of the scaled patent d5 diaphragm space.
     { label: "STO", R: 1e15, d: 5.3025, nd: 1, elemId: 0, sd: 8.83346026 },
     { label: "6", R: -15.1, d: 1.585, nd: 1.6398, elemId: 4, sd: 9.2 },
-    { label: "7", R: 45.09, d: 5.94, nd: 1.65844, elemId: 5, sd: 10.3 },
-    { label: "8", R: -20.935, d: 0.105, nd: 1, elemId: 0, sd: 11.05 },
+    { label: "7", R: 45.09, d: 5.94, nd: 1.65844, elemId: 5, sd: 10.7 },
+    { label: "8", R: -20.935, d: 0.105, nd: 1, elemId: 0, sd: 10.7 },
     { label: "9", R: 1179.685, d: 2.625, nd: 1.74472, elemId: 6, sd: 11.9 },
     // Final d uses the scaled published s′ = 72.4 × 0.5 = 36.2 mm, not the computed 36.218075 mm paraxial BFD.
     { label: "10", R: -38.62, d: 36.2, nd: 1, elemId: 0, sd: 12.1 },

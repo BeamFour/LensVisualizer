@@ -21,8 +21,8 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 | Selection criterion | Elements |
 |---|---:|
-| Smallest reference-index residual | 1579 |
-| Evidence-source priority | 973 |
+| Smallest reference-index residual | 1578 |
+| Evidence-source priority | 974 |
 | Vendor context | 273 |
 | Stable canonical-name order | 7 |
 | Smallest Abbe residual | 2 |
@@ -861,7 +861,7 @@ resolves for. Per-candidate residuals are one `explainCompatibleGlassResolution`
 | `773496 — lanthanum high-index class (vendor unresolved)` | 1.77250 / 49.60 (d) | J-LASF016 — smallest d-line \|Δn\| (1.7e-8 vs 6.4e-8) | N-LAF34 (Schott, code, alternate code row)<br>S-LAH66 (Ohara, code, preferred code row)<br>S-LAH66N (Ohara, code, alternate code row) | 2 | [MAMIYA-SEKOR ZOOM E 28-50mm f/3.5-4.5](../../src/lens-data/mamiya/MamiyaSekorZoomE2850mmf3545.data.ts) L5 |
 | `755275 — dense flint class (vendor unresolved)` | 1.75520 / 27.50 (d) | E-FD4 — smallest d-line \|Δn\| (2.6e-7 vs 3.8e-7) | H-ZF6 (CDGM, code, alternate code row) | 1 | [MAMIYA-SEKOR ZOOM E 28-50mm f/3.5-4.5](../../src/lens-data/mamiya/MamiyaSekorZoomE2850mmf3545.data.ts) L8 |
 | `699301 class (supplier unconfirmed)` | 1.69895 / 30.10 (d) | E-FD15 — smallest d-line \|Δn\| (2.0e-7 vs 3.2e-6) | S-TIM35 (Ohara, code, preferred code row) | 2 | [MEYER OPTIK GÖRLITZ ORESTOR 135mm f/2.8](../../src/lens-data/meyer-optik-goerlitz/MeyerOptikGorlitz135mmf28Orestor.data.ts) L3 |
-| `658509-class barium crown / short-flint coordinate (supplier unresolved)` | 1.65844 / 50.80 (d) | N-SSK5 — smallest d-line \|Δn\| (5.9e-8 vs 8.8e-7) | S-BSM25 (Ohara, code, alternate code row)<br>BACED5 (Hoya, code, alternate code row) | 1 | [MEYER-OPTIK GÖRLITZ ORESTEGOR 500mm f/5.6](../../src/lens-data/meyer-optik-goerlitz/MeyerOptikGorlitz500mmf56Orestegor.data.ts) L4 |
+| `658509 — dense crown; N-SSK5 compatible spectral proxy (historical supplier/melt unresolved)` | 1.65844 / 50.80 (d) | N-SSK5 — direct name evidence outranks six-digit code evidence. | S-BSM25 (Ohara, code, alternate code row)<br>BACED5 (Hoya, code, alternate code row) | 1 | [MEYER-OPTIK GÖRLITZ ORESTEGOR 500mm f/5.6](../../src/lens-data/meyer-optik-goerlitz/MeyerOptikGorlitz500mmf56Orestegor.data.ts) L4 |
 | `713539 — optical-glass coordinate class (vendor unresolved)` | 1.71300 / 53.93 (d) | LAC8 — smallest d-line \|Δn\| (1.8e-7 vs 3.0e-4) | MP-LAC8-30 (Hoya, code, alternate code row) | 1 | [MINOLTA AF 100mm f/2](../../src/lens-data/minolta/MinoltaAF100mmf2.data.ts) L1 |
 | `720503 — optical-glass coordinate class (vendor unresolved)` | 1.72000 / 50.31 (d) | LAC10 — smallest d-line \|Δn\| (1.7e-6 vs 1.0e-5) | J-LAK10 (Hikari, code, preferred code row) | 1 | [MINOLTA AF 100mm f/2](../../src/lens-data/minolta/MinoltaAF100mmf2.data.ts) L7 |
 | `S-NSL3-class crown (OHARA 518590; inferred)` | 1.51823 / 58.96 (d) | S-NSL3 — direct name evidence outranks six-digit code evidence. | E-C3 (Hoya, code, vendor ✗, alternate code row) | 1 | [MINOLTA AF 100mm f/2.8 Macro](../../src/lens-data/minolta/MinoltaAF100mmf28Macro.data.ts) L1 |

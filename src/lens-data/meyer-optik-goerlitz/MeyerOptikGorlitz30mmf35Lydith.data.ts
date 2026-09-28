@@ -153,7 +153,7 @@ const LENS_DATA = {
 
   closeFocusM: 0.33,
   focusDescription:
-    "NO_INTERNAL_RECONSTRUCTION — the patent supplies one nominal/infinity prescription only; 0.33 m is manufacturer metadata for the historical preselection-aperture variant and does not drive internal motion.",
+    "Focus travel is not modeled. The patent supplies one nominal/infinity prescription only; 0.33 m is manufacturer metadata for the historical preselection-aperture variant and does not drive internal motion.",
 
   nominalFno: 3.5,
   fstopSeries: [3.5, 4, 5.6, 8, 11, 16],

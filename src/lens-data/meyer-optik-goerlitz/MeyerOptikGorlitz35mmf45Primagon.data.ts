@@ -145,7 +145,7 @@ const LENS_DATA = {
   varLabels: [],
   closeFocusM: 0.4,
   focusDescription:
-    "NO_INTERNAL_RECONSTRUCTION. Patent Example 1 supplies one fixed prescription only. Period Meyer literature gives 0.4 m minimum focus, but no production unit-focus travel or internal spacing law is encoded.",
+    "Focus travel is not modeled. Patent Example 1 supplies one fixed prescription only. Period Meyer literature gives 0.4 m minimum focus, but no production unit-focus travel or internal spacing law is encoded.",
 
   /* ── Visual group annotations ── */
   groups: [
