@@ -173,7 +173,7 @@ Modeled encounter order in the data file:
 Key modeling points:
 
 - `M1F`/`M1R` model the annular primary shell. `M1R` is a second-surface mirror with matching `innerSd` on the shell surfaces.
-- `L5F`/`L5R` model the clear central plug of the same physical blank. Their semi-diameter is smaller than the primary shell's inner clear radius.
+- `L5F`/`L5R` model the clear central plug of the same physical blank. Their semi-diameter equals the primary shell's inner clear radius, so the two zones tile the blank's faces without a gap.
 - `OBS` is a synthetic central blocker representing the unusable central aperture caused by the secondary obstruction. It is kept separate from the stop because `innerSd` on a stop would pass the central hole rather than block it.
 - `STO` is a fixed synthetic aperture derived from $F_{NO}(OUT)$ rather than an iris diaphragm.
 - `SEC_R → SEC_M → SEC_R` models the secondary Mangin path from the rear side of the substrate to the silvered object-side surface and back out again.

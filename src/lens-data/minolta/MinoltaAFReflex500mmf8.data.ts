@@ -212,7 +212,7 @@ const LENS_DATA = {
     // L5F/L5R are the central clear plug; M1F/M1R are the complementary annular mirror shell.
     // The zero axial gaps are intentional same-station splits with non-overlapping radial material bands.
     { label: "L5F", R: -168.58, d: 0.0, nd: 1.67, elemId: 6, sd: 12.0 },
-    { label: "M1F", R: -168.58, d: 11.7, nd: 1.67, elemId: 2, sd: 38.5, innerSd: 13.5 },
+    { label: "M1F", R: -168.58, d: 11.7, nd: 1.67, elemId: 2, sd: 38.5, innerSd: 12.0 },
     {
       label: "M1R",
       R: -204.757,
@@ -220,7 +220,7 @@ const LENS_DATA = {
       nd: 1.0,
       elemId: 0,
       sd: 38.5,
-      innerSd: 13.5,
+      innerSd: 12.0,
       interaction: { type: "reflect", incidentSide: "front", inactiveSide: "block", mirrorKind: "second-surface" },
     },
     { label: "L5R", R: -204.757, d: 4.5, nd: 1.0, elemId: 0, sd: 12.0 },

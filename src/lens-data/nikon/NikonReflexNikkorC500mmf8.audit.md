@@ -21,3 +21,13 @@ Patent: US 3,632,190, Example 1
 - Visually rechecked `patents/US3632190.pdf`, PDF page 5, Example C. The front corrector remains patent code `525596`, `nd = 1.52559`, `νd = 59.6`.
 - SUMITA K5 is within the runtime catalog-equivalent window (`Δnd = -0.002010`, `Δνd = 0.00`).
 - Relabeled the corrector as a K5 optical equivalent while leaving the production supplier unspecified. No folded-path or prescription geometry changed.
+
+## 2026-09-29 - Zoned-blank medium check
+
+- Real rays traced EFL ≈ 459 mm against the header's traced 500.000 mm. The prescription and layout are correct: an
+  independent lab-frame paraxial trace of the stored geometry gives EFL 500.00 mm with focus at z = 172.62, the
+  stored image plane, when the ray leaving the silvered primary through `3` enters air.
+- The viewer's tracers resolved the medium entered on a reverse crossing of `3` from the surface before it in array
+  order, the clear central plug `9` (`nd = 1.54072`), so the returning beam stayed in glass and skipped the exit
+  refraction. The tracers now take that medium from the last earlier surface whose clear zone overlaps the annulus,
+  here air. Viewer real rays now give EFL 500.0 mm with focus at z = 172.6. No data changed.

@@ -31,3 +31,30 @@ Patent: US 4,951,078, Table 1 / Figures 4, 6, 9, 10
   `S-LAL52 (OHARA catalog-equivalent to 670571; patent vendor unspecified)`. This provides one
   coefficient-backed model for the repeated material without asserting the production supplier.
 - Synchronized the analysis narrative and tables. No geometry, mirror interaction, APD status, or aperture changed.
+
+## 2026-09-29 - Zoned-blank medium and primary inner radius
+
+### Phase 2 - Retained-information audit
+
+Real rays traced EFL ≈ 438–448 mm with focus near z = 175–178, against the header's 495.9725 mm and the stored
+image plane at z = 153.98. An independent lab-frame paraxial trace of the stored geometry gives EFL 495.97 mm with
+focus exactly on that plane when the ray leaving the Mangin primary through `M1F` enters air. The viewer's tracers
+took that medium from the central plug `L5F` (`nd = 1.67`), which precedes `M1F` in array order; they now use the
+last earlier surface whose clear zone overlaps the annulus.
+
+| Surface / field | Before | After | Justification |
+|---|---:|---:|---|
+| `M1F` `innerSd` | 13.5 | 12.0 | Tiles the blank's front face with the central plug (`L5F` sd 12.0); 13.5 left a 12.0–13.5 ring with no front surface, where returning rays skipped their exit refraction |
+| `M1R` `innerSd` | 13.5 | 12.0 | Paired annular surfaces share `innerSd`; FNO(IN) = 18.20 puts the inner pupil edge at 13.6 mm, whose ray meets the silvered r4 near 12.3 mm |
+
+Viewer real rays now give EFL 496.3–496.9 mm with focus at z = 154.0–154.1 across the usable annulus.
+
+### Phase 4 - Analysis sync
+
+- Updated the modeling note: the central plug's semi-diameter now equals the primary shell's inner clear radius.
+
+### Follow-ups
+
+- The explicit folded path cannot vignette the innermost returning rays (entrance heights ≈ 13.6–15 mm) that cross
+  the primary station inside r = 12 mm, where the cemented relay face would physically intercept them; they still
+  trace through the plug zone without refraction.

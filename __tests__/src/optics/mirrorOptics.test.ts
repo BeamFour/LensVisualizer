@@ -395,7 +395,7 @@ describe("mirror optics support", () => {
     expect(Math.abs(result!.samples.find((sample) => sample.channel === "G")!.focusShiftMm!)).toBeLessThan(1);
   });
 
-  it("orders the Nikon 1000mm folded path through the thick primary and the rear group", () => {
+  it("orders the Nikon 1000mm folded path through the thick primary and the rear group in its perforation", () => {
     const L = buildLens(nikonReflex1000Data);
     const layout = doLayout(0, 0, L);
     const indexByLabel = new Map(L.S.map((surface, index) => [surface.label, index]));
@@ -406,7 +406,8 @@ describe("mirror optics support", () => {
     const hitLabels = result.diagnostics?.hitSurfaceLabels ?? [];
 
     expect(z("M1R")).toBeGreaterThan(z("M1F"));
-    expect(z("L2F")).toBeGreaterThan(z("M1R"));
+    expect(z("L2F")).toBeGreaterThan(z("M1F"));
+    expect(z("L2F")).toBeLessThan(z("M1R"));
     expect(hitLabels.indexOf("M1R")).toBeGreaterThan(hitLabels.indexOf("M1F"));
     expect(hitLabels.indexOf("L2F")).toBeGreaterThan(hitLabels.indexOf("M2F"));
     expect(result.clipped).toBe(false);
@@ -442,6 +443,51 @@ describe("mirror optics support", () => {
     expect(hitLabels.slice(-4)).toEqual(["7", "8", "9", "10"]);
     expect(result.clipped).toBe(false);
     expect(result.reachedImagePlane).toBe(true);
+  });
+
+  it("exits an annular Mangin zone into air when a clear central plug is listed just before it", () => {
+    /* A zoned blank lists the clear central plug (PF) at the annulus' station, immediately before the annular front
+     * surface. A reverse crossing of that surface must enter the air in front of the annulus, not the plug glass
+     * that precedes it in array order, so annular rays trace exactly as through the plain Mangin fixture. */
+    const [STO, MG1, MG2] = manginData.surfaces;
+    const zoned = buildLens({
+      ...manginData,
+      key: "reference-zoned-mangin-plug",
+      elements: [
+        { ...manginData.elements[0], fromSurface: "MG1", toSurface: "MG2" },
+        {
+          ...manginData.elements[0],
+          id: 2,
+          name: "PL",
+          label: "Clear central plug",
+          fromSurface: "PF",
+          toSurface: "PR",
+        },
+      ],
+      surfaces: [
+        STO,
+        { label: "PF", R: MG1.R, d: 0, nd: MG1.nd, elemId: 2, sd: 5 },
+        { ...MG1, innerSd: 5 },
+        { ...MG2, innerSd: 5 },
+        { label: "PR", R: MG2.R, d: 0, nd: 1.0, elemId: 0, sd: 5 },
+      ],
+      groups: [{ text: "MG", fromSurface: "PF", toSurface: "PR" }],
+    } satisfies LensData);
+    const plain = buildLens(manginData);
+    const ray: VectorRayInput = { origin: [0, 12, -10], direction: [0, 0, 1] };
+    const zonedTraces = traceBothFoldedTracers(zoned, ray);
+    const plainTraces = traceBothFoldedTracers(plain, ray);
+
+    expect(validateLensData(zoned.data)).toEqual([]);
+    for (const tracer of ["engine", "legacy"] as const) {
+      const actual = zonedTraces[tracer];
+      const expected = plainTraces[tracer];
+      expect(actual.diagnostics.hitSurfaceLabels, tracer).toEqual(["STO", "MG1", "MG2", "MG1"]);
+      expect(actual.diagnostics.finalMedium, tracer).toBe(1);
+      for (let axis = 0; axis < 3; axis++) {
+        expect(actual.terminalDirection[axis], tracer).toBeCloseTo(expected.terminalDirection[axis], 12);
+      }
+    }
   });
 
   it("supports second-surface mirrors that exit through a repeated front surface", () => {
