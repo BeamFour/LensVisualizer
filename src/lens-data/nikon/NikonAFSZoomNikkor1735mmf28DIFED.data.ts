@@ -63,6 +63,7 @@ const LENS_DATA = {
     {
       id: 1,
       name: "L1",
+      diagramLabel: "L1",
       label: "Element 1",
       type: "Negative Meniscus (1× Asph)",
       nd: 1.796681,
@@ -103,6 +104,7 @@ const LENS_DATA = {
     {
       id: 4,
       name: "L3",
+      diagramLabel: "L3",
       label: "Element 3",
       type: "Biconcave Negative",
       nd: 1.80384,
@@ -115,6 +117,7 @@ const LENS_DATA = {
     {
       id: 5,
       name: "L4",
+      diagramLabel: "L4",
       label: "Element 4",
       type: "Biconvex Positive",
       nd: 1.805182,
@@ -127,6 +130,7 @@ const LENS_DATA = {
     {
       id: 6,
       name: "L5",
+      diagramLabel: "L5",
       label: "Element 5",
       type: "Negative Meniscus",
       nd: 1.749501,
@@ -140,6 +144,7 @@ const LENS_DATA = {
     {
       id: 7,
       name: "L6",
+      diagramLabel: "L6",
       label: "Element 6",
       type: "Biconvex Positive",
       nd: 1.58913,
@@ -153,6 +158,7 @@ const LENS_DATA = {
     {
       id: 8,
       name: "L7",
+      diagramLabel: "L7",
       label: "Element 7",
       type: "Biconvex Positive",
       nd: 1.716999,
@@ -165,6 +171,7 @@ const LENS_DATA = {
     {
       id: 9,
       name: "L8",
+      diagramLabel: "L8",
       label: "Element 8",
       type: "Biconcave Negative",
       nd: 1.748099,
@@ -178,6 +185,7 @@ const LENS_DATA = {
     {
       id: 10,
       name: "L9",
+      diagramLabel: "L9",
       label: "Element 9",
       type: "Positive Meniscus",
       nd: 1.84666,
@@ -191,6 +199,7 @@ const LENS_DATA = {
     {
       id: 11,
       name: "L10",
+      diagramLabel: "L10",
       label: "Element 10",
       type: "Biconvex Positive",
       nd: 1.49782,
@@ -198,11 +207,15 @@ const LENS_DATA = {
       indexReference: "d",
       fl: 48.888569,
       glass: "498825/498826 — J-FKH1 class (supplier unresolved)",
+      apd: "inferred",
+      apdNote:
+        "ED-class inference from the coordinate-compatible J-FKH1 curve (catalog dPgF approximately +0.0337); not patent-measured partial dispersion or proof of production glass identity.",
       role: "Positive ED-class element at the front of G4.",
     },
     {
       id: 12,
       name: "L11",
+      diagramLabel: "L11",
       label: "Element 11",
       type: "Negative Meniscus",
       nd: 1.805182,
@@ -216,6 +229,7 @@ const LENS_DATA = {
     {
       id: 13,
       name: "L12",
+      diagramLabel: "L12",
       label: "Element 12",
       type: "Biconvex Positive",
       nd: 1.49782,
@@ -223,12 +237,16 @@ const LENS_DATA = {
       indexReference: "d",
       fl: 31.036607,
       glass: "498825/498826 — J-FKH1 class (supplier unresolved)",
+      apd: "inferred",
+      apdNote:
+        "ED-class inference from the coordinate-compatible J-FKH1 curve (catalog dPgF approximately +0.0337); not patent-measured partial dispersion or proof of production glass identity.",
       role: "Positive ED-class rear member of the central G4 cemented pair.",
       cemented: "D3",
     },
     {
       id: 14,
       name: "L13",
+      diagramLabel: "L13",
       label: "Element 13",
       type: "Negative Meniscus (1× Asph)",
       nd: 1.76684,
@@ -333,7 +351,7 @@ const LENS_DATA = {
     ["9", "D9"],
     ["12", "D12"],
     ["14", "D14→STO"],
-    ["17", "D17 (raw table d18)"],
+    ["17", "D17"],
     ["24", "BF"],
   ],
 
@@ -356,7 +374,7 @@ const LENS_DATA = {
 
   closeFocusM: 0.28,
   focusDescription:
-    "CONSTRAINED_RECONSTRUCTION: G2F-only close-focus endpoints are code-solved at 17.5/24/34 mm for Nikon's 0.28 m focal-plane-referenced MFD, conserving D9+D12 with fixed Bf. Intermediate focus interpolation is modeled, not patent-published.",
+    "For close focus, G2F moves toward the image plane while the other groups stay fixed. Travel to 0.28 m is a constrained estimate at each zoom station; the patent does not publish close-focus spacings.",
 
   nominalFno: 2.9,
   zoomApertureModel: "from-nominal-fno",

@@ -26,3 +26,24 @@ f/3.6 aperture metadata; the patent's 25.0–82.5 mm stations and f/3.6–4.7 ca
 **Lint root cause:** the derived close-focus D13 literal `13.829655105893672` exceeds JavaScript decimal precision.
 Its round-trippable spelling is `13.829655105893671`; both parse to the same binary64 value, so this correction changes
 no focus spacing at runtime.
+
+## 2026-09-29 — Local diagram follow-up
+
+**Local diagram review:** re-compared the live wide/tele silhouettes and cemented rims with Example 2 Figure 3
+(PDF p. 8). The enlarged G2 rims remain closer to the optical outline; further changes lack strong figure evidence.
+Explicit L1–L15 labels now preserve physical numbering around L4r/L4 instead of counting the thin hybrid layer as an
+extra physical element. The figure's local G2 labels L1–L4 are distinct from this model's whole-lens numbering.
+
+**Motion:** retained source order 25/50/82.5 mm. At infinity, G1, G3 and G5 move objectward as focal length increases;
+G2 moves slightly imageward and G4 stays fixed. Near focus moves only G2 objectward by 1.4297/2.3129/3.9248 mm at
+those stations. The patent specifies G2 focusing (¶0045); the direction and magnitude here are the constrained
+0.38 m reconstruction, not a published close-focus cam. The live chart keeps G1–G5 in optical order.
+
+**Glass and color:** L13 now names J-FKH1 explicitly as a supplier-unresolved compatible spectral proxy and receives
+inferred APD color from that curve (catalog dPgF approximately +0.0337), consistent with the production single-ED
+correlation. Patent coordinates and spectral behavior are unchanged. Coverage remains 15/16 regions; no supported
+coefficient source was found for the unnamed 1.55389/38.1 hybrid layer.
+
+**Assignee:** the exact patent front page lists 株式会社ニコン, already represented by the canonical Nikon Corporation.
+The catalog keeps Nippon Kogaku K.K. as the historically distinct predecessor linked to the same corporate family;
+no duplicate assignee spelling in this batch requires consolidation.

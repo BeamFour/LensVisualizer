@@ -124,11 +124,11 @@ focal length of complete moving group G1, which also includes L13.
 
 ### L12 — Positive Meniscus, second member of CL1
 
-nd = 1.77249, νd = 49.61. Glass: **773496 lanthanum-crown class**. Standalone f = **+98.85 mm**.
+nd = 1.77249, νd = 49.61. Glass: **773496 class (supplier unresolved)**. Standalone f = **+98.85 mm**.
 
 L12 is the positive member cemented to L11 at source surface 2. The cemented interface therefore changes directly from the
 L11 medium to the L12 medium rather than passing through air. Its refractive-index/dispersion coordinate is consistent with
-a lanthanum-crown class, but the patent names no supplier.
+several compatible catalog families, so the coordinate alone does not establish a crown/flint family or supplier.
 
 The opposing standalone signs of L11 and L12 make CL1 a positive cemented component with substantially weaker net power
 than either member alone. This is a power accounting statement; the patent does not assign a specific aberration term to
@@ -136,7 +136,7 @@ L12 by itself.
 
 ### L13 — Positive Meniscus, rear element of G1
 
-nd = 1.81600, νd = 46.62. Glass: **816466 lanthanum-crown class**. Standalone f = **+108.63 mm**.
+nd = 1.81600, νd = 46.62. Glass: **816466 lanthanum-flint class**. Standalone f = **+108.63 mm**.
 
 L13 is the air-spaced rear positive meniscus of G1 (¶0106). Together with CL1 it produces the complete positive front-group
 power. The final data keep the 0.1000 mm air separation between CL1 and L13 exactly as published.
@@ -148,7 +148,7 @@ publishes no clear-aperture dimensions.
 
 **L21a:** nd = 1.53610, νd = 41.42. Glass: **Unmatched (thin aspheric-layer material)**. Standalone model-entry
 f = **-2786.32 mm**.\
-**L21b:** nd = 1.83480, νd = 42.72. Glass: **835427 lanthanum-crown class**. Standalone model-entry
+**L21b:** nd = 1.83480, νd = 42.72. Glass: **835427 lanthanum-flint class**. Standalone model-entry
 f = **-19.24 mm**.\
 **Combined physical L21:** standalone f = **-19.11 mm**.
 
@@ -167,7 +167,7 @@ than inferring an aberration role from the sign of L21 alone.
 
 ### L22 — Negative Meniscus
 
-nd = 1.83480, νd = 42.72. Glass: **835427 lanthanum-crown class**. Standalone f = **-89.16 mm**.
+nd = 1.83480, νd = 42.72. Glass: **835427 lanthanum-flint class**. Standalone f = **-89.16 mm**.
 
 L22 is the second negative lens component in G2 and is concave toward the object in the patent description (¶0106). It is
 air-spaced from both L21 and the following cemented component CL2.
@@ -228,7 +228,7 @@ therefore the strongest source-level material correlation with Nikon's statement
 element.
 
 That correlation is not enough to name a vendor or melt, and the final data intentionally do not store candidate nC, nF,
-ng, or dPgF. J-FKH1 supplies a qualified spectral proxy, not a production-glass identity. Consequently no apochromatic or anomalous-partial-dispersion performance claim is made
+ng, or dPgF. J-FKH1 supplies a qualified spectral proxy, not a production-glass identity. L33 receives explicitly inferred APD color from that curve (catalog dPgF approximately +0.0337), without claiming measured source partial dispersion. No apochromatic performance claim is made
 from L33's Abbe number alone.
 
 ### L41 — Positive Meniscus, first member of stabilization component CL4
@@ -243,7 +243,7 @@ vibration-reduction component (¶0108).
 
 ### L42 — Biconcave Negative, second member of stabilization component CL4
 
-nd = 1.80610, νd = 40.94. Glass: **806409 lanthanum-flint/crown class**. Standalone f = **-16.91 mm**.
+nd = 1.80610, νd = 40.94. Glass: **806409 class (supplier unresolved)**. Standalone f = **-16.91 mm**.
 
 L42 is cemented to L41 and is strongly negative as an isolated element. The two members together form CL4, whose calculated
 net standalone focal length is approximately **-52.93 mm**.
@@ -255,7 +255,7 @@ No numerical decenter range is published, so the LensVisualizer data do not enco
 
 ### L43 — Negative Meniscus, rear element of G4
 
-nd = 1.80400, νd = 46.58. Glass: **804466 lanthanum-crown class**. Standalone f = **-69.16 mm**.
+nd = 1.80400, νd = 46.58. Glass: **804466 lanthanum-flint class**. Standalone f = **-69.16 mm**.
 
 L43 is the air-spaced rear negative meniscus of G4 (¶0107). Its power combines with the negative CL4 component to produce
 the complete G4 focal length of -28.60 mm.
@@ -267,7 +267,7 @@ Keeping this distinction avoids treating the entire G4 assembly as a single tran
 
 **L51a:** nd = 1.53610, νd = 41.42. Glass: **Unmatched (thin aspheric-layer material)**. Standalone model-entry
 f = **+197.27 mm**.\
-**L51b:** nd = 1.80610, νd = 40.94. Glass: **806409 lanthanum-flint/crown class**. Standalone model-entry
+**L51b:** nd = 1.80610, νd = 40.94. Glass: **806409 class (supplier unresolved)**. Standalone model-entry
 f = **+29.12 mm**.\
 **Combined physical L51:** standalone f = **+25.71 mm**.
 
@@ -312,18 +312,18 @@ matches establish equivalence candidates, not the production supplier.
 | Data label | nd | νd | Used in | Identification status |
 |---|---:|---:|---|---|
 | 847238 class | 1.84666 | 23.78 | L11, L53 | class; supplier unresolved |
-| 773496 lanthanum-crown class | 1.77249 | 49.61 | L12 | class; supplier unresolved |
-| 816466 lanthanum-crown class | 1.81600 | 46.62 | L13 | class; supplier unresolved |
+| 773496 class (supplier unresolved) | 1.77249 | 49.61 | L12 | class; supplier unresolved |
+| 816466 lanthanum-flint class | 1.81600 | 46.62 | L13 | class; supplier unresolved |
 | Unmatched thin material | 1.53610 | 41.42 | L21a, L51a | no retained public-catalog match |
-| 835427 lanthanum-crown class | 1.83480 | 42.72 | L21b, L22 | class; supplier unresolved |
+| 835427 lanthanum-flint class | 1.83480 | 42.72 | L21b, L22 | class; supplier unresolved |
 | 808228 high-dispersion flint class | 1.80809 | 22.79 | L23 | class; supplier unresolved |
 | 821427 class | 1.82079 | 42.71 | L24 | class; supplier unresolved |
 | 904313 lanthanum-flint class | 1.90366 | 31.27 | L31 | class; supplier unresolved |
 | 603655 crown class | 1.60300 | 65.46 | L32 | class; supplier unresolved |
 | J-FKH1 spectral proxy | 1.49782 | 82.52 | L33 | class; supplier unresolved; ED-role correlation only |
 | 001255 high-index flint class | 2.00069 | 25.45 | L41 | class; supplier unresolved |
-| 806409 lanthanum-flint/crown class | 1.80610 | 40.94 | L42, L51b | class; supplier unresolved |
-| 804466 lanthanum-crown class | 1.80400 | 46.58 | L43 | class; supplier unresolved |
+| 806409 class (supplier unresolved) | 1.80610 | 40.94 | L42, L51b | class; supplier unresolved |
+| 804466 lanthanum-flint class | 1.80400 | 46.58 | L43 | class; supplier unresolved |
 | 487704 crown class | 1.48749 | 70.41 | L52 | class; supplier unresolved |
 
 Several coordinates have very close or exact matches in current public catalogs. Examples include OHARA S-LAH59 near

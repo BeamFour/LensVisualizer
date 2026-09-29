@@ -53,6 +53,7 @@ const LENS_DATA = {
     {
       id: 1,
       name: "L1",
+      diagramLabel: "L1",
       label: "Element 1",
       type: "Negative Meniscus",
       nd: 1.84666,
@@ -64,6 +65,7 @@ const LENS_DATA = {
     {
       id: 2,
       name: "L2",
+      diagramLabel: "L2",
       label: "Element 2",
       type: "Biconvex Positive",
       nd: 1.6968,
@@ -75,6 +77,7 @@ const LENS_DATA = {
     {
       id: 3,
       name: "L3",
+      diagramLabel: "L3",
       label: "Element 3",
       type: "Positive Meniscus",
       nd: 1.788,
@@ -85,6 +88,7 @@ const LENS_DATA = {
     {
       id: 4,
       name: "L4r",
+      diagramLabel: "L4r",
       label: "Element 4 hybrid layer",
       type: "Hybrid Aspherical Layer",
       nd: 1.55389,
@@ -96,6 +100,7 @@ const LENS_DATA = {
     {
       id: 5,
       name: "L4",
+      diagramLabel: "L4",
       label: "Element 4 substrate",
       type: "Negative Meniscus Substrate",
       nd: 1.83481,
@@ -107,6 +112,7 @@ const LENS_DATA = {
     {
       id: 6,
       name: "L5",
+      diagramLabel: "L5",
       label: "Element 5",
       type: "Biconcave Negative",
       nd: 1.804,
@@ -118,6 +124,7 @@ const LENS_DATA = {
     {
       id: 7,
       name: "L6",
+      diagramLabel: "L6",
       label: "Element 6",
       type: "Positive Meniscus",
       nd: 1.80809,
@@ -129,6 +136,7 @@ const LENS_DATA = {
     {
       id: 8,
       name: "L7",
+      diagramLabel: "L7",
       label: "Element 7",
       type: "Positive Meniscus",
       nd: 1.84666,
@@ -139,6 +147,7 @@ const LENS_DATA = {
     {
       id: 9,
       name: "L8",
+      diagramLabel: "L8",
       label: "Element 8",
       type: "Negative Meniscus",
       nd: 1.84666,
@@ -150,6 +159,7 @@ const LENS_DATA = {
     {
       id: 10,
       name: "L9",
+      diagramLabel: "L9",
       label: "Element 9",
       type: "Biconvex Positive",
       nd: 1.58913,
@@ -161,6 +171,7 @@ const LENS_DATA = {
     {
       id: 11,
       name: "L10",
+      diagramLabel: "L10",
       label: "Element 10",
       type: "Biconvex Positive",
       nd: 1.5168,
@@ -171,6 +182,7 @@ const LENS_DATA = {
     {
       id: 12,
       name: "L11",
+      diagramLabel: "L11",
       label: "Element 11",
       type: "Positive Meniscus",
       nd: 1.84666,
@@ -181,6 +193,7 @@ const LENS_DATA = {
     {
       id: 13,
       name: "L12",
+      diagramLabel: "L12",
       label: "Element 12",
       type: "Biconcave Negative",
       nd: 1.804,
@@ -191,16 +204,21 @@ const LENS_DATA = {
     {
       id: 14,
       name: "L13",
+      diagramLabel: "L13",
       label: "Element 13",
       type: "Biconvex Positive",
       nd: 1.49782,
       vd: 82.5,
       indexReference: "d",
-      glass: "498826 ED-class",
+      glass: "J-FKH1 — coordinate-compatible ED-class spectral proxy (supplier unresolved)",
+      apd: "inferred",
+      apdNote:
+        "ED-class inference from the coordinate-compatible J-FKH1 curve (catalog dPgF approximately +0.0337); not patent-measured partial dispersion or proof of production glass identity.",
     },
     {
       id: 15,
       name: "L14",
+      diagramLabel: "L14",
       label: "Element 14",
       type: "Biconvex Positive",
       nd: 1.6516,
@@ -211,6 +229,7 @@ const LENS_DATA = {
     {
       id: 16,
       name: "L15",
+      diagramLabel: "L15",
       label: "Element 15",
       type: "Negative Meniscus",
       nd: 1.84666,
@@ -321,7 +340,7 @@ const LENS_DATA = {
 
   closeFocusM: 0.38,
   focusDescription:
-    "CONSTRAINED_RECONSTRUCTION: G2-only focusing solved from a 0.38 m object-to-image-plane conjugate; D5 + D13 is conserved at each zoom station, the image plane and other groups stay fixed, and the close-focus spacings are not patent-published.",
+    "For close focus, G2 moves toward the object while the other groups stay fixed. Travel to 0.38 m is a constrained estimate at each zoom station; the patent does not publish close-focus spacings.",
 
   nominalFno: [3.6, 4.5, 4.7],
   fstopSeries: [3.5, 4, 4.5, 5.6, 8, 11, 16],

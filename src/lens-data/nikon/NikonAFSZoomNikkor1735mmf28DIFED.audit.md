@@ -26,3 +26,24 @@ All other regions already resolve within the unchanged compatibility guard.
 **Display:** removed the space between `f/2.8` and `D`, matching Nikon's
 [official product name](https://downloadcenter.nikonimglib.com/fr/products/270/AF-S_Zoom-Nikkor_17-35mm_f_28D_IF-ED.html).
 Marketed f/2.8 remains separate from the patent's modeled f/2.9.
+
+## 2026-09-29 — Local diagram follow-up
+
+**Local diagram review:** re-compared the live wide/tele silhouettes, cemented rims and aspheric outlines with
+Example 1 Figure 2 (PDF p. 7). Retained the revised G4 rims; the remaining apparent differences do not establish a
+clear-aperture error beyond figure-reading uncertainty. The oversized first blank's mechanical edge is not an optical
+rim target. Explicit L1–L13 labels now preserve physical numbering around the L2r/L2g split instead of displaying
+material-entry ids 1–14.
+
+**Motion:** source-ordered wide/mid/tele stations remain 17.5/24/34 mm. Relative to the fixed image plane, G1 moves
+imageward then reverses; G2F, G2R, G3 and G4 move objectward overall. At fixed zoom, near focus moves only G2F
+imageward by 4.1911/4.0734/4.3114 mm. The direction agrees with ¶0017; those travel magnitudes remain constrained
+reconstructions, not published focus rows. The live focus and zoom chart order is G1, G2F, G2R, G3, G4.
+
+**Glass and color:** L10 and L12 now use explicitly inferred APD color, justified by the compatible J-FKH1 curve
+(catalog dPgF approximately +0.0337) and the production two-ED-element correlation. No source line indices or numeric
+partial-dispersion fields were added. Coverage remains 13/14 regions; L2r has no supported coefficient-backed material.
+
+**Assignee:** the exact patent front page lists 株式会社ニコン, already represented by the canonical Nikon Corporation.
+The catalog keeps Nippon Kogaku K.K. as the historically distinct predecessor linked to the same corporate family;
+no duplicate assignee spelling in this batch requires consolidation.

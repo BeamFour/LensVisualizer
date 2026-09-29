@@ -234,8 +234,7 @@ supplier used in the 1999 design.
 
 The two `1.497820 / 82.52` positions are the only extremely high-Abbe coordinates in the design and correlate with Nikon's
 published two-ED-element construction. That supports an ED-class identification, but not a unique glass supplier or catalog
-name. No `nC`, `nF`, `ng`, or `dPgF` values are authored from the candidate catalogs, so the model remains at the Abbe-data tier
-for those proprietary source coordinates unless a runtime catalog resolution is later validated during integration.
+name. No `nC`, `nF`, `ng`, or `dPgF` values are authored from the candidate catalogs, while compatible runtime catalog curves provide qualified spectral estimates. L10 and L12 use inferred APD color from the J-FKH1 proxy (catalog dPgF approximately +0.0337), without claiming measured source partial dispersion.
 
 ## Focus Mechanism
 

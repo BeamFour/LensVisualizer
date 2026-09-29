@@ -21,3 +21,29 @@ The remaining 15 regions already use compatible curves; no APD flag or source li
 
 **Display:** retained ED VR, distinct from the original IF-ED 24–85mm. The selected production correlation remains
 unconfirmed, and the patent's f/5.78 tele calibration is not presented as the production f/4.5 specification.
+
+## 2026-09-29 — Local diagram follow-up
+
+**Local diagram review:** re-compared the live wide/tele silhouettes with Example 4 Figure 7 (PDF p. 25), excluding
+surface leaders and the front mechanical blank. Retained the SDs: the remaining optical-rim differences do not provide
+strong evidence for a further change. Compact L21a/L21b and L51a/L51b diagram labels now match the material-region
+names; inspector descriptions still distinguish thin and bulk regions without asserting resin chemistry.
+
+**Glass-family labels:** corrected 816466, 835427 and 804466 from lanthanum-crown to lanthanum-flint class,
+consistent with their compatible LAH/TAF/LASF/ZLaF catalog families. Removed crown/flint specificity from 773496
+and 806409, whose compatible candidates span different supplier families. These are class descriptions, not source
+composition identifications; the patent coordinates and runtime curves are unchanged.
+
+**Motion:** retained the three source zoom stations in wide-to-tele order. Relative to the image plane, G1, G3, G4 and
+G5 move objectward; G2 first moves imageward and then reverses. The live chart preserves G1–G5 order. Focus remains
+disabled at infinity: the patent describes objectward G2 focusing but supplies no numeric focus travel. The production
+0.38 m minimum distance is not presented as a simulated endpoint.
+
+**Glass and color:** L33 now receives inferred APD color from its compatible J-FKH1 curve (catalog dPgF approximately
++0.0337), consistent with the single-ED production correlation. It is not a source-measured partial dispersion or proof
+of melt identity. Coverage remains 16/18 regions. Neither 1.53610/41.42 thin layer has a supported public coefficient
+source or established chemistry, so both remain explicitly unresolved.
+
+**Assignee:** the exact patent front page lists 株式会社ニコン, already represented by the canonical Nikon Corporation.
+The catalog keeps Nippon Kogaku K.K. as the historically distinct predecessor linked to the same corporate family;
+no duplicate assignee spelling in this batch requires consolidation.

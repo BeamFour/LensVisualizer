@@ -254,9 +254,7 @@ supplier or melt identity.
 | `652585/652586 class` | 1.65160 | 58.5 | L14 | Crown/lanthanum-crown coordinate class |
 
 The most distinctive production correlation is L13. HIKARI J-FKH1 is an excellent coordinate candidate for the published
-`1.49782 / 82.5` pair, and Nikon states that the production lens contains one ED glass element. The final data deliberately
-retains the generic `498826 ED-class` label rather than a vendor name because neither the patent nor Nikon identifies the
-actual melt in this prescription.
+`1.49782 / 82.5` pair, and Nikon states that the production lens contains one ED glass element. The data names J-FKH1 as a coordinate-compatible spectral proxy with supplier uncertainty, because neither the patent nor Nikon identifies the actual melt in this prescription.
 
 The patent's chromatic design discussion is narrower than an APO claim. It states that chromatic correction is obtained by
 using dispersion differences between positive and negative components in G2 and makes `νd < 23.3` a condition for at least
@@ -380,7 +378,7 @@ Repository integration checks now include metadata, surface and image-circle val
 and exact corner chief-ray coverage at all three source zoom stations. The glass audit confirms coefficient-backed
 catalog proxies for 15/16 modeled material regions. The unnamed 1.55389/38.1 hybrid layer remains on Abbe fallback;
 no public coefficient source or production material identity was established. Existing glass coordinates, including
-L13's ED-class coordinate, are retained without an unsupported APD tag.
+L13's ED-class coordinate, are retained. L13 now uses explicitly inferred APD color from the compatible J-FKH1 proxy (catalog dPgF approximately +0.0337); this is not a source-measured partial dispersion or a production-melt identification.
 
 ## Sources
 
