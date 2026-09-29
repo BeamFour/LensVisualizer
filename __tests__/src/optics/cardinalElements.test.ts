@@ -145,6 +145,27 @@ describe("computeCardinalElementsAtState", () => {
     expect(result!.points.rearFocal.z).toBeCloseTo(2 * layout.z[L.labelIdx.SEC] - primaryFocusZ, 8);
   });
 
+  it("reports the closed-form Gregorian first order through an explicit folded surface order", () => {
+    /* The concave secondary sits s beyond the primary focus and relays it to s' = 1 / (1/f2 - 1/s); the intermediate
+     * real image makes the system EFL -f1·s'/s (an erect final image). Paraxial power is exact for spherical mirrors. */
+    const L = buildLens(LENS_CATALOG["reference-gregorian-secondary"]);
+    const layout = doLayout(0, 0, L);
+    const f1 = Math.abs(L.S[L.labelIdx.M1].R) / 2;
+    const f2 = Math.abs(L.S[L.labelIdx.SEC].R) / 2;
+    const secondaryZ = layout.z[L.labelIdx.SEC];
+    const s = layout.z[L.labelIdx.M1] - f1 - secondaryZ;
+    const sPrime = 1 / (1 / f2 - 1 / s);
+    const result = cardinalsFor(L);
+
+    expect(L.opticalPath.surfaceOrder).toEqual([L.labelIdx.M1, L.labelIdx.SEC]);
+    expect(result).not.toBeNull();
+    expect(result!.distances.efl.valueMm).toBeCloseTo((-f1 * sPrime) / s, 8);
+    expect(result!.points.rearFocal.z).toBeCloseTo(secondaryZ + sPrime, 8);
+    // The fixture is authored so that relay lands on its image plane with |EFL| equal to the design focal length.
+    expect(result!.points.rearFocal.z).toBeCloseTo(L.imagePlane.z, 8);
+    expect(Math.abs(result!.distances.efl.valueMm)).toBeCloseTo(L.EFL, 8);
+  });
+
   it("keeps auto-ordered folded cardinals consistent with the lens EFL across the catalog", () => {
     /* Auto-mode lenses without a surfaceOrder (production catadioptrics included) all run the sampled hit-order
      * inference. It must never throw, and any EFL it yields must match L.EFL — for folded lenses the authored
