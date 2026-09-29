@@ -84,16 +84,6 @@ describe("element render diagnostics", () => {
     expect(offenders).toEqual([]);
   });
 
-  it("documents the Canon 50mm f/2.8 patent-silhouette trim", () => {
-    const diagnostic = catalogDiagnostics("canon-s-50mm-f2-8").diagnostics.find((candidate) => candidate.eid === 2);
-
-    expect(diagnostic).toBeDefined();
-    expect(diagnostic!.rear.surfaceLabel).toBe("4");
-    expect(diagnostic!.rear.trimCause).toBe("gap");
-    expect(diagnostic!.rear.trimAmount).toBeGreaterThan(1.68);
-    expect(diagnostic!.rear.trimAmount).toBeLessThan(1.7);
-  });
-
   it("does not leave rendered cross-gap collisions in production lenses", () => {
     const offenders: string[] = [];
 

@@ -6,10 +6,11 @@
  * row, every compatible alternative, and the exact resolver criterion that
  * broke the tie.
  *
- * Always passes after asserting that the diagnostic explanation and runtime
- * resolver choose the same row.
+ * Runs only via `npm run generate:reports`, never in `npm test`. The invariant
+ * that the diagnostic explanation and the runtime resolver choose the same row
+ * is guarded in `npm test` by `__tests__/src/lens-data/glassResolutionParity.test.ts`.
  *
- * Regenerate: `npm test -- glassAmbiguityScan`
+ * Regenerate: `npm run generate:reports -- glassAmbiguityScan`
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
@@ -20,12 +21,12 @@ import {
   resolveCompatibleGlass,
   type CompatibleGlassCandidate,
   type GlassResolutionCriterion,
-} from "../../../src/optics/glassCatalog.js";
+} from "../src/optics/glassCatalog.js";
 import { walkLensSurfaces } from "./glassScanLib.js";
-import type { LensData, RefractiveIndexReferenceLine } from "../../../src/types/optics.js";
+import type { LensData, RefractiveIndexReferenceLine } from "../src/types/optics.js";
 
 const REPORT_DIR = "agent_docs/generated";
-const modules = import.meta.glob<{ default: LensData }>("../../../src/lens-data/**/*.data.ts", { eager: true });
+const modules = import.meta.glob<{ default: LensData }>("../src/lens-data/**/*.data.ts", { eager: true });
 
 interface AmbiguousElement {
   lensName: string;
@@ -170,7 +171,7 @@ describe("glass ambiguity scan", () => {
       "smallest reference-index residual; smallest Abbe residual; annotation token order; duplicate-code precedence; canonical name.",
     );
     lines.push("");
-    lines.push("**Regenerate this file** by running `npm test -- glassAmbiguityScan`.");
+    lines.push("**Regenerate this file** by running `npm run generate:reports -- glassAmbiguityScan`.");
     lines.push("Regenerate the full glass report set with `npm run generate:glass-reports`.");
     lines.push("");
     lines.push("## Summary");

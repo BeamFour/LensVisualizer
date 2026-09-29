@@ -31,7 +31,11 @@ import {
   normalLinePeC,
   summarizeDispersionQuality,
 } from "../../../src/optics/dispersion.js";
-import { sharedApoLanthar50f2 } from "./testLensFixtures.js";
+import {
+  buildChromaticPositiveElementLens,
+  buildSimplePositiveElementLens,
+  sharedApoLanthar50f2,
+} from "./testLensFixtures.js";
 
 describe("glass catalog", () => {
   it("every entry reproduces its listed nd, vd, and code coordinate", () => {
@@ -815,26 +819,17 @@ describe("makeSurfaceDispersion preference cascade", () => {
 });
 
 describe("buildLens integration with dispersion", () => {
+  it("summarizeDispersionQuality reports the weakest non-air tier of a built lens", () => {
+    // Catalog N-BK7 resolves to Sellmeier data; the same element with only nd/νd falls back to Abbe.
+    expect(summarizeDispersionQuality(buildChromaticPositiveElementLens())).toBe("sellmeier");
+    expect(summarizeDispersionQuality(buildSimplePositiveElementLens())).toBe("abbe");
+  });
+
   it("populates indexByIdx for each surface on a real lens", () => {
     const L = sharedApoLanthar50f2();
     for (let i = 0; i < L.N; i++) {
       expect(L.indexByIdx[i]).toBeDefined();
       expect(typeof L.indexByIdx[i].fn).toBe("function");
     }
-  });
-
-  it("resolves S-BSL7 via the catalog for ApoLanthar's L10 element (mixed-name string)", () => {
-    const L = sharedApoLanthar50f2();
-    // The Voigtländer APO-Lanthar's last element has glass "S-BSL7 / N-BK7 (universal)".
-    // At least one of its surfaces should land on the sellmeier path.
-    const qualities = new Set<string>();
-    for (let i = 0; i < L.N; i++) qualities.add(L.indexByIdx[i].quality);
-    expect(qualities.has("sellmeier")).toBe(true);
-  });
-
-  it("summarizeDispersionQuality returns the worst non-air tier across all glass surfaces", () => {
-    const L = sharedApoLanthar50f2();
-    // ApoLanthar has many proprietary/unmatched glasses, so the weakest surface is 'abbe'.
-    expect(summarizeDispersionQuality(L)).toBe("abbe");
   });
 });

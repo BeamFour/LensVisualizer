@@ -76,21 +76,22 @@ Kept only while a living doc or a lens `*.audit.md` sidecar links them; see [`re
 
 Regenerate instead of hand-editing. Reports are deterministic, so `git diff` after regeneration shows only real data
 changes. Judge glass coverage by the share of surfaces with trusted chromatic data, not by absolute missing counts.
+The generators live in `reports/` and never run in `npm test`. `npm run generate:reports` rewrites every report;
 `npm run generate:glass-reports` rewrites all glass reports, `npm run generate:mirror-reports` the mirror fixtures, and
 `npm run generate:mount-svgs` the mount SVG specification plus per-view SVGs. Individual reports:
 
-- [generated] [`generated/unresolved-glass.generated.md`](generated/unresolved-glass.generated.md) — `npm test -- unresolvedGlassScan`
-- [generated] [`generated/catalog-mismatches.generated.md`](generated/catalog-mismatches.generated.md) — `npm test -- catalogMismatchScan`
-- [generated] [`generated/glass-relabel-candidates.generated.md`](generated/glass-relabel-candidates.generated.md) — `npm test -- glassRelabelCandidatesScan`
-- [generated] [`generated/glass-relabel-by-lens.generated.md`](generated/glass-relabel-by-lens.generated.md) — `npm test -- glassRelabelByLensScan`
-- [generated] [`generated/glass-ambiguities.generated.md`](generated/glass-ambiguities.generated.md) — `npm test -- glassAmbiguityScan`; one rollup row per distinct ambiguity, per-candidate residuals come from `explainCompatibleGlassResolution`
-- [generated] [`generated/six-digit-glass-codes.generated.md`](generated/six-digit-glass-codes.generated.md) — `npm test -- sixDigitGlassCodeScan`
-- [generated] [`generated/six-digit-glass-codes-missing-sellmeier.generated.md`](generated/six-digit-glass-codes-missing-sellmeier.generated.md) — `npm test -- sixDigitGlassCodeScan`
+- [generated] [`generated/unresolved-glass.generated.md`](generated/unresolved-glass.generated.md) — `npm run generate:reports -- unresolvedGlassScan`
+- [generated] [`generated/catalog-mismatches.generated.md`](generated/catalog-mismatches.generated.md) — `npm run generate:reports -- catalogMismatchScan`
+- [generated] [`generated/glass-relabel-candidates.generated.md`](generated/glass-relabel-candidates.generated.md) — `npm run generate:reports -- glassRelabelCandidatesScan`
+- [generated] [`generated/glass-relabel-by-lens.generated.md`](generated/glass-relabel-by-lens.generated.md) — `npm run generate:reports -- glassRelabelByLensScan`
+- [generated] [`generated/glass-ambiguities.generated.md`](generated/glass-ambiguities.generated.md) — `npm run generate:reports -- glassAmbiguityScan`; one rollup row per distinct ambiguity, per-candidate residuals come from `explainCompatibleGlassResolution`
+- [generated] [`generated/six-digit-glass-codes.generated.md`](generated/six-digit-glass-codes.generated.md) — `npm run generate:reports -- sixDigitGlassCodeScan`
+- [generated] [`generated/six-digit-glass-codes-missing-sellmeier.generated.md`](generated/six-digit-glass-codes-missing-sellmeier.generated.md) — `npm run generate:reports -- sixDigitGlassCodeScan`
 - [generated] [`generated/six-digit-glass-codes-missing-sellmeier-reviewed.md`](generated/six-digit-glass-codes-missing-sellmeier-reviewed.md) — hand-written review sidecar read by two scans; preserve it when regenerating
-- [generated] [`generated/sellmeier-coverage.generated.md`](generated/sellmeier-coverage.generated.md) — `npm test -- sellmeierCoverageScan`
-- [generated] [`generated/glass-coverage-opportunities.generated.md`](generated/glass-coverage-opportunities.generated.md) — `npm test -- glassCoverageOpportunitiesScan`
-- [generated] [`generated/mirror-fixtures.generated.md`](generated/mirror-fixtures.generated.md) — `npm test -- mirrorFixtureAuthoringReport`
-- [generated] [`generated/lens-mount-svg-specifications.md`](generated/lens-mount-svg-specifications.md) — `npm test -- mountSvgSpecificationsReport`; figure counts and content hashes, with full SVG markup in [`generated/mounts/`](generated/mounts/) and diffable geometry in `src/mounts/`
+- [generated] [`generated/sellmeier-coverage.generated.md`](generated/sellmeier-coverage.generated.md) — `npm run generate:reports -- sellmeierCoverageScan`
+- [generated] [`generated/glass-coverage-opportunities.generated.md`](generated/glass-coverage-opportunities.generated.md) — `npm run generate:reports -- glassCoverageOpportunitiesScan`
+- [generated] [`generated/mirror-fixtures.generated.md`](generated/mirror-fixtures.generated.md) — `npm run generate:reports -- mirrorFixtureAuthoringReport`
+- [generated] [`generated/lens-mount-svg-specifications.md`](generated/lens-mount-svg-specifications.md) — `npm run generate:reports -- mountSvgSpecificationsReport`; figure counts and content hashes, with full SVG markup in [`generated/mounts/`](generated/mounts/) and diffable geometry in `src/mounts/`
 - [generated] [`benchmarks/README.md`](benchmarks/README.md) — on-demand `npm run benchmark:optics-rendering`; one JSON per run in [`benchmarks/runs/`](benchmarks/runs/), latest report in [`benchmarks/benchmark-report.md`](benchmarks/benchmark-report.md)
 
 The six-digit and glass-coverage-opportunities scans embed match statuses against the untracked local `patents/` PDF

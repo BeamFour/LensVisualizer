@@ -494,6 +494,8 @@ For an annular blocker, combine `innerSd` with `type: "block"`; only the ring cl
 
 Visible on-axis and off-axis ray sampling is obstruction-aware for folded systems. The sampler scans the usable pupil bands and avoids the central blocked region automatically, so mirror fixtures should not hand-tune `rayFractions` just to route around a secondary obstruction.
 
+For a zoned blank, where an annular Mangin shell and a clear central plug share one glass blank (the plug surfaces at the shell's stations, listed just before the shell), give the plug `sd` equal to the shell `innerSd` so the zones tile each face; a gap between them is a ring where rays cross no surface. A reverse crossing takes its entered medium from the last earlier surface whose radial band overlaps the crossed surface, so the plug's glass does not leak into the annular path.
+
 If a tilted or paired backing surface belongs to the same annular mirror element, keep `innerSd` consistent between the reflective face and its backing plane. Validation rejects mismatched paired annular faces because the SVG element and active optical aperture would otherwise disagree.
 
 ### Annular Mirror Nesting And Shared Blanks

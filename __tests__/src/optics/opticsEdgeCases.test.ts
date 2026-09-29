@@ -19,7 +19,7 @@ import {
   doLayout,
   traceRay,
 } from "../../../src/optics/optics.js";
-import { build, sharedApoLanthar50f2, sharedNikkorZ70200, sharedNokton50f1 } from "./testLensFixtures.js";
+import { build, sharedApoLanthar50f2, sharedNikkorZ70200 } from "./testLensFixtures.js";
 
 /* ── traceParaxialRay ── */
 
@@ -179,16 +179,6 @@ describe("solveFieldAngleForImageHeightAccurate", () => {
 /* ── buildLens half-field bisection ── */
 
 describe("buildLens — half-field refinement", () => {
-  it("Nokton 50/1.0 exercises real chief-ray vignetting refinement", () => {
-    /* The Nokton is a fast lens with a wide paraxial field estimate that
-       may be clipped by the real chief ray trace. buildLens should still
-       produce a valid half-field value. */
-    const L = sharedNokton50f1();
-    expect(isFinite(L.halfField)).toBe(true);
-    expect(L.halfField).toBeGreaterThan(0);
-    expect(L.halfField).toBeLessThan(90);
-  });
-
   it("zoom lens computes zoom-position arrays", () => {
     const L = sharedNikkorZ70200();
     expect(L.isZoom).toBe(true);

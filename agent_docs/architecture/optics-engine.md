@@ -480,7 +480,9 @@ lens vertex, so modeled rear plates count as back focus. For ordinary same-index
 photographic lenses, H/N and H′/N′ are marked coincident explicitly; non-unity image-side systems compute N/N′
 independently. Axial folded reflective systems share the same paraxial transfer/interaction stepper with an enabled
 reflect branch; folded systems with tilted image planes still return no cardinal result until a rotated-frame reporting
-convention exists.
+convention exists. The folded stepper restarts each surface in air, so any folded path that refracts into glass (Mangin
+and catadioptric lenses) also returns null rather than a wrong result. Explicit orders can list surfaces a real ray only
+passes outside of, so lifting that guard needs real-ray hit discovery for explicit orders too, not only index tracking.
 
 ## Off-Axis Geometry Policy
 

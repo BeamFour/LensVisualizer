@@ -19,7 +19,7 @@ import type {
   DiffractivePhaseSurface,
 } from "../../types/optics.js";
 import { DEFAULT_PHASE_WAVELENGTH_NM } from "../math/diffractivePhase.js";
-import { interactRefractiveSurface } from "../trace/interactions.js";
+import { interactRefractiveSurface, rearMediumSurfaceIndex } from "../trace/interactions.js";
 import { FLAT_R_THRESHOLD, conicPolySag } from "./surfaceMath.js";
 import {
   intersectSagSurface,
@@ -1351,7 +1351,8 @@ function resolvedNextIndex(
   lens: ExactTraceLens,
   indexAtSurface: ((surfaceIdx: number, nd: number) => number) | undefined,
 ): number {
-  const physicalNextNd = incidentSide === "front" ? surface.nd : surfaceIdx > 0 ? lens.S[surfaceIdx - 1].nd : 1.0;
+  const mediumIdx = incidentSide === "front" ? surfaceIdx : rearMediumSurfaceIndex(surfaceIdx, lens.S);
+  const physicalNextNd = incidentSide === "front" ? surface.nd : mediumIdx === null ? 1.0 : lens.S[mediumIdx].nd;
   if (!indexAtSurface) return physicalNextNd === 1.0 ? 1.0 : physicalNextNd;
   return physicalNextNd === 1.0 ? 1.0 : indexAtSurface(surfaceIdx, physicalNextNd);
 }

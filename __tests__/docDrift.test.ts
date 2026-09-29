@@ -29,7 +29,7 @@ const CLAUDE_MD_MAX_LINES = 200;
 const INDEX_TAGS = ["policy", "recipe", "architecture", "queue", "record", "generated"];
 
 /** Inline-code spans that look like repo paths and should resolve to real files/dirs. */
-const REPO_PATH_PATTERN = /^(?:src|scripts|__tests__|agent_docs)\/\S*$/;
+const REPO_PATH_PATTERN = /^(?:src|scripts|reports|__tests__|agent_docs)\/\S*$/;
 
 function isCheckablePath(span: string): boolean {
   if (!REPO_PATH_PATTERN.test(span)) return false;

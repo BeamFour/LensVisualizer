@@ -10,11 +10,11 @@
  */
 import { describe, expect, it } from "vitest";
 import { mkdirSync, writeFileSync } from "node:fs";
-import { MOUNT_SPECS } from "../../../../src/mounts/index.js";
-import type { AngleValue, ContactFeature, LengthValue, MountSpec, ValueEnvelope } from "../../../../src/types/mount.js";
-import { buildMountSvgDoc, type MountView } from "../../../../src/optics/mount/renderMount.js";
-import { mountSvgDocToString } from "../../../../src/optics/mount/toSvgString.js";
-import { emitMountJsonString } from "../../../../src/optics/mount/emitMountJson.js";
+import { MOUNT_SPECS } from "../src/mounts/index.js";
+import type { AngleValue, ContactFeature, LengthValue, MountSpec, ValueEnvelope } from "../src/types/mount.js";
+import { buildMountSvgDoc, type MountView } from "../src/optics/mount/renderMount.js";
+import { mountSvgDocToString } from "../src/optics/mount/toSvgString.js";
+import { emitMountJsonString } from "../src/optics/mount/emitMountJson.js";
 
 const REPORT_DIR = "agent_docs/generated";
 const SVG_DIR = `${REPORT_DIR}/mounts`;

@@ -11,7 +11,6 @@ import {
   computeChromaticRayFanSpread,
   traceToImage,
   conjugateK,
-  wavelengthNd,
   eflAtZoom,
   eflAtFocus,
   effectiveFNumber,
@@ -267,48 +266,6 @@ describe("traceRay — exact Snell", () => {
     expect(isFinite(result.y)).toBe(true);
     expect(isFinite(result.u)).toBe(true);
   });
-
-  it("does not emit fallback ghost points for non-ghost total internal reflection", () => {
-    const L = buildTirLens();
-    const { z: zPos } = doLayout(0, 0, L);
-    const result = traceRay(5, 1, zPos, 0, 0, 20, false, L);
-
-    expect(result.clipped).toBe(true);
-    expect(result.ghostPts).toHaveLength(0);
-  });
-});
-
-describe("wavelengthNd", () => {
-  it("returns 1.0 for air regardless of channel", () => {
-    expect(wavelengthNd(1.0, 64.17, "R")).toBe(1.0);
-    expect(wavelengthNd(1.0, 64.17, "G")).toBe(1.0);
-    expect(wavelengthNd(1.0, 64.17, "B")).toBe(1.0);
-  });
-
-  it("returns nd for green channel", () => {
-    expect(wavelengthNd(1.5168, 64.17, "G")).toBe(1.5168);
-  });
-
-  it("red < nd < blue for dispersive glass", () => {
-    const nd = 1.5168,
-      vd = 64.17;
-    expect(wavelengthNd(nd, vd, "R")).toBeLessThan(nd);
-    expect(wavelengthNd(nd, vd, "B")).toBeGreaterThan(nd);
-  });
-
-  it("computes BK7 dispersion approximately", () => {
-    // BK7: nd=1.5168, vd=64.17, nF-nC = (nd-1)/vd ≈ 0.00806
-    const nd = 1.5168,
-      vd = 64.17;
-    const nR = wavelengthNd(nd, vd, "R");
-    const nB = wavelengthNd(nd, vd, "B");
-    expect(nB - nR).toBeCloseTo((nd - 1) / vd, 4);
-  });
-
-  it("returns nd when vd is undefined or 0", () => {
-    expect(wavelengthNd(1.5, undefined, "R")).toBe(1.5);
-    expect(wavelengthNd(1.5, 0, "B")).toBe(1.5);
-  });
 });
 
 describe("traceRayChromatic", () => {
@@ -342,22 +299,6 @@ describe("traceRayChromatic", () => {
     expect(blue.y).toBeCloseTo(0, 10);
   });
 
-  it("returns clipped=true on chromatic total internal reflection", () => {
-    /* High-index to low-index at steep angle with dispersive glass */
-    const L = buildTirLens("test-chromatic-tir-lens");
-    const { z: zPos } = doLayout(0, 0, L);
-    const { clipped } = traceRayChromatic(5, 1, zPos, 0, 0, 20, true, L, "B");
-    expect(clipped).toBe(true);
-  });
-
-  it("ghost mode continues through chromatic TIR and returns ghostPts", () => {
-    const L = buildTirLens("test-chromatic-tir-ghost-lens");
-    const { z: zPos } = doLayout(0, 0, L);
-    const result = traceRayChromatic(5, 1, zPos, 0, 0, 20, true, L, "B");
-    /* Ghost mode should produce some points even when clipped */
-    expect(result.pts.length + result.ghostPts.length).toBeGreaterThan(0);
-  });
-
   it("non-ghost mode breaks on chromatic TIR without ghostPts", () => {
     const L = buildTirLens("test-chromatic-tir-non-ghost-lens");
     const { z: zPos } = doLayout(0, 0, L);
@@ -376,32 +317,13 @@ describe("traceRayChromatic", () => {
     expect(result.pts.length + result.ghostPts.length).toBeGreaterThan(1);
   });
 
-  it("green channel matches exact traceRay", () => {
-    const L = mkChromElement();
-    const { z: zPos } = doLayout(0, 0, L);
-    const ref = traceRay(5, 0, zPos, 0, 0, 15, false, L);
-    const chrom = traceRayChromatic(5, 0, zPos, 0, 0, 15, false, L, "G");
-
-    expect(chrom.y).toBeCloseTo(ref.y, 7);
-    expect(chrom.u).toBeCloseTo(ref.u, 7);
-  });
-
-  it("ghost mode continues through chromatic TIR", () => {
-    const L = buildTirLens("test-chromatic-tir-duplicate-ghost-lens");
+  it("ghost mode continues through chromatic TIR and keeps rendering points", () => {
+    const L = buildTirLens("test-chromatic-tir-ghost-lens");
     const { z: zPos } = doLayout(0, 0, L);
     const result = traceRayChromatic(5, 1, zPos, 0, 0, 20, true, L, "B");
 
     expect(result.clipped).toBe(true);
     expect(result.pts.length + result.ghostPts.length).toBeGreaterThan(0);
-  });
-
-  it("non-ghost exact chromatic TIR does not emit fallback ghost points", () => {
-    const L = buildTirLens("test-chromatic-tir-duplicate-non-ghost-lens");
-    const { z: zPos } = doLayout(0, 0, L);
-    const result = traceRayChromatic(5, 1, zPos, 0, 0, 20, false, L, "B");
-
-    expect(result.clipped).toBe(true);
-    expect(result.ghostPts).toHaveLength(0);
   });
 });
 

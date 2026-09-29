@@ -140,6 +140,85 @@ export function buildTirLens(key = "test-tir-lens"): RuntimeLens {
   });
 }
 
+/**
+ * Folded Mangin-style TIR fixture: collimated light enters a flat n = 2 front (MG1), reflects from a steep silvered
+ * rear (MG2, R = -40), and must exit back through MG1 from inside the glass. The reflected ray leaves at twice the
+ * mirror normal's tilt, so axial-parallel inputs above |R|·sin(θc/2) ≈ 10.35 mm exceed the 30° critical angle at the
+ * exit. The paraxial image (EFL 10) forms on the object side at z = 95; an explicit `surfaceOrder` is required because
+ * auto mode would terminate incoming rays on that front image plane before they reach the glass.
+ */
+export function buildFoldedTirLens(key = "test-folded-tir-lens"): RuntimeLens {
+  return buildFixture({
+    key,
+    nominalFno: 4,
+    focalLengthDesign: 10,
+    elements: [{ ...BASE_ELEMENT, name: "MG", label: "Mangin mirror", type: "Second-Surface Mirror", nd: 2.0, vd: 20 }],
+    surfaces: [
+      { label: "STO", R: 1e15, nd: 1.0, sd: 15, d: 100, elemId: 0 },
+      { label: "MG1", R: 1e15, nd: 2.0, sd: 15, d: 10, elemId: 1 },
+      {
+        label: "MG2",
+        R: -40,
+        nd: 1.0,
+        sd: 15,
+        d: 0,
+        elemId: 0,
+        interaction: { type: "reflect", incidentSide: "front", inactiveSide: "block", mirrorKind: "second-surface" },
+      },
+    ],
+    groups: [{ text: "MG", fromSurface: "MG1", toSurface: "MG2" }],
+    opticalPath: {
+      surfaceOrder: ["STO", "MG1", "MG2", "MG1"],
+      imagePlane: { z: 95, label: "IMG" },
+      maxInteractions: 5,
+    },
+  });
+}
+
+/**
+ * Two flat first-surface mirrors facing each other 10 mm apart (MA at z = 5 reflects rays travelling -z, MB at
+ * z = 15 reflects rays travelling +z) in auto path mode. Nothing ever leaves the cavity, so a ray launched between
+ * them can only end through auto-path loop detection or the `maxInteractions` cap; the image plane behind MB is
+ * never reachable.
+ */
+export function buildFacingFlatMirrorsLens(key = "test-facing-flat-mirrors"): RuntimeLens {
+  return buildFixture({
+    key,
+    nominalFno: 4,
+    focalLengthDesign: 100,
+    elements: [
+      { ...BASE_ELEMENT, id: 1, name: "MA", label: "Mirror A", type: "Flat First-Surface Mirror", nd: 1.0, vd: 0 },
+      { ...BASE_ELEMENT, id: 2, name: "MB", label: "Mirror B", type: "Flat First-Surface Mirror", nd: 1.0, vd: 0 },
+    ],
+    surfaces: [
+      { label: "STO", R: 1e15, nd: 1.0, sd: 20, d: 5, elemId: 0 },
+      {
+        label: "MA",
+        R: 1e15,
+        nd: 1.0,
+        sd: 20,
+        d: 10,
+        elemId: 1,
+        interaction: { type: "reflect", incidentSide: "rear", inactiveSide: "block", mirrorKind: "first-surface" },
+      },
+      {
+        label: "MB",
+        R: 1e15,
+        nd: 1.0,
+        sd: 20,
+        d: 0,
+        elemId: 2,
+        interaction: { type: "reflect", incidentSide: "front", inactiveSide: "block", mirrorKind: "first-surface" },
+      },
+    ],
+    groups: [
+      { text: "MA", fromSurface: "MA", toSurface: "MA" },
+      { text: "MB", fromSurface: "MB", toSurface: "MB" },
+    ],
+    opticalPath: { mode: "auto", imagePlane: { z: 50, label: "IMG" }, maxInteractions: 8 },
+  });
+}
+
 export function buildGhostClippingLens(key = "test-ghost-clipping-lens"): RuntimeLens {
   return buildFixture({
     key,

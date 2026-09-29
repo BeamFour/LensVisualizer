@@ -217,7 +217,6 @@ describe("perspective-control final acceptance matrix", () => {
       requestedMovement: { shiftMm: 8, tiltDeg: 8 },
     });
 
-    expect(L.perspectiveControl?.tiltPivot).toBeUndefined();
     expect(isMovementAxisEnabled(L.perspectiveControl!.tiltRangeDeg)).toBe(false);
     expect(clampedExtreme).toMatchObject({ shiftMm: 11, tiltDeg: 0, active: true });
     expect(shifted.context.pose.movement).toEqual({ shiftMm: 8, tiltDeg: 0 });

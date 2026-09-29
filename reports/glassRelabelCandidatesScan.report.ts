@@ -1,7 +1,7 @@
 /**
  * Glass-relabel candidate scanner.
  *
- * Companion to __tests__/src/optics/catalogMismatchScan.test.ts. Where that scan reports
+ * Companion to reports/catalogMismatchScan.report.ts. Where that scan reports
  * the *raw* mismatches (surfaces whose glass annotation resolves to a catalog
  * entry but disagrees with the stored nd/vd beyond the runtime tolerance), this scan goes one
  * step further: for each mismatch, it searches the catalog for a *better*
@@ -24,9 +24,9 @@
  *     as Unmatched and record in agent_docs/glass-relabel-followup.md for
  *     per-lens patent verification.
  *
- * Always passes — its job is to surface the data, not gate CI.
+ * Runs only via `npm run generate:reports`, never in `npm test`; its job is to surface the data.
  *
- * Regenerate: `npm test -- glassRelabelCandidatesScan`
+ * Regenerate: `npm run generate:reports -- glassRelabelCandidatesScan`
  */
 import { describe, it, expect } from "vitest";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -37,10 +37,10 @@ import {
   resolveCompatibleGlass,
   resolveGlass,
   decodeCode6,
-} from "../../../src/optics/glassCatalog.js";
-import { normalLinePgF } from "../../../src/optics/dispersion.js";
+} from "../src/optics/glassCatalog.js";
+import { normalLinePgF } from "../src/optics/dispersion.js";
 import { findCandidates, walkLensSurfaces } from "./glassScanLib.js";
-import type { LensData, RefractiveIndexReferenceLine } from "../../../src/types/optics.js";
+import type { LensData, RefractiveIndexReferenceLine } from "../src/types/optics.js";
 
 const REPORT_DIR = "agent_docs/generated";
 
@@ -76,7 +76,7 @@ interface Mismatch {
   embeddedCode: { raw: string; nd: number; vd: number } | null;
 }
 
-const modules = import.meta.glob<{ default: LensData }>("../../../src/lens-data/**/*.data.ts", { eager: true });
+const modules = import.meta.glob<{ default: LensData }>("../src/lens-data/**/*.data.ts", { eager: true });
 
 describe("glass-relabel candidate scan", () => {
   it("emits a report of catalog-relabel candidates for every mismatched surface", () => {
@@ -135,7 +135,7 @@ describe("glass-relabel candidate scan", () => {
     lines.push("catalog mismatch, this report searches the catalog for a *better* candidate whose reference index and");
     lines.push(`Abbe number both match within tolerance (Δn ±${GLASS_ND_TOLERANCE}, Δν ±${GLASS_VD_TOLERANCE}).`);
     lines.push("");
-    lines.push("**Regenerate** with `npm test -- glassRelabelCandidatesScan`.");
+    lines.push("**Regenerate** with `npm run generate:reports -- glassRelabelCandidatesScan`.");
     lines.push("");
     lines.push("## How to use this report");
     lines.push("");

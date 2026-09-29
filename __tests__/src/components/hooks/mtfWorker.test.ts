@@ -36,11 +36,18 @@ it("rebuilds serializable prescriptions in the worker and matches the pure engin
     ...L.data,
     rearPlates: [REAR_PLATE_FIXTURE, { ...REAR_PLATE_FIXTURE, gapAfterMm: 20 }],
   });
+  const methods = ["geometric", "geometric-dl", "diffraction"] as const;
+  const spectra = ["reference", "cdf", "photopic"] as const;
+  // The full method × spectrum grid proves dispatch once; the plated rebuild needs only one combination.
+  const cases = [
+    { lens: L, methods, spectra },
+    { lens: plated, methods: ["diffraction"] as const, spectra: ["photopic"] as const },
+  ];
   let id = 10;
-  for (const lens of [L, plated]) {
+  for (const { lens, methods, spectra } of cases) {
     send({ type: "init", data: structuredClone(lens.data) });
-    for (const method of ["geometric", "geometric-dl", "diffraction"] as const)
-      for (const spectrum of ["reference", "cdf", "photopic"] as const) {
+    for (const method of methods)
+      for (const spectrum of spectra) {
         const options: MtfOptions = {
           method,
           spectrum,

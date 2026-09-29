@@ -10,9 +10,9 @@
  *   2. the subset that does not have trusted Sellmeier data in the runtime
  *      dispersion cascade.
  *
- * Always passes — its job is to surface the data, not gate CI.
+ * Runs only via `npm run generate:reports`, never in `npm test`; its job is to surface the data.
  *
- * Regenerate: `npm test -- sixDigitGlassCodeScan`
+ * Regenerate: `npm run generate:reports -- sixDigitGlassCodeScan`
  *
  * The reports embed match statuses against the untracked local `patents/` PDF
  * inventory, so the rewrite is skipped when that inventory is empty (fresh
@@ -20,8 +20,8 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { evaluateSellmeier, LINE_NM, resolveCompatibleGlass, resolveGlass } from "../../../src/optics/glassCatalog.js";
-import type { DispersionQuality } from "../../../src/optics/dispersion.js";
+import { evaluateSellmeier, LINE_NM, resolveCompatibleGlass, resolveGlass } from "../src/optics/glassCatalog.js";
+import type { DispersionQuality } from "../src/optics/dispersion.js";
 import {
   extractPatentNumber,
   type PatentMatch,
@@ -31,10 +31,14 @@ import {
   isExplicitlyUnmatched,
   patentInventory,
   walkLensSurfaces,
+  hasAuditRecord,
+  hasReviewRecord,
+  reviewedSidecarStatus,
+  reviewRecordStatus,
 } from "./glassScanLib.js";
-import type { LensData, RefractiveIndexReferenceLine } from "../../../src/types/optics.js";
+import type { LensData, RefractiveIndexReferenceLine } from "../src/types/optics.js";
 
-const modules = import.meta.glob<{ default: LensData }>("../../../src/lens-data/**/*.data.ts", { eager: true });
+const modules = import.meta.glob<{ default: LensData }>("../src/lens-data/**/*.data.ts", { eager: true });
 const REPORT_DIR = "agent_docs/generated";
 const REVIEWED_SIDECAR = "agent_docs/generated/six-digit-glass-codes-missing-sellmeier-reviewed.md";
 const MAX_RELEVANT_PATENTS = 4;
@@ -129,35 +133,6 @@ function codeFrequency(rows: readonly CodeOnlyElement[]): [string, number, numbe
       if (countDiff !== 0) return countDiff;
       return a[0].localeCompare(b[0]);
     });
-}
-
-function reviewedSidecarStatus(filePath: string, codes: readonly string[], sidecarText: string): string {
-  if (!sidecarText) return "No reviewed sidecar found";
-  const basename = filePath.split("/").at(-1) ?? filePath;
-  const hits = sidecarText
-    .split("\n")
-    .filter((line) => line.includes(basename) && codes.some((code) => line.includes(code)));
-  return hits.length > 0 ? "Reviewed sidecar hit" : "No reviewed-sidecar hit";
-}
-
-function hasAuditRecord(filePath: string, codes: readonly string[]): boolean {
-  const auditPath = filePath.replace(/\.data\.ts$/, ".audit.md");
-  if (!existsSync(auditPath)) return false;
-  const auditText = readFileSync(auditPath, "utf8");
-  return codes.some((code) => auditText.includes(code));
-}
-
-type ReviewRecordFields = Pick<CodeOnlyElement, "explicitlyUnmatched" | "reviewedStatus" | "auditReviewed">;
-
-function hasReviewRecord(row: ReviewRecordFields): boolean {
-  return row.explicitlyUnmatched || row.reviewedStatus === "Reviewed sidecar hit" || row.auditReviewed;
-}
-
-function reviewRecordStatus(row: ReviewRecordFields): string {
-  if (row.explicitlyUnmatched) return "Explicit disposition in data";
-  if (row.reviewedStatus === "Reviewed sidecar hit") return row.reviewedStatus;
-  if (row.auditReviewed) return "Audit-log hit";
-  return "No review-record hit";
 }
 
 function summarizePatentStatus(rows: readonly CodeOnlyElement[]): string {
@@ -399,23 +374,6 @@ function renderReport(options: {
 }
 
 describe("six-digit glass-code scan", () => {
-  it("treats explicit unmatched annotations as self-recording review dispositions", () => {
-    expect(
-      hasReviewRecord({
-        explicitlyUnmatched: true,
-        reviewedStatus: "No reviewed-sidecar hit",
-        auditReviewed: false,
-      }),
-    ).toBe(true);
-    expect(
-      reviewRecordStatus({
-        explicitlyUnmatched: true,
-        reviewedStatus: "No reviewed-sidecar hit",
-        auditReviewed: false,
-      }),
-    ).toBe("Explicit disposition in data");
-  });
-
   it("emits reports for code-only glass annotations", () => {
     const rows: CodeOnlyElement[] = [];
     const patentFiles = patentInventory();
@@ -505,7 +463,7 @@ describe("six-digit glass-code scan", () => {
           "This is the broad inventory: some rows may already resolve to trusted Sellmeier data by code,",
           "but the lens data still lacks a human-readable glass type.",
         ],
-        regenerateCommand: "npm test -- sixDigitGlassCodeScan",
+        regenerateCommand: "npm run generate:reports -- sixDigitGlassCodeScan",
         rows,
         totalLenses,
         totalCodeOnlyElements: rows.length,
@@ -521,7 +479,7 @@ describe("six-digit glass-code scan", () => {
           "element surface resolves to trusted catalog Sellmeier data through the reference-line safety net.",
           "These are the highest-priority code-only rows for catalog additions, aliases, or explicit `Unmatched` notes.",
         ],
-        regenerateCommand: "npm test -- sixDigitGlassCodeScan",
+        regenerateCommand: "npm run generate:reports -- sixDigitGlassCodeScan",
         rows: noSellmeierRows,
         totalLenses,
         totalCodeOnlyElements: rows.length,

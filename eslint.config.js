@@ -143,9 +143,9 @@ export default [
     },
   },
 
-  // TypeScript test files
+  // TypeScript test files and report generators
   {
-    files: ["__tests__/**/*.ts"],
+    files: ["__tests__/**/*.ts", "reports/**/*.ts"],
     plugins: {
       "@typescript-eslint": tseslint.plugin,
     },

@@ -1001,6 +1001,157 @@ describe("validateLensData", () => {
     ).toBe(true);
   });
 
+  /* Proves malformed folded-path data is rejected: one row per validator branch, each mutating the hidden
+   * Newtonian reference (auto mode, so no probe trace runs). Branches already exercised by
+   * mirrorOptics.test.ts (unknown surfaceOrder label, innerSd >= sd, backing normals, maxInteractions floor,
+   * paired innerSd, unreachable image plane) are not repeated. */
+  const foldedBase = (): Record<string, any> => structuredClone(LENS_CATALOG["reference-newtonian-side-focus"]);
+  const surf = (d: Record<string, any>, label: string) => d.surfaces.find((s: { label: string }) => s.label === label);
+  const zoomControl = (range: unknown) => (d: Record<string, any>) =>
+    Object.assign(d, { zoomPositions: [100, 200], aberrationControl: { label: "SA", var: { STO: range } } });
+
+  it("accepts the unmodified folded reference base", () => {
+    expect(validateLensData(foldedBase())).toEqual([]);
+  });
+
+  it.each<{ name: string; mutate: (d: Record<string, any>) => unknown; expected: string }>([
+    {
+      name: "non-object opticalPath",
+      mutate: (d) => Object.assign(d, { opticalPath: "auto" }),
+      expected: '"opticalPath" must be an object',
+    },
+    {
+      name: "unknown opticalPath.mode",
+      mutate: (d) => Object.assign(d.opticalPath, { mode: "folded" }),
+      expected: '"opticalPath.mode" must be "sequential" or "auto"',
+    },
+    {
+      name: "empty surfaceOrder",
+      mutate: (d) => Object.assign(d.opticalPath, { surfaceOrder: [] }),
+      expected: '"opticalPath.surfaceOrder" must be a non-empty array',
+    },
+    {
+      name: "non-object imagePlane",
+      mutate: (d) => Object.assign(d.opticalPath, { imagePlane: 35 }),
+      expected: '"opticalPath.imagePlane" must be an object',
+    },
+    {
+      name: "non-finite imagePlane.z",
+      mutate: (d) => Object.assign(d.opticalPath.imagePlane, { z: Number.NaN }),
+      expected: '"opticalPath.imagePlane.z" must be a finite number',
+    },
+    {
+      name: "non-numeric imagePlane.y",
+      mutate: (d) => Object.assign(d.opticalPath.imagePlane, { y: "25" }),
+      expected: '"opticalPath.imagePlane.y" must be a finite number',
+    },
+    {
+      name: "non-string imagePlane.label",
+      mutate: (d) => Object.assign(d.opticalPath.imagePlane, { label: 7 }),
+      expected: '"opticalPath.imagePlane.label" must be a string',
+    },
+    {
+      name: "imagePlane.normal missing y",
+      mutate: (d) => Object.assign(d.opticalPath.imagePlane, { normal: { z: 0 } }),
+      expected: '"opticalPath.imagePlane.normal" must contain finite z and y numbers',
+    },
+    {
+      name: "fractional maxInteractions",
+      mutate: (d) => Object.assign(d.opticalPath, { maxInteractions: 2.5 }),
+      expected: '"opticalPath.maxInteractions" must be a positive integer',
+    },
+    {
+      name: "negative innerSd",
+      mutate: (d) => Object.assign(surf(d, "M1"), { innerSd: -1 }),
+      expected: "innerSd must be a finite non-negative number",
+    },
+    {
+      name: "non-object interaction",
+      mutate: (d) => Object.assign(surf(d, "SEC"), { interaction: "reflect" }),
+      expected: "interaction must be an object when provided",
+    },
+    {
+      name: "unknown interaction.type",
+      mutate: (d) => Object.assign(surf(d, "SEC").interaction, { type: "scatter" }),
+      expected: 'interaction.type must be "refract", "reflect", or "block"',
+    },
+    {
+      name: "unknown incidentSide",
+      mutate: (d) => Object.assign(surf(d, "SEC").interaction, { incidentSide: "side" }),
+      expected: 'interaction.incidentSide must be "front", "rear", or "both"',
+    },
+    {
+      name: "unknown inactiveSide",
+      mutate: (d) => Object.assign(surf(d, "SEC").interaction, { inactiveSide: "pass" }),
+      expected: 'interaction.inactiveSide must be "ignore" or "block"',
+    },
+    {
+      name: "unknown mirrorKind",
+      mutate: (d) => Object.assign(surf(d, "SEC").interaction, { mirrorKind: "third-surface" }),
+      expected: 'interaction.mirrorKind must be "first-surface" or "second-surface"',
+    },
+    {
+      name: "zero-vector interaction.normal",
+      mutate: (d) => Object.assign(surf(d, "SEC").interaction, { normal: { z: 0, y: 0 } }),
+      expected: "interaction.normal must not be the zero vector",
+    },
+    {
+      name: "unknown stopPlacement value",
+      mutate: (d) => Object.assign(surf(d, "STO"), { stopPlacement: "behind" }),
+      expected: 'stopPlacement must be "inside-element"',
+    },
+    {
+      name: "stopPlacement off the STO surface",
+      mutate: (d) => Object.assign(surf(d, "SEC"), { stopPlacement: "inside-element" }),
+      expected: 'stopPlacement is only valid on the "STO" surface',
+    },
+    {
+      name: "internal stop without a containing span",
+      mutate: (d) => Object.assign(surf(d, "STO"), { stopPlacement: "inside-element" }),
+      expected: "requires exactly one explicit containing element span",
+    },
+    {
+      name: "zoom aberrationControl.var without one entry per station",
+      mutate: zoomControl([[35, 40]]),
+      expected: 'aberrationControl.var["STO"]: expected array of 2 [normal, maximum] arrays',
+    },
+    {
+      name: "zoom aberrationControl.var station of wrong length",
+      mutate: zoomControl([[35, 40], [35]]),
+      expected: 'aberrationControl.var["STO"][1]: expected [normal, maximum] array of length 2',
+    },
+    {
+      name: "non-finite zoom aberrationControl.var position",
+      mutate: zoomControl([
+        [35, 40],
+        [Number.NaN, 40],
+      ]),
+      expected: 'aberrationControl.var["STO"][1]: normal must be a finite number',
+    },
+    {
+      name: "negative zoom aberrationControl.var position",
+      mutate: zoomControl([
+        [35, 40],
+        [35, -1],
+      ]),
+      expected: 'aberrationControl.var["STO"][1]: maximum=-1 is negative',
+    },
+    {
+      name: "empty lensMounts",
+      mutate: (d) => Object.assign(d, { lensMounts: [] }),
+      expected: '"lensMounts" must not be empty when provided',
+    },
+    {
+      name: "non-object projection",
+      mutate: (d) => Object.assign(d, { projection: "fisheye" }),
+      expected: '"projection" must be an object when provided',
+    },
+  ])("rejects $name", ({ mutate, expected }) => {
+    const data = foldedBase();
+    mutate(data);
+    expect(validateLensData(data)).toContainEqual(expect.stringContaining(expected));
+  });
+
   it("rejects malformed explicit element spans", () => {
     const missing = validateLensData(
       makeValid({
