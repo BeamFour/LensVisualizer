@@ -2,7 +2,7 @@
 
 Hidden/reference fixtures that exercise mirror, folded-path, annular, blocker, and image-plane metadata.
 
-**Regenerate this file** by running `npm test -- mirrorFixtureAuthoringReport`.
+**Regenerate this file** by running `npm run generate:reports -- mirrorFixtureAuthoringReport`.
 Regenerate the mirror report set with `npm run generate:mirror-reports`.
 
 ## Summary

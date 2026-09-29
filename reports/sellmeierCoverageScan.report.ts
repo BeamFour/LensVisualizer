@@ -6,9 +6,9 @@
  * src/optics/dispersion.ts: a glass annotation must resolve to a catalog entry
  * and the catalog coordinates must agree with the authored d- or e-line pair.
  *
- * Always passes — its job is to emit an authoring report, not to gate CI.
+ * Runs only via `npm run generate:reports`, never in `npm test`; its job is to emit an authoring report.
  *
- * Regenerate: `npm test -- sellmeierCoverageScan`
+ * Regenerate: `npm run generate:reports -- sellmeierCoverageScan`
  */
 import { describe, expect, it } from "vitest";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -18,12 +18,12 @@ import {
   GLASS_VD_TOLERANCE,
   resolveCompatibleGlass,
   resolveGlass,
-} from "../../../src/optics/glassCatalog.js";
-import type { DispersionQuality } from "../../../src/optics/dispersion.js";
+} from "../src/optics/glassCatalog.js";
+import type { DispersionQuality } from "../src/optics/dispersion.js";
 import { extractPatentNumber, isExplicitlyUnmatched, walkLensSurfaces } from "./glassScanLib.js";
-import type { ElementData, LensData } from "../../../src/types/optics.js";
+import type { ElementData, LensData } from "../src/types/optics.js";
 
-const modules = import.meta.glob<{ default: LensData }>("../../../src/lens-data/**/*.data.ts", { eager: true });
+const modules = import.meta.glob<{ default: LensData }>("../src/lens-data/**/*.data.ts", { eager: true });
 
 const REPORT_DIR = "agent_docs/generated";
 const MAX_MISSING_DETAILS = 8;
@@ -287,7 +287,7 @@ describe("Sellmeier coverage scan", () => {
     );
     lines.push("Trusted chromatic coverage additionally counts measured C/F/g line-index surfaces.");
     lines.push("");
-    lines.push("**Regenerate this file** by running `npm test -- sellmeierCoverageScan`.");
+    lines.push("**Regenerate this file** by running `npm run generate:reports -- sellmeierCoverageScan`.");
     lines.push("Regenerate the full glass report set with `npm run generate:glass-reports`.");
     lines.push("");
     lines.push("## Summary");

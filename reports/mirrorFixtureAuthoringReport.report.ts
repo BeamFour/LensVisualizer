@@ -4,20 +4,20 @@
  * Scans hidden/reference mirror fixtures and emits a markdown checklist for
  * optical-path, mirror, blocker, annular, and image-plane metadata.
  *
- * Always passes - its job is to emit an authoring report, not to gate CI.
+ * Runs only via `npm run generate:reports`, never in `npm test`; its job is to emit an authoring report.
  *
- * Regenerate: `npm test -- mirrorFixtureAuthoringReport`
+ * Regenerate: `npm run generate:reports -- mirrorFixtureAuthoringReport`
  */
 import { describe, expect, it } from "vitest";
 import { mkdirSync, writeFileSync } from "node:fs";
-import buildLens from "../../../src/optics/buildLens.js";
-import { foldedHitOrderLabelsForDisplay } from "../../../src/optics/foldedPathDisplay.js";
-import { doLayout } from "../../../src/optics/optics.js";
-import validateLensData from "../../../src/optics/validateLensData.js";
-import type { LensData, RuntimeLens, SurfaceData } from "../../../src/types/optics.js";
-import { LENS_CATALOG, isDebugLensKey } from "../../../src/utils/catalog/lensCatalog.js";
+import buildLens from "../src/optics/buildLens.js";
+import { foldedHitOrderLabelsForDisplay } from "../src/optics/foldedPathDisplay.js";
+import { doLayout } from "../src/optics/optics.js";
+import validateLensData from "../src/optics/validateLensData.js";
+import type { LensData, RuntimeLens, SurfaceData } from "../src/types/optics.js";
+import { LENS_CATALOG, isDebugLensKey } from "../src/utils/catalog/lensCatalog.js";
 
-const modules = import.meta.glob<{ default: LensData }>("../../../src/lens-data/**/*.data.ts", { eager: true });
+const modules = import.meta.glob<{ default: LensData }>("../src/lens-data/**/*.data.ts", { eager: true });
 
 const REPORT_DIR = "agent_docs/generated";
 const REPORT_PATH = `${REPORT_DIR}/mirror-fixtures.generated.md`;
@@ -140,7 +140,7 @@ function buildReport(rows: FixtureRow[]): string {
     "Hidden/reference fixtures that exercise mirror, folded-path, annular, blocker, and image-plane metadata.",
   );
   lines.push("");
-  lines.push("**Regenerate this file** by running `npm test -- mirrorFixtureAuthoringReport`.");
+  lines.push("**Regenerate this file** by running `npm run generate:reports -- mirrorFixtureAuthoringReport`.");
   lines.push("Regenerate the mirror report set with `npm run generate:mirror-reports`.");
   lines.push("");
   lines.push("## Summary");

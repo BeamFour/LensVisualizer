@@ -6,15 +6,15 @@
  * with non-explicit-unmatched glass strings that do not resolve at all. It keeps
  * the glass-catalog priority queue honest as new lens files are added.
  *
- * Always passes — its job is to emit an authoring report, not to gate CI.
+ * Runs only via `npm run generate:reports`, never in `npm test`; its job is to emit an authoring report.
  */
 import { describe, expect, it } from "vitest";
 import { mkdirSync, writeFileSync } from "node:fs";
-import { glassTokens, resolveGlass } from "../../../src/optics/glassCatalog.js";
+import { glassTokens, resolveGlass } from "../src/optics/glassCatalog.js";
 import { isExplicitlyUnmatched, walkLensSurfaces } from "./glassScanLib.js";
-import type { LensData } from "../../../src/types/optics.js";
+import type { LensData } from "../src/types/optics.js";
 
-const modules = import.meta.glob<{ default: LensData }>("../../../src/lens-data/**/*.data.ts", { eager: true });
+const modules = import.meta.glob<{ default: LensData }>("../src/lens-data/**/*.data.ts", { eager: true });
 const REPORT_DIR = "agent_docs/generated";
 
 interface Occurrence {
@@ -84,7 +84,7 @@ describe("unresolved glass scan", () => {
     lines.push("through `resolveGlass`. Use this report to prioritize catalog additions, aliases,");
     lines.push("or per-lens patent backfills.");
     lines.push("");
-    lines.push("**Regenerate this file** by running `npm test -- unresolvedGlassScan`.");
+    lines.push("**Regenerate this file** by running `npm run generate:reports -- unresolvedGlassScan`.");
     lines.push("");
     lines.push("## Summary");
     lines.push("");

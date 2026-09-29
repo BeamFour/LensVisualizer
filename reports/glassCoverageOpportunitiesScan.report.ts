@@ -6,9 +6,9 @@
  *   2. high-frequency six-digit code-only rows missing strict catalog Sellmeier data;
  *   3. proprietary glasses where line-index backfill is the likely upgrade path.
  *
- * Always passes — its job is to emit a planning report, not gate CI.
+ * Runs only via `npm run generate:reports`, never in `npm test`; its job is to emit a planning report.
  *
- * Regenerate: `npm test -- glassCoverageOpportunitiesScan`
+ * Regenerate: `npm run generate:reports -- glassCoverageOpportunitiesScan`
  *
  * The report embeds match statuses against the untracked local `patents/` PDF
  * inventory and sorts Sweep 1 by them, so the rewrite is skipped when that
@@ -17,12 +17,11 @@
  */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import type { DispersionQuality } from "../../../src/optics/dispersion.js";
-import { allEntries, resolveCompatibleGlass, resolveGlass, decodeCode6 } from "../../../src/optics/glassCatalog.js";
+import type { DispersionQuality } from "../src/optics/dispersion.js";
+import { allEntries, resolveCompatibleGlass, resolveGlass, decodeCode6 } from "../src/optics/glassCatalog.js";
 import {
   extractPatentNumber,
   findCandidates,
-  patentSearchTokens,
   findLocalPatent,
   extractSixDigitCodes,
   isCodeOnlyGlassAnnotation,
@@ -32,10 +31,15 @@ import {
   type EmbeddedCode,
   type GlassScanCandidate,
   type PatentMatch,
+  classifyMissingMaterial,
+  hasAuditRecord,
+  hasReviewRecord,
+  reviewedSidecarStatus,
+  type MissingMaterialKind,
 } from "./glassScanLib.js";
-import type { LensData, RefractiveIndexReferenceLine } from "../../../src/types/optics.js";
+import type { LensData, RefractiveIndexReferenceLine } from "../src/types/optics.js";
 
-const modules = import.meta.glob<{ default: LensData }>("../../../src/lens-data/**/*.data.ts", { eager: true });
+const modules = import.meta.glob<{ default: LensData }>("../src/lens-data/**/*.data.ts", { eager: true });
 
 const REPORT_DIR = "agent_docs/generated";
 const REVIEWED_SIDECAR = "agent_docs/generated/six-digit-glass-codes-missing-sellmeier-reviewed.md";
@@ -68,8 +72,6 @@ interface MissingSurface {
   quality: DispersionQuality | "missing";
   materialKind: MissingMaterialKind;
 }
-
-type MissingMaterialKind = "glass" | "resin" | "cement" | "plastic" | "other";
 
 interface CoverageOpportunity {
   lensName: string;
@@ -152,15 +154,6 @@ function extractGlassCode(annotation: string): EmbeddedCode | null {
   return { raw: `${match[1]}/${match[2]}`, nd, vd };
 }
 
-function classifyMissingMaterial(elementLabel: string, glassString: string): MissingMaterialKind {
-  const description = `${elementLabel} ${glassString}`;
-  if (/\b(?:cement|cemented layer|adhesive|bond layer|bonding layer)\b/i.test(description)) return "cement";
-  if (/\b(?:plastic|pmma|polycarbonate)\b/i.test(description)) return "plastic";
-  if (/\b(?:resin|polymer|organic|replica layer)\b/i.test(description)) return "resin";
-  if (/\b(?:water|liquid|fluid)\b/i.test(description) || !glassString.trim()) return "other";
-  return "glass";
-}
-
 function namedOpportunityTokens(glassString: string): string[] {
   const tokens = glassString.match(/[A-Za-z][A-Za-z0-9-]*\d[A-Za-z0-9]*/g) ?? [];
   return [
@@ -204,28 +197,6 @@ function qualityMix(surfaces: readonly MissingSurface[]): string {
     .join(", ");
 }
 
-function reviewedSidecarStatus(filePath: string, codes: readonly string[], sidecarText: string): string {
-  if (!sidecarText) return "No reviewed sidecar found";
-  const basename = filePath.split("/").at(-1) ?? filePath;
-  const hits = sidecarText
-    .split("\n")
-    .filter((line) => line.includes(basename) && codes.some((code) => line.includes(code)));
-  return hits.length > 0 ? "Reviewed sidecar hit" : "No reviewed-sidecar hit";
-}
-
-function hasAuditRecord(filePath: string, codes: readonly string[]): boolean {
-  const auditPath = filePath.replace(/\.data\.ts$/, ".audit.md");
-  if (!existsSync(auditPath)) return false;
-  const auditText = readFileSync(auditPath, "utf8");
-  return codes.some((code) => auditText.includes(code));
-}
-
-function hasReviewRecord(
-  row: Pick<CodeOpportunity, "explicitlyUnmatched" | "reviewedStatus" | "auditReviewed">,
-): boolean {
-  return row.explicitlyUnmatched || row.reviewedStatus === "Reviewed sidecar hit" || row.auditReviewed;
-}
-
 function summarizePatentStatus(rows: readonly { localPatent: PatentMatch }[]): string {
   const paths = [...new Set(rows.map((row) => row.localPatent.path).filter((path): path is string => path !== null))];
   if (paths.length > 0) return paths.slice(0, MAX_RELEVANT_PATENTS).join("<br>");
@@ -263,66 +234,6 @@ function parseTierAProprietaryRows(patentFiles: readonly string[]): ProprietaryO
 }
 
 describe("glass coverage opportunities scan", () => {
-  it("prefers explicit patent metadata when a subtitle uses Japanese-era notation", () => {
-    expect(extractPatentNumber("JP1987-244010 A", "JP S62-244010 A Example 2")).toBe("JP1987-244010 A");
-    expect(extractPatentNumber(undefined, "US 4,123,456 A Example 1")).toBe("US 4,123,456 A");
-  });
-
-  it("preserves era-form publications and matches their Gregorian PDF wrappers", () => {
-    expect(extractPatentNumber("JP S62-244010 A", "US 4,123,456 A Example 1")).toBe("JP S62-244010 A");
-    expect(extractPatentNumber(undefined, "JP S62-244010 A Example 2")).toBe("JP S62-244010 A");
-    expect(findLocalPatent("JP S62-244010 A", ["JPA 1987244010-000000.pdf"]).path).toBe(
-      "patents/JPA 1987244010-000000.pdf",
-    );
-    expect(findLocalPatent("JP H10-123456 B2", ["JPB 1998123456-000000.pdf"]).path).toBe(
-      "patents/JPB 1998123456-000000.pdf",
-    );
-    expect(findLocalPatent("JP S62-4010 A", ["JPA 1987244010-000000.pdf"]).path).toBeNull();
-  });
-
-  it("matches spaced legacy patent numbers without substring collisions", () => {
-    expect(patentSearchTokens("DE 1 228 820 B")).toEqual(["DE1228820B", "DE1228820", "1228820"]);
-    expect(findLocalPatent("DE 1 228 820 B", ["20260118637.pdf", "DE_1228820_B.pdf"])).toEqual({
-      path: "patents/DE_1228820_B.pdf",
-      status: "Matched untracked local patent PDF",
-    });
-  });
-
-  it("matches exact JPA and JPB export wrappers without short-serial collisions", () => {
-    expect(patentSearchTokens("JP1987-244010 A")).toContain("JPA1987244010000000");
-    expect(findLocalPatent("JP1987-244010 A", ["JPA 1987004010-000000.pdf", "JPA 1987244010-000000.pdf"])).toEqual({
-      path: "patents/JPA 1987244010-000000.pdf",
-      status: "Matched untracked local patent PDF",
-    });
-    expect(findLocalPatent("JP1987-4010 A", ["JPA 1987244010-000000.pdf"]).path).toBeNull();
-
-    expect(patentSearchTokens("JP1980-024081 B2")).toContain("JPB1980024081000000");
-    expect(findLocalPatent("JP1980-024081 B2", ["JPA 1980024081-000000.pdf", "JPB 1980024081-000000.pdf"])).toEqual({
-      path: "patents/JPB 1980024081-000000.pdf",
-      status: "Matched untracked local patent PDF",
-    });
-  });
-
-  it("separates glass opportunities from resin, cement, plastic, and other optical media", () => {
-    expect(classifyMissingMaterial("Element 2 synthetic-resin layer", "Proprietary optical resin")).toBe("resin");
-    expect(classifyMissingMaterial("Bond layer 1", "UV-curing adhesive")).toBe("cement");
-    expect(classifyMissingMaterial("Plastic corrector", "PMMA")).toBe("plastic");
-    expect(classifyMissingMaterial("Hybrid replica layer", "Unmatched optical medium")).toBe("resin");
-    expect(classifyMissingMaterial("Element 9", "Canon proprietary organic")).toBe("resin");
-    expect(classifyMissingMaterial("WTR", "")).toBe("other");
-    expect(classifyMissingMaterial("Element 4", "Unmatched barium crown")).toBe("glass");
-  });
-
-  it("treats explicit unmatched annotations as self-recording review dispositions", () => {
-    expect(
-      hasReviewRecord({
-        explicitlyUnmatched: true,
-        reviewedStatus: "No reviewed-sidecar hit",
-        auditReviewed: false,
-      }),
-    ).toBe(true);
-  });
-
   it("emits a consolidated three-sweep opportunity report", () => {
     const entries = allEntries();
     const patentFiles = patentInventory();
@@ -580,7 +491,7 @@ describe("glass coverage opportunities scan", () => {
     lines.push("Rows that cite `patents/` refer to ignored/untracked local PDF files used as source references only.");
     lines.push("Do not add, stage, or commit those patent files.");
     lines.push("");
-    lines.push("**Regenerate this file** by running `npm test -- glassCoverageOpportunitiesScan`.");
+    lines.push("**Regenerate this file** by running `npm run generate:reports -- glassCoverageOpportunitiesScan`.");
     lines.push("Regenerate the full glass report set with `npm run generate:glass-reports`.");
     lines.push("");
     lines.push("## Summary");

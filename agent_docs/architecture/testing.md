@@ -110,9 +110,21 @@ Existing tests cover:
 - Reducer, preferences, URL sync, feature flags, and page-theme hooks.
 - Component smoke tests for pages, controls, display panels, analysis drawer, and comparison layout.
 - Script regressions for metadata, route sync, lens-data helpers, sitemap/prerender support.
-- Generated authoring reports, including glass queues and the hidden mirror fixture report.
-- Benchmark report aggregation helpers. The expensive optics/rendering benchmark itself is manual-only and is not part of
-  the normal Vitest suite.
+- The glass-report helper library (`__tests__/reports/glassScanLib.test.ts`) and the glass-resolution parity sweep
+  (`__tests__/src/lens-data/glassResolutionParity.test.ts`); the reports themselves are generated outside the suite (see
+  "Reports and Tooling Tests").
+
+## Reports and Tooling Tests
+
+`npm run test` runs only product, data-contract, and build-pipeline tests. Two kinds of Vitest files stay out of it:
+
+- **Report generators** in `reports/*.report.ts` rewrite the committed files under `agent_docs/generated/`. They use
+  `import.meta.glob`, so they run under Vitest through `vitest.reports.config.js`: `npm run generate:reports` (all), or
+  `generate:glass-reports`, `generate:mirror-reports`, `generate:mount-svgs`, or `npm run generate:reports -- <name>`.
+  An invariant a report depends on belongs in the suite as its own test, not as an `expect` inside the generator.
+- **Tooling tests** for manual-only dev tools (the benchmark harness and the audit-script npm entries) are listed in
+  `TOOLING_TESTS` in `vite.config.js` and run with `npm run test:tooling`; CI runs both commands. Add a file there only
+  when it guards a tool that neither the build nor the app uses.
 
 ## Refactor Test Expectations
 
@@ -138,6 +150,8 @@ npm run format:check
 npm run lint
 npm run test
 ```
+
+Also run `npm run test:tooling` when changing `scripts/`, `src/benchmarks/`, or the audit tooling.
 
 ## Benchmark Verification
 

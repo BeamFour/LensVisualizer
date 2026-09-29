@@ -21,7 +21,7 @@
  * Native e-line coordinates are compared at C′/e/F′. Their six-digit-looking
  * tokens are never treated as catalog codes because those encode nd/νd.
  *
- * Always passes — its job is to surface the data, not to gate CI.
+ * Runs only via `npm run generate:reports`, never in `npm test`; its job is to surface the data.
  */
 import { describe, it, expect } from "vitest";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -32,9 +32,9 @@ import {
   GLASS_VD_TOLERANCE,
   resolveCompatibleGlass,
   resolveGlass,
-} from "../../../src/optics/glassCatalog.js";
+} from "../src/optics/glassCatalog.js";
 import { extractPatentNumber, walkLensSurfaces } from "./glassScanLib.js";
-import type { LensData } from "../../../src/types/optics.js";
+import type { LensData } from "../src/types/optics.js";
 
 const REPORT_DIR = "agent_docs/generated";
 
@@ -56,7 +56,7 @@ interface Mismatch {
   vdDiff: number | null;
 }
 
-const modules = import.meta.glob<{ default: LensData }>("../../../src/lens-data/**/*.data.ts", { eager: true });
+const modules = import.meta.glob<{ default: LensData }>("../src/lens-data/**/*.data.ts", { eager: true });
 
 describe("catalog-mismatch scan", () => {
   it("emits a report of catalog mismatches across the entire lens library", () => {
@@ -154,7 +154,7 @@ describe("catalog-mismatch scan", () => {
     lines.push("or accept the mismatch (some glass annotations in lens-data files are explicitly marked as guesses");
     lines.push('with words like "probable" or "approx").');
     lines.push("");
-    lines.push("**Regenerate this file** by running `npm test -- catalogMismatchScan`.");
+    lines.push("**Regenerate this file** by running `npm run generate:reports -- catalogMismatchScan`.");
     lines.push("");
     lines.push(`## Summary`);
     lines.push("");

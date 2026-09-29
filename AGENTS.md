@@ -36,6 +36,7 @@ src/content/          - Auto-registered markdown articles and static content
 src/benchmarks/       - Optics/render benchmark harness
 scripts/              - Metadata, folder-readme, prerender, sitemap, SEO, and lens-data build helpers
 __tests__/            - Vitest unit/component/script tests
+reports/              - Report generators for agent_docs/generated/ (npm run generate:reports; not in npm test)
 agent_docs/           - Focused agent docs; start at agent_docs/README.md
 ```
 
@@ -50,6 +51,7 @@ npm run test                    # Vitest; pretest regenerates src/generated/
 npm run typecheck
 npm run lint                    # npm run lint:fix to auto-fix
 npm run format:check            # npm run format to fix
+npm run generate:reports        # Refresh every agent_docs/generated/ report (not part of npm test)
 npm run generate:glass-reports  # Refresh agent_docs/generated/ glass reports after glass-data changes
 npm run generate:mount-svgs     # Refresh mount SVG specifications after src/mounts/ changes
 ```

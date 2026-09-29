@@ -41,10 +41,11 @@ Non-obvious constraints and failure modes: one trap per bullet, with the full ru
 - `vite.config.js` sets `base: '/'`; Cloudflare Pages serves production from the domain root.
 - `tsconfig.json` is `strict: true` with `allowJs: false`; `.data.ts` lens files are type-checked through the `"src"`
   include. Test files are `.ts`, and Vitest resolves `.js` import specifiers to `.ts` sources automatically.
-- Several scan suites under `__tests__/src/optics/` rewrite `agent_docs/generated/*.generated.md` on every run
-  (`npm run generate:glass-reports` is just a vitest filter). The six-digit and glass-coverage-opportunities scans skip
-  the rewrite when the untracked local `patents/` inventory is empty, so `npm run test` in a fresh worktree or CI leaves
-  the checked-in reports unchanged — regenerate from a checkout with `patents/` populated.
+- The report generators in `reports/*.report.ts` rewrite `agent_docs/generated/` and never run in `npm test`; they run
+  through `vitest.reports.config.js` (`npm run generate:reports`, or the `generate:glass-reports` /
+  `generate:mirror-reports` / `generate:mount-svgs` subsets). The six-digit and glass-coverage-opportunities scans skip
+  the rewrite when the untracked local `patents/` inventory is empty — regenerate from a checkout with `patents/`
+  populated.
 - `.git-blame-ignore-revs` lists the initial Prettier commit. GitHub honors it automatically; locally run
   `git config blame.ignoreRevsFile .git-blame-ignore-revs`.
 - Keep `react`, `react-dom`, `@types/react`, and `@types/react-dom` on the same React 19 line. `react-helmet-async` 3

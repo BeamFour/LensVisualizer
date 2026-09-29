@@ -6,9 +6,9 @@
  * used by the candidate report so patent-audit work can proceed one lens at a
  * time.
  *
- * Always passes — its job is to surface the data, not gate CI.
+ * Runs only via `npm run generate:reports`, never in `npm test`; its job is to surface the data.
  *
- * Regenerate: `npm test -- glassRelabelByLensScan`
+ * Regenerate: `npm run generate:reports -- glassRelabelByLensScan`
  */
 import { describe, expect, it } from "vitest";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -18,7 +18,7 @@ import {
   decodeCode6,
   resolveCompatibleGlass,
   resolveGlass,
-} from "../../../src/optics/glassCatalog.js";
+} from "../src/optics/glassCatalog.js";
 import {
   extractPatentNumber,
   findCandidates,
@@ -26,7 +26,7 @@ import {
   type EmbeddedCode,
   type GlassScanCandidate,
 } from "./glassScanLib.js";
-import type { LensData, RefractiveIndexReferenceLine } from "../../../src/types/optics.js";
+import type { LensData, RefractiveIndexReferenceLine } from "../src/types/optics.js";
 
 const REPORT_DIR = "agent_docs/generated";
 
@@ -50,7 +50,7 @@ interface RelabelRow {
   candidates: Candidate[];
 }
 
-const modules = import.meta.glob<{ default: LensData }>("../../../src/lens-data/**/*.data.ts", { eager: true });
+const modules = import.meta.glob<{ default: LensData }>("../src/lens-data/**/*.data.ts", { eager: true });
 
 function extractGlassCode(annotation: string): EmbeddedCode | null {
   const match = annotation.match(/\b(\d{3})[/\-\s](\d{3})\b/) ?? annotation.match(/\b(\d{3})(\d{3})\b/);
@@ -178,7 +178,7 @@ describe("glass relabel by lens scan", () => {
     lines.push("Use this when auditing a patent lens-by-lens: review all rows for a lens together,");
     lines.push("then update the lens data, companion analysis/audit notes, and regenerate the glass reports.");
     lines.push("");
-    lines.push("**Regenerate this file** by running `npm test -- glassRelabelByLensScan`.");
+    lines.push("**Regenerate this file** by running `npm run generate:reports -- glassRelabelByLensScan`.");
     lines.push("Regenerate the full glass report set with `npm run generate:glass-reports`.");
     lines.push("");
     lines.push("## Summary");

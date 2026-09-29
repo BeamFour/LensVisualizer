@@ -1,8 +1,7 @@
 /**
- * Shared harness for the glass report scans (precedent: `testLensFixtures.ts`,
- * `__tests__/testUtils.tsx`).
+ * Shared harness for the glass report scans in `reports/`.
  *
- * Eight scan files under `__tests__/src/optics/` previously re-implemented the
+ * The eight glass scans previously re-implemented the
  * same helpers — the lens-module walk, repo-relative paths, patent-number
  * extraction, the patent-PDF inventory matcher, six-digit code helpers, and
  * the candidate ranking — with drift already visible between copies. Each
@@ -10,10 +9,10 @@
  * their report-specific logic. Runtime primitives (`decodeCode6`,
  * `UNRESOLVED_MARKER`, `glassTokens`, `normalLinePgF`) come from the engine.
  */
-import { existsSync, readdirSync } from "node:fs";
-import validateLensData from "../../../src/optics/validateLensData.js";
-import { buildSpectralIndex } from "../../../src/optics/internal/lensState.js";
-import { expandRearPlates } from "../../../src/optics/prescription/rearPlates.js";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import validateLensData from "../src/optics/validateLensData.js";
+import { buildSpectralIndex } from "../src/optics/internal/lensState.js";
+import { expandRearPlates } from "../src/optics/prescription/rearPlates.js";
 import {
   assessCatalogGlassCompatibility,
   evaluateCatalogAbbeNumber,
@@ -21,10 +20,10 @@ import {
   GLASS_VD_TOLERANCE,
   UNRESOLVED_MARKER,
   type GlassEntry,
-} from "../../../src/optics/glassCatalog.js";
-import { buildSurfaceDispersionIndex, normalLinePgF, type SurfaceDispersion } from "../../../src/optics/dispersion.js";
-import LENS_DEFAULTS from "../../../src/lens-data/defaults.js";
-import type { ElementData, LensData, RefractiveIndexReferenceLine, SurfaceData } from "../../../src/types/optics.js";
+} from "../src/optics/glassCatalog.js";
+import { buildSurfaceDispersionIndex, normalLinePgF, type SurfaceDispersion } from "../src/optics/dispersion.js";
+import LENS_DEFAULTS from "../src/lens-data/defaults.js";
+import type { ElementData, LensData, RefractiveIndexReferenceLine, SurfaceData } from "../src/types/optics.js";
 
 /** ΔPgF spread that's plausible across melt variants. */
 export const PGF_TOLERANCE = 0.02;
@@ -356,4 +355,53 @@ export function findCandidates(
       return Math.abs(a.ndDiff) - Math.abs(b.ndDiff);
     })
     .slice(0, 5);
+}
+
+/** Review-record fields shared by the six-digit and coverage-opportunity scans. */
+export interface ReviewRecordFields {
+  explicitlyUnmatched: boolean;
+  reviewedStatus: string;
+  auditReviewed: boolean;
+}
+
+/** Whether the reviewed sidecar has a line naming this lens file and one of its codes. */
+export function reviewedSidecarStatus(filePath: string, codes: readonly string[], sidecarText: string): string {
+  if (!sidecarText) return "No reviewed sidecar found";
+  const basename = filePath.split("/").at(-1) ?? filePath;
+  const hits = sidecarText
+    .split("\n")
+    .filter((line) => line.includes(basename) && codes.some((code) => line.includes(code)));
+  return hits.length > 0 ? "Reviewed sidecar hit" : "No reviewed-sidecar hit";
+}
+
+/** Whether the lens's companion `*.audit.md` mentions any of the codes. */
+export function hasAuditRecord(filePath: string, codes: readonly string[]): boolean {
+  const auditPath = filePath.replace(/\.data\.ts$/, ".audit.md");
+  if (!existsSync(auditPath)) return false;
+  const auditText = readFileSync(auditPath, "utf8");
+  return codes.some((code) => auditText.includes(code));
+}
+
+/** An explicit unmatched annotation in the data counts as its own review record. */
+export function hasReviewRecord(row: ReviewRecordFields): boolean {
+  return row.explicitlyUnmatched || row.reviewedStatus === "Reviewed sidecar hit" || row.auditReviewed;
+}
+
+export function reviewRecordStatus(row: ReviewRecordFields): string {
+  if (row.explicitlyUnmatched) return "Explicit disposition in data";
+  if (row.reviewedStatus === "Reviewed sidecar hit") return row.reviewedStatus;
+  if (row.auditReviewed) return "Audit-log hit";
+  return "No review-record hit";
+}
+
+export type MissingMaterialKind = "glass" | "resin" | "cement" | "plastic" | "other";
+
+/** Separates glass opportunities from resin, cement, plastic, and other optical media. */
+export function classifyMissingMaterial(elementLabel: string, glassString: string): MissingMaterialKind {
+  const description = `${elementLabel} ${glassString}`;
+  if (/\b(?:cement|cemented layer|adhesive|bond layer|bonding layer)\b/i.test(description)) return "cement";
+  if (/\b(?:plastic|pmma|polycarbonate)\b/i.test(description)) return "plastic";
+  if (/\b(?:resin|polymer|organic|replica layer)\b/i.test(description)) return "resin";
+  if (/\b(?:water|liquid|fluid)\b/i.test(description) || !glassString.trim()) return "other";
+  return "glass";
 }
