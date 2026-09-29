@@ -19,6 +19,11 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-09-29",
+    type: "lens",
+    summary: "Added Nikon AF-S 17–35mm f/2.8D and 24–85mm f/3.5–4.5G IF-ED and ED VR zooms",
+  },
+  {
     date: "2026-09-28",
     type: "lens",
     summary: "Added Meyer-Optik Lydith 30mm f/3.5, Primagon 35mm f/4.5, and Orestegor 500mm f/5.6",
