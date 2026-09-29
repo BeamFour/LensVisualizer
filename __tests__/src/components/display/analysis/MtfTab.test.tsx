@@ -28,6 +28,20 @@ const focusedL = build({
 });
 const focusedState = prepareRuntimeState(focusedL, 0, 0);
 
+/* The stub worker runs the real engine; a coarse pupil grid and a per-state memo keep repeated
+ * identical jobs across tests from recomputing. No assertion here depends on grid resolution. */
+const mtfMemo = new WeakMap<typeof state, Map<string, MtfResult>>();
+function memoizedMtf(target: typeof state, options: MtfJob["options"]): MtfResult {
+  const byOptions = mtfMemo.get(target) ?? new Map<string, MtfResult>();
+  mtfMemo.set(target, byOptions);
+  const key = JSON.stringify(options);
+  const cached = byOptions.get(key);
+  if (cached) return cached;
+  const result = computeMtf(target, { ...options, maxGridSize: 32 });
+  byOptions.set(key, result);
+  return result;
+}
+
 /** Worker stand-in that runs the pure engine; `progress` first posts a result with every field pending. */
 function stubWorker({ progress = false, target = state }: { progress?: boolean; target?: typeof state } = {}) {
   const calls = { compute: 0, jobs: [] as MtfJob[] };
@@ -42,7 +56,7 @@ function stubWorker({ progress = false, target = state }: { progress?: boolean; 
         if (message.type !== "compute") return;
         calls.compute++;
         calls.jobs.push(message.job);
-        const result = computeMtf(target, { ...message.job.options, maxGridSize: 128 });
+        const result = memoizedMtf(target, message.job.options);
         const send = (reply: MtfWorkerReply) => this.onmessage?.({ data: reply } as MessageEvent<MtfWorkerReply>);
         if (progress) {
           const pending: MtfResult = {
