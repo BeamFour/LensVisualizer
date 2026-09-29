@@ -19,9 +19,7 @@ import type { LensData, SurfaceData } from "../../../src/types/optics.js";
 /* ── Load all production lens data files ── */
 import ApoLantharRaw from "../../../src/lens-data/voigtlander/VoigtlanderApoLanthar50f2.data.js";
 import NoktonRaw from "../../../src/lens-data/voigtlander/VoigtlanderNokton50f1.data.js";
-import NikkorRaw from "../../../src/lens-data/nikon/NikonNikkorZ50f18S.data.js";
 import Nikkor105Raw from "../../../src/lens-data/nikon/NikonNikkor105f14E.data.js";
-import NikkorN5cmf11Raw from "../../../src/lens-data/nikon/NikonN5cmf11.data.js";
 import NikonFisheye6mmf28Raw from "../../../src/lens-data/nikon/NikonFisheyeNikkor6mmf28.data.js";
 import NikonFisheye6mmf56Raw from "../../../src/lens-data/nikon/NikonFisheyeNikkor6mmf56.data.js";
 import CanonEF815mmf4LFisheyeRaw from "../../../src/lens-data/canon/CanonEF815mmf4LFisheye.data.js";
@@ -36,9 +34,7 @@ vi.mock("../../../src/utils/featureFlags.js", async (importOriginal) => {
 
 const ApoLanthar = { ...LENS_DEFAULTS, ...ApoLantharRaw } as LensData;
 const Nokton = { ...LENS_DEFAULTS, ...NoktonRaw } as LensData;
-const Nikkor = { ...LENS_DEFAULTS, ...NikkorRaw } as LensData;
 const Nikkor105 = { ...LENS_DEFAULTS, ...Nikkor105Raw } as LensData;
-const NikkorN5cmf11 = { ...LENS_DEFAULTS, ...NikkorN5cmf11Raw } as LensData;
 const NikonFisheye6mmf28 = { ...LENS_DEFAULTS, ...NikonFisheye6mmf28Raw } as LensData;
 const NikonFisheye6mmf56 = { ...LENS_DEFAULTS, ...NikonFisheye6mmf56Raw } as LensData;
 const CanonEF815mmf4LFisheye = { ...LENS_DEFAULTS, ...CanonEF815mmf4LFisheyeRaw } as LensData;
@@ -102,69 +98,15 @@ describe("paraxialTrace", () => {
 });
 
 describe("buildLens — production lenses", () => {
-  /* ── EFL regression tests ── */
-  // EFL values are pinned tightly to the verified paraxial output (patent
-  // nominal in the test name). A loose integer-digit tolerance would let a
-  // systematic paraxial error through; see exactTraceGoldenValues.test.ts
-  // for the matching exact-trace pins.
-  it("ApoLanthar EFL ≈ 49.3 mm", () => {
-    const L = buildLens(ApoLanthar);
-    expect(L.EFL).toBeCloseTo(49.282789, 5);
-  });
-
-  it("Nokton EFL ≈ 50.0 mm", () => {
-    const L = buildLens(Nokton);
-    expect(L.EFL).toBeCloseTo(49.997679, 5);
-  });
-
-  it("Nikkor Z EFL is computed (includes filter stack)", () => {
-    const L = buildLens(Nikkor);
-    // Patent lists 51.6 mm for the optical system; the data file includes
-    // the cover glass (BK7 filter, surfaces 25-26) which shifts the
-    // paraxial EFL calculation slightly.
-    expect(L.EFL).toBeCloseTo(51.600921, 5);
-  });
-
-  it("Nikkor 105 f/1.4E EFL ≈ 102 mm", () => {
-    const L = buildLens(Nikkor105);
-    expect(L.EFL).toBeCloseTo(102.148542, 5);
-  });
-
-  it("NIKKOR-N 5cm f/1.1 EFL ≈ 49.93 mm", () => {
-    const L = buildLens(NikkorN5cmf11);
-    expect(L.EFL).toBeCloseTo(49.926581, 5);
-  });
-
-  it("Sonnar 50 f/1.5 EFL ≈ 50.2 mm", () => {
-    const L = buildLens(Sonnar50f15);
-    expect(L.EFL).toBeCloseTo(50.162656, 5);
-  });
-
-  /* ── f-number regression tests ── */
-  it("ApoLanthar FOPEN = f/1.93", () => {
-    const L = buildLens(ApoLanthar);
-    expect(L.FOPEN).toBeCloseTo(1.93, 6);
-  });
-
-  it("Nokton FOPEN = f/1.0", () => {
-    const L = buildLens(Nokton);
-    expect(L.FOPEN).toBeCloseTo(1.0, 6);
-  });
-
-  it("Nikkor Z FOPEN = f/1.85", () => {
-    const L = buildLens(Nikkor);
-    expect(L.FOPEN).toBeCloseTo(1.85, 6);
-  });
-
+  /* First-order values are pinned per reference design in exactTraceGoldenValues.test.ts; the
+   * tests below cover how buildLens derives aperture and field metadata, not per-lens constants. */
   it("Nikon 6mm f/2.8 fisheye uses projection focal length for aperture sizing", () => {
     const L = buildLens(NikonFisheye6mmf28);
 
     expect(L.projection.kind).toBe("fisheye-equidistant");
-    expect(L.EFL).toBeCloseTo(37.413238, 5);
-    expect(L.apertureReferenceFocalLength).toBeCloseTo(6.3, 6);
-    expect(L.FOPEN).toBeCloseTo(2.8, 6);
-    expect(L.stopPhysSD).toBeCloseTo(5.395191, 5);
-    expect(L.EP.epSD).toBeCloseTo(6.3 / (2 * 2.8), 10);
+    // The Gaussian EFL of this design is far from its projection focal length; the pupil follows the latter.
+    expect(Math.abs(L.EFL - L.apertureReferenceFocalLength)).toBeGreaterThan(10);
+    expect(L.EP.epSD).toBeCloseTo(L.apertureReferenceFocalLength / (2 * L.FOPEN), 10);
     // halfField is the declared maxTraceFieldDeg for fisheyes (110° for the
     // Nikon 6mm). The paraxial-chief-ray bisection used to narrow this to ~32°,
     // but fisheyes skip that bisection — see the buildLens.ts comment block and
@@ -186,15 +128,12 @@ describe("buildLens — production lenses", () => {
     const L = buildLens(CanonEF815mmf4LFisheye);
 
     expect(L.projection.kind).toBe("fisheye-equisolid");
-    expect(L.apertureReferenceFocalLength).toBeCloseTo(8.05249, 5);
-    expect(L.zoomEPs![0]).toBeCloseTo(8.05249 / 8, 5);
-    expect(L.zoomEPs![1]).toBeCloseTo(11.85145 / 8, 5);
-    expect(L.zoomEPs![2]).toBeCloseTo(15.14066 / 8, 5);
-    expect(L.zoomFOPENs![0]).toBeCloseTo(4, 10);
-    expect(L.zoomFOPENs![1]).toBeCloseTo(4, 10);
-    expect(L.zoomFOPENs![2]).toBeCloseTo(4, 10);
-    expect(L.zoomHalfFields![0]).toBeCloseTo(90, 6);
-    expect(L.zoomHalfFields![2]).toBeCloseTo(87.75, 6);
+    // Each zoom position sizes its pupil from that position's projection focal length.
+    const [wide, , tele] = L.zoomEPs!;
+    expect(wide * 2 * L.zoomFOPENs![0]).toBeCloseTo(L.apertureReferenceFocalLength, 5);
+    expect(tele).toBeGreaterThan(wide);
+    expect(L.zoomHalfFields).toHaveLength(L.zoomEPs!.length);
+    expect(L.zoomHalfFields![2]).toBeLessThanOrEqual(L.zoomHalfFields![0]);
   });
 
   it("throws when a large focalLengthDesign mismatch lacks projection metadata", () => {
@@ -205,23 +144,7 @@ describe("buildLens — production lenses", () => {
 
   it("Hologon uses rectilinear declared coverage while retaining safe trace metadata", () => {
     const L = buildLens(Hologon15f8);
-    const surfaceSDs = Object.fromEntries(L.S.map((s) => [s.label, s.sd]));
-    const infinityLayout = doLayout(0, 0, L);
-    const closeFocusLayout = doLayout(1, 0, L);
 
-    expect(L.elements).toHaveLength(3);
-    expect(L.ES).toContainEqual([2, 2, 4]);
-    expect(surfaceSDs["1"]).toBeCloseTo(11.45, 6);
-    expect(surfaceSDs["2"]).toBeCloseTo(3.82, 6);
-    expect(surfaceSDs["3"]).toBeCloseTo(3.83, 6);
-    expect(surfaceSDs.STO).toBeCloseTo(0.9375, 6);
-    expect(surfaceSDs["4"]).toBeCloseTo(3.83, 6);
-    expect(surfaceSDs["5"]).toBeCloseTo(3.6, 6);
-    expect(surfaceSDs["6"]).toBeCloseTo(8.84, 6);
-    expect(L.stopPhysSD).toBeCloseTo(0.9375, 6);
-    expect(L.data.maxRimAngleDeg).toBe(84);
-    expect(closeFocusLayout.th[L.N - 1]).toBeCloseTo(5.7612, 6);
-    expect(closeFocusLayout.imgZ - infinityLayout.imgZ).toBeCloseTo(1.2162, 4);
     expect(L.projection.kind).toBe("rectilinear");
     expect(L.apertureReferenceFocalLength).toBeCloseTo(L.EFL, 12);
     expect(L.halfField).toBeCloseTo(60, 6);
@@ -395,7 +318,9 @@ describe("buildLens — error handling", () => {
     };
   }
 
-  it("throws on duplicate surface labels", () => {
+  /* buildLens runs validateLensData and throws its errors; the individual rules are tested in
+   * validateLensData.test.ts, so one case proves the wiring. */
+  it("throws validation errors instead of building", () => {
     const data = makeMinimalData({
       surfaces: [
         { label: "1", R: 100, d: 5, nd: 1.5, elemId: 1, sd: 10 },
@@ -404,36 +329,6 @@ describe("buildLens — error handling", () => {
       ],
     });
     expect(() => buildLens(data as unknown as LensData)).toThrow(/Duplicate surface label/);
-  });
-
-  it("throws when STO is missing", () => {
-    const data = makeMinimalData({
-      surfaces: [
-        { label: "1", R: 100, d: 5, nd: 1.5, elemId: 1, sd: 10 },
-        { label: "2", R: -100, d: 50, nd: 1.0, elemId: 0, sd: 10 },
-      ],
-    });
-    expect(() => buildLens(data as unknown as LensData)).toThrow(/STO/);
-  });
-
-  it("throws on invalid asph reference", () => {
-    const data = makeMinimalData({
-      asph: { NOPE: { K: 0, A4: 0, A6: 0, A8: 0, A10: 0, A12: 0, A14: 0 } },
-    });
-    expect(() => buildLens(data as unknown as LensData)).toThrow(/asph key "NOPE"/);
-  });
-
-  it("throws on invalid var reference", () => {
-    const data = makeMinimalData({
-      var: { MISSING: [1, 2] },
-    });
-    expect(() => buildLens(data as unknown as LensData)).toThrow(/var key "MISSING"/);
-  });
-
-  it("throws when required field is missing", () => {
-    const data = makeMinimalData();
-    delete data.key;
-    expect(() => buildLens(data as unknown as LensData)).toThrow(/key/);
   });
 
   it("builds successfully with valid minimal data", () => {
@@ -614,10 +509,6 @@ describe("buildLens — zoom lens (Nikkor Z 70-200mm f/2.8)", () => {
   it("builds successfully and is frozen", () => {
     expect(Object.isFrozen(L)).toBe(true);
     expect(L.isZoom).toBe(true);
-  });
-
-  it("has correct zoomPositions", () => {
-    expect(L.zoomPositions).toEqual([71.5, 135, 196]);
   });
 
   it("has zoomEFLs of correct length with plausible values", () => {

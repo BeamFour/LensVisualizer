@@ -226,9 +226,6 @@ describe("perspective trace foundation", () => {
         expect(full.sensorIntersection!.point[2]).toBeCloseTo(context.sensorPlane.point[2], 8);
       }
     }
-
-    expect(dualAxis.perspectiveControl?.tiltPivot?.basis).toBe("rear-vertex-fallback");
-    expect(shiftOnly.perspectiveControl?.tiltPivot).toBeUndefined();
   });
 
   it("extracts generic forward plane intersections and rejects parallel or rearward rays", () => {

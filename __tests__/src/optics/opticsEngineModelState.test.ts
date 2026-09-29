@@ -67,6 +67,8 @@ describe("Optics engine LensData normalization and compatibility", () => {
       /* Engine elements are every traced medium; runtime.elements drops synthetic rear plates for display. */
       expect(engine.elements).toHaveLength(runtime.data.elements.length);
       expect(engine.runtime).toBe(runtime);
+      // Perspective control is opt-in: lenses without the data block build with movement disabled.
+      if (runtime.data.perspectiveControl == null) expect(runtime.perspectiveControl, key).toBeNull();
     }
   });
 

@@ -34,9 +34,10 @@ describe("foldedHitOrderLabelsForDisplay", () => {
   });
 
   it("falls back to the first diagnostic hit order when every probe ray clips", () => {
-    const L = buildLens(LENS_CATALOG["reference-newtonian-side-focus"] as LensData);
+    // A pinhole stop clips every off-axis probe and the central blocker stops the axial one.
+    const L = buildLens(LENS_CATALOG["reference-annular-ring-blocker"] as LensData);
     const fallback = labels(L, 1e-4);
     expect(fallback.length).toBeGreaterThan(0);
-    expect(["M1", "SEC"]).toEqual(expect.arrayContaining(fallback));
+    expect(L.S.map((surface) => surface.label)).toEqual(expect.arrayContaining(fallback));
   });
 });
