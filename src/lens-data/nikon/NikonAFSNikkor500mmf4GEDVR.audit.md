@@ -13,3 +13,7 @@ Retained SDs after 600 dpi optical-rim inspection and live SVG comparison. Media
 ### Glass and display
 
 Added J-LASF010's manufacturer power-series coefficients (Hikari 2025-06-01 catalog, PDF p.140) to cover L6, raising catalog coverage from 14/15 to 15/15. Removed copied catalog C/F/g indices and Hikari-normal-line deviations from elements and rear GF plate; these are not patent measurements and must not bypass catalog resolution. All source nd/vd and physical plate spacings remain. The shared curves retain the qualified Hikari-coordinate assignments. Corrected display styling f/4 G to f/4G.
+
+## 2026-09-30 — Local-site follow-up
+
+Compared the local-site infinity/5 m sections with Fig. 1. The focusing group moves 10.84 mm imageward toward near focus, matching paragraph 0045. Retained optical-rim SDs. Added inferred-APD tags to L1/L2/L5 from the J-FKH1 proxy curve and explicit P1/L1–L14 diagram labels so the protective plate no longer offsets optical-element numbering. The source publication does not list an assignee; left it empty.

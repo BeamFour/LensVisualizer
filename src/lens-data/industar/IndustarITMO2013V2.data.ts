@@ -171,7 +171,7 @@ const LENS_DATA = {
   ],
   closeFocusM: 0,
   focusDescription:
-    "NO_INTERNAL_RECONSTRUCTION: one fixed infinity source model. No finite-focus motion or production minimum focus distance is established; closeFocusM = 0 is an unavailable-value placeholder for the required numeric field.",
+    "Fixed infinity source model. No finite-focus motion or production minimum focus distance is established.",
   nominalFno: 3.5647432498262934,
   fstopSeries: [3.5647432498262934, 4, 5.6, 8, 11, 16],
   yScFill: 0.3,

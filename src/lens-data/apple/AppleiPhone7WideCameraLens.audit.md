@@ -13,3 +13,7 @@ Inspected local PDF p.11, Fig. 10. Paragraphs 0209–0210 describe Example 11 as
 ### Glass and display
 
 All six elements remain unresolved patent-specified plastics. Searches for the 545559, 651215 and 661204 coordinates did not establish coefficient-backed named materials. The rear plate retains its coordinate-compatible crown proxy separately from these six lenses. Display name now leads with iPhone 7 Wide and explicitly identifies the inferred patent correlation.
+
+## 2026-09-30 — Local-site follow-up
+
+Compared the local-site silhouette with Fig. 10 again; the source only calls Example 11 similar to that figure, so no exact-rim transfer is justified. Retained fixed f/1.8 and unavailable focus travel. Mitsubishi Gas Chemical lists EP-8000 at nd=1.661/vd=20.4, matching L6 coordinates, but supplies no usable dispersion curve on its product page (https://iupizeta.mgc.co.jp/product/). This candidate does not establish the patent polymer identity or justify coefficient coverage. Apple Inc. is already canonical.

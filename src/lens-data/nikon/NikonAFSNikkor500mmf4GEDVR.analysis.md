@@ -187,6 +187,8 @@ The rendered patent page establishes the d-line reference as 587.6 nm (¶0059). 
 
 The shared catalog supplies dispersion from these adopted HIKARI coordinate matches. No catalog-derived `nC`, `nF`, `ng`, or vendor-normal-line `dPgF` fields are stored on the elements. The table records HIKARI’s own deviation convention for reference only. They are not values printed in Example 1 and they do not prove that HIKARI supplied the production lens. This distinction matters especially for L1/L2/L5: their high Abbe number and count are consistent with Nikon's three-ED-element specification, but the production material cannot be identified from the patent coordinate alone.
 
+The diagram marks L1/L2/L5 as **inferred APD**, using the coordinate-compatible J-FKH1 catalog curve (engine-baseline ΔPgF ≈ +0.0337). This qualifies the spectral proxy and does not identify Nikon’s production melt or claim patent-measured anomalous dispersion. No catalog line indices are copied into the prescription.
+
 ## Focus Mechanism
 
 The focus status is **PUBLISHED** rather than reconstructed. Patent ¶0045 states that G2 moves toward the image side when focus changes from infinity toward a near object, and Fig. 7 supplies both variable gaps at infinity and the 5 m near state.

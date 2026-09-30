@@ -15,3 +15,7 @@ Inspected Fig. 7A at 600 dpi and the live SVG. Retained all SDs. Axially calibra
 One of seven elements has a compatible catalog curve (678553); six retain unresolved 545560/671195 material coordinates. Source paragraph 0042 permits glass or plastic, so L1's glass-family curve is only a numerical proxy. Exact-coordinate polymer/source searches did not establish reusable coefficients or Apple material identity. Rear IR plate remains separately traced.
 
 Display name now leads with iPhone 12 Wide and marketed f/1.6, and explicitly says inferred patent model; f/1.65 remains the modeled design aperture. The 7.5 mm source image circle is retained.
+
+## 2026-09-30 — Local-site follow-up
+
+Compared the local-site silhouette with Fig. 7 again, excluding mounting flanges from optical rims; retained the SDs. Fixed the aperture at the modeled f/1.65 and removed selectable aperture controls. The product f/1.6 remains distinct from the patent model. No published focus motion is available. Apple Inc. is already the canonical assignee.

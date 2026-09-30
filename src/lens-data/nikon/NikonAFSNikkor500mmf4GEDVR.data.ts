@@ -64,6 +64,7 @@ const LENS_DATA = {
     {
       id: 1,
       name: "P1",
+      diagramLabel: "P1",
       label: "Protective glass",
       type: "Protective Positive Meniscus",
       nd: 1.5168,
@@ -75,6 +76,7 @@ const LENS_DATA = {
     {
       id: 2,
       name: "L1",
+      diagramLabel: "L1",
       label: "Element 1",
       type: "Biconvex Positive",
       nd: 1.49782,
@@ -82,10 +84,13 @@ const LENS_DATA = {
       indexReference: "d",
       fl: 302.793173,
       glass: "J-FKH1 (HIKARI coordinate match; supplier unconfirmed)",
+      apd: "inferred",
+      apdNote: "ED-class spectral proxy: catalog J-FKH1 dPgF ≈ +0.0337. Not patent-measured dispersion or confirmation of the production melt.",
       },
     {
       id: 3,
       name: "L2",
+      diagramLabel: "L2",
       label: "Element 2",
       type: "Biconvex Positive",
       nd: 1.49782,
@@ -93,10 +98,13 @@ const LENS_DATA = {
       indexReference: "d",
       fl: 266.079062,
       glass: "J-FKH1 (HIKARI coordinate match; supplier unconfirmed)",
+      apd: "inferred",
+      apdNote: "ED-class spectral proxy: catalog J-FKH1 dPgF ≈ +0.0337. Not patent-measured dispersion or confirmation of the production melt.",
       },
     {
       id: 4,
       name: "L3",
+      diagramLabel: "L3",
       label: "Element 3",
       type: "Biconcave Negative",
       nd: 1.788,
@@ -108,6 +116,7 @@ const LENS_DATA = {
     {
       id: 5,
       name: "L4",
+      diagramLabel: "L4",
       label: "Element 4",
       type: "Negative Meniscus",
       nd: 1.6968,
@@ -120,6 +129,7 @@ const LENS_DATA = {
     {
       id: 6,
       name: "L5",
+      diagramLabel: "L5",
       label: "Element 5",
       type: "Positive Meniscus",
       nd: 1.49782,
@@ -127,11 +137,14 @@ const LENS_DATA = {
       indexReference: "d",
       fl: 128.141296,
       glass: "J-FKH1 (HIKARI coordinate match; supplier unconfirmed)",
+      apd: "inferred",
+      apdNote: "ED-class spectral proxy: catalog J-FKH1 dPgF ≈ +0.0337. Not patent-measured dispersion or confirmation of the production melt.",
       cemented: "C1",
     },
     {
       id: 7,
       name: "L6",
+      diagramLabel: "L6",
       label: "Element 6",
       type: "Biconcave Negative",
       nd: 1.834,
@@ -143,6 +156,7 @@ const LENS_DATA = {
     {
       id: 8,
       name: "L7",
+      diagramLabel: "L7",
       label: "Element 7",
       type: "Positive Meniscus",
       nd: 1.84666,
@@ -155,6 +169,7 @@ const LENS_DATA = {
     {
       id: 9,
       name: "L8",
+      diagramLabel: "L8",
       label: "Element 8",
       type: "Biconcave Negative",
       nd: 1.6968,
@@ -167,6 +182,7 @@ const LENS_DATA = {
     {
       id: 10,
       name: "L9",
+      diagramLabel: "L9",
       label: "Element 9",
       type: "Biconvex Positive",
       nd: 1.48749,
@@ -178,6 +194,7 @@ const LENS_DATA = {
     {
       id: 11,
       name: "L10",
+      diagramLabel: "L10",
       label: "Element 10",
       type: "Negative Meniscus",
       nd: 1.84666,
@@ -189,6 +206,7 @@ const LENS_DATA = {
     {
       id: 12,
       name: "L11",
+      diagramLabel: "L11",
       label: "Element 11",
       type: "Biconvex Positive",
       nd: 1.801,
@@ -200,6 +218,7 @@ const LENS_DATA = {
     {
       id: 13,
       name: "L12",
+      diagramLabel: "L12",
       label: "Element 12",
       type: "Negative Meniscus",
       nd: 1.801,
@@ -212,6 +231,7 @@ const LENS_DATA = {
     {
       id: 14,
       name: "L13",
+      diagramLabel: "L13",
       label: "Element 13",
       type: "Biconvex Positive",
       nd: 1.62004,
@@ -224,6 +244,7 @@ const LENS_DATA = {
     {
       id: 15,
       name: "L14",
+      diagramLabel: "L14",
       label: "Element 14",
       type: "Negative Meniscus",
       nd: 1.48749,

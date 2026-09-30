@@ -273,7 +273,7 @@ const LENS_DATA = {
 
   closeFocusM: 0.1,
   focusDescription:
-    "NO_INTERNAL_RECONSTRUCTION — Example 11 is preserved at infinity only. The required 0.10 m UI endpoint is a non-operative boundary proxy from the patent's generic <100 mm focus statement, not an Example 11 or production iPhone 7 MFD; no focus var is authored.",
+    "Example 11 is modeled at infinity only. The patent does not establish focus travel or a minimum focus distance for this example.",
 
   nominalFno: 1.8,
   fstopSeries: [1.8],

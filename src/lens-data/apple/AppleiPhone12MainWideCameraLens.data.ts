@@ -247,10 +247,11 @@ const LENS_DATA = {
 
   closeFocusM: 0.12,
   focusDescription:
-    "NO_INTERNAL_RECONSTRUCTION: Example 7 publishes infinity only. 0.12 m is a UI-only family fallback from Apple's iPhone 12 Pro Wide minimum-focus-distance example, not a published iPhone 12 Main value; no internal focus motion is modeled.",
+    "Example 7 publishes an infinity prescription only; no focus travel or minimum focus distance is established for this model.",
 
   nominalFno: 1.65,
-  fstopSeries: [1.65, 2, 2.8, 4, 5.6, 8, 11, 16],
+  maxFstop: 1.65,
+  fstopSeries: [1.65],
 
   yScFill: 0.5,
 } satisfies LensDataInput;

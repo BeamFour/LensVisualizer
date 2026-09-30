@@ -52,13 +52,10 @@ shifted vibration-reduction subgroup. (US 2017/0315337 A1, ¶0202–¶0218.)
 
 The zoom cam is not monotonic for every moving group. Relative to the wide state, the start of G2 moves +25.313 mm at
 the 135 mm station and +34.661 mm at the tele station. G3 moves +13.749 mm at the middle station but returns to
-+10.991 mm at tele, a genuine reversal between the middle and tele stations. The implemented variable-gap sum
-d7 + d15 + d18 is 43.405 mm at all three stations, leaving the stop and G4 fixed at the same axial station.
-
-The patent prints the middle-state d18 spacing as 2.127 mm. That value makes the fixed stop/G4 station 0.001 mm
-different from the wide and tele states. The model preserves the raw source value in its evidence record but implements
-2.128 mm at the middle station. The one-micrometre source-precision correction restores the fixed rear-group geometry
-required by ¶0216 and the common variable-gap sum. No other prescription spacing is corrected.
++10.991 mm at tele, a genuine reversal between the middle and tele stations. The published variable-gap sums are 43.405 / 43.404 / 43.405 mm at W/M/T.
+The source describes the stop/G4 as fixed (¶0216), but its rounded middle-state d18 = 2.127 mm
+puts that station 0.001 mm forward. The model preserves the printed value rather than adjusting
+the prescription to force exact station equality. This rounding discrepancy does not reverse any zoom travel.
 
 Source surface 25 is a plane air-to-air flare-stopper bookkeeping plane between G4A and G4B. It has no refractive power
 and is omitted from the sequential model; its 0.5000 mm spacing is added to the preceding air gap, so source surface 26
@@ -285,9 +282,11 @@ does **not** establish that Nikon used J-FKH1 itself. Likewise, L46’s J-LASFH1
 and line-data proxy, not a verified Nikon melt.
 
 No apochromatic designation is inferred from the prescription. The strongest safe conclusion is that the model contains
-several high-Abbe/partial-dispersion-sensitive coordinate classes and explicit line data sufficient for wavelength-aware
+several high-Abbe/partial-dispersion-sensitive coordinate classes and catalog curves sufficient for wavelength-aware
 tracing of the chosen catalog equivalents. Production marketing describes three ED elements, but the mapping from that
 marketing count to L13/L14/L42 remains a correlation inference rather than a source fact.
+
+The diagram marks L13/L14/L42 as **inferred APD**, using the coordinate-compatible J-FKH1 catalog curve (engine-baseline ΔPgF ≈ +0.0337). This qualifies the spectral proxy and does not identify Nikon’s production melt or claim patent-measured anomalous dispersion. No catalog line indices are copied into the prescription.
 
 ## Focus Mechanism
 

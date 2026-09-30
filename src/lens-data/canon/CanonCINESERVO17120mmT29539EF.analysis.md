@@ -88,7 +88,7 @@ D2 reverses the sign order used in D1 and has a cemented-net focal length of −
 
 nd = 1.43387, νd = 95.1. Glass: CaF2 class (supplier-neutral coordinate match). f = +310.200 mm standalone.
 
-L9 is a weak positive element in U13 with the highest Abbe number in the prescription. Its `nd/νd` coordinate is compatible with calcium-fluoride material data, and the model labels it only as a CaF2 class because the patent does not name a supplier or melt. The shared catalog supplies a calcium-fluoride spectral proxy. No `dPgF` is authored, so the model does not use this coordinate to make an anomalous-partial-dispersion or APO claim.
+L9 is a weak positive element in U13 with the highest Abbe number in the prescription. Its `nd/νd` coordinate is compatible with calcium-fluoride material data, and the model labels it only as a CaF2 class because the patent does not name a supplier or melt. The shared catalog supplies a calcium-fluoride spectral proxy. The diagram uses an inferred-APD tag for this spectral proxy; it does not establish the production material or an APO designation.
 
 ### L10 — Biconvex Positive
 
@@ -206,7 +206,7 @@ The patent supplies `nd` and `νd` rather than vendor glass names. The model use
 | 589612 class | 1.58913 | 61.1 | L20 | OHARA S-BAL35 |
 | 883408 class | 1.88300 | 40.8 | L21 | OHARA S-LAH58 |
 
-The strongest source-backed chromatic statement concerns U11 and U13 rather than individual commercial glass names. For U11, the patent constrains the ratio of average Abbe numbers of the negative and positive lenses; for U13, it constrains the reciprocal sign-family relationship. The prescription satisfies both conditions. This supports a deliberate dispersion split inside the fixed front unit, but `nd/νd` and catalog spectral proxies alone are not sufficient to characterize the complete lens as apochromatic or to attribute anomalous partial dispersion to a particular element.
+The strongest source-backed chromatic statement concerns U11 and U13 rather than individual commercial glass names. For U11, the patent constrains the ratio of average Abbe numbers of the negative and positive lenses; for U13, it constrains the reciprocal sign-family relationship. The prescription satisfies both conditions. This supports a deliberate dispersion split inside the fixed front unit, but `nd/νd` and catalog spectral proxies alone are not sufficient to characterize the complete lens as apochromatic or to confirm anomalous partial dispersion in a production element.
 
 ## Focus Mechanism
 
@@ -258,7 +258,7 @@ The front fixed unit contains the prescription's largest Abbe-number contrasts. 
 
 The executed model gives `ν13pa/ν13na = 3.37290` from the rounded prescription, inside the patent's 2.0-5.8 range and close to Table 1's 3.38. It gives `ν11na/ν11pa = 2.83429`, inside the 2.0-3.6 range and close to Table 1's 2.84. The small differences are consistent with the surface table printing `νd` to one decimal place while Table 1 evidently uses less-rounded glass data.
 
-The shared catalog curves allow more useful spectral replay than an Abbe-only model for these coordinate classes, but their evidentiary scope remains limited: they reproduce catalog classes that match the patent coordinates. They do not establish Canon's exact melts, and the absence of `dPgF` prevents a source-backed anomalous-partial-dispersion claim.
+The shared catalog curves allow more useful spectral replay than an Abbe-only model for these coordinate classes, but their evidentiary scope remains limited: they reproduce catalog classes that match the patent coordinates. They do not establish Canon's exact melts, and inferred-APD tags describe only the adopted spectral proxies. L5, L8 and L9 use S-FPL51, S-FPL53 and CaF2 curves with engine-baseline ΔPgF approximately +0.0308, +0.0502 and +0.0548, respectively. No copied catalog line indices or `dPgF` override the shared resolver.
 
 ## Conditional Expressions
 

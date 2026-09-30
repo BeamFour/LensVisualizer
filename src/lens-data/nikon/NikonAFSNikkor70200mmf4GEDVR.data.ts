@@ -9,10 +9,9 @@ import type { LensDataInput } from "../../types/optics.js";
  * inactive air-to-air flare-stopper plane and is omitted; its 0.5000 mm spacing
  * is combined with source surface 24, giving d24 = 14.8500 mm.
  *
- * Source-precision correction: the published M-state d18 = 2.127 mm is preserved
- * here as source evidence, but the implemented model uses 2.128 mm. This +0.001 mm
- * correction restores the fixed G4/stop station and the same 43.405 mm variable-gap
- * sum as W/T, consistent with the patent's fixed-rear-group description and TL table.
+ * The published middle-state d18 = 2.127 mm is retained. Its rounded spacings
+ * put the nominally fixed stop/G4 station 0.001 mm forward of the W/T station;
+ * this source-precision discrepancy is not corrected by changing the prescription.
  *
  * Focus status: NO_INTERNAL_RECONSTRUCTION. The patent publishes G1B internal focusing
  * but no close-focus numerical spacing state. closeFocusM = 1.0 m is the production
@@ -92,6 +91,8 @@ const LENS_DATA = {
       indexReference: "d",
       fl: 131.635126,
       glass: "J-FKH1 (HIKARI coordinate equivalent; supplier unconfirmed)",
+      apd: "inferred",
+      apdNote: "ED-class spectral proxy: catalog J-FKH1 dPgF ≈ +0.0337. Not patent-measured dispersion or confirmation of the production melt.",
       cemented: "D1",
     },
     {
@@ -105,6 +106,8 @@ const LENS_DATA = {
       indexReference: "d",
       fl: 159.143358,
       glass: "J-FKH1 (HIKARI coordinate equivalent; supplier unconfirmed)",
+      apd: "inferred",
+      apdNote: "ED-class spectral proxy: catalog J-FKH1 dPgF ≈ +0.0337. Not patent-measured dispersion or confirmation of the production melt.",
       },
     {
       id: 5,
@@ -219,6 +222,8 @@ const LENS_DATA = {
       indexReference: "d",
       fl: 59.001577,
       glass: "J-FKH1 (HIKARI coordinate equivalent; supplier unconfirmed)",
+      apd: "inferred",
+      apdNote: "ED-class spectral proxy: catalog J-FKH1 dPgF ≈ +0.0337. Not patent-measured dispersion or confirmation of the production melt.",
       cemented: "D5",
     },
     {
@@ -353,7 +358,7 @@ const LENS_DATA = {
   var: {
     "7": [[2.435, 2.435], [27.748, 27.748], [37.096, 37.096]],
     "15": [[25.093, 25.093], [13.529, 13.529], [1.423, 1.423]],
-    "18": [[15.877, 15.877], [2.128, 2.128], [4.886, 4.886]],
+    "18": [[15.877, 15.877], [2.127, 2.127], [4.886, 4.886]],
   },
   varLabels: [["7", "d7"], ["15", "d15"], ["18", "d18"]],
   zoomPositions: [71.4, 135, 194],
