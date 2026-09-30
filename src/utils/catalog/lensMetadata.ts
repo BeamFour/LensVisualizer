@@ -20,7 +20,7 @@ const SOCIAL_IMAGE_WIDTH = 1200;
 const SOCIAL_IMAGE_HEIGHT = 630;
 const META_DESCRIPTION_MAX_LENGTH = 160;
 
-const MAKER_PREFIXES = makerPrefixes as { prefix: string; display: string; slug: string }[];
+const MAKER_PREFIXES = makerPrefixes as { prefix: string; display: string; slug: string; kind?: "design-family" }[];
 
 export interface MakerInfo {
   display: string;
@@ -52,6 +52,11 @@ export function deriveMaker(nameOrMaker: string, makerField?: string): MakerInfo
 /** All known maker slugs, derived from MAKER_PREFIXES. */
 export function allMakerSlugs(): string[] {
   return uniqueMakerSlugs();
+}
+
+/** Browse families do not identify the organization that manufactured a lens. */
+export function isDesignFamily(slug: string): boolean {
+  return MAKER_PREFIXES.some((entry) => entry.slug === slug && entry.kind === "design-family");
 }
 
 /** Look up maker display name from slug. */
@@ -143,7 +148,9 @@ export function lensJsonLd(lens: LensData, lensKey: string): Record<string, unkn
       "@type": "Product",
       name: lens.name,
       category: "Camera Lens",
-      manufacturer: { "@type": "Organization", name: deriveMaker(lens.name, lens.maker).display },
+      ...(isDesignFamily(deriveMaker(lens.name, lens.maker).slug)
+        ? {}
+        : { manufacturer: { "@type": "Organization", name: deriveMaker(lens.name, lens.maker).display } }),
     },
   };
 }

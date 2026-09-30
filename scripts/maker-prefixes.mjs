@@ -1,5 +1,8 @@
 export const MAKER_PREFIXES = [
   { prefix: "AGFA", display: "Agfa", slug: "agfa" },
+  { prefix: "APPLE", display: "Apple", slug: "apple" },
+  // Industar is a design-family browse label; individual source models need not assert a manufacturer.
+  { prefix: "INDUSTAR", display: "Industar", slug: "industar", kind: "design-family" },
   { prefix: "CANON", display: "Canon", slug: "canon" },
   /* "CARL ZEISS JENA" must come before "CARL ZEISS" — startsWith matching is
      order-sensitive, and a Jena lens must not be caught by the generic prefix. */

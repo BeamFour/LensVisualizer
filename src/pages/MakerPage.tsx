@@ -54,7 +54,7 @@ export default function MakerPage() {
   const details = getMakerDetails(maker);
   const makerMounts = mountsForMaker(lenses);
 
-  const lensCountText = `Explore ${lenses.length} patent-derived ${displayName} lens cross-sections with ray tracing and optical analysis.`;
+  const lensCountText = `Explore ${lenses.length} source-derived ${displayName} lens cross-sections with ray tracing and optical analysis.`;
   const seoDescription = details ? `${details.summary} ${lensCountText}` : lensCountText;
 
   return (
@@ -88,7 +88,8 @@ export default function MakerPage() {
           {details && (
             <div style={{ marginBottom: "1.5rem" }}>
               <p style={{ fontSize: "0.8rem", color: t.label, marginBottom: "0.75rem" }}>
-                Est. {details.founded} · {details.headquarters} · {lenses.length} {pluralize(lenses.length, "lens")}
+                {details.founded === null ? "Design family" : `Est. ${details.founded}`} · {details.headquarters} ·{" "}
+                {lenses.length} {pluralize(lenses.length, "lens")}
               </p>
               {details.history.split("\n\n").map((paragraph, i) => (
                 <p key={i} style={{ fontSize: "0.85rem", color: t.desc, lineHeight: 1.6, marginBottom: "0.75rem" }}>
@@ -128,7 +129,7 @@ export default function MakerPage() {
                 ))
               ) : (
                 <p style={{ fontSize: "0.85rem", color: t.muted, margin: 0 }}>
-                  No patent-derived lens diagrams have been published for {displayName} yet.
+                  No source-derived lens diagrams have been published for {displayName} yet.
                 </p>
               )}
             </div>

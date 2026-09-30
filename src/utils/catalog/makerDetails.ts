@@ -37,7 +37,8 @@
  */
 
 export interface MakerDetails {
-  founded: number;
+  /** Null for a design-family browse group with no corporate founding date. */
+  founded: number | null;
   headquarters: string;
   summary: string;
   history: string;
@@ -45,6 +46,28 @@ export interface MakerDetails {
 }
 
 export const MAKER_DETAILS: Record<string, MakerDetails> = {
+  // https://www.apple.com/sg/newsroom/2026/03/apple-to-celebrate-50-years-of-thinking-different/
+  // https://support.apple.com/en-gb/111943 and https://support.apple.com/en-us/111876
+  apple: {
+    founded: 1976,
+    headquarters: "Cupertino, California, United States",
+    summary:
+      "Consumer-electronics company whose iPhone camera systems combine compact multi-element optics, image stabilization and computational photography.",
+    history:
+      "Apple was founded in 1976. Its iPhone 7 camera pairs a six-element f/1.8 lens with optical image stabilization; the iPhone 12 Wide camera uses a seven-element f/1.6 lens. Those published specifications provide context for the compact aspheric patent models in this catalog.\n\nUS 2016/0341934 A1 names Romeo I. Mercado and Apple Inc.; US 2018/0364457 A1 names Yuhong Yao, Yoshikazu Shinohara and Lin-Yao Liao with Apple Inc. as applicant. Their associations with the iPhone 7 and iPhone 12 are inferred optical correlations, not Apple-confirmed production prescriptions. Apple branding and patent ownership do not identify the lens-element or camera-module supplier.",
+    notableDesigns:
+      "iPhone 7 Wide camera; iPhone 12 Wide camera; compact six- and seven-element aspheric patent models",
+  },
+  // Exact source: https://books.ifmo.ru/file/pdf/1465.pdf, pp.50–51.
+  industar: {
+    founded: null,
+    headquarters: "Manufacturer not established for this source model",
+    summary:
+      "Design-family browse group for the Industar teaching prescription in A. N. Ivanov’s 2013 ITMO text; not a corporate manufacturer attribution.",
+    history:
+      "The catalog’s Industar is Appendix 1.2, Variant 2 of A. N. Ivanov’s 2013 ITMO teaching text. It has four elements in three groups, a 52.39 mm source focal length, an 11.8 mm diaphragm, and published clear diameters of 16 mm at the front element and 14 mm at the remaining elements.\n\nThe book names TK14, LF5 and OF1 glass grades. The model qualifies its modern catalog dispersion proxies and preserves the published geometry. Its resemblance to the Industar-50 family does not establish a production Industar-50 or Industar-50-2 prescription. Ivanov is the source author and ITMO the publisher; neither is asserted as the original lens designer or manufacturer. Industar is grouped here as a design family, with no company founding date, headquarters or production mount inferred.",
+    notableDesigns: "Industar 52.39mm f/3.56 — ITMO 2013 Appendix 1.2, Variant 2",
+  },
   // French Ministry of Culture inventory: https://pop.culture.gouv.fr/notice/palissy/IM25001882
   // Tegea designs: US 3,037,426 and Kinoptik product literature cited in the lens analyses.
   kinoptik: {

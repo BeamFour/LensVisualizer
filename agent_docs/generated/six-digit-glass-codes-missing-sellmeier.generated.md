@@ -9,12 +9,12 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 ## Summary
 
-- **840** lenses scanned
-- **1869** total code-only elements found
-- **335** elements in this report
-- **124** distinct lens files affected
+- **846** lenses scanned
+- **1876** total code-only elements found
+- **341** elements in this report
+- **125** distinct lens files affected
 - **23** active unreviewed elements have no review-record hit or explicit disposition
-- **179** explicitly unmatched/unknown/proprietary/unidentified elements are self-recording review dispositions
+- **185** explicitly unmatched/unknown/proprietary/unidentified elements are self-recording review dispositions
 - **0** dispositions lack any review record
 
 ## Prioritized Unreviewed Queue
@@ -55,6 +55,7 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 493836 | 9 | 4 | patents/JPA 1996327896-000000.pdf<br>patents/JP2004109559A.pdf<br>patents/JPA 1989039542-000000.pdf | All rows have review records |
 | 847238 | 5 | 3 | patents/CN211826699U.pdf<br>patents/CN211955966U.pdf<br>patents/CN114755806A.pdf | All rows explicitly disposed |
 | 531559 | 4 | 3 | patents/US20200142167A1.pdf<br>patents/US20230213739A1.pdf<br>patents/WO2021039813A1.pdf | All rows have review records |
+| 545560 | 4 | 1 | patents/US20180364457A1.pdf | All rows explicitly disposed |
 | 662561 | 4 | 1 | patents/GB_850117_A.pdf | All rows have review records |
 | 835427 | 4 | 3 | patents/JP2015166834A.pdf<br>patents/CN114755806A.pdf | All rows explicitly disposed |
 | 863252 | 4 | 2 | patents/WO2021199923A1.pdf<br>patents/WO_2025263124_A1.pdf | All rows have review records |
@@ -75,6 +76,7 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 627376 | 2 | 2 | patents/WO2019131993A1.pdf | All rows have review records |
 | 633315 | 2 | 2 | patents/WO2019131993A1.pdf | All rows have review records |
 | 661204 | 2 | 1 | patents/US20210149156A1.pdf | All rows explicitly disposed |
+| 671195 | 2 | 1 | patents/US20180364457A1.pdf | All rows explicitly disposed |
 | 680557 | 2 | 1 | patents/JPB 1963011590-000000.pdf | No review-record hit |
 | 681320 | 2 | 2 | patents/US3037426.pdf | All rows explicitly disposed |
 | 682419 | 2 | 1 | patents/DE_1157000_B.pdf | No review-record hit |
@@ -315,6 +317,17 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
 |---|---|---|---|---|---|---|---|
 | L3 (Element 3) | 4 | `Unmatched (540/509 crown-flint-boundary glass; no public catalog match located)` | 1.54041 / 50.90 | No catalog entry | abbe | patents/GB_775944_A.pdf | Explicit disposition in data |
+
+### [APPLE iPhone 12 Wide 4.36mm f/1.6 (inferred patent model)](../../src/lens-data/apple/AppleiPhone12MainWideCameraLens.data.ts) - US 2018/0364457 A1
+
+| Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
+|---|---|---|---|---|---|---|---|
+| L2 (Element 2) | 4A | `Unmatched (545560 patent material coordinate)` | 1.54500 / 56.00 | No catalog entry | abbe | patents/US20180364457A1.pdf | Explicit disposition in data |
+| L3 (Element 3) | 6A | `Unmatched (671195 patent material coordinate)` | 1.67100 / 19.50 | No catalog entry | abbe | patents/US20180364457A1.pdf | Explicit disposition in data |
+| L4 (Element 4) | 8A | `Unmatched (545560 patent material coordinate)` | 1.54500 / 56.00 | No catalog entry | abbe | patents/US20180364457A1.pdf | Explicit disposition in data |
+| L5 (Element 5) | 10A | `Unmatched (671195 patent material coordinate)` | 1.67100 / 19.50 | No catalog entry | abbe | patents/US20180364457A1.pdf | Explicit disposition in data |
+| L6 (Element 6) | 12A | `Unmatched (545560 patent material coordinate)` | 1.54500 / 56.00 | No catalog entry | abbe | patents/US20180364457A1.pdf | Explicit disposition in data |
+| L7 (Element 7) | 14A | `Unmatched (545560 patent material coordinate)` | 1.54500 / 56.00 | No catalog entry | abbe | patents/US20180364457A1.pdf | Explicit disposition in data |
 
 ### [CANON EF-M 18-55mm f/3.5-5.6 IS STM](../../src/lens-data/canon/CanonEFM1855mmf3556ISSTM.data.ts) - US 2013/0335830 A1
 

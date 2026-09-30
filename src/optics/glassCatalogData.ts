@@ -625,6 +625,12 @@ const GLASS_CATALOG_SOURCE_ORDER = [
   "J-KF6",
   "J-LAK9",
   "F13",
+  "J-PSK02",
+  "J-SK5",
+  "J-LAF3",
+  "J-LASF05",
+  "J-LASF010",
+  "J-LASFH17",
 ] as const;
 
 const GLASS_CATALOG_ENTRIES_BY_NAME: ReadonlyMap<string, GlassEntry> = new Map(
@@ -647,6 +653,9 @@ const GLASS_CATALOG_ENTRIES_BY_NAME: ReadonlyMap<string, GlassEntry> = new Map(
  * resolver uses these explicit winners before adding non-duplicate code lookups.
  */
 export const DUPLICATE_CODE6_PRECEDENCE: ReadonlyMap<string, string> = new Map([
+  ["618633", "S-PHM52Q"],
+  ["717480", "LAF3"],
+  ["834372", "S-LAH60"],
   ["501564", "K10"],
   ["497815", "MC-FCD1-M20"],
   ["911353", "TAFD35"],
