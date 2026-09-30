@@ -6,7 +6,7 @@
 **Filed:** January 15, 2009  
 **Published:** July 30, 2009  
 **Inventor:** Takashi Suzuki  
-**Assignee:** None named on the supplied US publication  
+**Assignee:** Fujinon Corporation — same-application assignment history; none printed on the supplied US publication\
 **Title:** *Lens Having Vibration Proof Function and Imaging Apparatus*  
 **Embodiment analyzed:** Example 1, corresponding to Figs. 1, 6, and 7
 
@@ -21,7 +21,9 @@ The production correlation to the **Nikon AF-S NIKKOR 500mm f/4G ED VR** is an o
 5. The patent focuses by translating G2 internally, consistent with Nikon's IF specification.
 6. The patent stabilizes by laterally shifting an internal lens group, consistent with Nikon's VCM lens-shift VR description.
 
-Several limits prevent treating that correlation as a direct Nikon attribution. Nikon's product history places the production lens in 2007, before the patent's January 2008 priority date, and Nikon specifies a 4.0 m AF / 3.85 m MF minimum focus distance whereas the patent publishes only an infinity state and a 5 m near state. The supplied US publication names no assignee or applicant on its front page. In addition, the Google Patents record reports Fujinon Corporation as the original assignee and records a January 2009 assignment from Takashi Suzuki. That secondary assignment metadata is not used to rewrite the structured fields from the supplied publication, but it is a material provenance caution against implying Nikon ownership of the patent.
+Several limits prevent treating that correlation as a direct Nikon attribution. Nikon's product history places the production lens in 2007, before the patent's January 2008 priority date, and Nikon specifies a 4.0 m AF / 3.85 m MF minimum focus distance whereas the patent publishes only an infinity state and a 5 m near state. The supplied US publication names no assignee or applicant on its front page. The [Google Patents record](https://patents.google.com/patent/US20090190239A1/en) for the same application, **12/354,321**, reports an assignment from Takashi Suzuki to **Fujinon Corporation**, effective **January 7, 2009**, recorded **January 22, 2009**, at **reel/frame 022139/0546**. This recorded assignment predates the July 30, 2009 publication and supports the structured `patentAssignees` field under the same-application assignment policy. The underlying USPTO assignment instrument was not independently inspected. The Nikon catalog identity remains a production correlation; this assignment does not establish Nikon patent ownership or a Fujinon manufacturing/licensing relationship with Nikon.
+
+Two external catalogs also make the production correlation: [Photons to Photos — Optical Bench Hub](https://www.photonstophotos.net/GeneralTopics/Lenses/OpticalBench/OpticalBenchHub.htm) lists the Nikon lens against **US20090190239, Example01P**, and [Camera Gossip — Nikon Lens Patent Database](https://cameragossip.github.io/nikon-lens-patents.html) lists **US 2009-0190239** with an explicit Fujinon ownership note. Both qualify patent-to-production matches; Camera Gossip also references Photons to Photos, so these are not established independent confirmations.
 
 ## Optical Architecture
 
@@ -264,4 +266,6 @@ Those geometry checks are portable exact spherical checks of this authored model
 2. **Nikon**, “AF-S NIKKOR 500mm f/4G ED VR — specifications,” used for F-mount identity, 500 mm f/4 marketing values, 14-elements/11-groups plus protective-glass construction, three ED elements, FX/35 mm angle of view, IF mechanism, VR mechanism, and production minimum-focus distances: <https://nij.nikon.com/products/lineup/nikkor/fmount/af-s_nikkor_500mm_f4g_ed_vr/spec.html>.
 3. **Nikon**, “Our Product History: 2000s,” used for the production-history timing caveat: <https://imaging.nikon.com/imaging/information/products_history/2000/>.
 4. **HIKARI Optical Glass Co., Ltd.**, current optical-glass catalog and data sheets used for the adopted coordinate-match `nC`, `nF`, `ng`, and `dPgF` values: <https://www.hikari-g.co.jp/optical_glass/catalog/document/HIKARI_Catalog.pdf>. The current catalog gives J-F2 `ΔPgF = +0.0024` under its own normal-line convention; it is not copied into L13 as runtime `dPgF`. The HIKARI labels are catalog matches only; the patent and Nikon product specification do not establish HIKARI as production supplier.
-5. **Google Patents**, US20090190239A1 record, used only for the secondary assignment/provenance caveat reporting Fujinon Corporation; the supplied US publication remains the transcription and structured-attribution authority: <https://patents.google.com/patent/US20090190239A1/en>.
+5. **Google Patents**, US20090190239A1 record, used for the same-application assignment to Fujinon Corporation, effective January 7, 2009, recorded January 22, 2009, reel/frame 022139/0546; the supplied US publication remains the prescription transcription authority: <https://patents.google.com/patent/US20090190239A1/en>.
+6. **Photons to Photos**, Optical Bench Hub, Nikon AF-S Nikkor 500mm f/4G ED VR row linked to US20090190239, Example01P; third-party production correlation: <https://www.photonstophotos.net/GeneralTopics/Lenses/OpticalBench/OpticalBenchHub.htm>.
+7. **Camera Gossip**, Nikon Lens Patent Database, Nikon AF-S NIKKOR 500mm f/4G ED VR row linked to US 2009-0190239 with a Fujinon ownership note; third-party production correlation: <https://cameragossip.github.io/nikon-lens-patents.html>.

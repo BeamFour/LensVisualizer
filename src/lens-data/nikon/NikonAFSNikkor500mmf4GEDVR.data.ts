@@ -5,7 +5,8 @@ import type { LensDataInput } from "../../types/optics.js";
  *
  * Source prescription: US 2009/0190239 A1, Example 1 (Figs. 6-7), unscaled.
  * The optical-specification correlation to Nikon's production lens is substantial but not manufacturer-confirmed;
- * the source publication names Takashi Suzuki and no assignee/applicant.
+ * the source publication names Takashi Suzuki and no assignee/applicant. Same-application
+ * assignment history identifies Fujinon Corporation (recorded 2009-01-22, effective 2009-01-07).
  *
  * Model: 15 physical glass elements / 12 air-spaced groups when the front protective meniscus
  * is counted; this corresponds to Nikon's 14 elements / 11 groups plus one protective glass.
@@ -55,7 +56,9 @@ const LENS_DATA = {
   imageFormat: "135-full-frame",
   patentNumber: "US 2009/0190239 A1",
   patentAuthors: ["Takashi Suzuki"],
-  patentAssignees: [],
+  // Application 12/354,321 assignment to Fujinon, reel/frame 022139/0546, recorded before publication.
+  // https://patents.google.com/patent/US20090190239A1/en (not printed on the A1 front page).
+  patentAssignees: ["Fujinon Corporation"],
   patentYear: 2009,
   elementCount: 15,
   groupCount: 12,
