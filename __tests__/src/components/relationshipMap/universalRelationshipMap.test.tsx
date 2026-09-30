@@ -70,6 +70,9 @@ const graph: UniversalRelationshipGraph = {
   patents: [],
   components: [["family:example", assignee.id, author.id, "patent:US 1"]],
   stats: {
+    makers: 0,
+    lenses: 0,
+    catalogRelationships: 0,
     authors: 1,
     assignees: 1,
     patents: 1,
@@ -139,6 +142,9 @@ function makeMultiHubGraph(): UniversalRelationshipGraph {
     patents: [],
     components: [nodes.map((node) => node.id)],
     stats: {
+      makers: 0,
+      lenses: 0,
+      catalogRelationships: 0,
       authors: 1,
       assignees: 2,
       patents: 16,
@@ -152,6 +158,74 @@ function makeMultiHubGraph(): UniversalRelationshipGraph {
 }
 
 describe("UniversalRelationshipMap", () => {
+  it("renders catalog maker/model links and exposes model navigation without patent claims", () => {
+    const maker = { id: "maker:book", kind: "maker", name: "Book Optics", slug: "book" } as const;
+    const lens = {
+      id: "lens:book",
+      kind: "lens",
+      name: "Book Model",
+      lens: { key: "book", name: "Book Model" },
+    } as const;
+    const catalogGraph: UniversalRelationshipGraph = {
+      nodes: [maker, lens],
+      edges: [{ id: "catalog", from: lens.id, to: maker.id, kind: "catalog-maker" }],
+      patents: [],
+      components: [[maker.id, lens.id]],
+      stats: {
+        authors: 0,
+        assignees: 0,
+        patents: 0,
+        organizations: 0,
+        families: 0,
+        patentRelationships: 0,
+        corporateRelationships: 0,
+        makers: 1,
+        lenses: 1,
+        catalogRelationships: 1,
+        components: 1,
+      },
+    };
+    const select = vi.fn();
+    const { container, getByRole, unmount } = renderWithRouter(
+      <>
+        <UniversalRelationshipMap
+          graph={catalogGraph}
+          theme={themes.dark}
+          selectedNodeId={maker.id}
+          onSelectNode={select}
+        />
+        <UniversalEntityDetailCard
+          graph={catalogGraph}
+          node={maker}
+          theme={themes.dark}
+          onClose={vi.fn()}
+          onSelectNode={select}
+        />
+      </>,
+    );
+    expect(container.querySelector("line title")?.textContent).toBe(
+      "Book Model grouped under catalog maker Book Optics",
+    );
+    expect(getByRole("link", { name: "Open maker page →" }).getAttribute("href")).toBe("/makers/book/");
+    fireEvent.click(getByRole("button", { name: /^Book Model$/ }));
+    expect(select).toHaveBeenCalledWith(lens.id, true);
+    fireEvent.click(getByRole("button", { name: "Select lens model Book Model" }));
+    expect(select).toHaveBeenCalledWith(lens.id);
+    unmount();
+    const modelCard = renderWithRouter(
+      <UniversalEntityDetailCard
+        graph={catalogGraph}
+        node={lens}
+        theme={themes.dark}
+        onClose={vi.fn()}
+        onSelectNode={select}
+      />,
+    );
+    expect(modelCard.getByRole("link", { name: "Open lens model →" }).getAttribute("href")).toBe("/lens/book/");
+    expect(modelCard.queryByText("Related patents")).toBeNull();
+    expect(modelCard.getByText("non-patent catalog model")).toBeDefined();
+  });
+
   it("defers focus until measured and moves the overview below narrow viewports", () => {
     const observer = installResizeObserverMock();
     let width = 0;

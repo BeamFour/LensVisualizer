@@ -6,9 +6,12 @@
 **Filed:** 2006-02-15 — PCT/JP2006/302662  
 **Published:** 2008-09-11  
 **Inventors:** Daisuke Kuroda; Masafumi Sueyoshi; Kazuya Watanabe  
-**Assignee on the supplied US publication:** none printed  
+**Assignee on the supplied US publication:** none printed<br>
+**Assignees (assignment record):** Sony Corporation; Tamron Co., Ltd.<br>
 **Embodiment analyzed:** Example 1, Figures 1–4 and Tables 1–3  
 **Production correlation:** Carl Zeiss Vario-Sonnar T* 14.3–71.5 mm f/2.8–4.8 in the Sony Cyber-shot DSC-R1; strong correlation, not manufacturer confirmation that Example 1 is the exact production prescription
+
+The local A1 front page does not print an organizational assignee. The [same-application assignment history](https://patents.google.com/patent/US20080218875A1/en) for US 11/885,365 reports assignment to **Sony Corporation and Tamron Co., Ltd. jointly**, recorded **2007-08-30**, signing dates 2007-07-11 through 2007-08-01, reel/frame **019796/0850**. This record predates the A1 publication and supports the structured `patentAssignees` attribution. The printed applicant/inventor remains distinct from this assignment evidence; the underlying assignment instrument has not been independently inspected. Patent attribution does not establish the exact production prescription or manufacturing identity.
 
 The implemented prescription is the first numerical example of US 2008/0218875 A1. The patent describes a six-functional-group zoom with refractive-power sequence positive–negative–positive–negative–positive–negative, with the fourth group used for focusing. Figure 1 shows those six moving groups, the iris within the third-group region, the sixth group adjacent to the rear filter stack, and the final image plane. The numerical prescription is given in Tables 1–3. (US 2008/0218875 A1, Fig. 1; ¶¶0030, 0054–0061; PDF pp. 2, 18–19.)
 
@@ -18,7 +21,7 @@ The selected production correlation is supported by several converging facts, bu
 2. Sony specifies **three aspherical lenses plus one double-sided aspherical lens**. Example 1 contains four physical lenses with aspheric surfaces: G3, G5, G7, and G9; G9 is aspheric on both faces. This yields five aspheric surfaces in the numerical prescription. (Sony DSC-R1 archived specifications; US 2008/0218875 A1, Tables 1 and 3.)
 3. The patent design spans 14.71–69.8725 mm at published FNo 2.8501–5.0545, while Sony markets the production lens as 14.3–71.5 mm f/2.8–4.8. These are close but not identical, and the two endpoint focal lengths do not admit one uniform scale factor. The data therefore preserves the patent prescription unscaled and stores marketed and design values separately. (US 2008/0218875 A1, Table 2; Sony DSC-R1 specifications.)
 4. The patent expressly targets a compact integrated-lens digital still camera with high-speed autofocus, while the DSC-R1 is a fixed-lens digital camera. The patent priority date, 2005-03-11, also precedes Sony’s 2005-09-13 DSC-R1 announcement. (US 2008/0218875 A1, ¶¶0003, 0009–0014; Sony press release, 2005-09-13.)
-5. External bibliographic and assignment records associate this patent family with Sony Corporation and Tamron Co., Ltd. The supplied US A1 front page itself does not print an assignee, so the structured `patentAssignees` field remains empty rather than converting later bibliographic evidence into a source-publication assertion.
+5. The same-application assignment recorded on 2007-08-30 names Sony Corporation and Tamron Co., Ltd. jointly. This is patent-assignee evidence; it does not establish ZEISS ownership or an exact production-prescription mapping.
 
 Sony’s production specifications give a 21.5 × 14.4 mm CMOS sensor. The LensVisualizer record maps that camera to the project’s canonical `aps-c` taxonomy class, but the taxonomy’s nominal APS-C dimensions are not presented as the DSC-R1’s exact sensor dimensions. Sony also gives 14.3–71.5 mm, f/2.8–4.8, and macro focus limits of approximately 0.35 m at wide and 0.40 m at tele. Those manufacturer values remain separate from the patent design quantities and do not define an unprinted Example 1 focus state.
 

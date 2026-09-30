@@ -20,6 +20,11 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-09-30",
+    type: "fix",
+    summary: "Updated patent assignments across the lens catalog",
+  },
+  {
+    date: "2026-09-30",
     type: "lens",
     summary: "Added Nikon AF-S NIKKOR 500mm f/4G ED VR and 70–200mm f/4G ED VR",
   },

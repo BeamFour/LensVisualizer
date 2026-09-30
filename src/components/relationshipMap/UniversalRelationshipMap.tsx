@@ -25,6 +25,7 @@ import type {
   UniversalRelationshipEdge,
   UniversalRelationshipGraph,
 } from "../../utils/catalog/universalRelationshipGraph.js";
+import { isUniversalCorporateEdge } from "../../utils/catalog/universalRelationshipGraph.js";
 import { pluralize } from "../../utils/text.js";
 import { toggleBtn } from "../../utils/style/styles.js";
 import useViewBoxZoom from "../hooks/useViewBoxZoom.js";
@@ -58,6 +59,8 @@ function polygonPoints(cx: number, cy: number, radius: number, sides: number, ro
 
 function nodeRoleLabel(kind: UniversalNodeKind): string {
   if (kind === "author") return "inventor";
+  if (kind === "maker") return "catalog maker";
+  if (kind === "lens") return "lens model";
   if (kind === "family") return "corporate family";
   if (kind === "organization") return "external organization";
   return kind;
@@ -67,6 +70,7 @@ function edgeStroke(theme: Theme, kind: UniversalEdgeKind): string {
   if (kind === "authorship") return theme.rayWarm;
   if (kind === "assignment") return theme.rayCool;
   if (kind === "family") return theme.sliderAccent;
+  if (kind === "catalog-maker") return theme.imgLine;
   if (kind === "successor") return theme.imgLine;
   if (kind === "acquisition") return theme.stop;
   return theme.pupilExit;
@@ -74,6 +78,7 @@ function edgeStroke(theme: Theme, kind: UniversalEdgeKind): string {
 
 function edgeDash(kind: UniversalEdgeKind): string | undefined {
   if (kind === "family") return "2 3";
+  if (kind === "catalog-maker") return "1 3";
   if (kind === "successor") return "7 3";
   if (kind === "subsidiary") return "3 3";
   return undefined;
@@ -85,6 +90,7 @@ function relationshipTitle(edge: UniversalRelationshipEdge, nodeNames: ReadonlyM
   const date = edge.effectiveDate ?? edge.effectiveFrom;
   const end = edge.effectiveTo ? `–${edge.effectiveTo}` : "";
   const when = date ? ` (${date}${end})` : "";
+  if (edge.kind === "catalog-maker") return `${from} grouped under catalog maker ${to}`;
   if (edge.kind === "authorship") return `${to} named on ${from}`;
   if (edge.kind === "assignment") return `${from} assigned to ${to}`;
   if (edge.kind === "successor") return `${from} succeeded ${to}${when}`;
@@ -171,7 +177,7 @@ export default function UniversalRelationshipMap({
   )}, ${graph.stats.authors} ${pluralize(graph.stats.authors, "inventor")}, ${graph.stats.assignees} ${pluralize(
     graph.stats.assignees,
     "assignee",
-  )}, and ${graph.stats.components} connected ${pluralize(graph.stats.components, "component")}`;
+  )}${graph.stats.lenses ? `, ${graph.stats.lenses} non-patent models` : ""}, and ${graph.stats.components} connected ${pluralize(graph.stats.components, "component")}`;
 
   const legendItemStyle: CSSProperties = { display: "flex", alignItems: "center", gap: 6 };
   const overview = (
@@ -339,7 +345,7 @@ export default function UniversalRelationshipMap({
             const edge = graphEdgeById.get(layoutEdge.id);
             if (!edge) return null;
             const active = edge.from === activeNodeId || edge.to === activeNodeId;
-            const corporate = edge.kind !== "authorship" && edge.kind !== "assignment";
+            const corporate = isUniversalCorporateEdge(edge.kind);
             return (
               <line
                 key={edge.id}
@@ -374,11 +380,13 @@ export default function UniversalRelationshipMap({
                 ? t.rayWarm
                 : node.kind === "assignee"
                   ? t.rayCool
-                  : node.kind === "patent"
-                    ? t.stop
-                    : node.kind === "family"
-                      ? t.sliderAccent
-                      : t.pupilExit;
+                  : node.kind === "lens"
+                    ? t.imgLine
+                    : node.kind === "patent"
+                      ? t.stop
+                      : node.kind === "family"
+                        ? t.sliderAccent
+                        : t.pupilExit;
             const activate = () => onSelectNode(selected ? null : node.id);
 
             return (
@@ -402,7 +410,7 @@ export default function UniversalRelationshipMap({
                 }}
               >
                 <title>{node.name}</title>
-                {node.kind === "assignee" ? (
+                {node.kind === "assignee" || node.kind === "maker" ? (
                   <rect
                     x={layoutNode.x - layoutNode.r}
                     y={layoutNode.y - layoutNode.r}
@@ -413,9 +421,15 @@ export default function UniversalRelationshipMap({
                     stroke={stroke}
                     strokeWidth={strokeWidth}
                   />
-                ) : node.kind === "organization" ? (
+                ) : node.kind === "organization" || node.kind === "lens" ? (
                   <polygon
-                    points={polygonPoints(layoutNode.x, layoutNode.y, layoutNode.r, 4, Math.PI / 4)}
+                    points={polygonPoints(
+                      layoutNode.x,
+                      layoutNode.y,
+                      layoutNode.r,
+                      4,
+                      node.kind === "lens" ? 0 : Math.PI / 4,
+                    )}
                     fill={t.panelBg}
                     stroke={stroke}
                     strokeWidth={strokeWidth}
@@ -484,6 +498,17 @@ export default function UniversalRelationshipMap({
         <span style={legendItemStyle}>
           <span style={legendSwatch(t.sliderAccent, "hexagon")} /> Corporate family
         </span>
+        {graph.stats.lenses > 0 && (
+          <>
+            <span style={legendItemStyle}>
+              <span style={legendSwatch(t.pupilExit, "square")} /> Catalog maker
+            </span>
+            <span style={legendItemStyle}>
+              <span style={legendSwatch(t.imgLine, "diamond")} /> Non-patent model
+            </span>
+            <span style={legendItemStyle}>Dotted links · catalog maker grouping</span>
+          </>
+        )}
         <span style={legendItemStyle}>Solid/dashed colored links · corporate history</span>
         <span style={legendItemStyle}>Soft halos · hub neighborhoods</span>
       </div>

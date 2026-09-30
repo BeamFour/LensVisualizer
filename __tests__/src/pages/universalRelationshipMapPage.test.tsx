@@ -146,7 +146,7 @@ describe("UniversalRelationshipMapPage", () => {
     router.dispose();
   });
 
-  it.each(["author", "assignee", "patent", "organization", "family"] as const)(
+  it.each(["author", "assignee", "patent", "organization", "family", "maker", "lens"] as const)(
     "restores shared %s selection and requests focus after mounting",
     async (kind) => {
       const node = buildUniversalRelationshipGraph().nodes.find((n) => n.kind === kind)!;

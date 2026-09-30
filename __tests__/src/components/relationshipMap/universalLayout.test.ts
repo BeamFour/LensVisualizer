@@ -37,6 +37,9 @@ function makeGraph(nodes: UniversalRelationshipNode[], edgePairs: Array<[string,
     components,
     patents: [],
     stats: {
+      makers: 0,
+      lenses: 0,
+      catalogRelationships: 0,
       authors: nodes.filter((node) => node.kind === "author").length,
       assignees: nodes.filter((node) => node.kind === "assignee").length,
       patents: nodes.filter((node) => node.kind === "patent").length,
@@ -184,6 +187,32 @@ describe("layoutUniversalRelationshipGraph", () => {
     expect(layout.clusters).toHaveLength(2);
     expect(new Set(layout.clusters.map((cluster) => cluster.anchorId))).toEqual(new Set([alpha.id, beta.id]));
     expect(layout.nodeById[alpha.id].clusterId).not.toBe(layout.nodeById[beta.id].clusterId);
+    expect(halosOverlap(layout.clusters[0], layout.clusters[1])).toBe(false);
+  });
+
+  it.each([1, 6, 8])("keeps a %i-patent assignee separate when an inventor bridges a larger family", (count) => {
+    const family = corporateNode("family:large", "Large family");
+    const large = partyNode("assignee:large", "Large Optics", "assignee");
+    const small = partyNode("assignee:small", "Independent Optics", "assignee");
+    const author = partyNode("author:bridge", "Shared Inventor", "author");
+    const largePatents = Array.from({ length: 10 }, (_, index) => patentNode(index + 1, "LG"));
+    const smallPatents = Array.from({ length: count }, (_, index) => patentNode(index + 1, "SM"));
+    const graph = makeGraph(
+      [family, large, small, author, ...largePatents, ...smallPatents],
+      [
+        [large.id, family.id],
+        ...largePatents.map((patent) => [patent.id, large.id] satisfies [string, string]),
+        ...smallPatents.map((patent) => [patent.id, small.id] satisfies [string, string]),
+        [largePatents[0].id, author.id],
+        [smallPatents[0].id, author.id],
+      ],
+    );
+    const layout = layoutUniversalRelationshipGraph(graph);
+    expect(layout.components).toHaveLength(1);
+    expect(layout.nodeById[small.id].clusterId).toBe(`cluster:${small.id}`);
+    expect(layout.nodeById[large.id].clusterId).toBe(`cluster:${family.id}`);
+    for (const patent of smallPatents) expect(layout.nodeById[patent.id].clusterId).toBe(`cluster:${small.id}`);
+    expect(layout.edges).toHaveLength(graph.edges.length);
     expect(halosOverlap(layout.clusters[0], layout.clusters[1])).toBe(false);
   });
 
@@ -342,6 +371,21 @@ describe("layoutUniversalRelationshipGraph", () => {
       expect(node.y + node.r).toBeLessThanOrEqual(cluster.y + cluster.height);
     }
     expect(halosOverlap(layout.clusters[0], layout.clusters[1])).toBe(false);
+  });
+
+  it("positions every catalog node once and retains every graph edge", () => {
+    const graph = buildUniversalRelationshipGraph();
+    const layout = layoutUniversalRelationshipGraph(graph);
+    expect(layout.nodes).toHaveLength(graph.nodes.length);
+    expect(new Set(layout.nodes.map((node) => node.id)).size).toBe(graph.nodes.length);
+    expect(layout.edges).toHaveLength(graph.edges.length);
+    for (const maker of graph.nodes.filter((node) => node.kind === "maker")) {
+      const cluster = layout.clusters.find((entry) => entry.anchorId === maker.id)!;
+      expect(cluster).toBeDefined();
+      for (const edge of graph.edges.filter((entry) => entry.kind === "catalog-maker" && entry.to === maker.id)) {
+        expect(layout.nodeById[edge.from].clusterId).toBe(cluster.id);
+      }
+    }
   });
 
   it("breaks the live Nikon-centered network into hubs and multiple patent bands", () => {

@@ -138,7 +138,7 @@ Keep it normalized even when the product's official styling varies by source:
 | `imageFormat` | `ImageFormatId` | | Single canonical image-circle/format id, e.g. `"135-full-frame"`, `"aps-c"`, or `"110"`. Required for normalized fixed-sensor perspective field sampling. |
 | `patentNumber` | `string` | | Source patent publication or grant identifier, including jurisdiction and kind code when the source publishes one (e.g. `"US 10,571,651 B2"`). Do not include an example, embodiment, table, or figure label. |
 | `patentAuthors` | `string[]` | | Inventors named by the source patent, in source order. Use one complete personal name per entry. An empty array means the patent names no individual inventor. |
-| `patentAssignees` | `string[]` | | Organizational assignees named by the source patent, or organizational applicants when that jurisdiction publishes applicants rather than assignees. Use one canonical display name for each historical legal entity. An empty array means the patent names no organizational assignee or applicant. |
+| `patentAssignees` | `string[]` | | Organizational assignees named by the source patent, or organizational applicants when that jurisdiction publishes applicants rather than assignees. Use one canonical display name for each historical legal entity. When the front page omits the organization, a verified same-application assignment predating publication may supply the assignee; document its source and dates in the analysis/audit. An empty array means no organizational attribution is supported by these sources. |
 | `patentYear` | `number` | | Year the patent was published or granted (e.g. `2019`). |
 | `elementCount` | `number` | | Total number of glass elements in the design. |
 | `groupCount` | `number` | | Total number of air-separated groups in the design. |
@@ -245,10 +245,16 @@ patentAssignees: ["Canon Inc."],
   for that entity throughout the corpus. Omit locations, translated-name duplicates, and source-database artifacts.
   Preserve distinct historical legal entities, subsidiaries, and reorganized companies instead of merging them into the
   current product maker or a modern successor.
+- If the selected front page omits an organization, `patentAssignees` may use assignment history for the **same application**,
+  provided the assignment predates the selected publication. Document the source URL, assignment dates, and front-page
+  omission in the analysis/audit, and clarify the evidence in a data comment. Do not infer ownership from the lens maker,
+  a database's current-owner field, or an undated family association.
 - `patentAssignees` lists organizations only. When the source names a person as applicant or patent holder, including
-  inventor-applicant publications, use `patentAssignees: []`; the person is already credited through `patentAuthors`.
+  inventor-applicant publications, keep the person in `patentAuthors`; use `patentAssignees: []` unless the documented
+  same-application assignment evidence above identifies an organization.
 - Empty arrays are meaningful source statements, not placeholders for unfinished research: use `patentAuthors: []` only
-  when the source names no individual inventor, and `patentAssignees: []` only when it identifies no organizational assignee or applicant.
+  when the source names no individual inventor, and `patentAssignees: []` when neither the source publication nor the
+  documented assignment evidence above identifies an organizational assignee or applicant.
 - Do not add filing dates, priority numbers, attorneys, agents, examiners, translators, or current patent owners to these
   fields. `patentYear` remains the year of the source publication or grant named by `patentNumber`.
 - Build metadata generation checks curated historical assignee aliases and legal-form start years derived from the

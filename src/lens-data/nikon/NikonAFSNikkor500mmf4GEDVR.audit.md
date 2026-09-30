@@ -17,3 +17,8 @@ Added J-LASF010's manufacturer power-series coefficients (Hikari 2025-06-01 cata
 ## 2026-09-30 — Local-site follow-up
 
 Compared the local-site infinity/5 m sections with Fig. 1. The focusing group moves 10.84 mm imageward toward near focus, matching paragraph 0045. Retained optical-rim SDs. Added inferred-APD tags to L1/L2/L5 from the J-FKH1 proxy curve and explicit P1/L1–L14 diagram labels so the protective plate no longer offsets optical-element numbering. The source publication does not list an assignee; left it empty.
+
+## 2026-09-30 — Patent assignment attribution
+
+- Added `Fujinon Corporation` to `patentAssignees` from the [same-application assignment record](https://patents.google.com/patent/US20090190239A1/en) for 12/354,321: Takashi Suzuki to Fujinon Corporation, effective January 7, 2009, recorded January 22, 2009, reel/frame 022139/0546. The assignment predates publication; the A1 front page still names no assignee. The underlying USPTO assignment instrument was not independently inspected.
+- Preserved the Nikon catalog identity as a qualified production correlation. Documented the Photons to Photos Example01P association and Camera Gossip's matching row/Fujinon caveat; these do not establish manufacturer confirmation or a manufacturing/licensing relationship. The relationship graph now derives the patent assignment edge to Fujinon from the structured field.

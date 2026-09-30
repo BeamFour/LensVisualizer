@@ -66,7 +66,9 @@ const LENS_DATA = {
   imageFormat: "aps-c",
   patentNumber: "US 2012/0307375 A1",
   patentAuthors: ["Yohei Takano", "Hiromichi Atsuumi"],
-  patentAssignees: [], // The supplied US publication prints no assignee/applicant bibliographic block.
+  // A1 front page omits the organization; same-application assignment predates publication.
+  // Assignment-record evidence and dates are documented in the analysis/audit.
+  patentAssignees: ["Ricoh Co., Ltd."],
   patentYear: 2012,
   elementCount: 11,
   groupCount: 9,
