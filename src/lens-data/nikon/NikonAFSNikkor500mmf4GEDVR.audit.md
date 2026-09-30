@@ -1,0 +1,19 @@
+# Audit Log — NikonAFSNikkor500mmf4GEDVR
+
+## 2026-09-30 — Integration, optical-rim review and dispersion audit
+
+Catalog-compatible curves are supplier-neutral spectral proxies, not production-glass identifications.
+
+Patent: US 2009/0190239 A1, Example 1, Fig. 1 (local PDF p.2); prescription Figs. 6–7.
+
+### Optical rims
+
+Retained SDs after 600 dpi optical-rim inspection and live SVG comparison. Median figure/data ratio is 0.998. Apparent L8–L11 enlargements are group brackets, arrows and ray overlays; close inspection confirms they are not glass edges. Preserved D1=120.4 mm, inferred centered D30=39.44 mm and Dk=32.8 mm anchors, and the stepped/cemented outlines. Published 5 m focus endpoint is retained.
+
+### Glass and display
+
+Added J-LASF010's manufacturer power-series coefficients (Hikari 2025-06-01 catalog, PDF p.140) to cover L6, raising catalog coverage from 14/15 to 15/15. Removed copied catalog C/F/g indices and Hikari-normal-line deviations from elements and rear GF plate; these are not patent measurements and must not bypass catalog resolution. All source nd/vd and physical plate spacings remain. The shared curves retain the qualified Hikari-coordinate assignments. Corrected display styling f/4 G to f/4G.
+
+## 2026-09-30 — Local-site follow-up
+
+Compared the local-site infinity/5 m sections with Fig. 1. The focusing group moves 10.84 mm imageward toward near focus, matching paragraph 0045. Retained optical-rim SDs. Added inferred-APD tags to L1/L2/L5 from the J-FKH1 proxy curve and explicit P1/L1–L14 diagram labels so the protective plate no longer offsets optical-element numbering. The source publication does not list an assignee; left it empty.

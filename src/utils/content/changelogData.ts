@@ -19,6 +19,26 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-09-30",
+    type: "lens",
+    summary: "Added Nikon AF-S NIKKOR 500mm f/4G ED VR and 70–200mm f/4G ED VR",
+  },
+  {
+    date: "2026-09-30",
+    type: "lens",
+    summary: "Added Canon CINE-SERVO 17–120mm T2.95–3.9 (CN7×17 KAS S/E1)",
+  },
+  {
+    date: "2026-09-30",
+    type: "lens",
+    summary: "Added inferred iPhone 7 and iPhone 12 Wide-camera patent models",
+  },
+  {
+    date: "2026-09-30",
+    type: "lens",
+    summary: "Added the Industar 52.39mm f/3.56 ITMO 2013 Variant 2 source model",
+  },
+  {
     date: "2026-09-29",
     type: "lens",
     summary: "Added Nikon AF-S 17–35mm f/2.8D and 24–85mm f/3.5–4.5G IF-ED and ED VR zooms",

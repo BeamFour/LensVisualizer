@@ -54,7 +54,7 @@ export default function MakerPage() {
   const details = getMakerDetails(maker);
   const makerMounts = mountsForMaker(lenses);
 
-  const lensCountText = `Explore ${lenses.length} patent-derived ${displayName} lens cross-sections with ray tracing and optical analysis.`;
+  const lensCountText = `Explore ${lenses.length} source-derived ${displayName} lens cross-sections with ray tracing and optical analysis.`;
   const seoDescription = details ? `${details.summary} ${lensCountText}` : lensCountText;
 
   return (
@@ -128,7 +128,7 @@ export default function MakerPage() {
                 ))
               ) : (
                 <p style={{ fontSize: "0.85rem", color: t.muted, margin: 0 }}>
-                  No patent-derived lens diagrams have been published for {displayName} yet.
+                  No source-derived lens diagrams have been published for {displayName} yet.
                 </p>
               )}
             </div>
