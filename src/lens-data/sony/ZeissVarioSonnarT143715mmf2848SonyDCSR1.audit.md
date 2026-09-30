@@ -1,5 +1,12 @@
 # Lens integration audit — ZeissVarioSonnarT143715mmf2848SonyDCSR1.data
 
+## 2026-09-30 — Same-application assignee verification
+
+- Visually checked the local A1 front page: it omits an organizational assignee.
+- Verified US application 11/885,365 and its publication linkage in the [assignment history](https://patents.google.com/patent/US20080218875A1/en). It reports **Sony Corporation and Tamron Co., Ltd. jointly**, recorded **2007-08-30**, signing dates 2007-07-11 through 2007-08-01, reel/frame **019796/0850**.
+- Updated `patentAssignees` to Sony Corporation, Tamron Co., Ltd. and documented the prepublication assignment basis in the analysis. The underlying instrument was not independently inspected.
+- This restores the assignee-to-patent relationship in the universal map. Optical data and production-correlation qualifications are unchanged. Earlier audit entries retain their historical metadata state.
+
 ## 2026-09-18 — Repository integration and glass audit
 
 All twelve bulk glasses already resolve to compatible curves. The two composite asphere layers remain unresolved. Display manufacturer is Sony, with ZEISS branding and DSC-R1 camera association preserved; the empty source-assignee array remains unchanged.

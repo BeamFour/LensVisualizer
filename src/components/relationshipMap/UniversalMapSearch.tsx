@@ -20,6 +20,8 @@ function resultDescription(node: UniversalRelationshipNode): string {
   }
   if (node.kind === "patent")
     return `Patent${node.patent.patentYear === undefined ? "" : ` · ${node.patent.patentYear}`}`;
+  if (node.kind === "maker") return "Catalog maker";
+  if (node.kind === "lens") return "Non-patent catalog model";
   return node.kind === "family" ? "Corporate family" : "Organization";
 }
 
@@ -94,7 +96,7 @@ export default function UniversalMapSearch({ graph, theme: t, onSelectNode }: Un
         aria-controls={visible ? `${id}-results` : undefined}
         aria-activedescendant={visible && shown[activeIndex] ? `${id}-result-${activeIndex}` : undefined}
         autoComplete="off"
-        placeholder="Entity, inventor, or patent number"
+        placeholder="Entity, inventor, lens, or patent number"
         value={query}
         onChange={(event) => {
           setQuery(event.target.value);

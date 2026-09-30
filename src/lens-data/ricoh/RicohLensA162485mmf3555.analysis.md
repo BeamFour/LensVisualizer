@@ -12,12 +12,14 @@
 
 **Inventors:** Yohei Takano; Hiromichi Atsuumi
 
-**Assignee:** Not named in the supplied US publication
+**Assignee:** Ricoh Co., Ltd. (same-application assignment record; omitted from the A1 front page)
 
 **Title:** Zoom Lens, Imaging Device and Information Device
 **Embodiment analyzed:** Embodiment 3 / FIG. 9 / Table 3
 
 The prescription modeled here is Embodiment 3 of US 2012/0307375 A1. The patent identifies FIG. 9 as the optical layout for Embodiment 3, FIGS. 10–12 as its wide, intermediate, and telephoto aberration plots, and Table 3 as its variable-spacing table (¶¶0302–0346). The selected production correlation is the **RICOH LENS A16 24-85mm F3.5-5.5** GXR camera unit. This correlation is a source-based identification rather than a manufacturer statement that the patent example is the production prescription.
+
+The A1 front page names Takano and Atsuumi under **(76) Inventors**, but identifies no organizational assignee or applicant. Separately, [Google Patents' record for the later grant US 8,705,180 B2](https://patents.google.com/patent/US8705180B2/en), covering the same application **13/482,401**, lists **Ricoh Company, Ltd.** as original assignee. Its legal-events table reports an assignment from Takano and Atsuumi effective **May 22, 2012**, with a recorded event date of **May 29, 2012**, at reel/frame **028282/0090**. Both dates precede the A1 publication on December 6, 2012. The catalog records the assignee using the canonical name **Ricoh Co., Ltd.**, based on this same-application assignment history that predates the selected publication; this attribution is not printed on the A1 front page. The underlying assignment instrument was not independently inspected.
 
 Several independent characteristics converge on that identification. Ricoh published the A16 as an APS-C camera unit with an actual focal-length range of 15.7–55.5 mm, a 24–85 mm 35 mm-equivalent field of view, maximum aperture f/3.5–5.5, 11 elements in 9 groups, and three double-sided aspherical elements. The patent example has 11 elements in 9 air-separated component groups, six aspherical surfaces on three double-sided aspherical elements, a 14.3 mm maximum image height, and a computed design focal range of 16.146288–53.849931 mm. Its published design aperture is f/3.62 at wide, f/4.65 at the intermediate state, and f/5.67 at telephoto. Ricoh announced the production unit on February 2, 2012, after the patent family's first 2011 priority date and before the US publication date.
 

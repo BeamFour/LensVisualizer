@@ -57,7 +57,9 @@ const LENS_DATA = {
   imageFormat: "135-full-frame",
   patentNumber: "US 2008/0212200 A1",
   patentAuthors: ["Dayong Li", "Akio Arakawa"],
-  patentAssignees: [],
+  // A1 front page omits the organization; same-application assignment predates publication.
+  // Assignment-record evidence and dates are documented in the analysis/audit.
+  patentAssignees: ["Tamron Co., Ltd."],
   patentYear: 2008,
   elementCount: 18,
   groupCount: 13,

@@ -2,7 +2,7 @@
  * Deterministic multi-hub layout for the universal relationship map.
  *
  * Connected components remain the outer grouping, but large patent networks are
- * partitioned into corporate-family and major-assignee neighborhoods before
+ * partitioned into corporate-family and assignee neighborhoods before
  * they are drawn. Each neighborhood gets its own capacity-limited radial
  * layout, then a hierarchical-affinity hub graph arranges those neighborhoods
  * as a compact constellation. Corporate links take priority over shared
@@ -135,13 +135,15 @@ const KIND_ORDER: Record<UniversalNodeKind, number> = {
   organization: 2,
   author: 3,
   patent: 4,
+  maker: 2,
+  lens: 5,
 };
 
 export function universalNodeRadius(kind: UniversalNodeKind): number {
-  if (kind === "patent") return 5;
+  if (kind === "patent" || kind === "lens") return 5;
   if (kind === "family") return 10;
   if (kind === "organization") return 8;
-  if (kind === "assignee") return 8;
+  if (kind === "assignee" || kind === "maker") return 8;
   return 7;
 }
 
@@ -232,10 +234,7 @@ function selectClusterHubs(
   const coveredAssignees = new Set(familyHubs.flatMap((hub) => hub.seedIds.slice(1)));
   const assigneeHubs = componentNodes
     .filter(
-      (node) =>
-        node.kind === "assignee" &&
-        !coveredAssignees.has(node.id) &&
-        (patentDegree.get(node.id) ?? 0) >= MIN_HUB_PATENT_EDGES,
+      (node) => node.kind === "assignee" && !coveredAssignees.has(node.id) && (patentDegree.get(node.id) ?? 0) > 0,
     )
     .map(
       (assignee) =>
@@ -248,7 +247,22 @@ function selectClusterHubs(
         }) satisfies ClusterHub,
     );
 
-  const hubs = [...familyHubs, ...assigneeHubs].sort((left, right) => {
+  const makerHubs = componentNodes
+    .filter((node) => node.kind === "maker")
+    .map(
+      (maker) =>
+        ({
+          id: `cluster:${maker.id}`,
+          anchorId: maker.id,
+          anchorLabel: maker.name,
+          seedIds: [maker.id],
+          strength: degree.get(maker.id) ?? 0,
+        }) satisfies ClusterHub,
+    );
+
+  // A shared inventor connects networks, but does not make a smaller assignee
+  // part of a larger company's neighborhood. Every uncovered assignee is a hub.
+  const hubs = [...familyHubs, ...assigneeHubs, ...makerHubs].sort((left, right) => {
     if (right.strength !== left.strength) return right.strength - left.strength;
     const leftNode = graphNodeById.get(left.anchorId);
     const rightNode = graphNodeById.get(right.anchorId);

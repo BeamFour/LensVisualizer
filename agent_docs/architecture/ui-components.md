@@ -126,12 +126,15 @@ instead of linking out. The page owns URL `focus` state.
 
 The catalog-wide `/relationships/universal` route uses `src/utils/catalog/universalRelationshipGraph.ts` and the pure
 `universalLayout.ts` engine. Connected components are partitioned into corporate-family hubs and standalone assignees
-with at least eight patent-assignment edges (falling back to the highest-degree node); each node joins its nearest
+regardless of patent count (families still require eight assignment edges; networks without assignees fall back to
+the highest-degree node); shared inventors never absorb a small assignee into an unrelated hub. Each node joins its nearest
 deterministic hub in capacity-limited local rings, and the neighborhoods are contracted into a hierarchical-affinity hub
 graph. Center, orbit, and angular-neighbor selection use lexicographic priority: corporate-history edge count, then
 unique cross-neighborhood patent count, then neighborhood node count. `UniversalRelationshipMap.tsx` renders labeled
 halos inside each disconnected-network boundary, keeps every edge at its edge-kind brightness within and between
-neighborhoods, and draws nodes above both boundary layers.
+neighborhoods, and draws nodes above both boundary layers. Non-patent catalog models use distinct `lens` and `maker`
+nodes with `catalog-maker` edges derived only from an explicit lens `maker` field; these edges do not count as patents,
+corporate history, or corporate affinity. Maker hubs center their models, and details link to the model and maker pages.
 
 `UniversalMapSearch` searches only graph nodes and uses the shared portal dropdown with combobox keyboard semantics.
 `src/utils/catalog/universalRelationshipSearch.ts` normalizes names and compact patent numbers, ranking exact matches,

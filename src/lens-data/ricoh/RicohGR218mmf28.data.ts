@@ -55,7 +55,9 @@ const LENS_DATA = {
   imageFormat: "aps-c",
   patentNumber: "US 2013/0321936 A1",
   patentAuthors: ["Kazuyasu Ohashi"],
-  patentAssignees: [], // Front page names inventor Kazuyasu Ohashi as applicant; no organizational assignee printed.
+  // A1 front page omits an organization; same-application assignment recorded 2013-05-31.
+  // Source and reel/frame 030523/0446 are documented in the companion analysis.
+  patentAssignees: ["Ricoh Co., Ltd."],
   patentYear: 2013,
   elementCount: 7,
   groupCount: 5,

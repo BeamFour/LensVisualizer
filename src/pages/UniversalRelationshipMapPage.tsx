@@ -124,11 +124,12 @@ export default function UniversalRelationshipMapPage() {
         <>
           <h1 style={H1_STYLE}>Universal Relationship Map</h1>
           <p style={{ color: t.muted, fontSize: "0.85rem", lineHeight: 1.6, margin: "0 0 1rem", maxWidth: "52rem" }}>
-            This map draws the entire catalog at once, organized into corporate-family and major-assignee neighborhoods.
+            This map draws the entire catalog at once, organized into corporate-family and assignee neighborhoods.
             Patents connect their inventors and assignees, while dated successor, acquisition, subsidiary, and
             corporate-family records reconnect historical company names. Those corporate links appear only here; the
             standard relationship map remains strictly patent-focused. Neighborhood placement prioritizes corporate
-            connections, then shared patents, then neighborhood size.
+            connections, then shared patents, then neighborhood size. Shared inventors can bridge neighborhoods; a halo
+            does not imply corporate ownership. Non-patent models connect to their explicit catalog maker grouping.
           </p>
 
           <div
@@ -141,6 +142,7 @@ export default function UniversalRelationshipMapPage() {
           >
             {[
               [UNIVERSAL_GRAPH.stats.patents, "patents"],
+              [UNIVERSAL_GRAPH.stats.lenses, "non-patent models"],
               [UNIVERSAL_GRAPH.stats.authors, "inventors"],
               [UNIVERSAL_GRAPH.stats.assignees, "assignees"],
               [UNIVERSAL_GRAPH.stats.corporateRelationships, "corporate links"],

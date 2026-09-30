@@ -2,6 +2,13 @@
 
 Patent: US 2001/0030812 A1, Example 2, Figure 4A
 
+## 2026-09-30 — Same-application assignee verification
+
+- Visually checked the local A1 front page: it omits an organizational assignee.
+- Verified US application 09/800,525 and its publication linkage in the [assignment history](https://patents.google.com/patent/US6441967B2/en). It reports **Nikon Corporation**, recorded **2001-03-08**, effective 2001-03-01, reel/frame **011589/0217**.
+- Updated `patentAssignees` to Nikon Corporation and documented the prepublication assignment basis in the analysis. The underlying instrument was not independently inspected.
+- This restores the assignee-to-patent relationship in the universal map. Optical data and production-correlation qualifications are unchanged. Earlier audit entries retain their historical metadata state.
+
 ## 2026-08-14 — Screenshot, patent-figure, label, and glass review
 
 ### Semi-diameters

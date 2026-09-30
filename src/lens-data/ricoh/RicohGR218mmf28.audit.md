@@ -2,6 +2,13 @@
 
 Patent: US 2013/0321936 A1
 
+## 2026-09-30 — Same-application assignee verification
+
+- Visually checked the local A1 front page: it omits an organizational assignee.
+- Verified US application 13/906,594 and its publication linkage in the [assignment history](https://patents.google.com/patent/US20130321936A1/en). It reports **Ricoh Co., Ltd. (recorded as RICOH COMPANY, LTD.)**, recorded **2013-05-31**, effective 2013-05-27, reel/frame **030523/0446**.
+- Updated `patentAssignees` to Ricoh Co., Ltd. and documented the prepublication assignment basis in the analysis. The underlying instrument was not independently inspected.
+- This restores the assignee-to-patent relationship in the universal map. Optical data and production-correlation qualifications are unchanged. Earlier audit entries retain their historical metadata state.
+
 ## 2026-06-23 - Local patent glass/APD and SD review
 
 - Local patent source: `patents/US20130321936A1.pdf` (untracked local file), Example 3.

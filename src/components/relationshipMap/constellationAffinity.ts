@@ -7,6 +7,7 @@
  * lower-priority signal can outweigh a higher-priority one.
  */
 
+import { isUniversalCorporateEdge } from "../../utils/catalog/universalRelationshipGraph.js";
 import { catalogCollator } from "../../utils/catalog/collation.js";
 import type { UniversalEdgeKind, UniversalRelationshipGraph } from "../../utils/catalog/universalRelationshipGraph.js";
 
@@ -68,7 +69,7 @@ export function buildConstellationAffinities(
     }
 
     if (!isPatentRelationship(edge.kind)) {
-      affinity.corporateConnections++;
+      if (isUniversalCorporateEdge(edge.kind)) affinity.corporateConnections++;
       continue;
     }
 

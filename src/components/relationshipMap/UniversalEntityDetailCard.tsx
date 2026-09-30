@@ -6,6 +6,8 @@
  * provides the handoff from a catalog party to the existing focused map.
  */
 
+import LensEntryLink from "../content/LensEntryLink.js";
+import { isUniversalCorporateEdge } from "../../utils/catalog/universalRelationshipGraph.js";
 import { Link } from "react-router";
 import type { RefObject } from "react";
 import type { Theme } from "../../types/theme.js";
@@ -32,6 +34,8 @@ function nodeKindLabel(node: Exclude<UniversalRelationshipNode, { kind: "patent"
   if (node.kind === "author") return "inventor";
   if (node.kind === "family") return "corporate family";
   if (node.kind === "organization") return "external organization";
+  if (node.kind === "maker") return "catalog maker";
+  if (node.kind === "lens") return "non-patent catalog model";
   return "assignee";
 }
 
@@ -51,6 +55,7 @@ function relationshipParts(
   if (edge.kind === "successor") return { prefix: outgoing ? "Successor of" : "Succeeded by", other };
   if (edge.kind === "acquisition") return { prefix: outgoing ? "Acquired by" : "Acquired", other };
   if (edge.kind === "subsidiary") return { prefix: outgoing ? "Subsidiary of" : "Parent of", other };
+  if (edge.kind === "catalog-maker") return { prefix: outgoing ? "Catalog maker" : "Catalog model", other };
   if (edge.kind === "family") return { prefix: outgoing ? "Corporate family" : "Family member", other };
   return { prefix: "Related entity", other };
 }
@@ -64,9 +69,10 @@ export default function UniversalEntityDetailCard({
   headingRef,
 }: UniversalEntityDetailCardProps) {
   const nodeById = new Map(graph.nodes.map((entry) => [entry.id, entry]));
-  const corporateEdges = graph.edges.filter(
+  const entityEdges = graph.edges.filter(
     (edge) =>
-      edge.kind !== "authorship" && edge.kind !== "assignment" && (edge.from === node.id || edge.to === node.id),
+      (isUniversalCorporateEdge(edge.kind) || edge.kind === "catalog-maker") &&
+      (edge.from === node.id || edge.to === node.id),
   );
   const patentEdges = graph.edges.filter(
     (edge) =>
@@ -146,6 +152,16 @@ export default function UniversalEntityDetailCard({
         </Link>
       )}
 
+      {node.kind === "maker" && (
+        <Link to={`/makers/${node.slug}/`} style={{ color: t.descLinkColor, fontSize: "0.76rem" }}>
+          Open maker page →
+        </Link>
+      )}
+
+      {node.kind === "lens" && (
+        <LensEntryLink lensKey={node.lens.key} text="Open lens model →" specs={node.lens.specs} theme={t} />
+      )}
+
       {patents.length > 0 && (
         <section aria-label="Related patents" style={{ marginTop: "0.75rem" }}>
           <h4 style={{ color: t.label, fontSize: "0.75rem", margin: "0 0 0.35rem" }}>Related patents</h4>
@@ -165,9 +181,9 @@ export default function UniversalEntityDetailCard({
         </section>
       )}
 
-      {corporateEdges.length > 0 && (
+      {entityEdges.length > 0 && (
         <ul style={{ listStyle: "none", padding: 0, margin: "0.75rem 0 0" }}>
-          {corporateEdges.map((edge) => {
+          {entityEdges.map((edge) => {
             const date = relationshipDate(edge);
             const { prefix, other } = relationshipParts(edge, node.id, nodeById);
             return (

@@ -2,6 +2,12 @@
 
 Patent: US 2012/0307375 A1, Embodiment 3 / Figure 9.
 
+## 2026-09-30 — Assignee attribution review
+
+- Rendered and visually inspected page 1 of the exact local `patents/US20120307375A1.pdf`. It names Yohei Takano and Hiromichi Atsuumi under (76) Inventors and prints no organizational assignee/applicant block.
+- The [Google Patents record for US 8,705,180 B2](https://patents.google.com/patent/US8705180B2/en) covers the same application 13/482,401 and lists Ricoh Company, Ltd. as original assignee. Its legal-events table reports an assignment effective May 22, 2012 and recorded May 29, 2012, from Takano and Atsuumi, at reel/frame 028282/0090. The underlying USPTO assignment instrument was not independently inspected; the selected A1's online page was unavailable during this review.
+- Updated `patentAssignees` to `["Ricoh Co., Ltd."]` at the user's request, using the documented same-application assignment recorded before publication. Retained the selected A1 source identifier, publication year, and inventor order. Clarified in the analysis and data comment that this attribution comes from assignment history rather than the printed front page; the relationship graph now includes the assignment edge to the existing canonical assignee node.
+
 ## 2026-08-08 — Patent-figure SD, diagram-label, name, and glass audit
 
 - Compared all three zoom-state sections with Figure 9 on patent page 8. The original rear Group IV/V envelopes were

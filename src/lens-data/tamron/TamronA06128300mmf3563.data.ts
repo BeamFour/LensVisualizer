@@ -55,7 +55,9 @@ const LENS_DATA = {
   imageFormat: "135-full-frame",
   patentNumber: "US 2003/0156333 A1",
   patentAuthors: ["Yasuharu Yamada"],
-  patentAssignees: [],
+  // A1 front page omits an organization; same-application assignment recorded 2002-07-01.
+  // Source and reel/frame 013061/0001 are documented in the companion analysis.
+  patentAssignees: ["Tamron Co., Ltd."],
   patentYear: 2003,
   elementCount: 15,
   groupCount: 13,

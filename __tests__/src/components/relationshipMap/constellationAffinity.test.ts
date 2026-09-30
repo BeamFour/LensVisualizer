@@ -80,6 +80,9 @@ describe("constellation affinity", () => {
       patents: [],
       components: [["organization:a", "organization:b", "patent:one", "author:one", "assignee:b"]],
       stats: {
+        makers: 0,
+        lenses: 0,
+        catalogRelationships: 0,
         authors: 1,
         assignees: 1,
         patents: 1,

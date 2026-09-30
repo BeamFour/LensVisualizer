@@ -62,7 +62,9 @@ const LENS_DATA = {
   imageFormat: "135-full-frame",
   patentNumber: "US 2001/0030812 A1",
   patentAuthors: ["Akiko Furuta"],
-  patentAssignees: [],
+  // A1 front page omits an organization; same-application assignment recorded 2001-03-08.
+  // Source and reel/frame 011589/0217 are documented in the companion analysis.
+  patentAssignees: ["Nikon Corporation"],
   patentYear: 2001,
   elementCount: 11,
   groupCount: 8,

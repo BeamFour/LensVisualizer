@@ -45,8 +45,8 @@ import type { LensDataInput } from "../../types/optics.js";
  * ║                                                                                      ║
  * ║ Glass labels preserve patent d-line classes/codes only. Catalog coordinate matches   ║
  * ║ do not establish supplier identity. No nC/nF/ng/dPgF data are authored.              ║
- * ║ The supplied US publication front page names no assignee; patentAssignees is [] per  ║
- * ║ source-publication semantics. Linked assignment evidence remains in the dossier.     ║
+ * ║ The A1 front page omits assignees. Sony and Tamron are recorded jointly from the    ║
+ * ║ same-application assignment, recorded 2007-08-30 before the A1 publication.           ║
  * ╚══════════════════════════════════════════════════════════════════════════════════════╝
  */
 
@@ -79,7 +79,9 @@ const LENS_DATA = {
   imageFormat: "aps-c",
   patentNumber: "US 2008/0218875 A1",
   patentAuthors: ["Daisuke Kuroda", "Masafumi Sueyoshi", "Kazuya Watanabe"],
-  patentAssignees: [],
+  // A1 front page omits an organization; same-application assignment recorded 2007-08-30.
+  // Source and reel/frame 019796/0850 are documented in the companion analysis.
+  patentAssignees: ["Sony Corporation", "Tamron Co., Ltd."],
   patentYear: 2008,
   elementCount: 12,
   groupCount: 10,
