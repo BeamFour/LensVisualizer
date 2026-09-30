@@ -46,26 +46,34 @@ export interface MakerDetails {
 }
 
 export const MAKER_DETAILS: Record<string, MakerDetails> = {
+  // Corporate and camera history: Apple announcements/specifications and the Science Museum's QuickTake record.
   // https://www.apple.com/sg/newsroom/2026/03/apple-to-celebrate-50-years-of-thinking-different/
-  // https://support.apple.com/en-gb/111943 and https://support.apple.com/en-us/111876
+  // https://collection.sciencemuseumgroup.org.uk/objects/co8094250/apple-mac-quick-take-100-digital-camera
+  // https://www.apple.com/newsroom/2007/01/09Apple-Reinvents-the-Phone-with-iPhone/
+  // https://www.apple.com/eg/iphone-4s/specs/
+  // https://www.apple.com/newsroom/2016/09/apple-introduces-iphone-7-iphone-7-plus/
+  // https://www.apple.com/newsroom/2019/09/iphone-11-pro-and-iphone-11-pro-max-the-most-powerful-and-advanced-smartphones/
+  // https://support.apple.com/en-us/111876 and https://support.apple.com/en-asia/111874
+  // https://www.apple.com/newsroom/2023/09/apple-unveils-iphone-15-pro-and-iphone-15-pro-max/
   apple: {
     founded: 1976,
     headquarters: "Cupertino, California, United States",
     summary:
-      "Consumer-electronics company whose iPhone camera systems combine compact multi-element optics, image stabilization and computational photography.",
+      "Cupertino technology company whose camera history spans QuickTake digital cameras and iPhone imaging systems, combining compact lenses, autofocus, optical stabilization and computational photography.",
     history:
-      "Apple was founded in 1976. Its iPhone 7 camera pairs a six-element f/1.8 lens with optical image stabilization; the iPhone 12 Wide camera uses a seven-element f/1.6 lens. Those published specifications provide context for the compact aspheric patent models in this catalog.\n\nUS 2016/0341934 A1 names Romeo I. Mercado and Apple Inc.; US 2018/0364457 A1 names Yuhong Yao, Yoshikazu Shinohara and Lin-Yao Liao with Apple Inc. as applicant. Their associations with the iPhone 7 and iPhone 12 are inferred optical correlations, not Apple-confirmed production prescriptions. Apple branding and patent ownership do not identify the lens-element or camera-module supplier.",
+      "Founded in 1976, Apple entered consumer digital photography with the QuickTake 100 in 1994. Its later iPhone camera systems brought compact optics, image sensors and image processing into a device used for everyday photography and video. The original iPhone, introduced in 2007, had a two-megapixel camera; the iPhone 4S in 2011 paired an eight-megapixel sensor with a five-element f/2.4 lens, autofocus and a hybrid infrared filter.\n\nThe iPhone 7 in 2016 used a six-element f/1.8 lens and optical image stabilization for its 12-megapixel Wide camera. The iPhone 7 Plus added a separate Telephoto camera for a 2× view relative to the Wide camera, and used the two cameras for depth estimation in Portrait mode. This extended Apple's imaging work from a single taking lens to coordinated camera systems and computational depth effects.\n\nThe iPhone 11 Pro in 2019 combined Ultra Wide, Wide and Telephoto cameras with Night mode and improved image processing. In 2020, the iPhone 12's Main camera moved to a seven-element f/1.6 lens, alongside a five-element f/2.4 Ultra Wide camera. The iPhone 12 Pro Max introduced sensor-shift optical stabilization on its Wide camera. These developments addressed different parts of the imaging system: light collection, field coverage, camera shake and processing of the captured signal.\n\nFolded optics extended the telephoto range in the iPhone 15 Pro Max in 2023. Its f/2.8 Telephoto camera used a tetraprism optical path for a 120 mm-equivalent, 5× view, with a module combining autofocus and sensor-shift stabilization. The 120 mm figure describes its field of view in 35 mm-camera terms, rather than the physical focal length of the compact lens.\n\nThe catalog's iPhone 7 and iPhone 12 cross-sections are qualified patent models associated with those products by optical correlation. Their individual analyses document the evidence and limits of that association.",
     notableDesigns:
-      "iPhone 7 Wide camera; iPhone 12 Wide camera; compact six- and seven-element aspheric patent models",
+      "QuickTake 100; iPhone 4S five-element camera; iPhone 7 Wide and 7 Plus dual-camera system; iPhone 11 Pro triple-camera system; iPhone 12 seven-element Main camera; iPhone 15 Pro Max tetraprism Telephoto",
   },
-  // Exact source: https://books.ifmo.ru/file/pdf/1465.pdf, pp.50–51.
+  // Exact source: https://books.ifmo.ru/file/pdf/1465.pdf, pp.5–6 and 50–51.
+  // Family history: https://www.zenitcamera.com/archive/lenses/industar-50.html
   industar: {
     founded: null,
     headquarters: "Manufacturer not established for this source model",
     summary:
-      "Design-family browse group for the Industar teaching prescription in A. N. Ivanov’s 2013 ITMO text; not a corporate manufacturer attribution.",
+      "Soviet Tessar-type lens family represented here by an Industar teaching prescription from A. N. Ivanov’s 2013 ITMO text, with historical ties to KMZ's Industar-50.",
     history:
-      "The catalog’s Industar is Appendix 1.2, Variant 2 of A. N. Ivanov’s 2013 ITMO teaching text. It has four elements in three groups, a 52.39 mm source focal length, an 11.8 mm diaphragm, and published clear diameters of 16 mm at the front element and 14 mm at the remaining elements.\n\nThe book names TK14, LF5 and OF1 glass grades. The model qualifies its modern catalog dispersion proxies and preserves the published geometry. Its resemblance to the Industar-50 family does not establish a production Industar-50 or Industar-50-2 prescription. Ivanov is the source author and ITMO the publisher; neither is asserted as the original lens designer or manufacturer. Industar is grouped here as a design family, with no company founding date, headquarters or production mount inferred.",
+      "Industar denotes a Soviet family of Tessar-type photographic lenses. The KMZ archive credits the Industar-50 optical calculation to M. D. Maltsev at the Krasnogorsk Mechanical Plant, with development completed in 1953. It records KMZ production from 1953 through 1986 across the Industar-50 and Industar-50-2, and also identifies production at LZOS in Lytkarino and KOMZ in Kazan. KMZ is therefore a documented design and manufacturing association for the Industar-50 family, while the family name alone does not identify a particular factory.\n\nThis catalog's model comes from Appendix 1.2, Variant 2 of A. N. Ivanov’s 2013 ITMO teaching text. The same radii and internal spacings appear in its worked example, which identifies an Industar-50 from the OPAL optical-design library. The selected table gives four elements in three groups, an 11.8 mm diaphragm, and clear diameters of 16 mm at the front element and 14 mm at the remaining elements. The adopted glass proxies yield a modeled focal length of 52.39 mm.\n\nThe source does not establish a factory or production variant for this exact prescription. Industar is retained as a design-family browse group, with KMZ's history providing context. Ivanov is the source author and ITMO the publisher; the individual lens analysis documents the teaching model and its modern glass proxies.",
     notableDesigns: "Industar 52.39mm f/3.56 — ITMO 2013 Appendix 1.2, Variant 2",
   },
   // French Ministry of Culture inventory: https://pop.culture.gouv.fr/notice/palissy/IM25001882
