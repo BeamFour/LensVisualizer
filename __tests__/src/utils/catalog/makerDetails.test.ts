@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { MAKER_DETAILS, getMakerDetails } from "../../../../src/utils/catalog/makerDetails.js";
-import { allMakerSlugs, isDesignFamily } from "../../../../src/utils/catalog/lensMetadata.js";
+import { allMakerSlugs } from "../../../../src/utils/catalog/lensMetadata.js";
 import { describeDetailRegistry } from "./detailRegistryHarness.js";
 
 describeDetailRegistry({
@@ -9,6 +9,7 @@ describeDetailRegistry({
   ids: allMakerSlugs(),
   idNoun: "known maker slug",
   nonEmptyStringFields: ["headquarters", "summary", "history"],
+  positiveNumberFields: ["founded"],
 });
 
 describe("getMakerDetails", () => {
@@ -21,11 +22,4 @@ describe("getMakerDetails", () => {
   it("returns null for an unknown slug", () => {
     expect(getMakerDetails("unknown-maker")).toBeNull();
   });
-});
-
-it("keeps design-family groups separate from company founding dates", () => {
-  for (const [slug, details] of Object.entries(MAKER_DETAILS)) {
-    if (isDesignFamily(slug)) expect(details.founded).toBeNull();
-    else expect(details.founded).toBeGreaterThan(0);
-  }
 });

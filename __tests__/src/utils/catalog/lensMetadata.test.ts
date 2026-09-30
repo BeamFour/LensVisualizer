@@ -342,13 +342,6 @@ describe("makerCanonicalURL", () => {
 /* ── lensJsonLd ── */
 
 describe("lensJsonLd", () => {
-  it("does not present a design-family browse label as a manufacturer", () => {
-    const ld = lensJsonLd(makeLens({ name: "INDUSTAR teaching prescription" }), "source-model");
-    expect(ld.about).not.toHaveProperty("manufacturer");
-    const attributed = lensJsonLd(makeLens({ name: "INDUSTAR teaching prescription", maker: "Nikon" }), "source-model");
-    expect(attributed.about).toHaveProperty("manufacturer.name", "Nikon");
-  });
-
   it("returns valid JSON-LD structure", () => {
     const lens = makeLens();
     const ld = lensJsonLd(lens, "nikkor-z-50mm");

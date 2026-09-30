@@ -1,8 +1,6 @@
 export const MAKER_PREFIXES = [
   { prefix: "AGFA", display: "Agfa", slug: "agfa" },
   { prefix: "APPLE", display: "Apple", slug: "apple" },
-  // Industar is a design-family browse label; individual source models need not assert a manufacturer.
-  { prefix: "INDUSTAR", display: "Industar", slug: "industar", kind: "design-family" },
   { prefix: "CANON", display: "Canon", slug: "canon" },
   /* "CARL ZEISS JENA" must come before "CARL ZEISS" — startsWith matching is
      order-sensitive, and a Jena lens must not be caught by the generic prefix. */
@@ -16,6 +14,7 @@ export const MAKER_PREFIXES = [
   { prefix: "HASSELBLAD", display: "Hasselblad", slug: "hasselblad" },
   { prefix: "KONICA", display: "Konica", slug: "konica" },
   { prefix: "KINOPTIK", display: "Kinoptik", slug: "kinoptik" },
+  { prefix: "KMZ", display: "KMZ", slug: "kmz" },
   { prefix: "KODAK", display: "Kodak", slug: "kodak" },
   { prefix: "LAOWA", display: "Laowa", slug: "laowa" },
   { prefix: "LEICA", display: "Leica", slug: "leica" },

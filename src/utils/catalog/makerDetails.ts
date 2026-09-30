@@ -37,8 +37,7 @@
  */
 
 export interface MakerDetails {
-  /** Null for a design-family browse group with no corporate founding date. */
-  founded: number | null;
+  founded: number;
   headquarters: string;
   summary: string;
   history: string;
@@ -65,16 +64,18 @@ export const MAKER_DETAILS: Record<string, MakerDetails> = {
     notableDesigns:
       "QuickTake 100; iPhone 4S five-element camera; iPhone 7 Wide and 7 Plus dual-camera system; iPhone 11 Pro triple-camera system; iPhone 12 seven-element Main camera; iPhone 15 Pro Max tetraprism Telephoto",
   },
-  // Exact source: https://books.ifmo.ru/file/pdf/1465.pdf, pp.5–6 and 50–51.
-  // Family history: https://www.zenitcamera.com/archive/lenses/industar-50.html
-  industar: {
-    founded: null,
-    headquarters: "Manufacturer not established for this source model",
+  // https://www.zenitcamera.com/archive/history/marks.html
+  // https://www.rostec.ru/media/news/razrabotchik-legendarnoy-fototekhniki-zenit-vstrechaet-yubiley/
+  // https://www.zenitcamera.com/archive/lenses/industar-50.html
+  // Teaching prescription: https://books.ifmo.ru/file/pdf/1465.pdf, pp.5–6 and 50–51.
+  kmz: {
+    founded: 1942,
+    headquarters: "Krasnogorsk, Moscow Oblast, Russia",
     summary:
-      "Soviet Tessar-type lens family represented here by an Industar teaching prescription from A. N. Ivanov’s 2013 ITMO text, with historical ties to KMZ's Industar-50.",
+      "Krasnogorsk Mechanical Plant, the Russian optical manufacturer behind Zorki and Zenit cameras and the KMZ Industar-50 lens family.",
     history:
-      "Industar denotes a Soviet family of Tessar-type photographic lenses. The KMZ archive credits the Industar-50 optical calculation to M. D. Maltsev at the Krasnogorsk Mechanical Plant, with development completed in 1953. It records KMZ production from 1953 through 1986 across the Industar-50 and Industar-50-2, and also identifies production at LZOS in Lytkarino and KOMZ in Kazan. KMZ is therefore a documented design and manufacturing association for the Industar-50 family, while the family name alone does not identify a particular factory.\n\nThis catalog's model comes from Appendix 1.2, Variant 2 of A. N. Ivanov’s 2013 ITMO teaching text. The same radii and internal spacings appear in its worked example, which identifies an Industar-50 from the OPAL optical-design library. The selected table gives four elements in three groups, an 11.8 mm diaphragm, and clear diameters of 16 mm at the front element and 14 mm at the remaining elements. The adopted glass proxies yield a modeled focal length of 52.39 mm.\n\nThe source does not establish a factory or production variant for this exact prescription. Industar is retained as a design-family browse group, with KMZ's history providing context. Ivanov is the source author and ITMO the publisher; the individual lens analysis documents the teaching model and its modern glass proxies.",
-    notableDesigns: "Industar 52.39mm f/3.56 — ITMO 2013 Appendix 1.2, Variant 2",
+      "The Krasnogorsk Mechanical Plant (KMZ) was established in 1942 in Krasnogorsk, near Moscow, to produce optical instruments. Its photographic products included Zorki rangefinder cameras, Zenit SLRs, Krasnogorsk cine cameras and Horizon panoramic cameras. Industar is a lens-family name within that history; KMZ is the manufacturer.\n\nThe plant's archive credits the Industar-50 optical calculation to M. D. Maltsev at KMZ, with development completed in 1953. This four-element Tessar-type lens succeeded the Industar-22 and served Zorki, Zenit and Kristall cameras. The archive records KMZ production from 1953 through 1986 across the Industar-50 and Industar-50-2. It also identifies Industar-50 production at LZOS in Lytkarino and KOMZ in Kazan.\n\nThe catalog's Industar model is grouped under KMZ through this documented design association. Its geometry comes from A. N. Ivanov's 2013 ITMO teaching text, whose worked example identifies an Industar-50 from the OPAL optical-design library. The selected Appendix Variant 2 remains a qualified source model; the individual analysis distinguishes it from a verified factory production prescription.",
+    notableDesigns: "Industar-22; Industar-50 and Industar-50-2; Zorki and Zenit camera systems",
   },
   // French Ministry of Culture inventory: https://pop.culture.gouv.fr/notice/palissy/IM25001882
   // Tegea designs: US 3,037,426 and Kinoptik product literature cited in the lens analyses.

@@ -2,7 +2,9 @@
 
 **Patent:** Not applicable; the source is a published technical book.
 
-**Designer:** Not established for this selected prescription.
+**Maker grouping:** KMZ (Krasnogorsk Mechanical Plant), through the documented Industar-50 design association.
+
+**Designer:** M. D. Maltsev at KMZ is credited for the Industar-50 family; authorship of this exact teaching prescription is not independently established.
 
 **Source author:** А.Н. Иванов (A. N. Ivanov).
 
@@ -14,7 +16,7 @@
 
 **Embodiment analyzed:** Appendix 1.2, item 1, Industar Variant 2; PDF/printed p.51, with the schematic on p.50.
 
-**Model:** INDUSTAR 52.39mm f/3.56 (ITMO 2013 Variant 2).
+**Model:** KMZ INDUSTAR 52.39mm f/3.56 (ITMO 2013 Variant 2).
 
 This analysis concerns the fixed teaching prescription in Ivanov's book, supplemented by explicitly identified catalog
 glass coordinates. The book author and publisher are not attributed as the lens inventor or manufacturer. Its numerical
@@ -29,8 +31,11 @@ The resemblance to the production Industar-50 family is supported by several lim
 3. The archive describes the production family as Tessar-type, consistent with the two singlets and cemented rear pair
    in the selected prescription. [KMZ archive][kmz]
 
-These correspondences do not establish a particular production Industar-50 or Industar-50-2 prescription. No manufacturer,
-mount, production date or image format is assigned to this model. Its f/3.565 label denotes the calculated aperture
+The KMZ archive credits the Industar-50 calculation to M. D. Maltsev at KMZ. The teaching book's worked example
+identifies an Industar-50 from the OPAL library and gives the same radii and internal spacings as Appendix Variant 2.
+These sources support the KMZ maker grouping and Industar family branding. They do not establish a particular
+production Industar-50 or Industar-50-2 prescription, factory variant, mount, production date or image format.
+Its f/3.565 label denotes the calculated aperture
 convention explained below, not a manufacturer's specification.
 
 ## Optical Architecture

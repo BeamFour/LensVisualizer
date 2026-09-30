@@ -20,7 +20,8 @@ import type { LensDataInput } from "../../types/optics.js";
  * Book indices/wavelengths and historic glass melts are unconfirmed.
  * indexReference = d (587.56 nm). LF5 uses the coordinate-exact QF3 spectral proxy.
  * TK14/OF1 retain supplier-listed ng and Abbe fallback; no complete curves are established.
- * No manufacturer, mount, image format or patent metadata is asserted.
+ * KMZ maker grouping follows the documented Industar-50 design association.
+ * The exact source model is not a verified factory prescription; mount, image format and patent remain unset.
  *
  * NO_INTERNAL_RECONSTRUCTION: fixed infinity only, no var/finite conjugates.
  * closeFocusM = 0 is an explicit unavailable placeholder for the required numeric field,
@@ -30,7 +31,8 @@ import type { LensDataInput } from "../../types/optics.js";
 
 const LENS_DATA = {
   key: "industar-itmo2013-v2",
-  name: "INDUSTAR 52.39mm f/3.56 (ITMO 2013 Variant 2)",
+  name: "KMZ INDUSTAR 52.39mm f/3.56 (ITMO 2013 Variant 2)",
+  maker: "KMZ",
   subtitle: "Ivanov / ITMO 2013, Appendix 1.2 Variant 2, pp.50–51; qualified catalog-glass model",
   specs: ["4 ELEMENTS / 3 GROUPS", "52.3909 mm MODEL EFL", "11.8 mm PUBLISHED DIAPHRAGM", "FIXED INFINITY MODEL"],
   focalLengthDesign: 52.390881393,
