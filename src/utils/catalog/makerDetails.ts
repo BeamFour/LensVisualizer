@@ -45,8 +45,12 @@ export interface MakerDetails {
 }
 
 export const MAKER_DETAILS: Record<string, MakerDetails> = {
-  // Corporate and camera history: Apple announcements/specifications and the Science Museum's QuickTake record.
+  // Corporate and camera history: company announcements, archived specifications and museum records.
   // https://www.apple.com/sg/newsroom/2026/03/apple-to-celebrate-50-years-of-thinking-different/
+  // https://computerhistory.org/apple-timeline/
+  // https://www.apple.com/newsroom/2001/10/23Apple-Presents-iPod/
+  // https://www.apple.com/newsroom/2010/01/27Apple-Launches-iPad/
+  // https://www.apple.com/newsroom/2020/06/apple-announces-mac-transition-to-apple-silicon/
   // https://collection.sciencemuseumgroup.org.uk/objects/co8094250/apple-mac-quick-take-100-digital-camera
   // https://www.apple.com/newsroom/2007/01/09Apple-Reinvents-the-Phone-with-iPhone/
   // https://www.apple.com/eg/iphone-4s/specs/
@@ -58,24 +62,29 @@ export const MAKER_DETAILS: Record<string, MakerDetails> = {
     founded: 1976,
     headquarters: "Cupertino, California, United States",
     summary:
-      "Cupertino technology company whose camera history spans QuickTake digital cameras and iPhone imaging systems, combining compact lenses, autofocus, optical stabilization and computational photography.",
+      "American technology company known for Macintosh computers, iPhone and iPad, with a photographic history spanning QuickTake digital cameras and integrated iPhone camera systems.",
     history:
-      "Founded in 1976, Apple entered consumer digital photography with the QuickTake 100 in 1994. Its later iPhone camera systems brought compact optics, image sensors and image processing into a device used for everyday photography and video. The original iPhone, introduced in 2007, had a two-megapixel camera; the iPhone 4S in 2011 paired an eight-megapixel sensor with a five-element f/2.4 lens, autofocus and a hybrid infrared filter.\n\nThe iPhone 7 in 2016 used a six-element f/1.8 lens and optical image stabilization for its 12-megapixel Wide camera. The iPhone 7 Plus added a separate Telephoto camera for a 2× view relative to the Wide camera, and used the two cameras for depth estimation in Portrait mode. This extended Apple's imaging work from a single taking lens to coordinated camera systems and computational depth effects.\n\nThe iPhone 11 Pro in 2019 combined Ultra Wide, Wide and Telephoto cameras with Night mode and improved image processing. In 2020, the iPhone 12's Main camera moved to a seven-element f/1.6 lens, alongside a five-element f/2.4 Ultra Wide camera. The iPhone 12 Pro Max introduced sensor-shift optical stabilization on its Wide camera. These developments addressed different parts of the imaging system: light collection, field coverage, camera shake and processing of the captured signal.\n\nFolded optics extended the telephoto range in the iPhone 15 Pro Max in 2023. Its f/2.8 Telephoto camera used a tetraprism optical path for a 120 mm-equivalent, 5× view, with a module combining autofocus and sensor-shift stabilization. The 120 mm figure describes its field of view in 35 mm-camera terms, rather than the physical focal length of the compact lens.\n\nThe catalog's iPhone 7 and iPhone 12 cross-sections are qualified patent models associated with those products by optical correlation. Their individual analyses document the evidence and limits of that association.",
+      "Apple was founded in California on April 1, 1976, by Steve Jobs, Steve Wozniak and Ronald Wayne. Wozniak's Apple I provided the starting point for the business, while the Apple II, introduced in 1977, established its position in personal computing. The Macintosh followed in 1984 with a graphical interface and mouse. Based in Cupertino, Apple grew around the design of complete computing products, combining hardware, operating systems and application software.\n\nThe iPod in 2001 extended that approach to portable music, followed by the iPhone in 2007 and iPad in 2010. Apple subsequently developed its own processors for mobile devices and announced the Mac's transition to Apple silicon in 2020. Its product range expanded to watches, audio devices and digital services alongside computers and mobile devices.\n\nApple's photographic history began before the iPhone, with the QuickTake 100 digital camera in 1994. The original iPhone included a two-megapixel camera, placing photography alongside communication, music and web browsing in a single device. Successive generations developed the camera as a coordinated system of compact optics, sensors and image processing. The iPhone 4S in 2011 combined an eight-megapixel sensor with a five-element lens, autofocus and a hybrid infrared filter.\n\nLater iPhones expanded both the optical hardware and computational photography. The iPhone 7 in 2016 brought a six-element lens and optical stabilization to its Wide camera, while the 7 Plus paired Wide and Telephoto cameras for different fields of view and depth effects. The iPhone 11 Pro in 2019 added a three-camera system and Night mode. In 2020, the iPhone 12 adopted a seven-element Main-camera lens, and the 12 Pro Max introduced sensor-shift stabilization. The iPhone 15 Pro Max in 2023 extended the Telephoto camera to a 5× view with a folded tetraprism path and a combined autofocus and sensor-shift stabilization module.",
     notableDesigns:
       "QuickTake 100; iPhone 4S five-element camera; iPhone 7 Wide and 7 Plus dual-camera system; iPhone 11 Pro triple-camera system; iPhone 12 seven-element Main camera; iPhone 15 Pro Max tetraprism Telephoto",
   },
   // https://www.zenitcamera.com/archive/history/marks.html
-  // https://www.rostec.ru/media/news/razrabotchik-legendarnoy-fototekhniki-zenit-vstrechaet-yubiley/
+  // https://www.zenitcamera.com/archive/history/production-reliability-longevity.html
+  // https://www.zenitcamera.com/archive/history/feday-about-lenses.html
   // https://www.zenitcamera.com/archive/lenses/industar-50.html
-  // Teaching prescription: https://books.ifmo.ru/file/pdf/1465.pdf, pp.5–6 and 50–51.
+  // https://www.zenitcamera.com/archive/lenses/helios-44.html
+  // https://www.zenitcamera.com/archive/lenses/zenitar-2-8-16.html
+  // https://www.rostec.ru/media/news/fototekhnika-iz-krasnogorska-ot-gorizonta-do-zenita/
+  // https://www.rostec.ru/media/news/v-obektive-zemlya-o-kosmicheskoy-fototekhnike-kmz/
   kmz: {
     founded: 1942,
     headquarters: "Krasnogorsk, Moscow Oblast, Russia",
     summary:
-      "Krasnogorsk Mechanical Plant, the Russian optical manufacturer behind Zorki and Zenit cameras and the KMZ Industar-50 lens family.",
+      "Russian optical manufacturer known for Zorki and Zenit cameras, Industar and Helios lenses, and cine, panoramic and aerospace imaging systems.",
     history:
-      "The Krasnogorsk Mechanical Plant (KMZ) was established in 1942 in Krasnogorsk, near Moscow, to produce optical instruments. Its photographic products included Zorki rangefinder cameras, Zenit SLRs, Krasnogorsk cine cameras and Horizon panoramic cameras. Industar is a lens-family name within that history; KMZ is the manufacturer.\n\nThe plant's archive credits the Industar-50 optical calculation to M. D. Maltsev at KMZ, with development completed in 1953. This four-element Tessar-type lens succeeded the Industar-22 and served Zorki, Zenit and Kristall cameras. The archive records KMZ production from 1953 through 1986 across the Industar-50 and Industar-50-2. It also identifies Industar-50 production at LZOS in Lytkarino and KOMZ in Kazan.\n\nThe catalog's Industar model is grouped under KMZ through this documented design association. Its geometry comes from A. N. Ivanov's 2013 ITMO teaching text, whose worked example identifies an Industar-50 from the OPAL optical-design library. The selected Appendix Variant 2 remains a qualified source model; the individual analysis distinguishes it from a verified factory production prescription.",
-    notableDesigns: "Industar-22; Industar-50 and Industar-50-2; Zorki and Zenit camera systems",
+      "The Krasnogorsk Mechanical Plant (KMZ) was established in 1942 in Krasnogorsk, near Moscow, for wartime optical production. After the war it became a major Soviet camera and lens manufacturer. Zorki 35 mm rangefinder production began in 1948, followed by the first Zenit SLRs in 1952. Its camera range also included the Moskva folding cameras, Krasnogorsk cine cameras and Horizon panoramic cameras.\n\nKMZ developed and manufactured interchangeable lenses alongside its cameras. The four-element Tessar-type Industar-50, calculated by M. D. Maltsev at KMZ and completed in 1953, succeeded the Industar-22. The six-element Helios-44 58mm f/2 was derived from the Carl Zeiss Jena Biotar and became a standard lens for Zenit SLRs, evolving through changes to mounts, diaphragms and coatings. The plant's lens range also included the Helios-40 85mm f/1.5 portrait lens and the Zenitar 16mm f/2.8 fisheye.\n\nSpecialized camera systems were another substantial part of KMZ's work. The Horizon panoramic camera entered production in 1967, while the Krasnogorsk cine family served motion-picture photography. Beyond consumer cameras, the plant developed photographic equipment for the Zenit reconnaissance-satellite programs and later Earth-observation systems, including hyperspectral imaging equipment. This work joined lens design with precision mechanisms and complete optical instruments.",
+    notableDesigns:
+      "Industar-22; Industar-50 and Industar-50-2; Helios-44 58mm f/2; Helios-40 85mm f/1.5; Zenitar 16mm f/2.8 fisheye; Zorki, Zenit, Krasnogorsk and Horizon cameras",
   },
   // French Ministry of Culture inventory: https://pop.culture.gouv.fr/notice/palissy/IM25001882
   // Tegea designs: US 3,037,426 and Kinoptik product literature cited in the lens analyses.
