@@ -29,3 +29,27 @@ research/production center from early lens manufacture.
 ### Phase 4 — Analysis sync
 
 Aligned the glass table and prose with runtime fallback behavior and removed the erroneous F5 claim.
+
+## 2026-10-01 — Second local-site review
+
+Rechecked the exact local Fig. 13 and Example tables against the live SVG. The figure is shared by
+both examples; the tabulated diameters/sag remain the dimensional authority. Numeric element labels,
+cemented pairs and spherical tags agree with the source. Index colors correctly distinguish the
+mid-index exterior/crown elements from the low-index L-28 pair; no unsupported ED/APD tags are added.
+
+The 1936 Kachalov/Voano reference, p. 13 and Table 6 on p. 74, supplies the historical yellow D/d
+convention and L-24/SK4, L-28/LLF1, L-15/BaSF1 cross-references. The analysis now explicitly qualifies
+BACD4/LLF1 (and Example I's H-BaF8) as modern spectral proxies. The earlier blanket refusal of these
+proxies is superseded; historical melt identity remains unconfirmed. No new coefficient rows are
+invented. Catalog mismatch report: zero. The inspector distinguishes polynomial from Sellmeier curves.
+
+Example II's existing rims remain source-supported. Its h6/free-diameter conflict and omitted
+post-equator portions remain disclosed. Four of six elements resolve to catalog curves; L-67 and
+L-3 remain unmatched. The nearby E-F1 row does not establish a defensible L-3 proxy.
+
+Focus is visibly disabled, correctly reflecting the absence of source travel; there is no zoom.
+`maker: null` replaces the incorrect Russar manufacturer field. The Unattributed page explains the
+unknown factory; Roossinov's author page now holds the design-family history. The grant has no named
+organizational assignee, so its empty array is retained. The 72 catalog assignee names were reviewed:
+no additional spelling consolidation was needed, and legal successors remain separate entities.
+No additional changelog entry was made.

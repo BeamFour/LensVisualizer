@@ -30,8 +30,10 @@ import type { LensDataInput } from "../../types/optics.js";
  *   then reduced where needed to satisfy positive edge thickness,
  *   spherical rim-slope, and 90% cross-gap intrusion limits.
  *   Fig. 1 supports nearly common rims for surfaces 6–8; the rear
- *    radius is raised to 23.5 mm while the 24.3 mm front rims retain
+ *   radius is raised to 23.5 mm while the 24.3 mm front rims retain
  *   wide-field clearance within spherical-slope and neighboring-gap limits.
+ *   Surfaces 9/10 use 17.2 mm to improve the source 31-degree half-field
+ *   clearance; larger rims approach the source d8 gap intrusion limit.
  *   Glass labels use six-digit nd/νd coordinate classes because the
  *   patent does not identify historical melt suppliers.
  *
@@ -258,8 +260,8 @@ const LENS_DATA = {
     { label: "6", R: 501.01, d: 3.7, nd: 1.80518, elemId: 4, sd: 24.3 },
     { label: "7", R: -144.785, d: 1.5, nd: 1.67003, elemId: 5, sd: 24.3 },
     { label: "8", R: 26.326, d: 6.8, nd: 1.0, elemId: 0, sd: 23.5 },
-    { label: "9", R: 470.07, d: 1.5, nd: 1.62041, elemId: 6, sd: 16.8 },
-    { label: "10", R: 46.61, d: 5.5, nd: 1.0, elemId: 0, sd: 16.8 },
+    { label: "9", R: 470.07, d: 1.5, nd: 1.62041, elemId: 6, sd: 17.2 },
+    { label: "10", R: 46.61, d: 5.5, nd: 1.0, elemId: 0, sd: 17.2 },
     { label: "11", R: 39.703, d: 3.0, nd: 1.80518, elemId: 7, sd: 17.3 },
     { label: "12", R: 69.777, d: 45.122, nd: 1.0, elemId: 0, sd: 17.3 },
     { label: "13", R: 70.0, d: 3.0, nd: 1.62041, elemId: 8, sd: 14.6 },

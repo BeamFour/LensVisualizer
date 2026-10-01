@@ -191,6 +191,8 @@ export interface ElementData {
   name: string;
   /** Optional patent/source identifier shown beneath the element in the diagram. */
   diagramLabel?: string;
+  /** Source-backed front/rear aperture ratio limit; defaults to 3. Does not relax rim or crossing checks. */
+  maxSdRatio?: number;
   label: string;
   type: string;
   nd: number;
@@ -345,7 +347,8 @@ export interface LensData {
   /** Optional UTC publication timestamp for a replacement model; otherwise derived from Git history. */
   publishedAt?: string;
   key: string;
-  maker?: string;
+  /** null explicitly records an unconfirmed manufacturer; omission retains name inference. */
+  maker?: string | null;
   name: string;
   subtitle?: string;
   specs?: string[];

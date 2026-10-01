@@ -2,7 +2,7 @@ export interface LensIdentity {
   publishedAt: string | null;
   key: string | null;
   name: string | null;
-  maker: string | null;
+  maker: string | null | undefined;
   lensMountIds: string[];
   imageFormatId: string | null;
   visible: boolean;
@@ -59,7 +59,7 @@ export interface OrganizeRootLensFilesResult {
 
 export const MAKER_PREFIXES: MakerPrefix[];
 
-export function deriveMakerSlug(nameOrMaker: string): string;
+export function deriveMakerSlug(nameOrMaker: string, makerField?: string | null): string;
 export function extractLensIdentityContent(content: string): LensIdentity;
 export function extractLensIdentity(
   filePath: string,

@@ -66,7 +66,7 @@ for the geometry at surface 2 and is discussed in the verification section.
 
 ### L2 — Positive Component of the Front Cemented Member
 
-`nd` = 1.6126, `νd` = 58.6. Glass: Unmatched historical Lenzos L-24, coordinate class 613586; supplier unresolved.
+`nd` = 1.6126, `νd` = 58.6. Glass: Lenzos L-24 / SK4 class; BACD4 spectral proxy, historical melt unresolved.
 Standalone EFL = +24.638633 mm.
 
 L2 supplies the positive standalone component of the front cemented medial member. It is biconvex in the implemented
@@ -75,7 +75,7 @@ to L-28; no synthetic cement layer is modeled.
 
 ### L3 — Negative Component of the Front Cemented Member
 
-`nd` = 1.5480, `νd` = 45.9. Glass: Unmatched historical Lenzos L-28, coordinate class 548459; supplier unresolved.
+`nd` = 1.5480, `νd` = 45.9. Glass: Lenzos L-28; LLF1 spectral proxy, historical melt unresolved.
 Standalone EFL = −34.800840 mm.
 
 L3 is negative when calculated as an isolated element in air, but that standalone sign does not describe the cemented
@@ -84,7 +84,7 @@ one of the two positive medial members and places its rear surface immediately a
 
 ### L4 — Negative Component of the Rear Cemented Member
 
-`nd` = 1.5480, `νd` = 45.9. Glass: Unmatched historical Lenzos L-28, coordinate class 548459; supplier unresolved.
+`nd` = 1.5480, `νd` = 45.9. Glass: Lenzos L-28; LLF1 spectral proxy, historical melt unresolved.
 Standalone EFL = −34.800840 mm.
 
 L4 begins the rear cemented medial member and is the near-mirror counterpart of L3. Its front surface lies immediately
@@ -93,7 +93,7 @@ assembly.
 
 ### L5 — Positive Component of the Rear Cemented Member
 
-`nd` = 1.6126, `νd` = 58.6. Glass: Unmatched historical Lenzos L-24, coordinate class 613586; supplier unresolved.
+`nd` = 1.6126, `νd` = 58.6. Glass: Lenzos L-24 / SK4 class; BACD4 spectral proxy, historical melt unresolved.
 Standalone EFL = +24.638633 mm.
 
 L5 is cemented to L4 at surface 7 and completes the rear positive medial member. The verified L4+L5 cemented combination
@@ -102,7 +102,7 @@ prescription.
 
 ### L6 — Rear Exterior Negative Meniscus
 
-`nd` = 1.6259, `νd` = 39.1. Glass: Unmatched historical Lenzos L-15, coordinate class 626391; supplier unresolved.
+`nd` = 1.6259, `νd` = 39.1. Glass: Lenzos L-15 / BaSF1 class; H-BaF8 spectral proxy, historical melt unresolved.
 Standalone EFL = −73.135888 mm.
 
 L6 is the rear exterior negative meniscus. Its Abbe coordinate is lower than L1's 43.3, satisfying the patent's stated
@@ -111,27 +111,26 @@ surface 2 and shares the same over-hemispherical source-geometry issue.
 
 ## Glass Identification and Selection
 
-The patent states that the glasses were chosen from the Lenzos Co. 1936 catalog. It supplies one refractive-index
-coefficient and one Abbe number for each historical glass, but it does not state the spectral line for the index. The data
-therefore preserves the patent coordinates without assigning modern Sellmeier behavior. The schema fields are named
-`nd`/`vd`, but in this record they should be read as the retained historical index/Abbe coordinates rather than as proof
-that the original index was measured at the modern d line.
+The patent retains Lenzos 1936 catalog coordinates without naming the spectral line. Kachalov and Voano's
+[*Fundamentals of Optical Glass Production* (1936)](https://ru.djvu.online/file/129FlTkciu6QA), p. 13,
+identifies the historical yellow D/d convention; Table 6, p. 74, cross-references L-24 to SK4,
+L-28 to LLF1 and L-15 to BaSF1 at the patent's coordinates. This supports class-compatible spectral
+proxies, not a claim that a modern vendor supplied these lenses or reproduced their original melts.
 
-| Historical glass | Stored `nd` | Stored `νd` | Elements | Catalog disposition |
-|---|---:|---:|---|---|
-| Lenzos L-67 | 1.6395 | 43.3 | L1 | Unmatched; no close exact current row established |
-| Lenzos L-24 | 1.6126 | 58.6 | L2, L5 | 613586 coordinate class; modern supplier unresolved |
-| Lenzos L-28 | 1.5480 | 45.9 | L3, L4 | 548459 coordinate class; modern supplier unresolved |
-| Lenzos L-15 | 1.6259 | 39.1 | L6 | 626391 coordinate class; modern supplier unresolved |
+| Source glass | Retained index / Abbe | Runtime spectral model |
+|---|---|---|
+| L-67 | 1.6395 / 43.3 | Unmatched; Abbe fallback |
+| L-24 (L2, L5) | 1.6126 / 58.6 | BACD4 polynomial proxy (1.61272 / 58.58) |
+| L-28 (L3, L4) | 1.5480 / 45.9 | LLF1 Sellmeier proxy (1.54814 / 45.75) |
+| L-15 (L6) | 1.6259 / 39.1 | H-BaF8 Sellmeier proxy (1.62604 / 39.07) |
 
-Current OHARA, HOYA, SCHOTT, HIKARI, CDGM, and SUMITA catalogs were checked during source verification. Several modern
-catalog rows lie close to the L-24, L-28, and L-15 coordinates, but coordinate compatibility does not establish historical
-supplier or melt identity. For that reason all six elements retain explicit `Unmatched (...)` glass strings rather than a
-modern vendor label.
-
-No `nC`, `nF`, `ng`, or `dPgF` values are available for these elements, and no validated modern Sellmeier identity is
-assigned. The prescription therefore supports ordinary Abbe-coordinate chromatic interpretation only; it does not support
-an apochromatic or anomalous-partial-dispersion claim.
+The patent index and Abbe values remain unchanged. The monochromatic prescription retains those
+coordinates; chromatic tracing uses the compatible catalog curve directly. Its small index/Abbe offsets,
+the exact historical D/d distinction and partial dispersion remain modeling uncertainties. Evaluating BACD4, LLF1 and H-BaF8 at the historical sodium D wavelength (589.3 nm) gives
+1.612624, 1.548034 and 1.625899 respectively, close to the retained source coordinates. This is
+additional compatibility evidence, not a determination of the original melt. No independent
+`nC`, `nF`, `ng`, `dPgF`, ED, APD or apochromatic claim is added. These catalog entries already exist,
+so duplicating them under historical names would falsely imply new measured coefficient sets.
 
 ## Focus Mechanism
 
@@ -165,12 +164,14 @@ omits both `imageFormat` and `imageCircleMm`.
 The local patent's Fig. 13 is a shared schematic for both examples. The Example I diameter and sag table takes
 precedence over its drawing proportions. Surfaces 3/4 now use the 10 mm source full radius and surface 5 the 5 mm
 source free radius, replacing 8.37/4.62/2.75 mm ray-envelope estimates. Surface 8 likewise uses 10 mm instead of 8.19 mm.
-The rear cemented interface at surface 7 increases from 4.36 to 6.8 mm, a modeled active aperture below the source's
-10 mm full radius: the supported front/rear aperture-ratio bound prevents using that full radius with the retained
-2.2671 mm central face. This remains a representation limit, not a revised patent dimension. The outer menisci retain
-their bounded active apertures and omitted post-equator lips. L3 and L4 are labeled biconcave to match their radius signs.
+Surface 7 now uses the published 10 mm full radius. Its 4.41:1 ratio to the 2.2671 mm central face
+is admitted by a source-documented element-level sanity limit of 4.5; the independent crossing and
+rim-slope checks remain active. The outer faces at surfaces 1 and 10 now use the published 32.5 mm
+full radius. The inner near-equatorial faces still omit the unsupported post-equator lips.
+L3/L4 are biconcave, and the numeric element labels match Fig. 13.
 
-The catalog groups these lenses under Russar as a design family. That grouping does not identify a historical factory.
+The manufacturer is explicitly unconfirmed. The Unattributed catalog page replaces the former Russar
+maker grouping, and Roossinov's author page carries the design-family history.
 
 ## Verification Summary and Source Discrepancies
 

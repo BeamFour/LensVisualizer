@@ -34,8 +34,8 @@ import type { LensDataInput } from "../../types/optics.js";
  */
 const LENS_DATA = {
   key: "russar-22-70f8",
-  // Catalog grouping is the design family; the historical factory is unconfirmed.
-  maker: "Russar",
+  // Russar is a design family; the historical manufacturer is unconfirmed.
+  maker: null,
   name: "RUSSAR-22 70mm f/8 (patent model)",
   subtitle: "US 2,516,724 A — Example II; strong Russar-22 correlation, not manufacturer-confirmed",
   specs: ["6 ELEMENTS / 4 GROUPS", "f = 69.883 mm", "f/8", "2ω = 122°", "ALL-SPHERICAL"],
@@ -79,7 +79,7 @@ const LENS_DATA = {
       vd: 58.6,
       indexReference: "d",
       fl: 27.771277,
-      glass: "Unmatched (Lenzos L-24; reference wavelength unstated; BACD4 coordinate comparison only)",
+      glass: "BACD4 spectral proxy (Lenzos L-24 / historical SK4 class; production melt unresolved)",
       role: "Positive component of the front cemented member",
       cemented: "D1",
     },
@@ -93,7 +93,7 @@ const LENS_DATA = {
       vd: 45.9,
       indexReference: "d",
       fl: -37.496703,
-      glass: "Unmatched (Lenzos L-28; reference wavelength unstated; LLF1 coordinate comparison only)",
+      glass: "LLF1 spectral proxy (Lenzos L-28; production melt unresolved)",
       role: "Negative component of the front cemented member",
       cemented: "D1",
     },
@@ -107,7 +107,7 @@ const LENS_DATA = {
       vd: 45.9,
       indexReference: "d",
       fl: -36.823474,
-      glass: "Unmatched (Lenzos L-28; reference wavelength unstated; LLF1 coordinate comparison only)",
+      glass: "LLF1 spectral proxy (Lenzos L-28; production melt unresolved)",
       role: "Negative component of the rear cemented member",
       cemented: "D2",
     },
@@ -121,7 +121,7 @@ const LENS_DATA = {
       vd: 58.6,
       indexReference: "d",
       fl: 27.271994,
-      glass: "Unmatched (Lenzos L-24; reference wavelength unstated; BACD4 coordinate comparison only)",
+      glass: "BACD4 spectral proxy (Lenzos L-24 / historical SK4 class; production melt unresolved)",
       role: "Positive component of the rear cemented member",
       cemented: "D2",
     },

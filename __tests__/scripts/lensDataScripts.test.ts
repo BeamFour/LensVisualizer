@@ -19,7 +19,10 @@ function createTempLensDataDir() {
   return { rootDir, lensDataDir };
 }
 
-function writeLensDataFile(filePath: string, { key, name, maker }: { key: string; name: string; maker?: string }) {
+function writeLensDataFile(
+  filePath: string,
+  { key, name, maker }: { key: string; name: string; maker?: string | null },
+) {
   writeFileSync(
     filePath,
     [
@@ -27,7 +30,7 @@ function writeLensDataFile(filePath: string, { key, name, maker }: { key: string
       "",
       "const LENS_DATA = {",
       `  key: "${key}",`,
-      maker ? `  maker: "${maker}",` : null,
+      maker === null ? "  maker: null," : maker ? `  maker: "${maker}",` : null,
       `  name: "${name}",`,
       "  surfaces: [],",
       "  elements: [],",
@@ -54,6 +57,18 @@ afterEach(() => {
 describe("lens-data scripts", () => {
   it("keeps generated runtime maker prefixes in sync with the script source", () => {
     expect(runtimeMakerPrefixes).toEqual(MAKER_PREFIXES);
+  });
+
+  it("preserves explicit unknown makers when organizing branded prescriptions", () => {
+    const { rootDir, lensDataDir } = createTempLensDataDir();
+    tempRoots.push(rootDir);
+    writeLensDataFile(join(lensDataDir, "Prototype.data.ts"), {
+      key: "prototype",
+      name: "CANON prototype",
+      maker: null,
+    });
+    expect(deriveMakerSlug("CANON prototype", null)).toBe("unattributed");
+    expect(collectRootLensMovePlan(lensDataDir)[0].makerSlug).toBe("unattributed");
   });
 
   it("derives canonical maker slugs from maker fields and fallback names", () => {

@@ -36,3 +36,28 @@ patent-model qualification to the display name; retained the source inventor spe
 ### Phase 4 — Analysis sync
 
 Recorded aperture decisions and representation limits. Historical glass remains on the Abbe fallback.
+
+## 2026-10-01 — Second local-site review
+
+Rechecked the exact local Fig. 13 and Example tables against the live SVG. The figure is shared by
+both examples; the tabulated diameters/sag remain the dimensional authority. Numeric element labels,
+cemented pairs and spherical tags agree with the source. Index colors correctly distinguish the
+mid-index exterior/crown elements from the low-index L-28 pair; no unsupported ED/APD tags are added.
+
+The 1936 Kachalov/Voano reference, p. 13 and Table 6 on p. 74, supplies the historical yellow D/d
+convention and L-24/SK4, L-28/LLF1, L-15/BaSF1 cross-references. The analysis now explicitly qualifies
+BACD4/LLF1 (and Example I's H-BaF8) as modern spectral proxies. The earlier blanket refusal of these
+proxies is superseded; historical melt identity remains unconfirmed. No new coefficient rows are
+invented. Catalog mismatch report: zero. The inspector distinguishes polynomial from Sellmeier curves.
+
+Example I surfaces 1/10 increase to the published 32.5 mm full radius, and surface 7 to 10 mm.
+The previous 6.8 mm bound was a validation heuristic, not an optical or source restriction. A scoped
+L4 `maxSdRatio: 4.5` admits the published unequal apertures; slope and crossing checks still apply.
+Five of six elements now resolve to catalog curves; L-67 remains unmatched.
+
+Focus is visibly disabled, correctly reflecting the absence of source travel; there is no zoom.
+`maker: null` replaces the incorrect Russar manufacturer field. The Unattributed page explains the
+unknown factory; Roossinov's author page now holds the design-family history. The grant has no named
+organizational assignee, so its empty array is retained. The 72 catalog assignee names were reviewed:
+no additional spelling consolidation was needed, and legal successors remain separate entities.
+No additional changelog entry was made.

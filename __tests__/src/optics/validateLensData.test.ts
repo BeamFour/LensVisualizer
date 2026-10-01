@@ -1283,6 +1283,25 @@ describe("validateLensData", () => {
     expect(errors.some((e) => e.includes("SD ratio"))).toBe(true);
   });
 
+  it("supports a source-backed per-element aperture ratio without relaxing physical checks", () => {
+    const data = makeValid();
+    const elements = data.elements as Record<string, unknown>[];
+    const surfaces = data.surfaces as Record<string, unknown>[];
+    surfaces[0].sd = 2;
+    expect(validateLensData(data).some((e) => e.includes("SD ratio"))).toBe(true);
+    elements[0].maxSdRatio = 4;
+    expect(validateLensData(data)).toEqual([]);
+    surfaces[0].R = 1;
+    expect(validateLensData(data).length).toBeGreaterThan(0);
+    surfaces[0].R = 100;
+    surfaces[0].d = 0.001;
+    expect(validateLensData(data).some((e) => e.includes("negative edge thickness"))).toBe(true);
+    for (const value of [NaN, Infinity, 0, "4"]) {
+      elements[0].maxSdRatio = value;
+      expect(validateLensData(data).some((e) => e.includes("maxSdRatio must"))).toBe(true);
+    }
+  });
+
   it("allows SD ratio up to 3.0 for deep meniscus elements", () => {
     const data = makeValid({
       elements: [

@@ -98,19 +98,11 @@ export const MAKER_DETAILS: Record<string, MakerDetails> = {
       "Georges Grosset and Georges Perthuis founded Kinoptik in Paris in 1932. The company developed optics for cinema and specialized imaging, including an aerial-photography objective in 1939. Edgard Hugues's large-angular-field patent, assigned to Les Appareils de Precision Kinoptik, describes the three-system designs represented by the Tegea and Super-Tegea models in this catalog. Their production associations remain qualified in the individual lens analyses.",
     notableDesigns: "Tegea 5.7mm f/1.8, Tegea 9.8mm f/1.8, Super-Tegea 1.9mm f/1.9",
   },
-  // Design-family history, not an attribution of every Russar to one factory.
-  // https://museum.itmo.ru/person/212/
-  // https://science.itmo.ru/наука-в-итмо/достижения-университета-итмо/михаил-михайлович-русинов/
-  // https://museum.itmo.ru/page/84/
-  // https://news.itmo.ru/ru/archive/news/4352/
-  russar: {
-    headquarters: "Leningrad / Saint Petersburg, Russia (design tradition)",
-    summary:
-      "Wide-angle optical design family created by Mikhail Mikhailovich Rusinov, known for aerial mapping lenses and a later research and instrument-building tradition at ITMO.",
+  unattributed: {
+    headquarters: "Not established",
+    summary: "Lens prescriptions whose manufacturer has not been established from the available sources.",
     history:
-      "Russar is the name of an optical design family associated with Mikhail Mikhailovich Rusinov, whose name appears as Michael Michaelovitch Roossinov in his U.S. patents. Its history begins in Soviet aerial photography: Rusinov worked in Leningrad on geodesy, aerial surveying and cartography during the 1930s and early 1940s. The Russar-21, -22, -23 and -24 series earned recognition in 1941. The name identifies a design tradition spanning several institutions, rather than a single manufacturing company.\n\nThe early super-wide-angle Russars used strongly curved exterior negative menisci around central cemented positive members. Rusinov used aberrational vignetting to improve illumination toward the edge of a very wide field. His U.S. patent 2,516,724, granted in 1950, describes this principle and gives six-element examples with full fields of 133 and 122 degrees. Russar lenses became important tools for aerial surveying and Soviet mapping.\n\nRusinov's later work at LITMO, now ITMO University, extended the family into photogrammetric instruments and space imaging. The university's design bureau and experimental production facilities developed into the Russar educational, research and production center. ITMO reported in 2014 that the center designed and manufactured optical assemblies for the Meteor-M2 satellite. This later institution continues the optical tradition; it does not establish the factory that made each early Russar lens.",
-    notableDesigns:
-      "Russar-21 and Russar-22 super-wide-angle aerial objectives; Russar-23 and Russar-24; Kinorussar cinema optics; Hydrorussar underwater optics; Russar-96 and Russar-Argo space-imaging designs",
+      "Unattributed is a catalog category, not a manufacturing company. An inventor, design-family name or patent owner does not by itself identify the factory that produced a lens. These models retain their source-backed names and inventor attribution while their manufacturer remains unconfirmed. The individual lens notes explain the evidence and any product correlation.",
   },
   agfa: {
     founded: 1867,

@@ -123,7 +123,7 @@ Keep it normalized even when the product's official styling varies by source:
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `maker` | `string` | | Manufacturer name (e.g. `"Nikon"`, `"Voigtländer"`). Used for maker pages and SEO metadata. If omitted, derived from the lens `name` via prefix matching. |
+| `maker` | `string \| null` | | Manufacturer name (e.g. `"Nikon"`, `"Voigtländer"`). Used for maker pages and SEO metadata. If omitted, derived from the lens `name` via prefix matching. Use `null` when the manufacturer is explicitly unconfirmed; this uses the Unattributed catalog category and omits the SEO manufacturer claim. |
 | `publishedAt` | `string` | Git-derived | Optional explicit UTC ISO timestamp (`YYYY-MM-DDTHH:mm:ssZ`) for a newly published replacement model. Overrides inherited file publication history in recent lenses, feeds, and SEO; last-modified remains Git-derived but cannot precede publication. Omit for normal additions and routine corrections. |
 | `visible` | `boolean` | `true` | Controls whether the lens appears in the UI catalog. Set to `false` to hide a lens from the dropdown without removing its data file. |
 | `opticalConfiguration` | `object` | | Links complete prescriptions that are switchable optical states of one catalog lens. See Alternate Optical Configurations below. |
@@ -704,6 +704,10 @@ Each entry in the `elements` array describes one physical glass element.
   cemented: "D1",                           // optional: doublet/triplet group name
 }
 ```
+
+`maxSdRatio` optionally overrides the 3:1 front/rear aperture-ratio sanity limit for one element.
+Use only with cited source dimensions in the data comment and analysis; it does not relax the independent
+surface-rim-slope or edge-thickness checks. Never shrink a source-backed aperture merely to satisfy this heuristic.
 
 Use `diagramLabel` when the source identifies physical elements differently from the runtime sequence—for example
 `L11` through `L213`, `L5a` / `L5b`, or a primed identifier such as `1′`. When omitted, the diagram displays the

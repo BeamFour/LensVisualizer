@@ -320,8 +320,10 @@ curvature or a statement about the final corrected astigmatic field.
 No clear semi-diameters are printed in the patent. The modeled semi-diameters use meridional d-line ray envelopes
 bounded by physical geometry. A 600 dpi review of the exact local Fig. 1 shows a common optical rim across surfaces
 6–8, rather than the imported 24.3/24.3/16.8 mm step. The rear surface now uses 23.5 mm, close to the retained 24.3 mm front rims. Extending all
-three to 24.3 mm would exceed the supported spherical rim slope, and enlarging the following meniscus would violate
-cross-gap clearance. The remaining rims are retained. Fig. 1 depicts the long-focal-length arrangement: its large d5
+three to 24.3 mm would exceed the supported spherical rim slope, and a much larger following meniscus would violate
+cross-gap clearance. Surfaces 9/10 were subsequently increased from 16.8 to 17.2 mm toward the Fig. 1 rim proportions,
+improving wide-end chief-ray format-corner reach from 93% to 95%. A 17.3 mm candidate exceeds the
+90% intrusion limit of the preceding r8→r9 physical gap, so full corner clearance remains unproven. The other rims are retained. Fig. 1 depicts the long-focal-length arrangement: its large d5
 and small d12 must not be compared surface-by-surface to the default wide state.
 
 All 15 elements resolve to compatible existing catalog dispersion curves. These are supplier-neutral spectral proxies;

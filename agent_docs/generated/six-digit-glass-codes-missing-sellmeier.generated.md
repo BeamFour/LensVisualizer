@@ -10,11 +10,11 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 ## Summary
 
 - **852** lenses scanned
-- **1897** total code-only elements found
-- **347** elements in this report
-- **127** distinct lens files affected
+- **1892** total code-only elements found
+- **342** elements in this report
+- **126** distinct lens files affected
 - **23** active unreviewed elements have no review-record hit or explicit disposition
-- **191** explicitly unmatched/unknown/proprietary/unidentified elements are self-recording review dispositions
+- **186** explicitly unmatched/unknown/proprietary/unidentified elements are self-recording review dispositions
 - **0** dispositions lack any review record
 
 ## Prioritized Unreviewed Queue
@@ -70,8 +70,6 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 514428 | 2 | 1 | patents/JP2016021011A.pdf | All rows have review records |
 | 531557 | 2 | 2 | patents/WO2022071249A1.pdf<br>patents/US8994842.pdf | All rows explicitly disposed |
 | 540473 | 2 | 1 | patents/GB_135853_A.pdf | All rows explicitly disposed |
-| 548459 | 2 | 1 | patents/US2516724.pdf | All rows explicitly disposed |
-| 613586 | 2 | 1 | patents/US2516724.pdf | All rows explicitly disposed |
 | 620586 | 2 | 1 | patents/US4303314.pdf | All rows have review records |
 | 621569 | 2 | 1 | patents/GB_135853_A.pdf | All rows explicitly disposed |
 | 622532 | 2 | 1 | patents/GB_135853_A.pdf | All rows explicitly disposed |
@@ -168,7 +166,6 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 624584 | 1 | 1 | patents/JP2025052870A.pdf | All rows have review records |
 | 625533 | 1 | 1 | patents/US2721499.pdf | All rows have review records |
 | 626357 | 1 | 1 | patents/CN211955966U.pdf | All rows explicitly disposed |
-| 626391 | 1 | 1 | patents/US2516724.pdf | All rows explicitly disposed |
 | 630346 | 1 | 1 | patents/JP2015041012A.pdf | All rows have review records |
 | 634299 | 1 | 1 | patents/WO2024154461A1.pdf | No review-record hit |
 | 635232 | 1 | 1 | patents/US8081392.pdf | All rows explicitly disposed |
@@ -1043,17 +1040,7 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | L6 (Element 6) | 9 | `Unmatched (460658 patent-rounded fluor-crown; no unique catalog identity)` | 1.46000 / 65.80 | No catalog entry | abbe | patents/DE_3907928_A1.pdf | Explicit disposition in data |
 | L7 (Element 7) | 11 | `Unmatched (650396 patent-rounded short flint; no unique catalog identity)` | 1.65000 / 39.60 | No catalog entry | abbe | patents/DE_3907928_A1.pdf | Explicit disposition in data |
 
-### [RUSSAR-21 60mm f/18 (patent model)](../../src/lens-data/russar/Russar21.data.ts) - US 2,516,724 A
-
-| Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
-|---|---|---|---|---|---|---|---|
-| L2 (Element 2) | 3 | `Unmatched (Lenzos L-24; coordinate class 613586; supplier unresolved)` | 1.61260 / 58.60 | No catalog entry | abbe | patents/US2516724.pdf | Explicit disposition in data |
-| L3 (Element 3) | 4 | `Unmatched (Lenzos L-28; coordinate class 548459; supplier unresolved)` | 1.54800 / 45.90 | No catalog entry | abbe | patents/US2516724.pdf | Explicit disposition in data |
-| L4 (Element 4) | 6 | `Unmatched (Lenzos L-28; coordinate class 548459; supplier unresolved)` | 1.54800 / 45.90 | No catalog entry | abbe | patents/US2516724.pdf | Explicit disposition in data |
-| L5 (Element 5) | 7 | `Unmatched (Lenzos L-24; coordinate class 613586; supplier unresolved)` | 1.61260 / 58.60 | No catalog entry | abbe | patents/US2516724.pdf | Explicit disposition in data |
-| L6 (Element 6) | 9 | `Unmatched (Lenzos L-15; coordinate class 626391; supplier unresolved)` | 1.62590 / 39.10 | No catalog entry | abbe | patents/US2516724.pdf | Explicit disposition in data |
-
-### [RUSSAR-22 70mm f/8 (patent model)](../../src/lens-data/russar/Russar22.data.ts) - US 2,516,724 A
+### [RUSSAR-22 70mm f/8 (patent model)](../../src/lens-data/unattributed/Russar22.data.ts) - US 2,516,724 A
 
 | Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
 |---|---|---|---|---|---|---|---|

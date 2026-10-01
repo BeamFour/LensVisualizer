@@ -41,7 +41,7 @@ export const MAKER_PREFIXES = [
   { prefix: "RICOH", display: "Ricoh", slug: "ricoh" },
   { prefix: "G. RODENSTOCK", display: "Rodenstock", slug: "rodenstock" },
   { prefix: "RODENSTOCK", display: "Rodenstock", slug: "rodenstock" },
-  { prefix: "RUSSAR", display: "Russar", slug: "russar" },
+  { prefix: "UNATTRIBUTED", display: "Unattributed", slug: "unattributed" },
   { prefix: "SAMYANG", display: "Samyang", slug: "samyang" },
   { prefix: "ROKINON", display: "Samyang", slug: "samyang" },
   { prefix: "ALBERT SCHACHT", display: "Schacht", slug: "schacht" },

@@ -28,8 +28,8 @@ production formula. Three pieces of evidence converge:
    Roossinov's development history. The patent was filed later in the United States in 1946.
 
 No manufacturer-issued production sheet was located that establishes a legal manufacturing entity, interchangeable mount,
-or image format for this exact prescription. The catalog groups both models under the Russar design family; this does
-not assert a manufacturing company. Mount and image-format fields remain unset, and the display name says patent model.
+or image format for this exact prescription. The manufacturer is explicitly unconfirmed and the catalog places both models under Unattributed.
+Russar is retained as the design-family name, with its history on Roossinov's author page. Mount and image-format fields remain unset, and the display name says patent model.
 
 ## Optical Architecture
 
@@ -105,28 +105,28 @@ patent's description of a substantially, but not exactly, symmetrical two-half c
 L6 is the exterior negative meniscus of the rear half. Its Abbe number is lower than L1's 43.3, satisfying the patent's
 explicit condition that the rear exterior negative member have the lower Abbe number. The earlier F5 label did not identify a compatible runtime curve and has been removed. No modern supplier identity is assigned.
 
-## Glass Identification / Selection
+## Glass Identification and Selection
 
-| Elements | Source glass | Stored nd | Stored νd | Data-file identification |
-|---|---|---:|---:|---|
-| L1 | Lenzos L-67 | 1.6395 | 43.3 | Unmatched; code 640433 |
-| L2, L5 | Lenzos L-24 | 1.6126 | 58.6 | Unmatched; BACD4 coordinate comparison only |
-| L3, L4 | Lenzos L-28 | 1.5480 | 45.9 | Unmatched; LLF1 coordinate comparison only |
-| L6 | Lenzos L-3 | 1.6242 | 35.9 | Unmatched; flint coordinate class |
+The patent retains Lenzos 1936 catalog coordinates without naming the spectral line. Kachalov and Voano's
+[*Fundamentals of Optical Glass Production* (1936)](https://ru.djvu.online/file/129FlTkciu6QA), p. 13,
+identifies the historical yellow D/d convention; Table 6, p. 74, cross-references L-24 to SK4,
+L-28 to LLF1 and L-15 to BaSF1 at the patent's coordinates. This supports class-compatible spectral
+proxies, not a claim that a modern vendor supplied these lenses or reproduced their original melts.
 
-The patent says the glasses were selected from the Lenzos Co. 1936 catalog and publishes one refractive-index coordinate
-plus an Abbe number for each type. It does **not** identify the spectral line for that index and does not publish `nC`,
-`nF`, `ng`, or `dPgF`. Consequently, `indexReference: "d"` in the data file is a schema placement used for the retained
-coordinate, not a claim that the historical values have modern d-line melt precision.
+| Source glass | Retained index / Abbe | Runtime spectral model |
+|---|---|---|
+| L-67 | 1.6395 / 43.3 | Unmatched; Abbe fallback |
+| L-24 (L2, L5) | 1.6126 / 58.6 | BACD4 polynomial proxy (1.61272 / 58.58) |
+| L-28 (L3, L4) | 1.5480 / 45.9 | LLF1 Sellmeier proxy (1.54814 / 45.75) |
+| L-3 (L6) | 1.6242 / 35.9 | Unmatched; Abbe fallback |
 
-The runtime annotations now explicitly remain Unmatched, consistent with Example I. The previous code/name strings
-resolved four elements to modern curves despite the unresolved spectral reference. BACD4, LLF1 and E-F1 are nearby
-catalog comparison candidates, not established historical melts; adding duplicate rows would not resolve that evidence gap.
-
-The historical 1936 glass reference used in the dossier maps L-24 to SK4 and L-28 to LLF1. Current SCHOTT, OHARA, HOYA,
-HIKARI, CDGM, and SUMITA material was used only to audit coordinate compatibility and naming discipline. No modern
-Sellmeier curve or line-index set is copied onto these elements. Accordingly, the analysis makes no apochromatic or
-anomalous-partial-dispersion performance claim.
+The patent index and Abbe values remain unchanged. The monochromatic prescription retains those
+coordinates; chromatic tracing uses the compatible catalog curve directly. Its small index/Abbe offsets,
+the exact historical D/d distinction and partial dispersion remain modeling uncertainties. Evaluating BACD4, LLF1 and H-BaF8 at the historical sodium D wavelength (589.3 nm) gives
+1.612624, 1.548034 and 1.625899 respectively, close to the retained source coordinates. This is
+additional compatibility evidence, not a determination of the original melt. No independent
+`nC`, `nF`, `ng`, `dPgF`, ED, APD or apochromatic claim is added. These catalog entries already exist,
+so duplicating them under historical names would falsely imply new measured coefficient sets.
 
 ## Focus Mechanism
 
