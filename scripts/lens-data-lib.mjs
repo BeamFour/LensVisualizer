@@ -10,7 +10,9 @@ import {
 import { MAKER_PREFIXES } from "./maker-prefixes.mjs";
 
 /** Derive a URL-safe maker slug from a maker field or lens display name. */
-function deriveMakerSlug(nameOrMaker) {
+function deriveMakerSlug(nameOrMaker, makerField) {
+  if (makerField === null) return "unattributed";
+  nameOrMaker = makerField || nameOrMaker;
   const upper = nameOrMaker.toUpperCase();
   for (const { prefix, slug } of MAKER_PREFIXES) {
     if (upper.startsWith(prefix)) return slug;
@@ -33,7 +35,7 @@ function extractLensIdentityContent(content) {
     key: keyMatch ? keyMatch[1] : null,
     publishedAt: publishedAtMatch ? publishedAtMatch[1] : null,
     name: nameMatch ? nameMatch[1] : null,
-    maker: makerMatch ? makerMatch[1] : null,
+    maker: makerMatch ? makerMatch[1] : /maker:\s*null\b/.test(content) ? null : undefined,
     lensMountIds,
     imageFormatId: imageFormatMatch ? imageFormatMatch[1] : null,
     visible: visibleFalseMatch ? false : true,
@@ -171,7 +173,7 @@ function collectLensData({
       key,
       name,
       visible,
-      makerSlug: deriveMakerSlug(maker || name || key),
+      makerSlug: deriveMakerSlug(name || key, maker),
       lensMountIds,
       imageFormatId,
       freshness: applyPublicationDate(combineFreshness([dataFreshness, analysisFreshness], fallbackDate), publishedAt),
@@ -221,7 +223,7 @@ async function collectLensDataAsync({
       key,
       name,
       visible,
-      makerSlug: deriveMakerSlug(maker || name || key),
+      makerSlug: deriveMakerSlug(name || key, maker),
       lensMountIds,
       imageFormatId,
       freshness: applyPublicationDate(combineFreshness([dataFreshness, analysisFreshness], fallbackDate), publishedAt),
@@ -240,7 +242,7 @@ function collectRootLensMovePlan(lensDataDir, { exists = existsSync, readdir = r
   return rootFiles.map((dataFile) => {
     const fromDataPath = join(lensDataDir, dataFile);
     const { key, name, maker } = extractLensIdentity(fromDataPath);
-    const makerSlug = deriveMakerSlug(maker || name || key || dataFile);
+    const makerSlug = deriveMakerSlug(name || key || dataFile, maker);
     const targetDir = join(lensDataDir, makerSlug);
     const analysisFile = analysisRelativePathForDataPath(dataFile);
     const fromAnalysisPath = join(lensDataDir, analysisFile);

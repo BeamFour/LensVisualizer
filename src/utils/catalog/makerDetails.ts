@@ -37,7 +37,8 @@
  */
 
 export interface MakerDetails {
-  founded: number;
+  /** Omitted for design families without a documented corporate founding. */
+  founded?: number;
   headquarters: string;
   summary: string;
   history: string;
@@ -96,6 +97,12 @@ export const MAKER_DETAILS: Record<string, MakerDetails> = {
     history:
       "Georges Grosset and Georges Perthuis founded Kinoptik in Paris in 1932. The company developed optics for cinema and specialized imaging, including an aerial-photography objective in 1939. Edgard Hugues's large-angular-field patent, assigned to Les Appareils de Precision Kinoptik, describes the three-system designs represented by the Tegea and Super-Tegea models in this catalog. Their production associations remain qualified in the individual lens analyses.",
     notableDesigns: "Tegea 5.7mm f/1.8, Tegea 9.8mm f/1.8, Super-Tegea 1.9mm f/1.9",
+  },
+  unattributed: {
+    headquarters: "Not established",
+    summary: "Lens prescriptions whose manufacturer has not been established from the available sources.",
+    history:
+      "Unattributed is a catalog category, not a manufacturing company. An inventor, design-family name or patent owner does not by itself identify the factory that produced a lens. These models retain their source-backed names and inventor attribution while their manufacturer remains unconfirmed. The individual lens notes explain the evidence and any product correlation.",
   },
   agfa: {
     founded: 1867,

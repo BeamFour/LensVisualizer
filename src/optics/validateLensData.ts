@@ -927,6 +927,12 @@ export default function validateLensData(data: UntrustedLensData): string[] {
       errors.push(`elements[${i}]: "synthetic" is engine-generated; declare plates in "rearPlates"`);
     }
     elemIds.add(e.id);
+    if (
+      e.maxSdRatio !== undefined &&
+      (typeof e.maxSdRatio !== "number" || !isFinite(e.maxSdRatio) || e.maxSdRatio < 1)
+    ) {
+      errors.push(`elements[${i}]: maxSdRatio must be a finite number >= 1 when provided`);
+    }
     if (e.indexReference !== undefined && e.indexReference !== "d" && e.indexReference !== "e") {
       errors.push(`elements[${i}]: indexReference must be "d" or "e" when provided`);
     }
@@ -1420,9 +1426,11 @@ export default function validateLensData(data: UntrustedLensData): string[] {
      * can use patent-accurate SDs. */
     const sdMax = Math.max(front.sd, rear.sd);
     const sdMin = Math.min(front.sd, rear.sd);
-    if (sdMin > 0 && sdMax / sdMin > 3.0)
+    const maxSdRatio =
+      typeof elem.maxSdRatio === "number" && isFinite(elem.maxSdRatio) && elem.maxSdRatio >= 1 ? elem.maxSdRatio : 3;
+    if (sdMin > 0 && sdMax / sdMin > maxSdRatio)
       errors.push(
-        `Element ${elem.id} ("${elem.name}"): front/rear SD ratio ${(sdMax / sdMin).toFixed(2)} exceeds 3.0 — surfaces "${front.label}" (sd=${front.sd}) / "${rear.label}" (sd=${rear.sd}) may indicate a data entry error`,
+        `Element ${elem.id} ("${elem.name}"): front/rear SD ratio ${(sdMax / sdMin).toFixed(2)} exceeds ${maxSdRatio.toFixed(1)} — surfaces "${front.label}" (sd=${front.sd}) / "${rear.label}" (sd=${rear.sd}) may indicate a data entry error`,
       );
   }
 

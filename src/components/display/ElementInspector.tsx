@@ -96,6 +96,7 @@ function surfaceSummary(surface: SurfaceData): string | null {
 interface ElementDispersionRow {
   surfaceLabel: string;
   quality: DispersionQuality;
+  qualityLabel: string;
   glassName: string | null;
   indices: Record<ChromaticChannel, number>;
 }
@@ -109,6 +110,10 @@ function elementDispersionRows(info: ElementData, L: RuntimeLens): ElementDisper
     rows.push({
       surfaceLabel: L.S[idx]?.label ?? String(idx + 1),
       quality: entry.quality,
+      qualityLabel:
+        entry.quality === "sellmeier" && (entry.glassEntry?.polynomial || entry.glassEntry?.powerSeries)
+          ? "Catalog polynomial"
+          : DISPERSION_QUALITY_LABEL[entry.quality],
       glassName: entry.glassEntry?.name ?? null,
       indices: {
         R: entry.fn("R"),
@@ -294,7 +299,7 @@ export default function ElementInspector({ info, L, t, showChromatic, onOpenAsph
                   Dispersion{dispersionRows.length > 1 ? ` ${row.surfaceLabel}` : ""}:{" "}
                 </span>
                 <span style={{ color: t.value }}>
-                  {DISPERSION_QUALITY_LABEL[row.quality]}
+                  {row.qualityLabel}
                   {row.glassName ? ` (${row.glassName})` : ""}
                 </span>
               </div>

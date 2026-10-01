@@ -20,7 +20,8 @@ import type { LensMountId, ImageFormatId } from "./lensTaxonomy.js";
 export interface LensSummary {
   key: string;
   name: string;
-  maker?: string;
+  /** null explicitly records an unconfirmed manufacturer; omission retains name inference. */
+  maker?: string | null;
   specs?: string[];
   focalLengthMarketing?: number | [number, number];
   apertureMarketing?: number;

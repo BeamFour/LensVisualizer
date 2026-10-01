@@ -34,6 +34,10 @@ function makeLens(overrides: Partial<LensData> = {}): LensData {
 /* ── deriveMaker ── */
 
 describe("deriveMaker", () => {
+  it("does not infer a manufacturer when explicitly unconfirmed", () => {
+    expect(deriveMaker("CANON branded prototype", null)).toEqual({ display: "Unattributed", slug: "unattributed" });
+    expect(deriveMaker("CANON branded prototype").slug).toBe("canon");
+  });
   it("derives maker from known prefix in lens name", () => {
     const info = deriveMaker("NIKON NIKKOR Z 50mm f/1.8 S");
     expect(info.display).toBe("Nikon");
@@ -353,6 +357,11 @@ describe("lensJsonLd", () => {
     expect((ld.author as Record<string, unknown>).name).toBe("Ron Buening");
     expect((ld.publisher as Record<string, unknown>).name).toBe(SITE_NAME);
     expect(((ld.isBasedOn as Record<string, unknown>) || {}).name).toBe("US Patent 2019/0234567");
+  });
+
+  it("omits the manufacturer claim for an unattributed prescription", () => {
+    const ld = lensJsonLd({ ...makeLens(), maker: null }, "prototype");
+    expect(ld.about).not.toHaveProperty("manufacturer");
   });
 
   it("includes manufacturer derived from lens name", () => {

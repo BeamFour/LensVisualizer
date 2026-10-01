@@ -32,7 +32,8 @@ function uniqueMakerSlugs(): string[] {
 }
 
 /** Derive maker info from a lens's maker field or name. */
-export function deriveMaker(nameOrMaker: string, makerField?: string): MakerInfo {
+export function deriveMaker(nameOrMaker: string, makerField?: string | null): MakerInfo {
+  if (makerField === null) return { display: "Unattributed", slug: "unattributed" };
   /* Use explicit maker field if provided */
   if (makerField) {
     const upperMaker = makerField.toUpperCase();
@@ -143,7 +144,9 @@ export function lensJsonLd(lens: LensData, lensKey: string): Record<string, unkn
       "@type": "Product",
       name: lens.name,
       category: "Camera Lens",
-      manufacturer: { "@type": "Organization", name: deriveMaker(lens.name, lens.maker).display },
+      ...(lens.maker === null
+        ? {}
+        : { manufacturer: { "@type": "Organization", name: deriveMaker(lens.name, lens.maker).display } }),
     },
   };
 }

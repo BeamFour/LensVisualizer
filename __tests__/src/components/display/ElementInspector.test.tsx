@@ -180,7 +180,11 @@ describe("ElementInspector", () => {
     expect(screen.getByText(/diffractive radial phase, order \+1, λ₀ 587\.6 nm/)).toBeTruthy();
   });
 
-  it("shows resolved chromatic indices and quality instead of recomputing an Abbe-only fallback", () => {
+  it.each([
+    [{}, "Sellmeier"],
+    [{ polynomial: [1, 0, 0, 0, 0, 0] }, "Catalog polynomial"],
+    [{ powerSeries: [[1, 0]] }, "Catalog polynomial"],
+  ])("shows resolved indices and the correct catalog formula label (%j)", (formula, label) => {
     const chromaticLens = {
       ...mockLens,
       S: [{ label: "1", R: 100, d: 5, nd: 1.5, sd: 10, elemId: basicElement.id }],
@@ -188,7 +192,7 @@ describe("ElementInspector", () => {
       indexByIdx: {
         0: {
           quality: "sellmeier",
-          glassEntry: { name: "N-BK7" },
+          glassEntry: { name: "N-BK7", ...formula },
           fn: (channel: ChromaticChannel) => ({ R: 1.49, G: 1.5, B: 1.51, V: 1.515 })[channel],
         },
       },
@@ -203,7 +207,7 @@ describe("ElementInspector", () => {
       />,
     );
 
-    expect(screen.getByText("Sellmeier (N-BK7)")).toBeTruthy();
+    expect(screen.getByText(`${label} (N-BK7)`)).toBeTruthy();
     expect(screen.getByText("0.02000")).toBeTruthy();
     expect(screen.getByText("1.49000").getAttribute("title")).toBe("C-line 656.3 nm");
     expect(screen.getByText("1.50000").getAttribute("title")).toBe("d-line 587.6 nm");
