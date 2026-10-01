@@ -64,6 +64,8 @@ describe("patent catalog", () => {
     expect(espacenetPatentUrl("JP 1989-039542 A")).toBe(search("JPS6439542A"));
     expect(espacenetPatentUrl("JP 1989-100000 A")).toBe(search("JPH01100000A"));
     expect(espacenetPatentUrl("JP 2016-090725 A")).toBe(search("JP2016090725A"));
+    expect(espacenetPatentUrl("JP 2025-50505 A")).toBe(search("JP2025050505A"));
+    expect(espacenetPatentUrl("JP 2001-7512 A")).toBe(search("JP2001007512A"));
   });
 
   it("distinguishes publication numbers from local source fallback labels", () => {

@@ -19,6 +19,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-10-01",
+    type: "lens",
+    summary: "Added Canon RF 10–20mm f/4 L IS STM and RF 16–28mm f/2.8 IS STM patent models",
+  },
+  {
+    date: "2026-10-01",
+    type: "lens",
+    summary: "Added the Canon RF-S 14–30mm f/4–6.3 IS STM PZ patent model",
+  },
+  {
     date: "2026-09-30",
     type: "fix",
     summary: "Updated patent assignments across the lens catalog",
