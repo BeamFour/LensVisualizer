@@ -68,7 +68,7 @@ const LENS_DATA = {
   /* ── Identity ── */
   key: "canon-rf-16-28mm-f28-is-stm",
   maker: "Canon",
-  name: "CANON RF 16-28mm f/2.8 IS STM (patent-family model)",
+  name: "CANON RF 16-28mm f/2.8 IS STM",
   subtitle: "JP 2024-101615 A EXAMPLE 1 — CANON / SAITO (family-level correlation; not manufacturer-confirmed)",
   specs: [
     "16 ELEMENTS / 13 GROUPS",

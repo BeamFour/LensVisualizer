@@ -1,4 +1,4 @@
-# Canon RF 16-28mm f/2.8 IS STM (patent-family model) — Optical Design Analysis
+# Canon RF 16-28mm f/2.8 IS STM — Optical Design Analysis
 
 ## 1. Patent Reference and Design Identification
 
@@ -16,7 +16,7 @@ JP 2024-101615 A describes a family of negative-lead ultra-wide zoom lenses in w
 
 Numerical Example 1 is a five-group design, L1(−) L2(+) L3(−) L4(+) L5(+), with the stop at the front of L4 (¶0026). The patent prints focal lengths of 15.488 / 24.114 / 27.160 mm and F2.900 at all three published states (PDF p. 16). The ratio of the printed end focal lengths is 1.754, and ¶0015 describes Example 1 as a zoom ratio of about 1.8 at an aperture ratio of about 2.9.
 
-The correlation with the production Canon RF 16-28mm F2.8 IS STM (announced January 23, 2025) rests on the following convergent points, together with three recorded contradictions:
+The correlation with the production Canon RF 16-28mm F2.8 IS STM (announced January 23, 2025) rests on the following convergent points, together with the recorded differences below:
 
 1. **Applicant and timing.** Canon Inc. filed the application on January 18, 2023; publication followed on July 30, 2024, about six months before the product announcement.
 2. **Architecture and aperture.** A negative-lead ultra-wide zoom with a constant F2.9 design aperture across a 1.754× range corresponds to a constant f/2.8, 16–28 mm product.
@@ -25,9 +25,9 @@ The correlation with the production Canon RF 16-28mm F2.8 IS STM (announced Janu
 5. **Front-group low-dispersion element.** Canon U.S.A. describes a large-diameter UD lens in the front group; Example 1 places a biconcave 1.49700 / 81.61 element (E3) in L1. All four examples share this feature.
 6. **Focus and stabilization.** The patent's focus group is a single negative lens beside the stop (Fig. 1, ¶0078), which ¶0078 says eases quick focusing and which is consistent with the product's STM drive; its stabilization group is the cemented 10th/11th-lens doublet decentred perpendicular to the axis (¶0088), consistent with the product's optical IS.
 
-The contradicting evidence is material. Canon describes one glass-molded (GMo) asphere and one replica asphere, with the large replica element in the front-most position; Example 1 has no resin layer and places a direct asphere on a front element whose glass coordinates match only precision-moldable glass families. Canon lists four UD elements, whereas Example 1 contains five elements with νd ≥ 75. A secondary-source barrel length (112.8 mm at 16 mm, 102.1 mm at 28 mm) plus the 20 mm RF flange distance falls short of Example 1's printed first-vertex-to-image track by 7.36 mm at the wide end and 7.86 mm at the telephoto end. Example 3, by contrast, carries one resin-layer (replica-type) asphere, on its second element rather than its first, plus one double-aspheric glass element, which matches Canon's count of aspheric lenses by type but not the replica's position.
+The differences prevent claiming the exact factory prescription. Canon describes one glass-molded (GMo) asphere and one replica asphere, with the large replica element in the front-most position; Example 1 has no resin layer and places a direct asphere on a front element whose glass coordinates match only precision-moldable glass families. Canon lists four UD elements, whereas Example 1 contains five elements with νd ≥ 75; that numerical threshold does not establish Canon's manufacturer-defined UD classification. A secondary-source barrel length (112.8 mm at 16 mm, 102.1 mm at 28 mm) plus the 20 mm RF flange distance falls short of Example 1's printed first-vertex-to-image track by 7.36 mm at the wide end and 7.86 mm at the telephoto end. Example 3, by contrast, carries one resin-layer (replica-type) asphere, on its second element rather than its first, plus one double-aspheric glass element, which matches Canon's count of aspheric lenses by type but not the replica's position.
 
-The display name marks this as a patent-family model. Example 1 is treated as the selected example of the patent family, not as a manufacturer-confirmed production prescription and not as uniquely closest. Specifications quoted from Canon below are marketed values and are kept separate from the design values of the example.
+Example 1 is the closest overall match to Canon's published optical construction diagrams. The correspondence includes the four-element front group, two isolated lenses before the stop, three cemented doublets including the stabilization unit, the thin rear asphere, and the separate final positive lens. Its aspheric elements occupy the same first and penultimate positions that Canon marks. Example 3 is a close alternative in silhouette and element count, but places its front asphere on the second element. Examples 2 and 4 add a rear element, and Example 2 also reverses the stabilization doublet's interface orientation. This supports identifying the modeled architecture with the product while retaining the manufacturing and numerical differences above; Canon has not confirmed Example 1 as the exact production prescription. Specifications quoted from Canon below are marketed values and are kept separate from the design values of the example.
 
 ## 2. Optical Architecture
 
@@ -303,3 +303,4 @@ The four numerical examples trace a small design space around one layout: a four
 8. Video SALON. "キヤノン、ズーム全域F2.8の超広角ズームレンズ「RF16-28mm F2.8 IS STM」." https://videosalon.jp/news/canon_rf16-28mm (accessed September 29, 2026). Secondary source for extended barrel lengths only.
 9. Optical glass catalogs of OHARA (S-series), HOYA, Schott, HIKARI, CDGM, and Sumita, as distributed with the *opticalglass* 2.0.2 Python package (M. Hayford); catalog coordinates computed at 587.56, 486.13, 656.27, and 435.83 nm.
 10. W. T. Welford, *Aberrations of Optical Systems* (Bristol: Adam Hilger, 1986), for the Seidel and first-order chromatic sum conventions used in Sections 3, 6, 7, and 8.
+11. Canon Marketing Japan. Official January 23, 2025 [press release](https://corporate.jp.canon/newsroom/newsrelease/2025/pr-0123), including the downloadable optical construction diagram at 16 mm; cross-checked against the [Japanese product specifications diagram](https://personal.canon.jp/product/camera/rf/rf16-28-f28/spec) on October 1, 2026.

@@ -1,4 +1,4 @@
-# Nikon AF-S NIKKOR 58mm f/1.4G — Design Candidate
+# Nikon 58mm f/1.45 — Patent Design Candidate
 
 ## Patent Reference and Design Identification
 
@@ -14,9 +14,23 @@
 
 **Embodiment analyzed:** Example 2 (OS2), Figure 3, Tables 4 and 5.
 
-This is a patent design candidate associated with the catalog's 58mm product name, not an established production prescription. The source has nine elements in five air-separated components and four optical groups. No production modification, such as splitting a cemented pair, is established by the patent.
+This is a related patent design candidate associated with the AF-S NIKKOR 58mm f/1.4G, not an established production prescription. The display name uses the patent's design aperture, f/1.45; the subtitle and visible specification line preserve the inferred product association. The source has nine elements in five air-separated components and four optical groups. No production modification, such as splitting a cemented pair, is established by the patent.
 
 Table 4 specifies f=58.0216mm, FNO1.450, half-field20.86°, image height21.6mm, total track92.20380mm and BF38.70000mm. Numerical controls use f/1.45; f/1.4 remains the marketing designation.
+
+### Comparison with the production construction diagram
+
+Nikon's [global product page](https://imaging.nikon.com/imaging/lineup/lens/f-mount/singlefocal/normal/af-s_nikkor58mmf_14g/) and [Japanese specifications](https://nij.nikon.com/products/lineup/nikkor/fmount/af-s_nikkor_58mm_f14g/spec.html) publish nine elements in six groups and mark two aspheric elements. Comparing those official diagrams with local patent Figure 3 shows a related arrangement: a positive front collector, a front cemented doublet and negative meniscus before the stop, and a positive-negative-positive cemented triplet at the rear. Two structural differences prevent identifying Example 2 as the production prescription:
+
+| Feature | Patent Example 2 / modeled prescription | Nikon production diagram |
+|---|---|---|
+| Post-stop E5–E6 | Cemented negative-positive pair, with one shared surface | Separate negative and positive elements with an air gap |
+| Air-separated component count | Five | Six |
+| Aspheric elements | E1 and E9 (first and last) | E1 and E6 (first and the positive element behind the stop) |
+
+The extra production air gap accounts for the component-count difference, but the patent supplies no prescription for that air-spaced arrangement and does not establish it as a later modification of Example 2. Moving the asphere from E9 to E6 would also require source-backed coefficients and a new prescription; a display adjustment cannot reproduce it.
+
+The other three examples do not supply the production combination. Examples 1 and 4 retain the post-stop cemented pair and rear triplet, with aspheres on E3 and E9; Example 4 is a 51.6mm design. Example 3 is a 58.0216mm design with eight elements, retaining the post-stop pair and rear triplet. The association of Example 2 with the AF-S 58mm f/1.4G therefore remains an inference from the focal length, aperture, Nikon/Haruo Sato provenance, timing and general architecture. The entry should identify a related patent design candidate rather than promise the retail optical construction.
 
 ## Optical Architecture
 
