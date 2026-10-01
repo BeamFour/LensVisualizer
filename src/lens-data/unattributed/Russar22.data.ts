@@ -36,7 +36,7 @@ const LENS_DATA = {
   key: "russar-22-70f8",
   // Russar is a design family; the historical manufacturer is unconfirmed.
   maker: null,
-  name: "RUSSAR-22 70mm f/8 (patent model)",
+  name: "RUSSAR-22 70mm f/8",
   subtitle: "US 2,516,724 A — Example II; strong Russar-22 correlation, not manufacturer-confirmed",
   specs: ["6 ELEMENTS / 4 GROUPS", "f = 69.883 mm", "f/8", "2ω = 122°", "ALL-SPHERICAL"],
 

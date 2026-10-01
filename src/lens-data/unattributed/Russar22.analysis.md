@@ -29,7 +29,7 @@ production formula. Three pieces of evidence converge:
 
 No manufacturer-issued production sheet was located that establishes a legal manufacturing entity, interchangeable mount,
 or image format for this exact prescription. The manufacturer is explicitly unconfirmed and the catalog places both models under Unattributed.
-Russar is retained as the design-family name, with its history on Roossinov's author page. Mount and image-format fields remain unset, and the display name says patent model.
+Russar is retained as the design-family name, with its history on Roossinov's author page. Mount and image-format fields remain unset; the production-correlation caveat stays in these notes and the subtitle.
 
 ## Optical Architecture
 

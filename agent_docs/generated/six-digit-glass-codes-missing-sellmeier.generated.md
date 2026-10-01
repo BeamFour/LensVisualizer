@@ -1040,7 +1040,7 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | L6 (Element 6) | 9 | `Unmatched (460658 patent-rounded fluor-crown; no unique catalog identity)` | 1.46000 / 65.80 | No catalog entry | abbe | patents/DE_3907928_A1.pdf | Explicit disposition in data |
 | L7 (Element 7) | 11 | `Unmatched (650396 patent-rounded short flint; no unique catalog identity)` | 1.65000 / 39.60 | No catalog entry | abbe | patents/DE_3907928_A1.pdf | Explicit disposition in data |
 
-### [RUSSAR-22 70mm f/8 (patent model)](../../src/lens-data/unattributed/Russar22.data.ts) - US 2,516,724 A
+### [RUSSAR-22 70mm f/8](../../src/lens-data/unattributed/Russar22.data.ts) - US 2,516,724 A
 
 | Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
 |---|---|---|---|---|---|---|---|

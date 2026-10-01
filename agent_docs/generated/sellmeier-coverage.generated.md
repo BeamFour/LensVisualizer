@@ -294,7 +294,7 @@ Six-digit codes are not considered because their encoded coordinates are nd/νd.
 | [FUJIFILM FUJINON XF 18mm f/1.4 R LM WR](../../src/lens-data/fujifilm/FujifilmFujinonXf18mmf14RLMWR.data.ts) | 15/15 | 15 | 15/15 |
 | [FUJIFILM FUJINON XF 23mm f/1.4 R LM WR](../../src/lens-data/fujifilm/FujifilmXF23mmf14RLMWR.data.ts) | 15/15 | 15 | 15/15 |
 | [FUJIFILM FUJINON XF 33mm f/1.4 R LM WR](../../src/lens-data/fujifilm/FujifilmXF33mmf14RLMWR.data.ts) | 15/15 | 15 | 15/15 |
-| [KONICA VARIFOCAL HEXANON AR 35–100mm f/2.8 (patent model)](../../src/lens-data/konica/KonicaVarifocalHexanonAR35100mmf28.data.ts) | 15/15 | 15 | 15/15 |
+| [KONICA VARIFOCAL HEXANON AR 35–100mm f/2.8](../../src/lens-data/konica/KonicaVarifocalHexanonAR35100mmf28.data.ts) | 15/15 | 15 | 15/15 |
 | [KONICA ZOOM-HEXANON AR 70–150mm f/4](../../src/lens-data/konica/KonicaZoomHexanonAR70150mmf4.data.ts) | 15/15 | 15 | 15/15 |
 | [LEICA SUMMILUX-C 40mm T1.4](../../src/lens-data/leica/LeicaSummiluxC40mmT14.data.ts) | 15/15 | 15 | 15/15 |
 | [NIKON AF ZOOM-NIKKOR 28-85mm f/3.5-4.5](../../src/lens-data/nikon/NikonAFZoomNikkor2885mmf3545.data.ts) | 15/15 | 15 | 15/15 |
@@ -874,7 +874,7 @@ Fully strict and line-index-complete trusted lenses are listed above; this table
 | 131 | [NIKON AF-P DX NIKKOR 18-55mm f/3.5-5.6 G VR](../../src/lens-data/nikon/NikonAFPDX1855mmf3556G.data.ts) | 84.6% | 84.6% | 11/13 | 11/13 | 2 | abbe: 2 |
 | 132 | [CANON RF 50mm f/1.8 STM](../../src/lens-data/canon/CanonRF50mmf18STM.data.ts) | 83.3% | 83.3% | 5/6 | 5/6 | 1 | abbe: 1 |
 | 133 | [MAMIYA-SEKOR CS 35mm f/2.8](../../src/lens-data/mamiya/MamiyaSekorCS35mmf28.data.ts) | 83.3% | 83.3% | 5/6 | 5/6 | 1 | abbe: 1 |
-| 134 | [RUSSAR-21 60mm f/18 (patent model)](../../src/lens-data/unattributed/Russar21.data.ts) | 83.3% | 83.3% | 5/6 | 5/6 | 1 | abbe: 1 |
+| 134 | [RUSSAR-21 60mm f/18](../../src/lens-data/unattributed/Russar21.data.ts) | 83.3% | 83.3% | 5/6 | 5/6 | 1 | abbe: 1 |
 | 135 | [SCHNEIDER-KREUZNACH APO-SYMMAR 100mm f/5.6](../../src/lens-data/schneider-kreuznach/SchneiderAPOSymmar100mmf56.data.ts) | 83.3% | 83.3% | 5/6 | 5/6 | 1 | abbe: 1 |
 | 136 | [SCHNEIDER-KREUZNACH SUPER-SYMMAR XL 110mm f/5.6 ASPHERIC](../../src/lens-data/schneider-kreuznach/SchneiderSuperSymmarXL110mmf56.data.ts) | 83.3% | 83.3% | 5/6 | 5/6 | 1 | abbe: 1 |
 | 137 | [VILTROX AF 14mm f/4 AIR](../../src/lens-data/viltrox/ViltroxAF14mmf4Air.data.ts) | 83.3% | 83.3% | 10/12 | 10/12 | 2 | abbe: 2 |
@@ -956,7 +956,7 @@ Fully strict and line-index-complete trusted lenses are listed above; this table
 | 210 | [NIKON NIKKOR 300mm f/4.5 ED](../../src/lens-data/nikon/NikonNikkor300mmf45ED.data.ts) | 66.7% | 66.7% | 4/6 | 4/6 | 2 | abbe: 2 |
 | 211 | [RODENSTOCK GRANDAGON-N 75mm f/6.8](../../src/lens-data/rodenstock/RodenstockGrandagonN75mmf68.data.ts) | 66.7% | 66.7% | 4/6 | 4/6 | 2 | abbe: 2 |
 | 212 | [RODENSTOCK SIRONAR-N 100mm f/5.6](../../src/lens-data/rodenstock/RodenstockSironarN100mmf56.data.ts) | 66.7% | 66.7% | 4/6 | 4/6 | 2 | abbe: 2 |
-| 213 | [RUSSAR-22 70mm f/8 (patent model)](../../src/lens-data/unattributed/Russar22.data.ts) | 66.7% | 66.7% | 4/6 | 4/6 | 2 | abbe: 2 |
+| 213 | [RUSSAR-22 70mm f/8](../../src/lens-data/unattributed/Russar22.data.ts) | 66.7% | 66.7% | 4/6 | 4/6 | 2 | abbe: 2 |
 | 214 | [NIKON AF-S NIKKOR 18-35mm f/3.5-4.5 G ED](../../src/lens-data/nikon/NikonAFSNikkor1835mmf3545GED.data.ts) | 66.7% | 66.7% | 12/18 | 12/18 | 6 | abbe: 6 |
 |  | **60-64.9% coverage** |  |  |  |  |  |  |
 | 215 | [LAOWA 58mm f/2.8 2× Ultra-Macro APO](../../src/lens-data/laowa/Laowa58mmf28MacroAPO.data.ts) | 64.3% | 64.3% | 9/14 | 9/14 | 5 | abbe: 5 |
@@ -1866,7 +1866,7 @@ Incomplete visible lenses, still ordered by descending trusted chromatic complet
 |---|---|---|---|---|
 | 3 | Element 2 | abbe | `Unmatched (nd=1.69480, νd=55.5; nearest public 697555 lanthanum-crown family)` | Explicit unmatched/proprietary annotation |
 
-### [RUSSAR-21 60mm f/18 (patent model)](../../src/lens-data/unattributed/Russar21.data.ts) - 83.3% trusted (5/6); 83.3% Sellmeier (5/6) - US 2,516,724 A
+### [RUSSAR-21 60mm f/18](../../src/lens-data/unattributed/Russar21.data.ts) - 83.3% trusted (5/6); 83.3% Sellmeier (5/6) - US 2,516,724 A
 
 | Surface | Element | Runtime quality | Glass annotation | Reason |
 |---|---|---|---|---|
@@ -2440,7 +2440,7 @@ Incomplete visible lenses, still ordered by descending trusted chromatic complet
 | 2 | Element 2 | abbe | `Unmatched (vintage light-flint / BaLF-class; patent e-line values stored)` | Explicit unmatched/proprietary annotation |
 | 8 | Element 5 | abbe | `Unmatched (vintage light-flint / BaLF-class; patent e-line values stored)` | Explicit unmatched/proprietary annotation |
 
-### [RUSSAR-22 70mm f/8 (patent model)](../../src/lens-data/unattributed/Russar22.data.ts) - 66.7% trusted (4/6); 66.7% Sellmeier (4/6) - US 2,516,724 A
+### [RUSSAR-22 70mm f/8](../../src/lens-data/unattributed/Russar22.data.ts) - 66.7% trusted (4/6); 66.7% Sellmeier (4/6) - US 2,516,724 A
 
 | Surface | Element | Runtime quality | Glass annotation | Reason |
 |---|---|---|---|---|
