@@ -26,7 +26,7 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-01",
     type: "lens",
-    summary: "Added Russar-21 60mm f/18 and Russar-22 70mm f/8 patent models and Russar history",
+    summary: "Added Russar-21 60mm f/18 and Russar-22 70mm f/8 patent models",
   },
   {
     date: "2026-10-01",
