@@ -33,7 +33,9 @@ import type { LensDataInput } from "../../types/optics.js";
  *   then reduced where edge thickness (≥ 0.5 mm target), rim slope (≤ 64.2°), or cross-gap intrusion (≤ 0.9 × gap)
  *   would fail. Surfaces 15/16 are limited by the 0.80 mm E8–E9 air gap (rim-face clearance ≈ 0.08 mm, ≈ 10% of the gap).
  *
- * Fig. 1 (PDF p. 2, 600 dpi) supports a smaller C2 front rim: surface 13 is 8.4 mm, matching the cemented junction
+ * Fig. 1 (PDF p. 2, 600 dpi) supports smaller, continuous C2 and C4 rims. C4 surfaces 21–23 share
+ * a 9.9 mm rim (figure ≈ 9.3 mm), retaining ray clearance without the former 11.5 mm front step. The C2
+ * front rim: surface 13 is 8.4 mm, matching the cemented junction
  * instead of 9.8 mm. The rear rim stays 6.9 mm for cross-gap clearance. These remain modeled apertures.
  * Catalog glass names identify coordinate-compatible, supplier-neutral spectral proxies; production suppliers are
  * not identified by the patent.
@@ -123,6 +125,7 @@ const LENS_DATA = {
     {
       id: 5,
       name: "E5",
+      diagramLabel: "G1P",
       label: "Element 5",
       type: "Biconvex Positive",
       nd: 1.883,
@@ -136,6 +139,7 @@ const LENS_DATA = {
     {
       id: 6,
       name: "E6",
+      diagramLabel: "GP",
       label: "Element 6",
       type: "Biconvex Positive",
       nd: 1.72047,
@@ -242,6 +246,7 @@ const LENS_DATA = {
     {
       id: 14,
       name: "E14",
+      diagramLabel: "GIS",
       label: "Element 14",
       type: "Negative Meniscus",
       nd: 1.883,
@@ -266,6 +271,7 @@ const LENS_DATA = {
     {
       id: 16,
       name: "E16",
+      diagramLabel: "LN",
       label: "Element 16",
       type: "Positive Meniscus",
       nd: 1.497,
@@ -300,9 +306,9 @@ const LENS_DATA = {
     { label: "18", R: 39.963, d: 0.35, nd: 1.0, elemId: 0, sd: 8.75 }, // E10 rear
     { label: "19", R: 19.54, d: 5.55, nd: 1.497, elemId: 11, sd: 10.9 }, // E11 front (UD-class GMo asphere)
     { label: "20A", R: -31.043, d: 0.15, nd: 1.0, elemId: 0, sd: 10.85 }, // E11 rear (asph)
-    { label: "21", R: 18.566, d: 0.64, nd: 2.0509, elemId: 12, sd: 11.5 }, // E12 front (C4)
+    { label: "21", R: 18.566, d: 0.64, nd: 2.0509, elemId: 12, sd: 9.9 }, // E12 front (C4)
     { label: "22", R: 11.089, d: 7.99, nd: 1.497, elemId: 13, sd: 9.9 }, // E12→E13 junction
-    { label: "23", R: -43.632, d: 0.35, nd: 1.0, elemId: 0, sd: 10.4 }, // E13 rear
+    { label: "23", R: -43.632, d: 0.35, nd: 1.0, elemId: 0, sd: 9.9 }, // E13 rear
     { label: "24", R: 22.204, d: 0.9, nd: 1.883, elemId: 14, sd: 10.6 }, // E14 front — IS element GIS
     { label: "25", R: 16.576, d: 5.56, nd: 1.0, elemId: 0, sd: 10.15 }, // E14 rear
     { label: "26A", R: -26.667, d: 1.9, nd: 1.854, elemId: 15, sd: 10.6 }, // E15 front (GMo asph)

@@ -227,6 +227,8 @@ about the same as that of E6 (−0.637 mm), although its focal length is much sh
 **E13 — Biconvex Positive.** nd = 1.49700, νd = 81.5. Glass: S-FPL51 (OHARA) / FCD1 (HOYA) class — 497815
 fluorophosphate (UD class). f = +18.70 mm.
 
+Fig. 1 shows a common optical rim across C4. Surfaces 21–23 therefore use a modeled 9.9 mm semi-diameter, slightly above the approximately 9.3 mm figure reading; the former 11.5 mm front rim introduced an unsupported step.
+
 C4 is a conventional crown-flint achromat: a UD-class positive element cemented to a very-high-index flint negative. E12
 has the highest refractive index in the design (nd = 2.0509) and is only 0.64 mm thick, so the cemented junction carries
 a large index step. E13, at 7.99 mm, is the thickest element in the lens.

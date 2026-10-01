@@ -2008,8 +2008,8 @@ Incomplete visible lenses, still ordered by descending trusted chromatic complet
 
 | Surface | Element | Runtime quality | Glass annotation | Reason |
 |---|---|---|---|---|
-| 4A | Element 2 | abbe | `Unmatched (molded COP-class optical polymer, nd 1.53504 / νd 55.7; Canon PMo; supplier unconfirmed)` | Explicit unmatched/proprietary annotation |
-| 19A | Element 9 | abbe | `Unmatched (molded COP-class optical polymer, nd 1.53504 / νd 55.7; Canon PMo; supplier unconfirmed)` | Explicit unmatched/proprietary annotation |
+| 4A | Element 2 | abbe | `Unmatched (molded optical polymer, COP-like coordinates nd 1.53504 / νd 55.7; supplier and grade unconfirmed)` | Explicit unmatched/proprietary annotation |
+| 19A | Element 9 | abbe | `Unmatched (molded optical polymer, COP-like coordinates nd 1.53504 / νd 55.7; supplier and grade unconfirmed)` | Explicit unmatched/proprietary annotation |
 
 ### [LEICA ELMARIT-TL 18mm f/2.8 ASPH.](../../src/lens-data/leica/LeicaElmaritTL18mmf28.data.ts) - 80.0% trusted (8/10); 80.0% Sellmeier (8/10) - US 2020/0341238 A1
 

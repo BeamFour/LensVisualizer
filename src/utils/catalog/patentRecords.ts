@@ -62,14 +62,14 @@ export function isPatentPublicationNumber(value: string): boolean {
  * Convert a catalog display number into the DOCDB publication number that
  * Espacenet indexes.
  *
- * Three catalog formats diverge from DOCDB. US application publications print a
+ * Catalog display formats can diverge from DOCDB. US application publications print a
  * seven-digit serial whose leading zero DOCDB drops (US 2018/0164556 A1 is
  * US2018164556A1). Japanese era numbers keep their serial without leading zeros
  * (JP S62-078520 A is JPS6278520A). Pre-2000 Japanese numbers recorded with a
  * Western year must use the Showa or Heisei era year the publication carries
- * (JP 1991-141313 is JPH03141313). Every other format, including post-2000
- * Japanese numbers whose six-digit serials keep their zeros, only needs its
- * display punctuation removed.
+ * (JP 1991-141313 is JPH03141313). Post-2000 Japanese serials are padded to six
+ * digits even when the printed serial omits its leading zeros. Every other
+ * format only needs its display punctuation removed.
  */
 export function docdbPublicationNumber(patentNumber: string): string {
   const display = patentNumber.trim().toUpperCase();
@@ -84,6 +84,7 @@ export function docdbPublicationNumber(patentNumber: string): string {
       ? { era, eraYear: Number(eraYear) }
       : japaneseEraFromWesternYear(Number(westernYear), Number(serial));
     if (resolved) return `JP${resolved.era}${String(resolved.eraYear).padStart(2, "0")}${Number(serial)}${kind}`;
+    if (westernYear && Number(westernYear) >= 2000) return `JP${westernYear}${serial.padStart(6, "0")}${kind}`;
   }
 
   return display.replace(/[^A-Z0-9]/g, "");

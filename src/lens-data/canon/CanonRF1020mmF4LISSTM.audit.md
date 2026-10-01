@@ -16,3 +16,17 @@ Fig. 1 was inspected at 600 dpi. The measured axial glass span gives 45.71 µm/p
 All 16 visible elements already resolve to coefficient-backed catalog curves. S-FPL55, FCD515, S-NBH52V, TAFD65 and L-LAH85V are present in the shared catalog; this batch does not need duplicate rows. The Super UD/UD classifications remain inferred. No measured line indices or patent APD data were invented.
 
 Display name retained: **CANON RF 10-20mm f/4 L IS STM**; Canon's [product page](https://www.usa.canon.com/shop/catalog/product/view/id/197450/s/rf10-20mm-f4-l-is-stm/) confirms the STM and L designations. The production correlation remains unconfirmed, and the published back-focus/group-power discrepancies remain disclosed in the analysis.
+
+## 2026-10-01 — Live diagram, C4 rim and movement review
+
+| Surface / element | Field | Before | After | Source and reason |
+| --- | --- | --- | --- | --- |
+| 21 / E12 | `sd` | 11.5 mm | 9.9 mm | Fig. 1, PDF p. 2: C4 has a shared optical rim, approximately 9.3 mm; remove the unsupported front step with clearance retained. |
+| 23 / E13 | `sd` | 10.4 mm | 9.9 mm | Same figure: align the rear rim with the unchanged 9.9 mm cemented junction. |
+| E5, E6, E14, E16 | `diagramLabel` | Numeric fallback | G1P, GP, GIS, LN | Fig. 1 names these elements or their single-element units; retain E-number inspector identities. |
+
+The reduced C4 rims exceed the maximum sampled heights of previously unclipped diagram rays at surfaces 21/23 (8.38/8.07 mm, nine zoom settings and three focus settings). This is a meridional display-ray clearance check, not a new physical finite-conjugate verification. The other optical rims and all cemented pairs were re-inspected against the exact figure; source ink and existing cross-gap constraints do not support further edits.
+
+Fixed-image-plane movement agrees with Fig. 1 and the published infinity gaps: L1 moves imageward by 6.47 mm to the middle station, then objectward by 0.91 mm; L2 and L3 move objectward through zoom; L4 stays fixed. Near focus moves only GP imageward by 2.2469/2.2852/2.4319 mm at W/M/T. Close-focus distances and travel remain reconstructed. The live inspector retains four inferred APD elements and five aspheric surfaces on three elements; all 16 elements retain coefficient-backed curves.
+
+Structured assignee retained as **Canon Inc.**, consistent with the other two new lenses and the modern Canon catalog identity. Historical **Canon Camera Co., Inc.** remains a distinct source-era identity linked by the corporate-history registry; it is not a spelling duplicate.

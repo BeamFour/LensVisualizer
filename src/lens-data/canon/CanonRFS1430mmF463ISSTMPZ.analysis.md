@@ -126,7 +126,7 @@ surveyed catalogs, so no single vendor is identified.
 
 ### G12 — Biconcave Negative (2× Asph)
 
-nd = 1.53504, νd = 55.7. Glass: Unmatched (molded COP-class optical polymer, nd 1.53504 / νd 55.7; Canon PMo; supplier unconfirmed). f = −59.96 mm.
+nd = 1.53504, νd = 55.7. Glass: Unmatched (molded optical polymer, COP-like coordinates nd 1.53504 / νd 55.7; supplier and grade unconfirmed). f = −59.96 mm.
 
 G12 is a weak negative element, aspherical on both faces (surfaces 4 and 5). Its index and Abbe number match no glass
 catalog. They fall in the range of cyclo-olefin optical polymers, which is consistent with Canon's description of two
@@ -207,7 +207,7 @@ gives no glass rationale.
 
 ### G32 — Pos. Meniscus (2× Asph)
 
-nd = 1.53504, νd = 55.7. Glass: Unmatched (molded COP-class optical polymer, nd 1.53504 / νd 55.7; Canon PMo; supplier unconfirmed). f = +85.04 mm.
+nd = 1.53504, νd = 55.7. Glass: Unmatched (molded optical polymer, COP-like coordinates nd 1.53504 / νd 55.7; supplier and grade unconfirmed). f = +85.04 mm.
 
 G32 is the second polymer element, a weak positive meniscus concave to the object (R = −31.961 / −19.173 mm), aspherical
 on both faces. It is the positive lens that claim 1 requires behind the negative lens of L3. Its paraxial power is small,
@@ -227,7 +227,7 @@ at 22.29° to the axis and leaves at 12.96°. At the tele end the angles are 19.
 53.17, 84.17 and 139.21 mm in front of the image plane at the three stations. At the published image height the real
 chief ray meets the image at 13.76° at the wide end and 6.33° at the tele end. This is the "telecentricity" that the
 patent ties to condition (5) (¶0026) and condition (6) (¶0027). In third order G41 contributes −2.84 % distortion at the
-wide end and −0.074 mm of lateral colour. Exact coordinate matches were found only in the HOYA catalog (TAFD37A and TAFD37).
+wide end and −0.074 mm of lateral colour. The coordinate search found HOYA TAFD37A and TAFD37 as close class matches; this does not identify the production supplier.
 
 ## Glass Identification and Selection
 
@@ -239,22 +239,22 @@ dPgF values.
 
 | Element | nd / νd        | Label in data file              | Match                    | Basis row       | θgF    | ΔPgF    | Role                              |
 | ------- | -------------- | ------------------------------- | ------------------------ | --------------- | ------ | ------- | --------------------------------- |
-| G11     | 1.77250 / 49.6 | S-LAH66 / TAF1 class            | Exact, vendor unresolved | OHARA S-LAH66   | 0.5520 | −0.0084 | front negative meniscus           |
-| G12     | 1.53504 / 55.7 | Unmatched (COP-class polymer)   | Unmatched                | —               | —      | —       | aspheric field corrector          |
-| G13     | 1.84666 / 23.9 | S-TIH53WN (OHARA)               | Exact                    | OHARA S-TIH53WN | 0.6208 | +0.0172 | L1 chromatic partner              |
-| G21     | 1.48749 / 70.2 | S-FSL5 (OHARA)                  | Exact                    | OHARA S-FSL5    | 0.5300 | +0.0044 | weak pre-stop crown; IS candidate |
-| G22     | 1.80400 / 46.5 | S-LAH65VS (OHARA)               | Exact                    | OHARA S-LAH65VS | 0.5577 | −0.0079 | main post-stop positive           |
-| G23     | 1.95375 / 32.3 | S-LAH98 / TAFD45 class          | Exact, vendor unresolved | OHARA S-LAH98   | 0.5905 | +0.0011 | doublet flint                     |
-| G24     | 1.49700 / 81.7 | S-FPL51 / FCD1 class (Canon UD) | Close                    | HIKARI J-FK01A  | 0.5372 | +0.0307 | doublet ED crown                  |
-| G31     | 1.63980 / 34.5 | S-TIM27 (OHARA)                 | Exact                    | OHARA S-TIM27   | 0.5922 | +0.0064 | focus-group negative              |
-| G32     | 1.53504 / 55.7 | Unmatched (COP-class polymer)   | Unmatched                | —               | —      | —       | aspheric field corrector          |
-| G41     | 1.90043 / 37.4 | TAFD37A (HOYA)                  | Exact                    | HOYA TAFD37A    | 0.5766 | −0.0043 | rear meniscus; exit-pupil control |
+| G11     | 1.77250 / 49.6 | S-LAH66 / TAF1 class            | Coordinate match; supplier unresolved | OHARA S-LAH66   | 0.5520 | −0.0084 | front negative meniscus           |
+| G12     | 1.53504 / 55.7 | Unmatched (COP-like polymer coordinates)   | Unmatched                | —               | —      | —       | aspheric field corrector          |
+| G13     | 1.84666 / 23.9 | S-TIH53WN class               | Coordinate match; supplier unresolved | OHARA S-TIH53WN | 0.6208 | +0.0172 | L1 chromatic partner              |
+| G21     | 1.48749 / 70.2 | S-FSL5 class                  | Coordinate match; supplier unresolved | OHARA S-FSL5    | 0.5300 | +0.0044 | weak pre-stop crown; IS candidate |
+| G22     | 1.80400 / 46.5 | S-LAH65VS class               | Coordinate match; supplier unresolved | OHARA S-LAH65VS | 0.5577 | −0.0079 | main post-stop positive           |
+| G23     | 1.95375 / 32.3 | S-LAH98 / TAFD45 class          | Coordinate match; supplier unresolved | OHARA S-LAH98   | 0.5905 | +0.0011 | doublet flint                     |
+| G24     | 1.49700 / 81.7 | S-FPL51 / FCD1 class (inferred UD) | Close class; supplier unresolved | HIKARI J-FK01A  | 0.5372 | +0.0307 | doublet ED crown                  |
+| G31     | 1.63980 / 34.5 | S-TIM27 class                 | Coordinate match; supplier unresolved | OHARA S-TIM27   | 0.5922 | +0.0064 | focus-group negative              |
+| G32     | 1.53504 / 55.7 | Unmatched (COP-like polymer coordinates)   | Unmatched                | —               | —      | —       | aspheric field corrector          |
+| G41     | 1.90043 / 37.4 | TAFD37A class                  | Coordinate match; supplier unresolved | HOYA TAFD37A    | 0.5766 | −0.0043 | rear meniscus; exit-pupil control |
 
 The palette has three features. First, the glass elements use high-index lanthanum and titanium flints: five of the eight
 glass elements have nd > 1.77. A high index permits lower curvatures for a given power, which matters in a lens whose elements are small and
 strongly powered.
 Second, the only low-index materials are the two crowns G21 and G24, both of low dispersion, and the two polymers G12
-and G32, which carry all four aspheric surfaces. Third, there is exactly one anomalous-dispersion-class glass, G24.
+and G32, which carry all four aspheric surfaces. Third, G24 is the one element tagged as inferred APD in the model, consistent with a possible assignment of Canon’s single production UD element. This does not establish the production prescription or exclude anomalous partial dispersion in other glass classes.
 Its class heads S-FPL51 and FCD1 have catalog ΔPgF of +0.0308 and +0.0321. The patent contains no conditional
 expression on glass properties. For the two polymer elements only nd and νd are available, so any chromatic model of
 them rests on the Abbe number alone.
@@ -392,13 +392,13 @@ aperture and field, as transverse image-plane values in mm, are:
 - **Within L2.** The UD-class doublet D1 reduces L2's own axial colour by opposing G22 and G21 (see D1 above).
 - **Within L1.** The dense flint G13 opposes the lanthanum-flint and polymer negatives.
 
-The only anomalous-dispersion-class element is G24. Its class heads have catalog ΔPgF near +0.03, and the dense flint
+The model tags G24 as inferred APD from its ED-class coordinate. Its class heads have catalog ΔPgF near +0.03, and the dense flint
 G13's basis row has +0.0172. The patent publishes no partial-dispersion data, states no chromatic conditional
 expression, and the data file carries no spectral fields. Canon describes the UD element only as correcting chromatic
 aberration. The design is therefore described here as a primary-colour-balanced achromat with one ED-class element. No
 apochromatic or secondary-spectrum claim is supported. The two polymer elements have no verified grade-specific catalog dispersion curves, so
 their partial dispersion is unknown. [ZEON’s public COP property table](https://www.zeon.co.jp/business/enterprise/resin/cop/)
-lists both K26R and K22R at nd = 1.535, but supplies no dispersion coefficients and does not identify either as Canon’s
+and its [COP brochure](https://www.zeon.co.jp/en/business/enterprise/resin/pdf/200323391.pdf) list several grades at nd = 1.535, but supply no wavelength-dependent index coefficients and do not identify any as Canon’s
 material. The index match alone therefore does not support adding a spectral proxy for these elements.
 
 ## Aberration Correction Strategy

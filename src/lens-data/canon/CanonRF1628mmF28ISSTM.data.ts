@@ -415,7 +415,7 @@ const LENS_DATA = {
   closeFocusM: 0.25,
   zoomCloseFocusM: [0.25, 0.213, 0.2], // 0.25 / 0.20 m Canon MFDs (image-plane reference); 0.213 m interpolated
   focusDescription:
-    "CONSTRAINED_RECONSTRUCTION: inner focus by L3 (single negative lens E6) moving toward the object with D10 + D12 conserved; all other groups and the image plane fixed. The patent publishes infinity states only; close spacings are solved paraxially for object distances of 0.250 / 0.213 / 0.200 m from the image plane (Canon MFDs at the ends, interpolated at the middle station).",
+    "Inner focus by L3 (single negative lens E6) moving toward the object with D10 + D12 conserved; all other groups and the image plane fixed. The patent publishes infinity states only; close spacings are solved paraxially for object distances of 0.250 / 0.213 / 0.200 m from the image plane (Canon MFDs at the ends, interpolated at the middle station).",
 
   /* ── Aperture configuration ── */
   nominalFno: 2.9,
