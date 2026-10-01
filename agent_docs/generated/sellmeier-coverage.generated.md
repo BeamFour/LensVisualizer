@@ -11,18 +11,18 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 ## Summary
 
-- **849** lenses scanned
-- **837** visible lenses scanned
-- **566** lenses fully covered by trusted chromatic data
-- **564** visible lenses fully covered by trusted chromatic data
-- **560** lenses fully covered by strict Sellmeier data
-- **558** visible lenses fully covered by strict Sellmeier data
+- **852** lenses scanned
+- **840** visible lenses scanned
+- **567** lenses fully covered by trusted chromatic data
+- **565** visible lenses fully covered by trusted chromatic data
+- **561** lenses fully covered by strict Sellmeier data
+- **559** visible lenses fully covered by strict Sellmeier data
 - **6** lenses fully covered only after measured line-index data
 - **6** visible lenses fully covered only after measured line-index data
-- **8840 / 9538** non-air surfaces use strict catalog Sellmeier data
-- **92.7%** strict Sellmeier surface coverage overall
-- **8855 / 9538** non-air surfaces use trusted chromatic data
-- **92.8%** trusted chromatic coverage overall
+- **8855 / 9565** non-air surfaces use strict catalog Sellmeier data
+- **92.6%** strict Sellmeier surface coverage overall
+- **8870 / 9565** non-air surfaces use trusted chromatic data
+- **92.7%** trusted chromatic coverage overall
 - **119 / 164** native e-line surfaces use name-verified catalog Sellmeier data
 
 ## Native E-Line Catalog Matches
@@ -248,7 +248,7 @@ Six-digit codes are not considered because their encoded coordinates are nd/νd.
 | [CANON RF 10-20mm f/4 L IS STM](../../src/lens-data/canon/CanonRF1020mmF4LISSTM.data.ts) | 16/16 | 16 | 16/16 |
 | [CANON RF 14-35mm f/4 L IS USM](../../src/lens-data/canon/CanonRF1435mmf4LISUSM.data.ts) | 16/16 | 16 | 16/16 |
 | [CANON RF 15-35mm f/2.8 L IS USM](../../src/lens-data/canon/CanonRF1535f28.data.ts) | 16/16 | 16 | 16/16 |
-| [CANON RF 16-28mm f/2.8 IS STM (patent-family model)](../../src/lens-data/canon/CanonRF1628mmF28ISSTM.data.ts) | 16/16 | 16 | 16/16 |
+| [CANON RF 16-28mm f/2.8 IS STM](../../src/lens-data/canon/CanonRF1628mmF28ISSTM.data.ts) | 16/16 | 16 | 16/16 |
 | [CANON RF 70-200mm f/4 L IS USM](../../src/lens-data/canon/CanonRF70200mmf4LISUSM.data.ts) | 16/16 | 16 | 16/16 |
 | [FUJIFILM FUJINON GF 250mm f/4 R LM OIS WR](../../src/lens-data/fujifilm/FujifilmGF250mmf4RLM.data.ts) | 16/16 | 16 | 16/16 |
 | [FUJIFILM FUJINON GF 30mm f/5.6 T/S](../../src/lens-data/fujifilm/FujifilmGF30mmf56TS.data.ts) | 16/16 | 16 | 16/16 |
@@ -294,6 +294,7 @@ Six-digit codes are not considered because their encoded coordinates are nd/νd.
 | [FUJIFILM FUJINON XF 18mm f/1.4 R LM WR](../../src/lens-data/fujifilm/FujifilmFujinonXf18mmf14RLMWR.data.ts) | 15/15 | 15 | 15/15 |
 | [FUJIFILM FUJINON XF 23mm f/1.4 R LM WR](../../src/lens-data/fujifilm/FujifilmXF23mmf14RLMWR.data.ts) | 15/15 | 15 | 15/15 |
 | [FUJIFILM FUJINON XF 33mm f/1.4 R LM WR](../../src/lens-data/fujifilm/FujifilmXF33mmf14RLMWR.data.ts) | 15/15 | 15 | 15/15 |
+| [KONICA VARIFOCAL HEXANON AR 35–100mm f/2.8 (patent model)](../../src/lens-data/konica/KonicaVarifocalHexanonAR35100mmf28.data.ts) | 15/15 | 15 | 15/15 |
 | [KONICA ZOOM-HEXANON AR 70–150mm f/4](../../src/lens-data/konica/KonicaZoomHexanonAR70150mmf4.data.ts) | 15/15 | 15 | 15/15 |
 | [LEICA SUMMILUX-C 40mm T1.4](../../src/lens-data/leica/LeicaSummiluxC40mmT14.data.ts) | 15/15 | 15 | 15/15 |
 | [NIKON AF ZOOM-NIKKOR 28-85mm f/3.5-4.5](../../src/lens-data/nikon/NikonAFZoomNikkor2885mmf3545.data.ts) | 15/15 | 15 | 15/15 |
@@ -905,7 +906,7 @@ Fully strict and line-index-complete trusted lenses are listed above; this table
 | 162 | [CANON FD 35mm f/2 S.S.C. (I)](../../src/lens-data/canon/CanonFD35mmf2.data.ts) | 77.8% | 77.8% | 7/9 | 7/9 | 2 | abbe: 2 |
 | 163 | [KINOPTIK TEGEA 9.8mm f/1.8](../../src/lens-data/kinoptik/KinoptikTegea98mmf18.data.ts) | 77.8% | 77.8% | 7/9 | 7/9 | 2 | abbe: 2 |
 | 164 | [MINOLTA AF 28mm f/2](../../src/lens-data/minolta/MinoltaAF28mmf2.data.ts) | 77.8% | 77.8% | 7/9 | 7/9 | 2 | abbe: 2 |
-| 165 | [NIKON AF-S NIKKOR 58mm f/1.4 G](../../src/lens-data/nikon/Nikon58f14GDesignCandidate.data.ts) | 77.8% | 77.8% | 7/9 | 7/9 | 2 | abbe: 2 |
+| 165 | [NIKON 58mm f/1.45 (patent design candidate)](../../src/lens-data/nikon/Nikon58f14GDesignCandidate.data.ts) | 77.8% | 77.8% | 7/9 | 7/9 | 2 | abbe: 2 |
 | 166 | [SAMYANG AF 18mm f/2.8 FE](../../src/lens-data/samyang/SamyangAF18mmf28.data.ts) | 77.8% | 77.8% | 7/9 | 7/9 | 2 | abbe: 2 |
 | 167 | [SAMYANG AF 50mm f/1.4 FE](../../src/lens-data/samyang/SamyangAF50mmf14FE.data.ts) | 77.8% | 77.8% | 7/9 | 7/9 | 2 | abbe: 2 |
 | 168 | [SONY E 30mm f/3.5 Macro](../../src/lens-data/sony/SonySEL30mmf35.data.ts) | 77.8% | 77.8% | 7/9 | 7/9 | 2 | abbe: 2 |
@@ -1028,9 +1029,11 @@ Fully strict and line-index-complete trusted lenses are listed above; this table
 | 271 | [MEYER OPTIK GÖRLITZ DOUBLE-PLASMAT 135mm f/4.5 (patent model)](../../src/lens-data/meyer-optik-goerlitz/MeyerOptikGorlitz135mmf45DoublePlasmat.data.ts) | 0.0% | 0.0% | 0/6 | 0/6 | 6 | abbe: 6 |
 | 272 | [MEYER OPTIK GÖRLITZ KINO-PLASMAT 100mm f/2](../../src/lens-data/meyer-optik-goerlitz/MeyerOptikGorlitz100mmf2KinoPlasmat.data.ts) | 0.0% | 0.0% | 0/6 | 0/6 | 6 | constant: 6 |
 | 273 | [Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) | 0.0% | 0.0% | 0/6 | 0/6 | 6 | abbe: 6 |
-| 274 | [SAMSUNG 4.3mm f/1.5 (Galaxy S9)](../../src/lens-data/samsung/SamsungGalaxyS9MainWideCameraLens.data.ts) | 0.0% | 0.0% | 0/7 | 0/7 | 7 | abbe: 7 |
-| 275 | [SAMYANG AF 35mm f/2.8 FE](../../src/lens-data/samyang/SamyangAF35mmf28FE.data.ts) | 0.0% | 0.0% | 0/7 | 0/7 | 7 | abbe: 7 |
-| 276 | [SONY SONNAR T* FE 35mm f/2.8 ZA](../../src/lens-data/sony/SonyFE35mmf28ZA.data.ts) | 0.0% | 0.0% | 0/7 | 0/7 | 7 | abbe: 7 |
+| 274 | [RUSSAR-21 60mm f/18 (patent model)](../../src/lens-data/russar/Russar21.data.ts) | 0.0% | 0.0% | 0/6 | 0/6 | 6 | abbe: 6 |
+| 275 | [RUSSAR-22 70mm f/8 (patent model)](../../src/lens-data/russar/Russar22.data.ts) | 0.0% | 0.0% | 0/6 | 0/6 | 6 | abbe: 6 |
+| 276 | [SAMSUNG 4.3mm f/1.5 (Galaxy S9)](../../src/lens-data/samsung/SamsungGalaxyS9MainWideCameraLens.data.ts) | 0.0% | 0.0% | 0/7 | 0/7 | 7 | abbe: 7 |
+| 277 | [SAMYANG AF 35mm f/2.8 FE](../../src/lens-data/samyang/SamyangAF35mmf28FE.data.ts) | 0.0% | 0.0% | 0/7 | 0/7 | 7 | abbe: 7 |
+| 278 | [SONY SONNAR T* FE 35mm f/2.8 ZA](../../src/lens-data/sony/SonyFE35mmf28ZA.data.ts) | 0.0% | 0.0% | 0/7 | 0/7 | 7 | abbe: 7 |
 
 ## Missing Surface Details
 
@@ -2086,7 +2089,7 @@ Incomplete visible lenses, still ordered by descending trusted chromatic complet
 | 9 | Element 6 | abbe | `750504 - dense lanthanum crown class (catalog unresolved)` | No catalog match |
 | 13 | Element 8 | abbe | `773501 - lanthanum flint (catalog unresolved)` | No catalog match |
 
-### [NIKON AF-S NIKKOR 58mm f/1.4 G](../../src/lens-data/nikon/Nikon58f14GDesignCandidate.data.ts) - 77.8% trusted (7/9); 77.8% Sellmeier (7/9) - JP 2013-019993 A
+### [NIKON 58mm f/1.45 (patent design candidate)](../../src/lens-data/nikon/Nikon58f14GDesignCandidate.data.ts) - 77.8% trusted (7/9); 77.8% Sellmeier (7/9) - JP 2013-019993 A
 
 | Surface | Element | Runtime quality | Glass annotation | Reason |
 |---|---|---|---|---|
@@ -3021,6 +3024,28 @@ Incomplete visible lenses, still ordered by descending trusted chromatic complet
 | 6 | Element 4 | abbe | `668358 — supplier unresolved` | No catalog match |
 | 8 | Element 5 | abbe | `575391 — supplier unresolved` | No catalog match |
 | 10 | Element 6 | abbe | `704408 — supplier unresolved` | No catalog match |
+
+### [RUSSAR-21 60mm f/18 (patent model)](../../src/lens-data/russar/Russar21.data.ts) - 0.0% trusted (0/6); 0.0% Sellmeier (0/6) - US 2,516,724 A
+
+| Surface | Element | Runtime quality | Glass annotation | Reason |
+|---|---|---|---|---|
+| 1 | Element 1 | abbe | `Unmatched (Lenzos L-67; nd=1.6395, vd=43.3; reference wavelength unstated)` | Explicit unmatched/proprietary annotation |
+| 3 | Element 2 | abbe | `Unmatched (Lenzos L-24; coordinate class 613586; supplier unresolved)` | Explicit unmatched/proprietary annotation |
+| 4 | Element 3 | abbe | `Unmatched (Lenzos L-28; coordinate class 548459; supplier unresolved)` | Explicit unmatched/proprietary annotation |
+| 6 | Element 4 | abbe | `Unmatched (Lenzos L-28; coordinate class 548459; supplier unresolved)` | Explicit unmatched/proprietary annotation |
+| 7 | Element 5 | abbe | `Unmatched (Lenzos L-24; coordinate class 613586; supplier unresolved)` | Explicit unmatched/proprietary annotation |
+| 9 | Element 6 | abbe | `Unmatched (Lenzos L-15; coordinate class 626391; supplier unresolved)` | Explicit unmatched/proprietary annotation |
+
+### [RUSSAR-22 70mm f/8 (patent model)](../../src/lens-data/russar/Russar22.data.ts) - 0.0% trusted (0/6); 0.0% Sellmeier (0/6) - US 2,516,724 A
+
+| Surface | Element | Runtime quality | Glass annotation | Reason |
+|---|---|---|---|---|
+| 1 | Element 1 | abbe | `Unmatched (Lenzos L-67; code 640433)` | Explicit unmatched/proprietary annotation |
+| 3 | Element 2 | abbe | `Unmatched (Lenzos L-24; reference wavelength unstated; BACD4 coordinate comparison only)` | Explicit unmatched/proprietary annotation |
+| 4 | Element 3 | abbe | `Unmatched (Lenzos L-28; reference wavelength unstated; LLF1 coordinate comparison only)` | Explicit unmatched/proprietary annotation |
+| 6 | Element 4 | abbe | `Unmatched (Lenzos L-28; reference wavelength unstated; LLF1 coordinate comparison only)` | Explicit unmatched/proprietary annotation |
+| 7 | Element 5 | abbe | `Unmatched (Lenzos L-24; reference wavelength unstated; BACD4 coordinate comparison only)` | Explicit unmatched/proprietary annotation |
+| 9 | Element 6 | abbe | `Unmatched (Lenzos L-3; reference wavelength unstated; flint coordinate class)` | Explicit unmatched/proprietary annotation |
 
 ### [SAMSUNG 4.3mm f/1.5 (Galaxy S9)](../../src/lens-data/samsung/SamsungGalaxyS9MainWideCameraLens.data.ts) - 0.0% trusted (0/7); 0.0% Sellmeier (0/7) - US 2021/0149156 A1
 

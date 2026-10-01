@@ -20,6 +20,16 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-01",
+    type: "lens",
+    summary: "Added the Konica Varifocal Hexanon AR 35–100mm f/2.8 patent model",
+  },
+  {
+    date: "2026-10-01",
+    type: "lens",
+    summary: "Added Russar-21 60mm f/18 and Russar-22 70mm f/8 patent models and Russar history",
+  },
+  {
+    date: "2026-10-01",
     type: "fix",
     summary: "Corrected the Canon RF 800mm f/11 focus-element outline against its patent figure",
   },

@@ -9,12 +9,12 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 ## Summary
 
-- **849** lenses scanned
-- **1876** total code-only elements found
-- **341** elements in this report
-- **125** distinct lens files affected
+- **852** lenses scanned
+- **1897** total code-only elements found
+- **347** elements in this report
+- **127** distinct lens files affected
 - **23** active unreviewed elements have no review-record hit or explicit disposition
-- **185** explicitly unmatched/unknown/proprietary/unidentified elements are self-recording review dispositions
+- **191** explicitly unmatched/unknown/proprietary/unidentified elements are self-recording review dispositions
 - **0** dispositions lack any review record
 
 ## Prioritized Unreviewed Queue
@@ -70,6 +70,8 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 514428 | 2 | 1 | patents/JP2016021011A.pdf | All rows have review records |
 | 531557 | 2 | 2 | patents/WO2022071249A1.pdf<br>patents/US8994842.pdf | All rows explicitly disposed |
 | 540473 | 2 | 1 | patents/GB_135853_A.pdf | All rows explicitly disposed |
+| 548459 | 2 | 1 | patents/US2516724.pdf | All rows explicitly disposed |
+| 613586 | 2 | 1 | patents/US2516724.pdf | All rows explicitly disposed |
 | 620586 | 2 | 1 | patents/US4303314.pdf | All rows have review records |
 | 621569 | 2 | 1 | patents/GB_135853_A.pdf | All rows explicitly disposed |
 | 622532 | 2 | 1 | patents/GB_135853_A.pdf | All rows explicitly disposed |
@@ -166,12 +168,14 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 624584 | 1 | 1 | patents/JP2025052870A.pdf | All rows have review records |
 | 625533 | 1 | 1 | patents/US2721499.pdf | All rows have review records |
 | 626357 | 1 | 1 | patents/CN211955966U.pdf | All rows explicitly disposed |
+| 626391 | 1 | 1 | patents/US2516724.pdf | All rows explicitly disposed |
 | 630346 | 1 | 1 | patents/JP2015041012A.pdf | All rows have review records |
 | 634299 | 1 | 1 | patents/WO2024154461A1.pdf | No review-record hit |
 | 635232 | 1 | 1 | patents/US8081392.pdf | All rows explicitly disposed |
 | 636239 | 1 | 1 | patents/US20150124127A1.pdf | All rows explicitly disposed |
 | 639235 | 1 | 1 | patents/US20210149156A1.pdf | All rows explicitly disposed |
 | 640353 | 1 | 1 | patents/US4277149.pdf | All rows have review records |
+| 640433 | 1 | 1 | patents/US2516724.pdf | All rows explicitly disposed |
 | 641589 | 1 | 1 | patents/US7307794.pdf | All rows explicitly disposed |
 | 642581 | 1 | 1 | patents/US2721499.pdf | All rows have review records |
 | 646287 | 1 | 1 | patents/WO2024154461A1.pdf | No review-record hit |
@@ -1038,6 +1042,22 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | L1 (Element 1) | 1 | `Unmatched (520642 patent-rounded crown; no unique catalog identity)` | 1.52000 / 64.20 | No catalog entry | abbe | patents/DE_3907928_A1.pdf | Explicit disposition in data |
 | L6 (Element 6) | 9 | `Unmatched (460658 patent-rounded fluor-crown; no unique catalog identity)` | 1.46000 / 65.80 | No catalog entry | abbe | patents/DE_3907928_A1.pdf | Explicit disposition in data |
 | L7 (Element 7) | 11 | `Unmatched (650396 patent-rounded short flint; no unique catalog identity)` | 1.65000 / 39.60 | No catalog entry | abbe | patents/DE_3907928_A1.pdf | Explicit disposition in data |
+
+### [RUSSAR-21 60mm f/18 (patent model)](../../src/lens-data/russar/Russar21.data.ts) - US 2,516,724 A
+
+| Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
+|---|---|---|---|---|---|---|---|
+| L2 (Element 2) | 3 | `Unmatched (Lenzos L-24; coordinate class 613586; supplier unresolved)` | 1.61260 / 58.60 | No catalog entry | abbe | patents/US2516724.pdf | Explicit disposition in data |
+| L3 (Element 3) | 4 | `Unmatched (Lenzos L-28; coordinate class 548459; supplier unresolved)` | 1.54800 / 45.90 | No catalog entry | abbe | patents/US2516724.pdf | Explicit disposition in data |
+| L4 (Element 4) | 6 | `Unmatched (Lenzos L-28; coordinate class 548459; supplier unresolved)` | 1.54800 / 45.90 | No catalog entry | abbe | patents/US2516724.pdf | Explicit disposition in data |
+| L5 (Element 5) | 7 | `Unmatched (Lenzos L-24; coordinate class 613586; supplier unresolved)` | 1.61260 / 58.60 | No catalog entry | abbe | patents/US2516724.pdf | Explicit disposition in data |
+| L6 (Element 6) | 9 | `Unmatched (Lenzos L-15; coordinate class 626391; supplier unresolved)` | 1.62590 / 39.10 | No catalog entry | abbe | patents/US2516724.pdf | Explicit disposition in data |
+
+### [RUSSAR-22 70mm f/8 (patent model)](../../src/lens-data/russar/Russar22.data.ts) - US 2,516,724 A
+
+| Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
+|---|---|---|---|---|---|---|---|
+| L1 (Element 1) | 1 | `Unmatched (Lenzos L-67; code 640433)` | 1.63950 / 43.30 | No catalog entry | abbe | patents/US2516724.pdf | Explicit disposition in data |
 
 ### [SAMSUNG 30mm f/2](../../src/lens-data/samsung/Samsung30mmf2.data.ts) - US 2010/0149663 A1
 
