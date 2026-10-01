@@ -20,6 +20,16 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-01",
+    type: "fix",
+    summary: "Corrected the Canon RF 800mm f/11 focus-element outline against its patent figure",
+  },
+  {
+    date: "2026-10-01",
+    type: "improvement",
+    summary: "Clarified Canon RF 16–28mm and Nikon 58mm patent-model labels",
+  },
+  {
+    date: "2026-10-01",
     type: "lens",
     summary: "Added Canon RF 10–20mm f/4 L IS STM and RF 16–28mm f/2.8 IS STM patent models",
   },
