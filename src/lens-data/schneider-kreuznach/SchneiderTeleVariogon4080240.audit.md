@@ -21,4 +21,4 @@ Display names were reviewed against the documented product correlations. Schneid
 
 ### Retained limits
 
-The image-circle heuristic has no canonical source-format ID for S-100, COOLPIX SQ, COOLPIX 4300 or TV-Variogon. Its skipped result does not establish full-field coverage. The source/analysis notes retain static-focus, rounded-prescription and pupil-coverage limits.
+The source/analysis notes retain static-focus, rounded-prescription and pupil-coverage limits. Production-format metadata is a nominal frame reference and does not establish full-field coverage.

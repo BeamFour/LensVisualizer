@@ -302,3 +302,7 @@ No sensor cover glass, rear filter plate, dummy optical plane, or dimensional sc
 10. SUMITA OPTICAL GLASS, Inc., optical-glass data: https://sumita-opt.co.jp/en/download/ — cross-vendor coordinate audit.
 11. CDGM optical-glass catalog: https://cdgmglass.com/ — cross-vendor coordinate audit.
 12. Corning Incorporated, **OptiGrade Calcium Fluoride Data Sheet**: https://www.corning.com/content/dam/corning/media/worldwide/csm/documents/Corning_AdvancedOptics_OpticalGradeCaF2_DataSheet.pdf — CaF2 coordinate-class comparison.
+
+## Image-format reference
+
+`imageFormat: "super-35-1.9"` uses the 26.2 × 13.8 mm EOS C500 frame in [Canon’s CN7×17 operating manual](https://downloads.canon.com/nw/camera/products/cine-lenses/cine-servo/pdfs/b-im-20237-4-web.pdf). The explicit 29.6 mm production image circle remains. The larger 24.9 × 18.7 mm silent-film aperture is not substituted; the patent/product correlation remains inferential.

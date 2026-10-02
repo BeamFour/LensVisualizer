@@ -58,8 +58,8 @@ const LENS_DATA = {
 
   focalLengthMarketing: [15.1, 60.4],
   focalLengthDesign: [15.57, 58.93],
+  imageFormat: "1.5-inch-type",
   lensMounts: ["fixed-lens-camera"],
-  // imageFormat intentionally omitted: the project taxonomy has no canonical id for the G1 X 1.5-inch format.
   patentNumber: "US 2013/0176385 A1",
   patentAuthors: ["Hiroshi Saruwatari"],
   patentAssignees: ["Canon Inc."],

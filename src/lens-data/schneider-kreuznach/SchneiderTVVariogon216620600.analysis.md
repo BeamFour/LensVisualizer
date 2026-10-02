@@ -311,3 +311,9 @@ Prism P remains an optically active, source-listed rear block but is not include
 ## Integration audit
 
 The October 2, 2026 UTC audit reviewed the exact local patent figure, checked optical rims against edge and gap constraints, and reviewed compatible catalog dispersion. The sibling audit log records retained dimensions, changes and unresolved source limits. Catalog curves are qualified spectral proxies, with production supplier/melt identity unconfirmed.
+
+## Image-format reference
+
+Schneider’s [manufacturer advertisement](https://www.worldradiohistory.com/Archive-All-BC-Engineering/BME/80s/BME-1980-09.pdf) lists the 2.1/20–600 among lenses for 1¼-inch pickup tubes. `imageFormat: "1.25-inch-tube"` uses the nominal 16 × 12 mm target documented in LENS_MOUNT_FORMAT_OPTIONS.md. The patent correlation remains qualified; this does not identify a production camera/prism or establish full-pupil coverage.
+
+At wide infinity, the current aperture-contained chief-ray edge reaches about 8.72 mm, 87% of the nominal 10.00 mm tube-format corner. Surface 21 limits that field; the unclipped corner path reaches about 18.18 mm radius there versus the authored 15.8 mm. This remains a qualified reconstruction with inferred optical rims; the format assignment does not establish production corner illumination.

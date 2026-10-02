@@ -23,7 +23,7 @@ Stop diameter and inferred stop location are unchanged. No focus-motion law is a
 
 Resolved catalog curves are qualified spectral proxies. They do not identify historical suppliers or melts. No patent coordinates are changed and no catalog line indices or anomalous-dispersion flags are copied into the lens data. The analysis glass table is synchronized.
 
-Image-circle floor audit is skipped because imageFormat is unset; production-variant uncertainty is preserved rather than inventing format metadata.
+The manufacturer catalog supports the correlated Xenon 1.9/50’s 35 mm still-camera format. Production-variant and exact prescription uncertainty remain.
 
 ### Metadata and display
 

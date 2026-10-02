@@ -52,6 +52,7 @@ const LENS_DATA = {
   ],
   focalLengthMarketing: [12.5, 62.5],
   focalLengthDesign: [12.84, 60.72],
+  imageFormat: "1.5-inch-type",
   apertureMarketing: 2.0,
   apertureDesign: 2.06,
   lensMounts: ["fixed-lens-camera"],

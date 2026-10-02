@@ -50,6 +50,7 @@ const LENS_DATA = {
 
   focalLengthMarketing: [70, 210] as [number, number],
   focalLengthDesign: [72.13, 203.79] as [number, number],
+  imageFormat: "135-full-frame",
   apertureMarketing: 2.8,
   apertureDesign: 2.89,
   patentNumber: "US 4,758,073",

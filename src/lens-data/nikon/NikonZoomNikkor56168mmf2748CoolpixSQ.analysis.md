@@ -179,3 +179,7 @@ The surface-by-surface Petzval sum, using $\phi/(n n')$ for every refracting sur
 ## Integration audit
 
 The October 2, 2026 UTC audit reviewed the exact local patent figure, checked optical rims against edge and gap constraints, and reviewed compatible catalog dispersion. The sibling audit log records retained dimensions, changes and unresolved source limits. Catalog curves are qualified spectral proxies, with production supplier/melt identity unconfirmed.
+
+## Image-format reference
+
+The correlated production COOLPIX SQ uses a 1/2.7-inch-type CCD (Nikon manual, p.107). `imageFormat` records that production class using the nominal dimensions documented in LENS_MOUNT_FORMAT_OPTIONS.md. Patent Y = 3.52 mm remains separate from the sensor reference; this does not certify full-field coverage.

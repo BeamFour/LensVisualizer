@@ -45,6 +45,7 @@ const LENS_DATA = {
 
   focalLengthMarketing: 50,
   focalLengthDesign: 48.72,
+  imageFormat: "135-full-frame",
   apertureMarketing: 1.4,
   apertureDesign: 1.45,
   patentNumber: "JP 2023-183894 A",

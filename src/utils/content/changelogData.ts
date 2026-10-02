@@ -20,6 +20,11 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-02",
+    type: "improvement",
+    summary: "Added compact-camera, tube and cinema formats and filled missing lens assignments",
+  },
+  {
+    date: "2026-10-02",
     type: "lens",
     summary: "Added Nikon S-100, COOLPIX SQ and COOLPIX 4300 patent lens models",
   },

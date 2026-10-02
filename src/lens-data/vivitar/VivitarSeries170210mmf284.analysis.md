@@ -284,3 +284,7 @@ The production lens was manufactured by Cosina (serial prefix 09) and was sold f
 6. M. Cavina, "Vivitar Series 1 70-210mm Macro (seconda parte)," NOC Sensei, July 2023 (identifies Example 4 as the production embodiment and discusses glass substitutions).
 7. M. Roberts, "Vivitar 70-210 Series 1 Macro Zoom Lenses," robertstech.com (version comparison and manufacturing data).
 8. Lens-DB.com, "Vivitar Series 1 70-210mm F/2.8-4 Q-Dos VMC Macro [III]," serial number and manufacturer identification.
+
+## Image-format reference
+
+`imageFormat: "135-full-frame"` records the production 35 mm SLR format. The [1984 Vivitar manufacturer brochure](https://www.pacificrimcamera.com/rl/02093/02093.pdf) documents the matching 14-element/10-group 70–210mm f/2.8–4.0 lens and the SLR application; its diagonal angle of acceptance supports the 36 × 24 mm reference. This does not choose among its interchangeable mounts.

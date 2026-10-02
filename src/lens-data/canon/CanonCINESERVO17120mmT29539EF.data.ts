@@ -31,6 +31,7 @@ const LENS_DATA = {
   ],
   focalLengthMarketing: [17, 120],
   focalLengthDesign: [17.02059017073925, 118.9429343445522],
+  imageFormat: "super-35-1.9",
   lensMounts: ["canon-ef"],
   imageCircleMm: 29.6,
   patentNumber: "JP 2015-94867 A",

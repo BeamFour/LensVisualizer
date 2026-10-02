@@ -60,9 +60,9 @@ const LENS_DATA = {
 
   focalLengthMarketing: [5.6, 16.8],
   focalLengthDesign: [5.973871682, 16.878610506],
+  imageFormat: "1-2.7-inch-type",
   apertureMarketing: 2.7, // Wide-end scalar; the marketed f/2.7-4.8 range is retained in the name/specs.
   lensMounts: ["fixed-lens-camera"],
-  // imageFormat intentionally omitted: the supplied current taxonomy has no 1/2.7-inch-type id.
   patentNumber: "US 2003/0072085 A1",
   patentAuthors: ["Keiko Mizuguchi", "Atsushi Shibayama"],
   patentAssignees: ["Nikon Corporation"],

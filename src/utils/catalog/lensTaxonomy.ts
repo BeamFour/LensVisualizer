@@ -148,6 +148,16 @@ export const IMAGE_FORMATS = [
     sortOrder: 100,
   },
   {
+    // Nominal frame dimensions and sources: LENS_MOUNT_FORMAT_OPTIONS.md.
+    id: "1-2.7-inch-type",
+    label: "1/2.7-inch type",
+    widthMm: 5.371,
+    heightMm: 4.035,
+    diagonalMm: Math.hypot(5.371, 4.035),
+    aspectRatio: 5.371 / 4.035,
+    sortOrder: 105,
+  },
+  {
     // Nominal active area: 4032 × 3024 pixels at 1.4 µm (Galaxy S9).
     // Sources and derivation: LENS_MOUNT_FORMAT_OPTIONS.md.
     id: "1-2.55-inch-type",
@@ -168,6 +178,16 @@ export const IMAGE_FORMATS = [
     sortOrder: 120,
   },
   {
+    // Nominal frame dimensions and sources: LENS_MOUNT_FORMAT_OPTIONS.md.
+    id: "1-1.8-inch-type",
+    label: "1/1.8-inch type",
+    widthMm: 7.176,
+    heightMm: 5.319,
+    diagonalMm: Math.hypot(7.176, 5.319),
+    aspectRatio: 7.176 / 5.319,
+    sortOrder: 125,
+  },
+  {
     id: "1-1.7-inch-type",
     label: "1/1.7-inch type",
     widthMm: 7.44,
@@ -175,6 +195,16 @@ export const IMAGE_FORMATS = [
     diagonalMm: 9.3,
     aspectRatio: 4 / 3,
     sortOrder: 130,
+  },
+  {
+    // Nominal frame dimensions and sources: LENS_MOUNT_FORMAT_OPTIONS.md.
+    id: "2-3-inch-type",
+    label: "2/3-inch type",
+    widthMm: 8.8,
+    heightMm: 6.6,
+    diagonalMm: Math.hypot(8.8, 6.6),
+    aspectRatio: 8.8 / 6.6,
+    sortOrder: 140,
   },
   {
     id: "1-inch-type",
@@ -186,6 +216,16 @@ export const IMAGE_FORMATS = [
     sortOrder: 150,
   },
   {
+    // Nominal frame dimensions and sources: LENS_MOUNT_FORMAT_OPTIONS.md.
+    id: "1.25-inch-tube",
+    label: "1¼-inch television tube",
+    widthMm: 16,
+    heightMm: 12,
+    diagonalMm: Math.hypot(16, 12),
+    aspectRatio: 16 / 12,
+    sortOrder: 170,
+  },
+  {
     id: "four-thirds",
     label: "Four Thirds",
     widthMm: 17.3,
@@ -193,6 +233,36 @@ export const IMAGE_FORMATS = [
     diagonalMm: 21.64,
     aspectRatio: 4 / 3,
     sortOrder: 180,
+  },
+  {
+    // Nominal frame dimensions and sources: LENS_MOUNT_FORMAT_OPTIONS.md.
+    id: "1.5-inch-type",
+    label: "1.5-inch type",
+    widthMm: 18.7,
+    heightMm: 14,
+    diagonalMm: Math.hypot(18.7, 14),
+    aspectRatio: 18.7 / 14,
+    sortOrder: 190,
+  },
+  {
+    // Nominal frame dimensions and sources: LENS_MOUNT_FORMAT_OPTIONS.md.
+    id: "super-35-cinema",
+    label: "Super 35 cinema (24.9 × 18.7 mm)",
+    widthMm: 24.9,
+    heightMm: 18.7,
+    diagonalMm: Math.hypot(24.9, 18.7),
+    aspectRatio: 24.9 / 18.7,
+    sortOrder: 196,
+  },
+  {
+    // Nominal frame dimensions and sources: LENS_MOUNT_FORMAT_OPTIONS.md.
+    id: "super-35-1.9",
+    label: "Super 35 digital (26.2 × 13.8 mm)",
+    widthMm: 26.2,
+    heightMm: 13.8,
+    diagonalMm: Math.hypot(26.2, 13.8),
+    aspectRatio: 26.2 / 13.8,
+    sortOrder: 197,
   },
   {
     id: "aps-c",

@@ -270,3 +270,7 @@ The patent was filed by inventor Yamanaka Kenji, with the publication appearing 
 - Kazuto Yamaki (Sigma CEO), interview with Imaging Resource (September 2020): discussion of FLD glass equivalence to fluorite and Sigma's glass selection methodology.
 - HOYA Corporation optical glass catalog: FCD100, FCD705, M-TAFD305, PCD51, E-FD2, E-F1, E-FL5 catalog entries.
 - OHARA Corporation optical glass catalog (May 2023 pocket edition): S-LAH66, S-LAH55V, PBH21, S-TIM5 catalog entries.
+
+## Image-format reference
+
+`imageFormat: "135-full-frame"` follows [Sigma’s official product specifications](https://www.sigma-global.com/en/lenses/a018_40_14/), which identify the production lens as Full-frame [DG]. The format assignment does not assert production prescription identity or select an interchangeable mount.

@@ -42,6 +42,7 @@ const LENS_DATA = {
   ],
   focalLengthMarketing: [20, 600],
   focalLengthDesign: [19.833025763378, 613.643291786978],
+  imageFormat: "1.25-inch-tube",
   apertureMarketing: 2.1,
   patentNumber: "US 3,912,373",
   patentAuthors: ["Karl Macher"],

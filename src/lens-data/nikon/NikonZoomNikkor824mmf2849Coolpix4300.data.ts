@@ -16,8 +16,7 @@ import type { LensDataInput } from "../../types/optics.js";
  * endpoint F-numbers with zoomApertureModel: "from-nominal-fno". Its base sd is the calibrated wide-end value.
  * The source flat stop radius 0.0000 is encoded as R = 1e15, and source surface 10 is labeled 10A for its asphere.
  * No scaling, rear plate, dummy plane, filter plate, or mechanical component is included.
- * The production camera uses a 1/1.8-inch-type CCD, but that format has no current canonical imageFormat id, so
- * imageFormat is intentionally omitted rather than substituted with 1-1.7-inch-type.
+ * imageFormat records the production camera’s 1/1.8-inch-type CCD; nominal dimensions are not patent image heights.
  */
 
 // Patent optical-rim and compatible glass review: see the sibling .audit.md (2026-10-02 UTC).
@@ -36,6 +35,7 @@ const LENS_DATA = {
 
   focalLengthMarketing: [8, 24],
   focalLengthDesign: [8.239898, 23.299954],
+  imageFormat: "1-1.8-inch-type",
   lensMounts: ["fixed-lens-camera"],
   patentNumber: "JP 2003-177313 A",
   patentAuthors: ["Kouichi Ohshita", "Mami Muratani"],

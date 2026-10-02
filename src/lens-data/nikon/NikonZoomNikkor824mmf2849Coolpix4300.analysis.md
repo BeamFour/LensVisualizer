@@ -40,9 +40,7 @@ This is a strong research correlation, not manufacturer confirmation of the exac
 matching the element count and group arrangement does not certify the production radii, glass melts, coating stack or
 internal mechanical travel.
 
-The production camera uses a 1/1.8-inch-type CCD. The data correctly identifies an integral fixed-camera lens, but omits
-`imageFormat` because the available taxonomy has no matching identifier. A nearby format is not substituted. The patent's
-image height remains a source quantity; it is not an independently measured sensor dimension. [M2, p.144][M2]; [P1, Table 1][P1]
+The production camera uses a 1/1.8-inch-type CCD. `imageFormat` records this class with nominal dimensions documented in LENS_MOUNT_FORMAT_OPTIONS.md. The patent’s image height remains a source quantity, not an independently measured sensor dimension. [M2, p.144][M2]; [P1, Table 1][P1]
 
 ## Optical Architecture
 

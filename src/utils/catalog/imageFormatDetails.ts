@@ -15,6 +15,55 @@ export interface ImageFormatDetails {
 }
 
 export const IMAGE_FORMAT_DETAILS: Record<ImageFormatId, ImageFormatDetails> = {
+  "1-2.7-inch-type": {
+    summary: "A compact CCD sensor class used by the Nikon COOLPIX SQ.",
+    description:
+      "The inch-type name comes from historical optical-format conventions rather than a physical diagonal in inches. This catalog uses a nominal 5.371 × 4.035 mm frame. Individual cameras can use a slightly different active area or crop; the format alone does not identify a sensor part or establish a lens’s corner performance.",
+    commonUses: "Compact digital cameras, including COOLPIX SQ",
+    coverageNotes: "Nominal 5.371 × 4.035 mm frame; approximately 6.72 mm diagonal",
+  },
+  "1-1.8-inch-type": {
+    summary: "A compact-camera sensor class used by the Nikon COOLPIX 4300.",
+    description:
+      "The catalog uses a nominal 7.176 × 5.319 mm frame for this optical class. The designation is not the physical diagonal in inches. Production recording dimensions and electronic crops can differ, so this reference does not replace source-listed patent image heights.",
+    commonUses: "Compact CCD cameras, including COOLPIX 4300",
+    coverageNotes: "Nominal 7.176 × 5.319 mm frame; approximately 8.93 mm diagonal",
+  },
+  "2-3-inch-type": {
+    summary: "A 4:3 optical format used by both compact digital cameras and television systems.",
+    description:
+      "The nominal 8.8 × 6.6 mm frame has an 11 mm diagonal. The Fujifilm X10 and Olympus E-10/E-20 use this sensor class. Historically the designation also described pickup tubes; the active image area is much smaller than two thirds of an inch measured diagonally. A common optical class does not imply interchangeable camera mounts.",
+    commonUses: "Premium compact cameras and television imaging",
+    coverageNotes: "Nominal 8.8 × 6.6 mm frame; 11 mm diagonal",
+  },
+  "1.25-inch-tube": {
+    summary: "A historical television pickup-tube class with a nominal 16 × 12 mm target.",
+    description:
+      "Schneider listed the TV-Variogon 20–600mm among lenses for 1¼-inch pickup tubes. The catalog uses the 16 × 12 mm, 20 mm diagonal image reference documented for 30 mm Plumbicon tubes. The inch designation refers to the tube class, not the active image diagonal. Actual target scanning and camera prisms vary.",
+    commonUses: "Historical studio and outside-broadcast television cameras",
+    coverageNotes: "Nominal 16 × 12 mm target; 20 mm diagonal",
+  },
+  "1.5-inch-type": {
+    summary: "The large compact-camera sensor class used by the Canon PowerShot G1 X family.",
+    description:
+      "Canon specifies an 18.7 × 14.0 mm sensor envelope for the G1 X and G1 X Mark II. The Mark II uses a multi-aspect sensor with different 3:2 and 4:3 recording crops. This catalog reference describes the nominal envelope; it does not reconstruct those crops or certify full-envelope optical coverage at every zoom position.",
+    commonUses: "Canon PowerShot G1 X and G1 X Mark II",
+    coverageNotes: "Nominal 18.7 × 14.0 mm sensor envelope; approximately 23.36 mm diagonal",
+  },
+  "super-35-cinema": {
+    summary: "The 24.9 × 18.7 mm ANSI Super 35 Silent camera aperture.",
+    description:
+      "ARRI publishes this silent-aperture reference in its Ultra Prime technical specifications. Its approximately 31.14 mm diagonal is larger than the 22 × 16 mm Normal 35 camera aperture. Super 35 gates and digital crops vary; this entry records the full silent-film reference rather than every frame marketed under the Super 35 name.",
+    commonUses: "Super 35 motion-picture film cameras and compatible cinema lenses",
+    coverageNotes: "24.9 × 18.7 mm reference aperture; approximately 31.14 mm diagonal",
+  },
+  "super-35-1.9": {
+    summary: "A 26.2 × 13.8 mm Super 35 digital cinema reference with a 1.9:1 shape.",
+    description:
+      "Canon lists this EOS C500 frame in the CN7×17 operating manual, alongside the smaller 24.6 × 13.8 mm C300 frame. It needs an approximately 29.61 mm diagonal and fits the CN7’s specified 29.6 mm image circle within source rounding. The taller Super 35 Silent film aperture needs a larger circle and is a separate catalog format.",
+    commonUses: "Digital cinema cameras using the EOS C500 1.9:1 frame reference",
+    coverageNotes: "26.2 × 13.8 mm reference frame; approximately 29.61 mm diagonal",
+  },
   "normal-8": {
     summary: "The original 8 mm motion-picture format, also called Standard or Regular 8.",
     description:

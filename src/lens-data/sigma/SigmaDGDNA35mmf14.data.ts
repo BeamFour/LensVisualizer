@@ -69,6 +69,7 @@ export const sigmaDgDnA35mmF14Data = {
   /* ── Patent / production metadata ── */
   focalLengthMarketing: 35,
   focalLengthDesign: 33.72,
+  imageFormat: "135-full-frame",
   apertureMarketing: 1.4,
   apertureDesign: 1.46,
   patentNumber: "JP 2022-033487 A",

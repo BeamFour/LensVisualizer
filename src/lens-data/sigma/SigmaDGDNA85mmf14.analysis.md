@@ -190,3 +190,7 @@ The analysis is consistent with Sigma's published specifications for the product
 - **Sigma product page:** *85mm F1.4 DG DN | Art* — Sigma Global Vision Art line, announced 6 August 2020. Mounts: Sony E and L-mount. Specifications: 15 elements / 11 groups; 5 SLD elements; 1 aspherical element; minimum focus 0.85 m; maximum magnification 1:8.4; filter thread 77 mm.
 - **Glass-family references:** public OHARA, HOYA, HIKARI, and SUMITA catalog data for coefficient-backed optical equivalents. Catalog names are dispersion models, not claims about Sigma's production suppliers.
 - **Independent verification:** Paraxial y-ν ray trace, surface-by-surface Petzval summation, thick-lens-in-air element focal-length computation, and aspherical sag evaluation performed in Python during the preparation of the companion data file. All numerical claims in this document reproduce patent-tabulated values to four-digit precision unless otherwise noted.
+
+## Image-format reference
+
+`imageFormat: "135-full-frame"` follows [Sigma’s official product specifications](https://www.sigma-global.com/en/lenses/a020_85_14/), which identify the production lens as Full-frame [DG]. The format assignment does not assert production prescription identity or select an interchangeable mount.

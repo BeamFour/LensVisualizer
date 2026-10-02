@@ -210,3 +210,7 @@ The four-unit design spreads variable magnification across moving units rather t
 - Canon Camera Museum, "PowerShot G1 X" product page: https://global.canon/en/c-museum/product/dcc612.html
 - Ohara optical glass data pages for S-TIH53, S-LAL14, S-LAH66, S-NPH2, S-TIH6, S-FSL5, and S-BAL42.
 - Hoya optical glass data/cross-reference material for M-TAFD305 moldable glass class.
+
+## Image-format reference
+
+`imageFormat: "1.5-inch-type"` records the production sensor’s nominal 18.7 × 14.0 mm envelope from [Canon’s G1 X brochure](https://downloads.canon.com/cpr/software/camera/2012CES_0162W812.pdf). The patent’s zoom-dependent image heights and digital correction remain separate; assigning the sensor class does not establish unvignetted corner coverage at every zoom state.

@@ -43,7 +43,7 @@ import type { LensDataInput } from "../../types/optics.js";
  * ║                                                                              ║
  * ║  MOUNT/FORMAT: large-format-lens-board is a LensVisualizer taxonomy        ║
  * ║  mapping for the documented shutter-mounted view-camera form, not a        ║
- * ║  manufacturer mount name. imageFormat is intentionally unset.              ║
+ * ║  manufacturer mount name. Format: documented Super Technika 4×5 use.              ║
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
@@ -61,6 +61,7 @@ const LENS_DATA = {
 
   focalLengthMarketing: 210,
   focalLengthDesign: 210.004074571199,
+  imageFormat: "4x5",
   apertureMarketing: 4.5,
   apertureDesign: 4.5,
   lensMounts: ["large-format-lens-board"],

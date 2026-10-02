@@ -48,8 +48,8 @@ import type { LensDataInput } from "../../types/optics.js";
  * ║  NOTE ON STOP POSITION: source surface 12 "(stop)", ¶0084.           ║
  * ║  NOTE ON FIELD: projection declares ARRI's 31.14 mm design image     ║
  * ║    diameter (real half-field 6.56°); SD-limited chief rays would     ║
- * ║    otherwise imply a ~35 mm image height. PL mount and Super 35 have ║
- * ║    no canonical taxonomy ids, so lensMounts/imageFormat are unset.   ║
+ * ║    otherwise imply a ~35 mm image height. Format: ANSI Super 35; ║
+ * ║    PL mount remains outside the current mount taxonomy.   ║
  * ║  No scaling (s = 1). Labels keep patent surface numbers.             ║
  * ║                                                                      ║
  * ║  Optical design only: glass surfaces, stop. No sensor glass,         ║
@@ -68,6 +68,7 @@ const LENS_DATA = {
   /* ── Explicit metadata fields ── */
   focalLengthMarketing: 135,
   focalLengthDesign: 134.3, // computed d-line EFL of this model (patent states 135 mm)
+  imageFormat: "super-35-cinema",
   // apertureMarketing omitted: marketed value is T1.9, a transmission stop, not an f-number.
   apertureDesign: 1.8, // patent ¶0078 relative aperture
   patentNumber: "US 2017/0307860 A1",

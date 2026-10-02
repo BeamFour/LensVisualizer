@@ -227,7 +227,7 @@ The patent states that in Fig. 7 the central and oblique pencils "are focused ex
 
 **Stop and semi-diameters.** The patent publishes no clear apertures and no stop diameter. The stop semi-diameter of 18.22 mm is calibrated so that the model's paraxial f-number equals the published f/1.8. This makes the f/1.8 agreement a calibration, not an independent verification; the stop mark in Fig. 7 reads closer to 19.4 mm, within the figure's reading uncertainty. All other semi-diameters were read from the to-scale Fig. 7 layout (about 10.15 px/mm at 600 dpi, uncertainty about ±0.5 mm). They were then checked against real f/1.8 marginal rays, off-axis bundles at the design image height, edge thickness, rim slope and cross-gap clearance.
 
-Because the patent gives no field stop or image format, the data file declares a rectilinear projection with a 6.56° half-field. That half-field corresponds to ARRI's 31.14 mm design image diameter, reached by a real chief ray; without it, the semi-diameter-limited chief ray would imply an image height of roughly 35 mm.
+Although the patent gives no field stop or image format, the data file declares a rectilinear projection with a 6.56° half-field. That half-field corresponds to ARRI's 31.14 mm design image diameter, reached by a real chief ray; without it, the semi-diameter-limited chief ray would imply an image height of roughly 35 mm.
 
 ## Design Heritage and Context
 
@@ -254,3 +254,7 @@ The patent cites the Alvarez variable-power lens (US 3,305,294) and Lohmann's eq
 11. L. W. Alvarez, *Two-Element Variable-Power Spherical Lens*, US Patent 3,305,294, granted February 21, 1967; cited in ¶0055.
 12. A. W. Lohmann, "A New Class of Varifocal Lenses," *Applied Optics* 9(7), 1669–1671 (1970); cited in ¶0062.
 13. ARRI, "Lens Mounts," https://www.arri.com/en/learn-help/arri-camera-technology/lens-mounts-and-lds-2 (accessed September 2026), for the 52 mm PL flange focal distance.
+
+## Image-format reference
+
+`imageFormat: "super-35-cinema"` records the 24.9 × 18.7 mm ANSI Super 35 Silent aperture in [ARRI’s Ultra Prime technical data](https://www.arri.com/en/cine-lenses/arri-zeiss-fujinon-lenses/legacy/ultra-prime-lenses/arri-ultra-prime-lenses-technical-data). This format’s 31.14 mm diagonal agrees with the existing field reference; production prescription identification remains qualified.
