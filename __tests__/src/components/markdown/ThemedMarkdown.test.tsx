@@ -16,7 +16,10 @@ describe("ThemedMarkdown article links", () => {
           "[Series index](/articles/manufacturer-lens-stories)",
           "[Lens diagram](/lens/example-lens)",
           "[Lens state](/lens/example-lens?v=1#diagram)",
+          "[Absolute lens](https://surfaceandstop.com/lens/example-lens?v=1#diagram)",
+          "https://surfaceandstop.com/lens/cited-lens/",
           "[External lens](https://example.com/lens/example-lens)",
+          "[Lookalike host](https://surfaceandstop.com.example.org/lens/example-lens)",
           "[Article section](#section)",
         ].join("\n\n")}
         theme={themes.dark}
@@ -35,6 +38,8 @@ describe("ThemedMarkdown article links", () => {
     for (const [name, href] of [
       ["Lens diagram", "/lens/example-lens/"],
       ["Lens state", "/lens/example-lens/?v=1#diagram"],
+      ["Absolute lens", "https://surfaceandstop.com/lens/example-lens/?v=1#diagram"],
+      ["https://surfaceandstop.com/lens/cited-lens/", "https://surfaceandstop.com/lens/cited-lens/"],
     ]) {
       const lensLink = screen.getByRole("link", { name });
       expect(lensLink.getAttribute("href")).toBe(href);
@@ -43,9 +48,11 @@ describe("ThemedMarkdown article links", () => {
       expect(lensLink.getAttribute("referrerpolicy")).toBeNull();
     }
 
-    const externalLensLink = screen.getByRole("link", { name: "External lens" });
-    expect(externalLensLink.getAttribute("target")).toBe("_blank");
-    expect(externalLensLink.getAttribute("rel")).toBe("noopener noreferrer");
+    for (const name of ["External lens", "Lookalike host"]) {
+      const externalLensLink = screen.getByRole("link", { name });
+      expect(externalLensLink.getAttribute("target")).toBe("_blank");
+      expect(externalLensLink.getAttribute("rel")).toBe("noopener noreferrer");
+    }
 
     const sectionLink = screen.getByRole("link", { name: "Article section" });
     expect(sectionLink.getAttribute("href")).toBe("#section");
