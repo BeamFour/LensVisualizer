@@ -36,7 +36,14 @@ export default function comparisonReducer(state: LensState, action: LensAction):
     case SET_SHARED_STOPDOWN_T:
       return { ...state, sharedSliders: { ...state.sharedSliders, sharedStopdownT: action.value } };
     case SET_SHARED_ZOOM_T:
-      return { ...state, sharedSliders: { ...state.sharedSliders, sharedZoomT: action.value } };
+      return {
+        ...state,
+        sharedSliders: {
+          ...state.sharedSliders,
+          sharedZoomT: action.value,
+          sharedFocusT: action.focusT ?? state.sharedSliders.sharedFocusT,
+        },
+      };
     case SET_SHARED_SHIFT_MM:
       return { ...state, sharedSliders: { ...state.sharedSliders, sharedShiftMm: action.value } };
     case SET_SHARED_TILT_DEG:

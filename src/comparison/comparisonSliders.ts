@@ -6,7 +6,7 @@
  * different maximum apertures) with clamping past common points.
  */
 
-import { closeFocusAtZoom } from "../optics/focusDistance.js";
+import { closeFocusAtZoom, remapFocusDistance } from "../optics/focusDistance.js";
 import { getGroupMovementAvailability } from "../optics/groupMovement.js";
 import type { RuntimeLens } from "../types/optics.js";
 import { FOCUS_INFINITY_THRESHOLD, fopenAtZoom } from "../optics/optics.js";
@@ -215,6 +215,21 @@ export function computeZoomPair(sharedZoomT: number, LA: RuntimeLens, LB: Runtim
   );
 
   return { zoomA, zoomB, showZoom: true, sharedFL, minFL, maxFL, commonPointLow, commonPointHigh };
+}
+
+/** Preserve the requested object distance when the shared zoom control changes. */
+export function comparisonFocusAfterZoom(
+  sharedFocusT: number,
+  previousZoomT: number,
+  nextZoomT: number,
+  LA: RuntimeLens,
+  LB: RuntimeLens,
+): number {
+  const previousZoom = computeZoomPair(previousZoomT, LA, LB);
+  const nextZoom = computeZoomPair(nextZoomT, LA, LB);
+  const previous = computeFocusPair(sharedFocusT, LA, LB, previousZoom.zoomA, previousZoom.zoomB);
+  const next = computeFocusPair(0, LA, LB, nextZoom.zoomA, nextZoom.zoomB);
+  return remapFocusDistance(sharedFocusT, previous.minCloseFocus, next.minCloseFocus);
 }
 
 export function computeMovementPair(

@@ -11,6 +11,7 @@ import ComparisonLayout from "./ComparisonLayout.js";
 import SharedSlidersBar from "./SharedSlidersBar.js";
 import SharedAnalysisDock from "./SharedAnalysisDock.js";
 import { isComparisonOk, type ComparisonLensesResult } from "./useComparisonMode.js";
+import { comparisonFocusAfterZoom } from "./comparisonSliders.js";
 import { SET_SHARED_ZOOM_T } from "./comparisonReducer.js";
 import { SET_GROUP_MOVEMENT } from "../utils/state/lensReducer.js";
 import { ErrorDisplay } from "../components/errors/ErrorBoundary.js";
@@ -42,8 +43,8 @@ interface ComparisonContentProps {
   onSharedStopdownChange: (value: number, direct?: boolean) => void;
   onSharedShiftChange: (value: number) => void;
   onSharedTiltChange: (value: number) => void;
-  onFocusPointerDown: () => void;
-  onAperturePointerDown: () => void;
+  onFocusPointerDown: (value?: number) => void;
+  onAperturePointerDown: (value?: number) => void;
   onSliderPointerUp: () => void;
   dispatch: Dispatch<LensAction>;
   showEffectiveFocalLength: boolean;
@@ -149,7 +150,19 @@ export default function ComparisonContent({
               sharedTiltDeg={sharedTiltDeg}
               onSharedFocusChange={onSharedFocusChange}
               onSharedStopdownChange={onSharedStopdownChange}
-              onSharedZoomChange={(v) => dispatch({ type: SET_SHARED_ZOOM_T, value: v })}
+              onSharedZoomChange={(v) =>
+                dispatch({
+                  type: SET_SHARED_ZOOM_T,
+                  value: v,
+                  focusT: comparisonFocusAfterZoom(
+                    sharedFocusT,
+                    sharedZoomT,
+                    v,
+                    comparisonLenses.LA,
+                    comparisonLenses.LB,
+                  ),
+                })
+              }
               onSharedShiftChange={onSharedShiftChange}
               onSharedTiltChange={onSharedTiltChange}
               onFocusPointerDown={onFocusPointerDown}

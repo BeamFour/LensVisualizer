@@ -142,7 +142,7 @@ export interface PanelAdaptersModel {
   onAberrationsExpandedChange: (expanded: boolean) => void;
   onEffectiveFocalLengthChange: (expanded: boolean) => void;
   onEffectiveApertureChange: (expanded: boolean) => void;
-  onZoomChange: (value: number) => void;
+  onZoomChange: (value: number, focusT?: number) => void;
   onAberrationChange: (value: number) => void;
   onFocusChange: (value: number) => void;
   onStopdownChange: (value: number) => void;

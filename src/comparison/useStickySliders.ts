@@ -19,8 +19,8 @@ import type { LensAction } from "../types/state.js";
 interface UseStickySliderResult {
   handleSharedFocusChange: (rawT: number, direct?: boolean) => void;
   handleSharedStopdownChange: (rawT: number, direct?: boolean) => void;
-  handleFocusPointerDown: () => void;
-  handleAperturePointerDown: () => void;
+  handleFocusPointerDown: (value?: number) => void;
+  handleAperturePointerDown: (value?: number) => void;
   flashPanel: string | null;
   resetSticky: () => void;
   prevStopdownT: MutableRefObject<number>;
@@ -118,11 +118,13 @@ export default function useStickySliders(
     [aperturePair, triggerFlash, dispatch],
   );
 
-  const handleFocusPointerDown = useCallback((): void => {
+  const handleFocusPointerDown = useCallback((value?: number): void => {
+    if (value != null) prevFocusT.current = value;
     focusStuck.current = false;
   }, []);
 
-  const handleAperturePointerDown = useCallback((): void => {
+  const handleAperturePointerDown = useCallback((value?: number): void => {
+    if (value != null) prevStopdownT.current = value;
     apertureStuck.current = false;
   }, []);
 

@@ -93,7 +93,7 @@ describe("ComparisonContent", () => {
     ).toBe(true);
 
     fireEvent.click(screen.getByRole("button", { name: "Zoom" }));
-    expect(dispatch).toHaveBeenCalledWith({ type: SET_SHARED_ZOOM_T, value: 0.4 });
+    expect(dispatch).toHaveBeenCalledWith({ type: SET_SHARED_ZOOM_T, value: 0.4, focusT: 0 });
     fireEvent.click(screen.getByRole("button", { name: "Focal length" }));
     expect(dispatch).toHaveBeenCalledWith({
       type: "SET_PANEL_EXPANDED",

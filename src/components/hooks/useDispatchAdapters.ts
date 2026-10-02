@@ -26,7 +26,7 @@ import type { GroupMovementMode } from "../../types/groupMovement.js";
 
 export interface DispatchAdapters {
   onFocusChange: (v: number) => void;
-  onZoomChange: (v: number) => void;
+  onZoomChange: (v: number, focusT?: number) => void;
   onAberrationChange: (v: number) => void;
   onStopdownChange: (v: number) => void;
   onShiftChange: (v: number) => void;
@@ -80,7 +80,8 @@ export default function useDispatchAdapters(): DispatchAdapters {
   return useMemo(
     () => ({
       onFocusChange: (v: number) => dispatch({ type: SET_FOCUS_T, value: v }),
-      onZoomChange: (v: number) => dispatch({ type: SET_ZOOM_T, value: v }),
+      onZoomChange: (v: number, focusT?: number) =>
+        dispatch({ type: SET_ZOOM_T, value: v, ...(focusT === undefined ? {} : { focusT }) }),
       onAberrationChange: (v: number) => dispatch({ type: SET_ABERRATION_T, value: v }),
       onStopdownChange: (v: number) => dispatch({ type: SET_STOPDOWN_T, value: v }),
       onShiftChange: (v: number) => dispatch({ type: SET_SHIFT_MM, value: v }),

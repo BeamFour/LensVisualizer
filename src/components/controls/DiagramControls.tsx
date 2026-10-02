@@ -6,6 +6,7 @@
 import { useCallback, useEffect } from "react";
 import { eflAtZoom, formatDist, formatFNumber } from "../../optics/optics.js";
 import { fisheyeProjectionFocalLengthAtZoom, isFisheyeProjection } from "../../optics/projection.js";
+import { closeFocusAtZoom, remapFocusDistance } from "../../optics/focusDistance.js";
 import { getGroupMovementAvailability } from "../../optics/groupMovement.js";
 import { isMovementAxisEnabled, perspectiveControlSteps } from "../../optics/lensMovement.js";
 import { snapToZeroStop } from "../../utils/style/sliderStops.js";
@@ -27,7 +28,7 @@ interface DiagramControlsProps {
   compact: boolean;
   useSideLayout: boolean;
   zoomT: number;
-  onZoomChange?: (value: number) => void;
+  onZoomChange?: (value: number, focusT?: number) => void;
   aberrationT: number;
   onAberrationChange?: (value: number) => void;
   focusT: number;
@@ -116,9 +117,14 @@ export default function DiagramControls({
   const handleZoomChange = useCallback(
     (v: number) => {
       onChangeActivity();
-      onZoomChange?.(v);
+      onZoomChange?.(
+        v,
+        groupMovementAvailability.focus
+          ? remapFocusDistance(focusT, closeFocusAtZoom(zoomT, L), closeFocusAtZoom(v, L))
+          : 0,
+      );
     },
-    [onChangeActivity, onZoomChange],
+    [onChangeActivity, onZoomChange, groupMovementAvailability.focus, focusT, zoomT, L],
   );
 
   const handleFocusChange = useCallback(

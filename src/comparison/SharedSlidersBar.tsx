@@ -54,8 +54,8 @@ interface SharedSlidersBarProps {
   onSharedZoomChange: (value: number) => void;
   onSharedShiftChange: (value: number) => void;
   onSharedTiltChange: (value: number) => void;
-  onFocusPointerDown: () => void;
-  onAperturePointerDown: () => void;
+  onFocusPointerDown: (value?: number) => void;
+  onAperturePointerDown: (value?: number) => void;
   onSliderPointerUp?: () => void;
   focusPair: FocusPairResult;
   aperturePair: AperturePairResult;
@@ -347,7 +347,7 @@ export default function SharedSlidersBar({
           disabledReason="No modeled focus travel data"
           onSliderChange={onSharedFocusChange}
           onDirectChange={(value) => onSharedFocusChange(value, true)}
-          onPointerDown={onFocusPointerDown}
+          onPointerDown={() => onFocusPointerDown(sharedFocusT)}
           onPointerUp={onSliderPointerUp}
           markerPositions={showFocusCP ? [focusCP] : []}
           action={
@@ -381,7 +381,7 @@ export default function SharedSlidersBar({
           sliderValue={sharedStopdownT}
           onSliderChange={onSharedStopdownChange}
           onDirectChange={(value) => onSharedStopdownChange(value, true)}
-          onPointerDown={onAperturePointerDown}
+          onPointerDown={() => onAperturePointerDown(sharedStopdownT)}
           onPointerUp={onSliderPointerUp}
           markerPositions={showApertureCP ? [apertureCP] : []}
           readouts={

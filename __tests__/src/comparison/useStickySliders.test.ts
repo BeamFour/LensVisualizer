@@ -123,6 +123,15 @@ describe("useStickySliders", () => {
     expect(dispatchMock).toHaveBeenLastCalledWith({ type: SET_SHARED_FOCUS_T, value: 0.504 });
   });
 
+  it("starts a new drag from the displayed value after zoom or URL changes", () => {
+    const { result } = renderHook(() => useStickySliders(dispatch, makeFocusPair(0.5), makeAperturePair(0.5)));
+    act(() => result.current.handleFocusPointerDown(0.8));
+    act(() => result.current.handleSharedFocusChange(0.9));
+    expect(dispatchMock).toHaveBeenLastCalledWith({ type: SET_SHARED_FOCUS_T, value: 0.9 });
+    act(() => result.current.handleSharedFocusChange(0.4));
+    expect(dispatchMock).toHaveBeenLastCalledWith({ type: SET_SHARED_FOCUS_T, value: 0.5 });
+  });
+
   it("resetSticky clears stuck state", () => {
     const focusPair = makeFocusPair(0.5);
     const { result } = renderHook(() => useStickySliders(dispatch, focusPair, null));

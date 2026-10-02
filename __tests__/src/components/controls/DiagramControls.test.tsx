@@ -2,6 +2,7 @@
 
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { build, buildVariableStopGapLens } from "../../optics/testLensFixtures.js";
 import DiagramControls from "../../../../src/components/controls/DiagramControls.js";
 import buildLens from "../../../../src/optics/buildLens.js";
 import themes from "../../../../src/utils/theme/themes.js";
@@ -23,6 +24,7 @@ function renderControls(
   } = {},
 ) {
   const callbacks = {
+    onZoomChange: vi.fn(),
     onAberrationChange: vi.fn(),
     onStopdownChange: vi.fn(),
     onFocusChange: vi.fn(),
@@ -40,7 +42,7 @@ function renderControls(
         compact={false}
         useSideLayout={false}
         zoomT={0}
-        onZoomChange={vi.fn()}
+        onZoomChange={callbacks.onZoomChange}
         aberrationT={0}
         onAberrationChange={callbacks.onAberrationChange}
         focusT={options.focusT ?? 0}
@@ -77,6 +79,26 @@ function renderControls(
 }
 
 describe("DiagramControls", () => {
+  it.each([
+    [0.5, 2 / 3],
+    [1, 1],
+    [0, 0],
+  ])("preserves focus distance or clamps on zoom from focus %s", (focusT, expected) => {
+    const L = build({
+      ...buildVariableStopGapLens([
+        [1, 2],
+        [2, 3],
+        [3, 4],
+      ]).data,
+      closeFocusM: 0.3,
+      zoomCloseFocusM: [0.3, 0.3, 0.4],
+    });
+    const { callbacks } = renderControls(L, { focusT });
+    fireEvent.change(screen.getByRole("slider", { name: "ZOOM" }), { target: { value: "1" } });
+    expect(callbacks.onZoomChange).toHaveBeenCalledTimes(1);
+    expect(callbacks.onZoomChange.mock.calls[0][0]).toBe(1);
+    expect(callbacks.onZoomChange.mock.calls[0][1]).toBeCloseTo(expected, 12);
+  });
   it.each([1.03, 1.45, 1.85])("preserves patent aperture precision for f/%s", (nominalFno) => {
     const L = buildLens({ ...LENS_CATALOG["sonnar-50f15"], nominalFno });
     renderControls(L);

@@ -47,6 +47,10 @@ Focus ranges include only lenses with modeled focus travel. Unsupported panes re
 Sticky common-point detents apply only to pointer drags. Keyboard adjustments and aperture presets select their
 requested value directly and release an existing detent.
 
+Interactive zoom changes rescale normalized focus to preserve the current object distance, clamping at the new
+close-focus endpoint. Single-lens controls use the same distance conversion. Zoom actions carry the adjusted focus
+atomically; URL hydration omits this adjustment so saved focus and zoom restore together without reinterpretation.
+
 ## Scale Modes
 
 Comparison mode can normalize the two panels so users can compare physical scale or framing. Scale ratios are computed

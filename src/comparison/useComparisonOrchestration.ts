@@ -47,8 +47,8 @@ export interface ComparisonOrchestration {
   handleSharedStopdownChange: (value: number, direct?: boolean) => void;
   handleSharedShiftChange: (value: number) => void;
   handleSharedTiltChange: (value: number) => void;
-  handleFocusPointerDown: () => void;
-  handleAperturePointerDown: () => void;
+  handleFocusPointerDown: (value?: number) => void;
+  handleAperturePointerDown: (value?: number) => void;
   toggleCompare: () => void;
 }
 

@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import {
   computeFocusPair,
+  comparisonFocusAfterZoom,
   computeAperturePair,
   computeZoomPair,
   computeMovementPair,
@@ -347,6 +348,29 @@ describe("computeMovementPair", () => {
 });
 
 describe("zoom-dependent focus distance", () => {
+  it("preserves distance across zoom, including a change in the closest modeled lens", () => {
+    const zoom = build({
+      ...buildVariableStopGapLens([
+        [1, 2],
+        [2, 3],
+        [3, 4],
+      ]).data,
+      closeFocusM: 0.3,
+      zoomCloseFocusM: [0.3, 0.45, 0.6],
+    });
+    const prime = build({ ...focusData, closeFocusM: 0.4 });
+    const focus = comparisonFocusAfterZoom(0.3, 0, 1, zoom, prime);
+    expect(focus).toBeCloseTo(0.4, 12);
+    const pair = computeFocusPair(focus, zoom, prime, 1, 0);
+    expect(0.6 / pair.focusA).toBeCloseTo(1, 12);
+    expect(0.4 / pair.focusB).toBeCloseTo(1, 12);
+    expect(comparisonFocusAfterZoom(focus, 1, 0, zoom, prime)).toBeCloseTo(0.3, 12);
+    expect(comparisonFocusAfterZoom(1, 0, 1, zoom, prime)).toBe(1);
+    expect(comparisonFocusAfterZoom(0, 0, 1, zoom, prime)).toBe(0);
+    const fixed = buildSimplePositiveElementLens();
+    expect(comparisonFocusAfterZoom(0.5, 0, 1, zoom, fixed)).toBe(1);
+    expect(comparisonFocusAfterZoom(0.5, 0, 1, fixed, fixed)).toBe(0);
+  });
   it("uses the current zoom endpoint for labels and comparison clamping", () => {
     const zoom = build({
       ...buildVariableStopGapLens([
