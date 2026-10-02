@@ -28,10 +28,18 @@ import type {
 import { isUniversalCorporateEdge } from "../../utils/catalog/universalRelationshipGraph.js";
 import { pluralize } from "../../utils/text.js";
 import { toggleBtn } from "../../utils/style/styles.js";
+import { ENABLE_REVISED_UNIVERSAL_MAP, ENABLE_UNIVERSAL_MAP_EXTRA_VIEWS } from "../../utils/featureFlags.js";
 import useViewBoxZoom from "../hooks/useViewBoxZoom.js";
 import useSvgViewport from "../hooks/useSvgViewport.js";
 import UniversalMapOverview from "./UniversalMapOverview.js";
-import { layoutUniversalRelationshipGraph } from "./universalLayout.js";
+import { layoutUniversalRelationshipGraph, type UniversalRelationshipLayout } from "./universalLayout.js";
+import { UNIVERSAL_EDGE_KINDS } from "../../utils/catalog/universalRelationshipQueries.js";
+import {
+  boundsIntersect,
+  directionalUniversalNode,
+  placeUniversalLabels,
+  universalEdgeCurve,
+} from "./universalMapGeometry.js";
 
 interface UniversalRelationshipMapProps {
   graph: UniversalRelationshipGraph;
@@ -40,6 +48,11 @@ interface UniversalRelationshipMapProps {
   onSelectNode: (nodeId: string | null) => void;
   focusRequest?: { nodeId: string; requestId: number };
   viewResetRequest?: number;
+  layout?: UniversalRelationshipLayout;
+  edgeKinds?: readonly UniversalEdgeKind[];
+  pathNodeIds?: readonly string[];
+  pathEdgeIds?: readonly string[];
+  isVisible?: boolean;
 }
 
 function isActivateKey(event: KeyboardEvent): boolean {
@@ -106,8 +119,14 @@ export default function UniversalRelationshipMap({
   onSelectNode,
   focusRequest,
   viewResetRequest,
+  layout: providedLayout,
+  edgeKinds = UNIVERSAL_EDGE_KINDS,
+  pathNodeIds,
+  pathEdgeIds,
+  isVisible = true,
 }: UniversalRelationshipMapProps) {
-  const layout = useMemo(() => layoutUniversalRelationshipGraph(graph), [graph]);
+  const revised = ENABLE_REVISED_UNIVERSAL_MAP;
+  const layout = useMemo(() => providedLayout ?? layoutUniversalRelationshipGraph(graph), [graph, providedLayout]);
   const svgRef = useRef<SVGSVGElement>(null);
   const zoom = useViewBoxZoom(layout.width, layout.height, true, svgRef);
   const viewport = useSvgViewport(svgRef, zoom.viewBox);
@@ -115,14 +134,17 @@ export default function UniversalRelationshipMap({
   const [showOverview, setShowOverview] = useState(true);
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [emphasizeConnections, setEmphasizeConnections] = useState(false);
+  const [keyboardNodeId, setKeyboardNodeId] = useState<string | null>(null);
+  const nodeRefs = useRef(new Map<string, SVGGElement>());
   const adjacency = useMemo(() => {
     const neighbors = new Map(graph.nodes.map((node) => [node.id, new Set<string>()]));
     for (const edge of graph.edges) {
+      if (!edgeKinds.includes(edge.kind)) continue;
       neighbors.get(edge.from)?.add(edge.to);
       neighbors.get(edge.to)?.add(edge.from);
     }
     return neighbors;
-  }, [graph]);
+  }, [graph, edgeKinds]);
   const selectedNeighborhood = useMemo(
     () => (selectedNodeId ? new Set([selectedNodeId, ...(adjacency.get(selectedNodeId) ?? [])]) : null),
     [adjacency, selectedNodeId],
@@ -146,7 +168,7 @@ export default function UniversalRelationshipMap({
       if (!node) return true;
       const rect = svgRef.current?.getBoundingClientRect();
       if (!rect?.width || !rect.height) return false;
-      // Labels are nine SVG units high; 1.5 CSS pixels per unit makes them readable.
+      // Frame a local area large enough to distinguish individual relationship targets.
       const fitScale = Math.min(rect.width / layout.width, rect.height / layout.height);
       centerOn(node.x, node.y, Math.max(currentZoom, 1.5 / fitScale));
       return true;
@@ -155,21 +177,99 @@ export default function UniversalRelationshipMap({
   );
 
   useEffect(() => {
-    if (!focusRequest || handledFocus.current === focusRequest) return;
+    if (!isVisible || !focusRequest || handledFocus.current === focusRequest) return;
     const applyFocus = () => {
       if (handledFocus.current === focusRequest) return;
       if (focusNode(focusRequest.nodeId)) handledFocus.current = focusRequest;
     };
     applyFocus();
     if (handledFocus.current === focusRequest || !svgRef.current) return;
+    if (typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver(applyFocus);
     observer.observe(svgRef.current);
     return () => observer.disconnect();
-  }, [focusRequest, focusNode]);
+  }, [focusRequest, focusNode, isVisible]);
 
   const graphNodeById = useMemo(() => new Map(graph.nodes.map((node) => [node.id, node])), [graph.nodes]);
   const graphEdgeById = useMemo(() => new Map(graph.edges.map((edge) => [edge.id, edge])), [graph.edges]);
   const nodeNames = useMemo(() => new Map(graph.nodes.map((node) => [node.id, node.name])), [graph.nodes]);
+  const bounds = useMemo(
+    () =>
+      viewport.bounds ?? {
+        x: zoom.state.vbX,
+        y: zoom.state.vbY,
+        width: zoom.state.vbW,
+        height: zoom.state.vbH,
+      },
+    [viewport.bounds, zoom.state.vbX, zoom.state.vbY, zoom.state.vbW, zoom.state.vbH],
+  );
+  const scale =
+    viewport.width && viewport.height ? Math.min(viewport.width / bounds.width, viewport.height / bounds.height) : 1;
+  const visibleNodes = useMemo(
+    () =>
+      revised
+        ? layout.nodes.filter((n) =>
+            boundsIntersect({ x: n.x - n.r, y: n.y - n.r, width: n.r * 2, height: n.r * 2 }, bounds),
+          )
+        : layout.nodes,
+    [layout.nodes, bounds, revised],
+  );
+  const hubIds = useMemo(() => new Set(layout.clusters.map((c) => c.anchorId)), [layout.clusters]);
+  const labels = useMemo(
+    () =>
+      revised
+        ? placeUniversalLabels(
+            visibleNodes,
+            bounds,
+            scale,
+            [...new Set([selectedNodeId, hoveredNodeId, ...(pathNodeIds ?? [])].filter((id): id is string => !!id))],
+            hubIds,
+          )
+        : [],
+    [visibleNodes, bounds, scale, selectedNodeId, hoveredNodeId, pathNodeIds, hubIds, revised],
+  );
+  const curves = useMemo(
+    () =>
+      layout.edges.map((edge) => ({
+        edge,
+        ...universalEdgeCurve(
+          edge,
+          revised && layout.nodeById[edge.from].clusterId !== layout.nodeById[edge.to].clusterId,
+        ),
+      })),
+    [layout, revised],
+  );
+  const visibleEdges = curves
+    .filter(
+      (curve) =>
+        edgeKinds.includes(graphEdgeById.get(curve.edge.id)!.kind) &&
+        (!revised || boundsIntersect(curve.bounds, bounds)),
+    )
+    .sort((a, b) =>
+      revised
+        ? Number(a.edge.from === activeNodeId || a.edge.to === activeNodeId || !!pathEdgeIds?.includes(a.edge.id)) -
+          Number(b.edge.from === activeNodeId || b.edge.to === activeNodeId || !!pathEdgeIds?.includes(b.edge.id))
+        : 0,
+    );
+  const tabNodeId = visibleNodes.some((n) => n.id === keyboardNodeId)
+    ? keyboardNodeId
+    : visibleNodes.some((n) => n.id === selectedNodeId)
+      ? selectedNodeId
+      : visibleNodes[0]?.id;
+  const fitNeighborhood = () => {
+    const cluster = layout.clusters.find(
+      (c) => c.id === (selectedNodeId ? layout.nodeById[selectedNodeId]?.clusterId : undefined),
+    );
+    if (!cluster) return;
+    const rect = svgRef.current?.getBoundingClientRect();
+    if (!rect?.width || !rect.height) return;
+    const fitScale = Math.min(rect.width / layout.width, rect.height / layout.height);
+    centerOn(
+      cluster.x + cluster.width / 2,
+      cluster.y + cluster.height / 2,
+      Math.min(rect.width / (cluster.width + 40), rect.height / (cluster.height + 40)) / fitScale,
+    );
+  };
 
   const ariaLabel = `Universal relationship map: ${graph.stats.patents} ${pluralize(
     graph.stats.patents,
@@ -230,6 +330,7 @@ export default function UniversalRelationshipMap({
           { label: "Zoom in", action: zoom.zoomIn, disabled: !zoom.canZoomIn },
           { label: "Zoom out", action: zoom.zoomOut, disabled: !zoom.canZoomOut },
           { label: "Fit all", action: zoom.reset, disabled: false },
+          ...(revised ? [{ label: "Fit neighborhood", action: fitNeighborhood, disabled: !selectedNodeId }] : []),
           {
             label: "Center selection",
             action: () => {
@@ -290,6 +391,7 @@ export default function UniversalRelationshipMap({
           onPointerDown={zoom.handlePointerDown}
           onPointerMove={zoom.handlePointerMove}
           onPointerUp={zoom.handlePointerUp}
+          onPointerCancel={zoom.handlePointerUp}
         >
           {layout.components.map((component) => (
             <g key={component.id} pointerEvents="none">
@@ -304,7 +406,7 @@ export default function UniversalRelationshipMap({
                 strokeWidth={1}
                 strokeDasharray="5 7"
               />
-              <text x={component.x + 12} y={component.y + 20} fontSize={10} fill={t.muted}>
+              <text x={component.x + 12} y={component.y + 20} fontSize={10} fill={t.muted} aria-hidden="true">
                 {`Network ${component.index + 1} · ${component.nodeCount} ${pluralize(component.nodeCount, "node")} · ${component.clusterCount} ${pluralize(component.clusterCount, "neighborhood")}`}
               </text>
             </g>
@@ -328,53 +430,55 @@ export default function UniversalRelationshipMap({
                   strokeDasharray="3 5"
                   opacity={active ? 0.9 : 0.72}
                 />
-                <text
-                  x={cluster.x + cluster.width / 2}
-                  y={cluster.y + 17}
-                  textAnchor="middle"
-                  fontSize={9}
-                  fill={active ? t.title : t.label}
-                >
-                  {`${anchorLabel} · ${cluster.nodeCount} ${pluralize(cluster.nodeCount, "node")}`}
-                </text>
+                {(!revised || cluster.width * scale > 220) && (
+                  <text
+                    x={cluster.x + cluster.width / 2}
+                    y={cluster.y + 17}
+                    textAnchor="middle"
+                    fontSize={revised ? 12 / scale : 9}
+                    fill={active ? t.title : t.label}
+                  >
+                    {`${anchorLabel} · ${cluster.nodeCount} ${pluralize(cluster.nodeCount, "node")}`}
+                  </text>
+                )}
               </g>
             );
           })}
 
-          {layout.edges.map((layoutEdge) => {
+          {visibleEdges.map(({ edge: layoutEdge, d }) => {
             const edge = graphEdgeById.get(layoutEdge.id);
             if (!edge) return null;
-            const active = edge.from === activeNodeId || edge.to === activeNodeId;
+            const onPath = revised && pathEdgeIds?.includes(edge.id);
+            const active = edge.from === activeNodeId || edge.to === activeNodeId || onPath;
             const corporate = isUniversalCorporateEdge(edge.kind);
             return (
-              <line
+              <path
                 key={edge.id}
-                x1={layoutEdge.x1}
-                y1={layoutEdge.y1}
-                x2={layoutEdge.x2}
-                y2={layoutEdge.y2}
+                d={d}
+                fill="none"
+                vectorEffect={revised ? "non-scaling-stroke" : undefined}
+                data-edge-id={edge.id}
                 stroke={edgeStroke(t, edge.kind)}
                 strokeWidth={active ? 2.5 : corporate ? 1.35 : 0.8}
                 strokeDasharray={edgeDash(edge.kind)}
                 opacity={
                   (active ? 1 : corporate ? 0.62 : 0.3) *
-                  (emphasisActive && edge.from !== selectedNodeId && edge.to !== selectedNodeId ? 0.15 : 1)
+                  (emphasisActive && !onPath && edge.from !== selectedNodeId && edge.to !== selectedNodeId ? 0.15 : 1)
                 }
                 pointerEvents="none"
               >
                 <title>{relationshipTitle(edge, nodeNames)}</title>
-              </line>
+              </path>
             );
           })}
 
-          {layout.nodes.map((layoutNode) => {
+          {visibleNodes.map((layoutNode) => {
             const node = graphNodeById.get(layoutNode.id);
             if (!node) return null;
             const hovered = hoveredNodeId === node.id;
             const selected = selectedNodeId === node.id;
             const active = hovered || selected;
             const strokeWidth = selected ? 3 : hovered ? 2.5 : 1.25;
-            const showLabel = zoom.state.zoom >= 2.2 || active || node.kind === "family";
             const stroke =
               node.kind === "author"
                 ? t.rayWarm
@@ -393,23 +497,44 @@ export default function UniversalRelationshipMap({
               <g
                 key={node.id}
                 role="button"
-                tabIndex={0}
+                tabIndex={!revised || tabNodeId === node.id ? 0 : -1}
+                ref={(element) => {
+                  if (element) nodeRefs.current.set(node.id, element);
+                  else nodeRefs.current.delete(node.id);
+                }}
                 aria-label={`Select ${nodeRoleLabel(node.kind)} ${node.name}`}
                 opacity={emphasisActive && !selectedNeighborhood?.has(node.id) ? 0.15 : 1}
                 style={{ cursor: "pointer" }}
                 onPointerDown={stopNodePointerDown}
                 onPointerEnter={() => setHoveredNodeId(node.id)}
                 onPointerLeave={() => setHoveredNodeId((current) => (current === node.id ? null : current))}
-                onFocus={() => setHoveredNodeId(node.id)}
+                onFocus={() => {
+                  setHoveredNodeId(node.id);
+                  setKeyboardNodeId(node.id);
+                }}
                 onBlur={() => setHoveredNodeId((current) => (current === node.id ? null : current))}
                 onClick={activate}
                 onKeyDown={(event) => {
+                  if (revised && ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(event.key)) {
+                    event.preventDefault();
+                    const target = directionalUniversalNode(visibleNodes, layoutNode, event.key);
+                    if (target) nodeRefs.current.get(target.id)?.focus();
+                    return;
+                  }
                   if (!isActivateKey(event)) return;
                   event.preventDefault();
                   activate();
                 }}
               >
                 <title>{node.name}</title>
+                {revised && (
+                  <circle
+                    cx={layoutNode.x}
+                    cy={layoutNode.y}
+                    r={Math.max(layoutNode.r, Math.min(12 / scale, 14))}
+                    fill="transparent"
+                  />
+                )}
                 {node.kind === "assignee" || node.kind === "maker" ? (
                   <rect
                     x={layoutNode.x - layoutNode.r}
@@ -420,6 +545,7 @@ export default function UniversalRelationshipMap({
                     fill={t.panelBg}
                     stroke={stroke}
                     strokeWidth={strokeWidth}
+                    vectorEffect={revised ? "non-scaling-stroke" : undefined}
                   />
                 ) : node.kind === "organization" || node.kind === "lens" ? (
                   <polygon
@@ -433,6 +559,7 @@ export default function UniversalRelationshipMap({
                     fill={t.panelBg}
                     stroke={stroke}
                     strokeWidth={strokeWidth}
+                    vectorEffect={revised ? "non-scaling-stroke" : undefined}
                   />
                 ) : node.kind === "family" ? (
                   <polygon
@@ -440,6 +567,7 @@ export default function UniversalRelationshipMap({
                     fill={active ? t.toggleActiveBg : t.panelBg}
                     stroke={stroke}
                     strokeWidth={strokeWidth}
+                    vectorEffect={revised ? "non-scaling-stroke" : undefined}
                   />
                 ) : (
                   <circle
@@ -449,9 +577,10 @@ export default function UniversalRelationshipMap({
                     fill={t.panelBg}
                     stroke={stroke}
                     strokeWidth={strokeWidth}
+                    vectorEffect={revised ? "non-scaling-stroke" : undefined}
                   />
                 )}
-                {showLabel && (
+                {!revised && (zoom.state.zoom >= 2.2 || active || node.kind === "family") && (
                   <text
                     x={layoutNode.x + layoutNode.r + 4}
                     y={layoutNode.y + 3}
@@ -466,12 +595,38 @@ export default function UniversalRelationshipMap({
               </g>
             );
           })}
+          <g pointerEvents="none" aria-hidden="true">
+            {labels.map((label) => (
+              <text
+                key={label.id}
+                data-node-label={label.id}
+                x={label.x}
+                y={label.y}
+                fontSize={13 / scale}
+                fill={label.id === selectedNodeId ? t.title : t.label}
+                stroke={t.panelBg}
+                strokeWidth={4 / scale}
+                paintOrder="stroke"
+              >
+                {label.text}
+              </text>
+            ))}
+          </g>
         </svg>
         {showOverview && viewport.width >= 600 && (
           <div style={{ position: "absolute", right: 8, bottom: 8 }}>{overview}</div>
         )}
       </div>
       {showOverview && viewport.width < 600 && <div style={{ marginTop: 8 }}>{overview}</div>}
+      {revised && (
+        <p style={{ color: t.muted, fontSize: "0.72rem" }}>
+          Arrow keys move between visible nodes; Enter selects.{" "}
+          {ENABLE_UNIVERSAL_MAP_EXTRA_VIEWS
+            ? "Search or Research lists reach every entity."
+            : "Search reaches every entity."}{" "}
+          Labels are spaced automatically.
+        </p>
+      )}
 
       <div
         style={{

@@ -30,19 +30,19 @@ flowchart LR
   n_external_pkg_react["pkg:react"]
   n_external_pkg_react_router["pkg:react-router"]
   n_external_src_components_layout["src/components/layout"]
-  n_external_src_utils_style["src/utils/style"]
+  n_external_src_utils_featureFlags_ts["src/utils/featureFlags.ts"]
   n_src_components_relationshipMap_src_components_relationshipMap_RelationshipEntityPicker_tsx --> |4| n_external_src_utils_catalog
   n_src_components_relationshipMap_src_components_relationshipMap_PatentDetailCard_tsx --> |3| n_external_src_components_content
   n_src_components_relationshipMap_src_components_relationshipMap_constellationAffinity_ts --> |3| n_external_src_utils_catalog
   n_src_components_relationshipMap_src_components_relationshipMap_PatentDetailCard_tsx --> |3| n_external_src_utils_catalog
   n_src_components_relationshipMap_src_components_relationshipMap_UniversalEntityDetailCard_tsx --> |3| n_external_src_utils_catalog
+  n_src_components_relationshipMap_src_components_relationshipMap_UniversalRelationshipMap_tsx --> |3| n_external_src_utils_catalog
   n_src_components_relationshipMap_src_components_relationshipMap_UniversalRelationshipMap_tsx --> |2| n_external_src_components_hooks
   n_src_components_relationshipMap_src_components_relationshipMap_PatentDetailCard_tsx --> |2| n_external_src_types
   n_src_components_relationshipMap_src_components_relationshipMap_roleChip_ts --> |2| n_external_src_types
   n_src_components_relationshipMap_src_components_relationshipMap_universalExploreLayout_ts --> |2| n_external_src_utils_catalog
   n_src_components_relationshipMap_src_components_relationshipMap_universalLayout_ts --> |2| n_external_src_utils_catalog
   n_src_components_relationshipMap_src_components_relationshipMap_UniversalMapSearch_tsx --> |2| n_external_src_utils_catalog
-  n_src_components_relationshipMap_src_components_relationshipMap_UniversalRelationshipMap_tsx --> |2| n_external_src_utils_catalog
   n_src_components_relationshipMap_src_components_relationshipMap_PatentDetailCard_tsx --> n_external_pkg_react
   n_src_components_relationshipMap_src_components_relationshipMap_RelationshipEntityPicker_tsx --> n_external_pkg_react
   n_src_components_relationshipMap_src_components_relationshipMap_RelationshipMap_tsx --> n_external_pkg_react
@@ -66,7 +66,7 @@ flowchart LR
   n_src_components_relationshipMap_src_components_relationshipMap_layout_ts --> n_external_src_utils_catalog
   n_src_components_relationshipMap_src_components_relationshipMap_RelationshipMap_tsx --> n_external_src_utils_catalog
   n_src_components_relationshipMap_src_components_relationshipMap_universalMapGeometry_ts --> n_external_src_utils_catalog
-  n_src_components_relationshipMap_src_components_relationshipMap_PatentDetailCard_tsx --> n_external_src_utils_style
+  n_src_components_relationshipMap_src_components_relationshipMap_UniversalRelationshipMap_tsx --> n_external_src_utils_featureFlags_ts
   n_src_components_relationshipMap_truncated["additional relationships omitted"]
 ```
 
@@ -74,7 +74,7 @@ flowchart LR
 
 - Direct source files: 13
 - Direct subfolders: 0
-- Main outbound areas: src/utils/catalog (24), same folder (10), src/types (10), package:react (8), src/utils/style (7), src/components/hooks (5), src/components/content (4), src/utils/text.ts (4), +3 more
+- Main outbound areas: src/utils/catalog (25), same folder (11), src/types (10), package:react (8), src/utils/style (7), src/components/hooks (5), src/components/content (4), src/utils/text.ts (4), +4 more
 - External consumers: src/pages/RelationshipMapPage.tsx, src/pages/UniversalRelationshipMapPage.tsx
 
 ## Files
@@ -90,7 +90,7 @@ flowchart LR
 | `UniversalEntityDetailCard.tsx` | React component module | src/utils/catalog (3), package:react, package:react-router, src/components/content, src/types, +2 more | src/pages/UniversalRelationshipMapPage.tsx | default, UniversalEntityDetailCard |
 | `universalExploreLayout.ts` | Universal Explore Layout helper module | same folder (2), src/utils/catalog (2) | none | UniversalNeighborhood, UniversalNeighborhoodBridge, buildUniversalNeighborhoods, layoutUniversalNeighborhoods |
 | `universalLayout.ts` | Universal Layout helper module | same folder (2), src/utils/catalog (2) | same folder (4) | UniversalLayoutNode, UniversalLayoutEdge, UniversalLayoutCluster, UniversalLayoutComponent, UniversalRelationshipLayout, universalNodeRadius, layoutUniversalRelationshipGraph |
-| `universalMapGeometry.ts` | Universal Map Geometry helper module | same folder, src/utils/catalog, src/utils/svgCoordinates.ts | none | boundsIntersect, universalEdgeCurve, placeUniversalLabels, directionalUniversalNode |
+| `universalMapGeometry.ts` | Universal Map Geometry helper module | same folder, src/utils/catalog, src/utils/svgCoordinates.ts | same folder | boundsIntersect, universalEdgeCurve, placeUniversalLabels, directionalUniversalNode |
 | `UniversalMapOverview.tsx` | React component module | package:react, same folder, src/components/hooks, src/types, src/utils/style, +1 more | same folder | default, UniversalMapOverview |
 | `UniversalMapSearch.tsx` | React component module | src/utils/catalog (2), package:react, src/components/layout, src/types, src/utils/style | src/pages/UniversalRelationshipMapPage.tsx | default, UniversalMapSearch |
-| `UniversalRelationshipMap.tsx` | React component module | same folder (2), src/components/hooks (2), src/utils/catalog (2), package:react, src/types, +2 more | src/pages/UniversalRelationshipMapPage.tsx | default, UniversalRelationshipMap |
+| `UniversalRelationshipMap.tsx` | React component module | same folder (3), src/utils/catalog (3), src/components/hooks (2), package:react, src/types, +3 more | src/pages/UniversalRelationshipMapPage.tsx | default, UniversalRelationshipMap |
