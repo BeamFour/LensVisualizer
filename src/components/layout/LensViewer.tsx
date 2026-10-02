@@ -41,7 +41,7 @@ import _OPTICS_PRIMER_SIMPLE_MD from "../../content/OpticsPrimerSimple.md?raw";
 import _OPTICS_PRIMER_INTERMEDIATE_MD from "../../content/OpticsPrimerIntermediate.md?raw";
 import _ABERRATIONS_PRIMER_SIMPLE_MD from "../../content/AberrationsPrimerSimple.md?raw";
 import _ABERRATIONS_PRIMER_INTERMEDIATE_MD from "../../content/AberrationsPrimerIntermediate.md?raw";
-import { stripFrontmatter } from "../../utils/content/homepageContent.js";
+import { stripFrontmatter } from "../../utils/content/stripFrontmatter.js";
 import useLensState from "../../utils/state/useLensState.js";
 import useMediaQuery from "../../utils/useMediaQuery.js";
 import { ENABLE_ANALYSIS_VIEW } from "../../utils/featureFlags.js";
