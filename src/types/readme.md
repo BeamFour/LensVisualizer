@@ -44,7 +44,7 @@ flowchart LR
 - Direct source files: 11
 - Direct subfolders: 0
 - Main outbound areas: same folder (11), src/utils/catalog (4), src/comparison (2)
-- External consumers: src/benchmarks, src/comparison, src/components/content, src/components/controls, src/components/diagram, src/components/display, src/components/homepage, src/components/hooks, +49 more
+- External consumers: src/benchmarks, src/comparison, src/components/content, src/components/controls, src/components/diagram, src/components/display, src/components/homepage, src/components/hooks, +50 more
 
 ## Files
 
@@ -60,4 +60,4 @@ flowchart LR
 | `optics.ts` | Shared TypeScript types | same folder (2), src/utils/catalog | src/components/display (25), src/components/diagram (14), src/components/hooks (10), src/optics/analysis (10), src/optics/perspective (10), +41 more | RadialPhaseTerm, DiffractivePhaseSurface, SurfaceData, SyntheticOpticsKind, RearPlateData, SurfaceIncidentSide, SurfaceInactiveSideBehavior, SurfaceInteractionType, +54 more |
 | `state.ts` | Shared TypeScript types | src/comparison (2), same folder | src/components/layout (12), src/utils/state (8), src/components/hooks (7), src/comparison (4), src/components/controls (2), +6 more | SharedSlidersSlice, ComparisonAction, OFF_AXIS_MODES, RAY_DENSITIES, MOBILE_VIEWS, DESKTOP_VIEWS, ANALYSIS_TAB_IDS, OffAxisMode, +27 more |
 | `theme.ts` | Shared TypeScript types | same folder | src/components/display (59), src/components/layout (22), src/components/diagram (16), src/components/relationshipMap (12), src/components/controls (11), +13 more | ThemeInternalTokens, ThemeColorTokens, Theme, ThemeVariant |
-| `universalMap.ts` | Shared TypeScript types | src/utils/catalog | src/components/relationshipMap, src/utils/catalog, src/utils/state | UniversalMapView, UniversalMapState, UniversalConnectionPath |
+| `universalMap.ts` | Shared TypeScript types | src/utils/catalog | src/components/relationshipMap, src/pages/UniversalRelationshipMapPage.tsx, src/utils/catalog, src/utils/state | UniversalMapView, UniversalMapState, UniversalConnectionPath |
