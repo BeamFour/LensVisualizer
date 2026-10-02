@@ -6,6 +6,16 @@ import type { GlassEntry } from "../glassCatalogTypes.js";
 
 export const HOYA_GLASS_ENTRIES: readonly GlassEntry[] = [
   {
+    name: "BACD2",
+    vendor: "Hoya",
+    polynomial: [2.5393255, -0.0087207883, 0.015909566, 0.000088163036, 0.000025876593, -0.0000011733523],
+    nd: 1.60738,
+    vd: 56.72,
+    code6: "607567",
+    source:
+      "HOYA Zemax catalog 2026-07-07 including obsolete glasses; formula 1 polynomial for BACD2, accessed 2026-10-02. https://www.hoya-opticalworld.com/common/agf/HOYA20260707_include_obsolete.agf",
+  },
+  {
     name: "NBFD265",
     vendor: "Hoya",
     polynomial: [3.6415592, -0.017833211, 0.049779099, 0.0043665512, -0.00035538803, 4.031812e-5],

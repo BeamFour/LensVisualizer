@@ -9,12 +9,12 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 ## Summary
 
-- **852** lenses scanned
-- **1892** total code-only elements found
-- **342** elements in this report
-- **126** distinct lens files affected
+- **858** lenses scanned
+- **1902** total code-only elements found
+- **343** elements in this report
+- **127** distinct lens files affected
 - **23** active unreviewed elements have no review-record hit or explicit disposition
-- **186** explicitly unmatched/unknown/proprietary/unidentified elements are self-recording review dispositions
+- **187** explicitly unmatched/unknown/proprietary/unidentified elements are self-recording review dispositions
 - **0** dispositions lack any review record
 
 ## Prioritized Unreviewed Queue
@@ -231,6 +231,7 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 738493 | 1 | 1 | patents/JP2022092388A.pdf | All rows have review records |
 | 740375 | 1 | 1 | patents/US3589798.pdf | All rows explicitly disposed |
 | 740439 | 1 | 1 | patents/US2983193.pdf | All rows explicitly disposed |
+| 740449 | 1 | 1 | patents/US_4437733_A.pdf | All rows explicitly disposed |
 | 740458 | 1 | 1 | patents/US2983193.pdf | All rows explicitly disposed |
 | 740464 | 1 | 1 | patents/US2983193.pdf | All rows explicitly disposed |
 | 740491 | 1 | 1 | patents/US20150131163A1.pdf | All rows explicitly disposed |
@@ -920,6 +921,12 @@ Completion counts are conditional on finding a source-verified catalog identity 
 |---|---|---|---|---|---|---|---|
 | L1 (Element 1) | 1 | `620586 — patent crown glass (nd=1.62041, νd=58.6; no catalog match verified)` | 1.62041 / 58.60 | No catalog entry | abbe | patents/US4303314.pdf | Reviewed sidecar hit |
 | L2 (Element 2) | 3 | `620586 — patent crown glass (nd=1.62041, νd=58.6; no catalog match verified)` | 1.62041 / 58.60 | No catalog entry | abbe | patents/US4303314.pdf | Reviewed sidecar hit |
+
+### [NIKON TV-NIKKOR 11.5-69mm f/1.2 (Nikon S-100)](../../src/lens-data/nikon/NikonTVNikkor11569mmf12NikonS100.data.ts) - US 4,437,733
+
+| Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
+|---|---|---|---|---|---|---|---|
+| L8 (L8) | 18 | `Unmatched (740449; current authoritative catalogs)` | 1.74000 / 44.90 | No catalog entry | abbe | patents/US_4437733_A.pdf | Explicit disposition in data |
 
 ### [NIKON ULTRA-MICRO-NIKKOR 29.5mm f/1.2](../../src/lens-data/nikon/NikonUltraMicroNikkor295mmf12.data.ts) - GB 1,050,055
 

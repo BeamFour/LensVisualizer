@@ -9,12 +9,12 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 ## Summary
 
-- **852** lenses scanned (**840** visible)
-- **8864 / 9565** non-air surfaces use strict catalog Sellmeier data (92.7%)
-- **8879 / 9565** non-air surfaces use trusted chromatic data (Sellmeier or measured line indices, 92.8%)
+- **858** lenses scanned (**846** visible)
+- **8937 / 9646** non-air surfaces use strict catalog Sellmeier data (92.6%)
+- **8952 / 9646** non-air surfaces use trusted chromatic data (Sellmeier or measured line indices, 92.8%)
 - **0** mismatch surfaces in Sweep 1 across **0** lens files
 - **0** Sweep 1 surfaces have a matching untracked local patent PDF
-- **342** code-only missing-Sellmeier elements in Sweep 2: **23** active unreviewed, **186** self-recording explicit dispositions, **0** dispositions missing any review record
+- **343** code-only missing-Sellmeier elements in Sweep 2: **23** active unreviewed, **187** self-recording explicit dispositions, **0** dispositions missing any review record
 - **1** unresolved named-token elements in Sweep 2B, producing **1** token occurrences across **1** distinct tokens
 - **21** Tier A proprietary backfill rows in Sweep 3
 
@@ -31,6 +31,7 @@ These lenses are missing trusted chromatic data only on glass elements. One or t
 
 | Lens | Patent | Local source | Trusted chromatic coverage | Strict Sellmeier coverage | Missing trusted surfaces | Missing surface details | Missing quality mix |
 |---|---|---|---:|---:|---:|---|---|
+| [SCHNEIDER-KREUZNACH TV-VARIOGON 20-600mm f/2.1-6.6](../../src/lens-data/schneider-kreuznach/SchneiderTVVariogon216620600.data.ts) | US 3,912,373 | [PDF](../../patents/US_3912373_A.pdf) | 96.8% (30/31) | 96.8% (30/31) | 1 | 29 [glass] (Element 17: `Unmatched (native e-line ne=1.499, νe=66.8; vendor unresolved)`) | abbe: 1 |
 | [CANON NEW FD 150-600mm f/5.6L](../../src/lens-data/canon/CanonFD150600mmf56L.data.ts) | US 4,110,006 | [PDF](../../patents/US4110006.pdf) | 94.7% (18/19) | 94.7% (18/19) | 1 | 30 [glass] (Element 17: `Unmatched (534555 vintage crown; no first-party coefficient row found)`) | abbe: 1 |
 | [OLYMPUS ZUIKO DIGITAL ED 14-35mm f/2.0 SWD](../../src/lens-data/olympus/OlympusMZuiko1435mmf2ED.data.ts) | US 8,081,392 B2 | [PDF](../../patents/US8081392.pdf) | 94.4% (17/18) | 94.4% (17/18) | 1 | 35 [glass] (Element 18: `Unmatched proprietary short flint (635/232, condition-b APD glass)`) | abbe: 1 |
 | [FUJIFILM FUJINON XF 16-55mm f/2.8 R LM WR](../../src/lens-data/fujifilm/FujifilmXF1655mmf28R.data.ts) | US 2016/0154221 A1 | [PDF](../../patents/US20160154221A1.pdf) | 94.1% (16/17) | 94.1% (16/17) | 1 | 13A [glass] (Element 8 (L31): `Unmatched (685309 dense flint; nearest public catalog row exceeds d-line tolerance)`) | abbe: 1 |
@@ -41,6 +42,7 @@ These lenses are missing trusted chromatic data only on glass elements. One or t
 | [NIKON AF-S ZOOM-NIKKOR 24-85mm f/3.5-4.5G IF-ED](../../src/lens-data/nikon/NikonAFSZoomNikkor2485mmf3545GIFED.data.ts) | JP 2003-241093 A | [PDF](../../patents/JP_2003241093_A.pdf) | 93.8% (15/16) | 93.8% (15/16) | 1 | 6A [glass] (Element 4 hybrid layer: `Unmatched (thin hybrid-asphere layer, n_d=1.55389, v_d=38.1)`) | abbe: 1 |
 | [PANASONIC LUMIX G VARIO 7-14mm f/4 ASPH.](../../src/lens-data/panasonic/PanasonicLumixGVario714mmf4.data.ts) | US 2010/0194930 A1 | [PDF](../../patents/US20100194930A1.pdf) | 93.8% (15/16) | 93.8% (15/16) | 1 | 28 [glass] (Element 16: `Unmatched crown class (523/701, likely phosphate/fluorophosphate)`) | abbe: 1 |
 | [PANASONIC LUMIX S 24-105mm f/4 MACRO O.I.S.](../../src/lens-data/panasonic/PanasonicLumixS24105mmf4MacroOIS.data.ts) | JP 2020-118738 A | [PDF](../../patents/JP2020118738A.pdf) | 93.8% (15/16) | 93.8% (15/16) | 1 | 16A [glass] (Element 8: `Unmatched (688311; M-FD80 / S-TIM28 / J-SF8 class)`) | abbe: 1 |
+| [NIKON TV-NIKKOR 11.5-69mm f/1.2 (Nikon S-100)](../../src/lens-data/nikon/NikonTVNikkor11569mmf12NikonS100.data.ts) | US 4,437,733 | [PDF](../../patents/US_4437733_A.pdf) | 93.3% (14/15) | 93.3% (14/15) | 1 | 18 [glass] (L8: `Unmatched (740449; current authoritative catalogs)`) | abbe: 1 |
 | [CANON EF-M 32mm f/1.4 STM](../../src/lens-data/canon/CanonEFM32mmf14STM.data.ts) | JP 2018-180366 A | [PDF](../../patents/JP2018180366A.pdf) | 92.9% (13/14) | 92.9% (13/14) | 1 | 13 [glass] (LR negative member: `Unmatched (675/348 partial-dispersion flint; patent nd=1.67542, vd=34.8, θgF=0.5825)`) | abbe: 1 |
 | [FUJIFILM FUJINON GF 55mm f/1.7 R WR](../../src/lens-data/fujifilm/FujifilmGF55mmf17.data.ts) | US 2023/0341664 A1 | [PDF](../../patents/US20230341664A1.pdf) | 92.9% (13/14) | 92.9% (13/14) | 1 | 11A [glass] (L24: `772493 — molded lanthanum-crown class (no exact public catalog match)`) | abbe: 1 |
 | [NIKON AF-P DX NIKKOR 70-300mm f/4.5-6.3 G ED VR](../../src/lens-data/nikon/NikonAFPDX70300mmf4563G.data.ts) | US 2021/0026133 A1 | [PDF](../../patents/US20210026133A1.pdf) | 92.9% (13/14) | 92.9% (13/14) | 1 | 3 [glass] (L12: `612313 — anomalous-dispersion flint class (patent nd=1.61155, νd=31.26, θgF=0.618; no exact public catalog match)`) | abbe: 1 |
@@ -48,6 +50,7 @@ These lenses are missing trusted chromatic data only on glass elements. One or t
 | [NIKON AF-S NIKKOR 105mm f/1.4E ED](../../src/lens-data/nikon/NikonNikkor105f14E.data.ts) | WO 2019/116563 A1 | [PDF](../../patents/JPWO2019116563A1.pdf) | 92.9% (13/14) | 92.9% (13/14) | 1 | 8 [glass] (Element 5: `Unmatched APD medium (patent optical constants; supplier unspecified)`) | abbe: 1 |
 | [PANASONIC LEICA DC VARIO-ELMARIT 4.5-108mm f/2.8 (Panasonic Lumix DMC-FZ300)](../../src/lens-data/panasonic/LeicaDCVarioElmarit45108mmf28PanasonicFZ300.data.ts) | US 2015/0103211 A1 | [PDF](../../patents/US20150103211A1.pdf) | 92.9% (13/14) | 92.9% (13/14) | 1 | 28A [glass] (Element 14: `Unmatched (nd=1.54410, νd=56.1; current six-vendor sweep)`) | abbe: 1 |
 | [SAMYANG AF 14mm f/2.8 FE](../../src/lens-data/samyang/SamyangAF14mmf28FE.data.ts) |  | No patent number parsed from lens metadata | 92.9% (13/14) | 92.9% (13/14) | 1 | 12A [glass] (Element 7: `Unmatched (nd=1.877950, vd=37.3)`) | abbe: 1 |
+| [SCHNEIDER-KREUZNACH TELE-VARIOGON 80-240mm f/4](../../src/lens-data/schneider-kreuznach/SchneiderTeleVariogon4080240.data.ts) | US 3,336,094 | [PDF](../../patents/US3336094A.pdf) | 92.9% (13/14) | 92.9% (13/14) | 1 | 3 [glass] (Element 2: `Unmatched (raw patent coordinate nd=1.50378, νd=76.7)`) | abbe: 1 |
 | [SCHNEIDER-KREUZNACH VARIOGON 45-100mm f/2.8](../../src/lens-data/schneider-kreuznach/SchneiderVariogon2845100.data.ts) | US 3,482,900 | [PDF](../../patents/US3482900.pdf) | 92.9% (13/14) | 92.9% (13/14) | 1 | 18 [glass] (Element 11: `Unmatched (1.62364 / 36.75; supplier unresolved)`) | abbe: 1 |
 | [SONY ZEISS VARIO-SONNAR T* 8.8-73.3mm f/2.8 (Sony Cyber-shot DSC-RX10 / DSC-RX10 II)](../../src/lens-data/sony/ZeissVarioSonnarT88733mmf28SonyDSCRX10M12.data.ts) | US 2014/0354857 A1 | [PDF](../../patents/US20140354857A1.pdf) | 92.9% (13/14) | 92.9% (13/14) | 1 | 6A [glass] (Element 4: `803456 - high-index lanthanum class (catalog unresolved)`) | abbe: 1 |
 | [CANON EF-M 18-55mm f/3.5-5.6 IS STM](../../src/lens-data/canon/CanonEFM1855mmf3556ISSTM.data.ts) | US 2013/0335830 A1 | [PDF](../../patents/US20130335830A1.pdf) | 92.3% (12/13) | 92.3% (12/13) | 1 | 22 [glass] (Element 12: `Unmatched (nd=1.52996, nu_d=55.8; code 530558)`) | abbe: 1 |

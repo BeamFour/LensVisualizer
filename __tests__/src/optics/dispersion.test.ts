@@ -527,10 +527,12 @@ describe("resolveGlass", () => {
   it("preserves explicit duplicate-code precedence for legacy resolution", () => {
     expect(resolveGlass("516641 crown class (vendor unproven)")?.name).toBe("S-BSL7");
     expect(resolveGlass("501564")?.name).toBe("K10");
+    expect(resolveGlass("607567")?.name).toBe("N-SK2");
     expect(resolveGlass("626357")?.name).toBe("E-F1");
   });
 
   it("exposes every duplicate-code candidate", () => {
+    expect(resolveGlassCandidates("607567").map((entry) => entry.name)).toEqual(["N-SK2", "BACD2"]);
     expect(resolveGlassCandidates("516641").map((entry) => entry.name)).toEqual(["S-BSL7", "K-BK7", "L-BSL7"]);
     expect(resolveGlassCandidates("626357").map((entry) => entry.name)).toEqual(["E-F1", "F13", "S-TIM1"]);
     expect(resolveGlassCandidates("589485").map((entry) => entry.name)).toEqual(["BAF6", "BAFN6"]);
@@ -538,6 +540,7 @@ describe("resolveGlass", () => {
   });
 
   it("uses vendor context and coordinates to disambiguate duplicate codes", () => {
+    expect(resolveCompatibleGlass("607567 (HOYA)", 1.60738, 56.72)?.name).toBe("BACD2");
     expect(resolveCompatibleGlass("516641 (SUMITA)", 1.5163, 64.11)?.name).toBe("K-BK7");
     expect(resolveCompatibleGlass("516641 (OHARA)", 1.51633, 64.14)?.name).toBe("S-BSL7");
     expect(resolveCompatibleGlass("626357 (CDGM)", 1.62588, 35.7)?.name).toBe("F13");
