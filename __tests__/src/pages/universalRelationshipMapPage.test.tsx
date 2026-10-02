@@ -218,13 +218,24 @@ describe("UniversalRelationshipMapPage", () => {
     expect(screen.getByRole("status", { name: "Current location" }).textContent).toBe(location);
   });
 
-  it("defaults legacy node links to Explore and shares selection and filters across views and history", async () => {
+  it("places Full map first, defaults legacy node links to it, and shares selection and filters across views and history", async () => {
     const node = buildUniversalRelationshipGraph().nodes.find((n) => n.kind === "assignee")!;
     const router = createMemoryRouter([{ path: "/relationships/universal", Component: UniversalRelationshipMapPage }], {
       initialEntries: [`/relationships/universal${universalMapHash("#keep=yes", node.id)}`],
     });
     render(<RouterProvider router={router} />);
-    expect((await screen.findByRole("tab", { name: "Explore" })).getAttribute("aria-selected")).toBe("true");
+    expect((await screen.findByRole("tab", { name: "Full map" })).getAttribute("aria-selected")).toBe("true");
+    expect(
+      within(screen.getByRole("tablist"))
+        .getAllByRole("tab")
+        .map((tab) => tab.textContent),
+    ).toEqual(["Full map", "Explore", "Research"]);
+    fireEvent.keyDown(screen.getByRole("tab", { name: "Full map" }), { key: "ArrowRight" });
+    expect(screen.getByRole("tab", { name: "Explore" }).getAttribute("aria-selected")).toBe("true");
+    expect(router.state.location.hash).toContain("view=explore");
+    fireEvent.keyDown(screen.getByRole("tab", { name: "Explore" }), { key: "Home" });
+    expect(screen.getByRole("tab", { name: "Full map" }).getAttribute("aria-selected")).toBe("true");
+    expect(router.state.location.hash).not.toContain("view=");
     expect(screen.getByRole("heading", { level: 3, name: node.name })).toBeDefined();
     fireEvent.click(screen.getByRole("button", { name: /^Filters/ }));
     fireEvent.click(screen.getByRole("checkbox", { name: "Corporate history" }));
@@ -235,7 +246,7 @@ describe("UniversalRelationshipMapPage", () => {
     await act(async () => {
       await router.navigate(-1);
     });
-    expect(screen.getByRole("tab", { name: "Explore" }).getAttribute("aria-selected")).toBe("true");
+    expect(screen.getByRole("tab", { name: "Full map" }).getAttribute("aria-selected")).toBe("true");
     expect((screen.getByRole("checkbox", { name: "Corporate history" }) as HTMLInputElement).checked).toBe(false);
     router.dispose();
   });

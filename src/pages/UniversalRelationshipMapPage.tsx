@@ -45,8 +45,8 @@ const UNIVERSAL_NODE_IDS = new Set(UNIVERSAL_GRAPH.nodes.map((node) => node.id))
 const UNIVERSAL_LAYOUT = layoutUniversalRelationshipGraph(UNIVERSAL_GRAPH);
 const UNIVERSAL_NEIGHBORHOOD_IDS = new Set(UNIVERSAL_LAYOUT.clusters.map((cluster) => cluster.id));
 const MAP_VIEWS: { id: UniversalMapView; label: string }[] = [
-  { id: "explore", label: "Explore" },
   { id: "full", label: "Full map" },
+  { id: "explore", label: "Explore" },
   { id: "research", label: "Research" },
 ];
 

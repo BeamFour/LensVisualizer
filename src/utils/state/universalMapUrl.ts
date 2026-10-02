@@ -33,7 +33,7 @@ export function universalMapStateFromHash(
       ? [...UNIVERSAL_EDGE_KINDS]
       : UNIVERSAL_EDGE_KINDS.filter((kind) => rawKinds.split(",").includes(kind));
   return {
-    view: view === "full" || view === "research" ? view : "explore",
+    view: view === "explore" || view === "research" ? view : "full",
     nodeId: node("node"),
     neighborhoodId: neighborhood && neighborhoodIds.has(neighborhood) ? neighborhood : null,
     edgeKinds: rawKinds && edgeKinds.length === 0 && rawKinds !== "none" ? [...UNIVERSAL_EDGE_KINDS] : edgeKinds,
@@ -48,7 +48,7 @@ export function universalMapStateHash(hash: string, patch: Partial<UniversalMapS
   for (const [field, key] of Object.entries(fields)) {
     if (!(field in patch)) continue;
     const value = patch[field as keyof typeof fields];
-    if (!value || (field === "view" && value === "explore")) params.delete(key);
+    if (!value || (field === "view" && value === "full")) params.delete(key);
     else params.set(key, value);
   }
   if (patch.edgeKinds) {

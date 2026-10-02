@@ -62,9 +62,9 @@ can become stale when Back interrupts a concurrent navigation. Changed selection
 reselecting the same node can recenter without another history entry. Search and detail navigation carry pending camera
 intent, consumed only when the corresponding URL commits. Direct SVG selection and closing details preserve the camera.
 The fragment also owns `view=explore|full|research`, `neighborhood=<cluster-id>`, comma-separated `relations=<edge-kinds>`
-(`none` disables every kind), and submitted path endpoints `from=<node-id>&to=<node-id>`. Explore and the complete
+(`none` disables every kind), and submitted path endpoints `from=<node-id>&to=<node-id>`. Full map and the complete
 relationship set are omitted when writing URLs. The parser validates views, graph IDs, neighborhood IDs, and edge kinds;
-unknown views become Explore, invalid IDs are ignored, and wholly unknown relationship sets fall back to all kinds.
+unknown views become Full map, invalid IDs are ignored, and wholly unknown relationship sets fall back to all kinds.
 Legacy `#node` links select that entity in the available default view. Feature flags gate available views after parsing;
 see [UI components](ui-components.md#relationship-map-components) for defaults and fallbacks. Reload restores selection, details and framing; Back/Forward reframes
 only when the selected entity changes, preserving the Full map camera for mode/filter-only history changes. Query text,

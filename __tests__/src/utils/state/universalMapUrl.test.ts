@@ -25,17 +25,28 @@ describe("universal map fragments", () => {
     expect(
       universalMapStateFromHash(universalMapStateHash(hash, { edgeKinds: [] }), ids, neighborhoods).edgeKinds,
     ).toEqual([]);
-    expect(universalMapStateHash("", { view: "explore", edgeKinds: UNIVERSAL_EDGE_KINDS })).toBe("");
+    expect(universalMapStateHash("", { view: "full", edgeKinds: UNIVERSAL_EDGE_KINDS })).toBe("");
     expect(
       universalMapStateFromHash("#view=bad&node=unknown&relations=bad&neighborhood=bad&from=bad", ids, neighborhoods),
     ).toEqual({
-      view: "explore",
+      view: "full",
       nodeId: null,
       neighborhoodId: null,
       edgeKinds: UNIVERSAL_EDGE_KINDS,
       fromId: null,
       toId: null,
     });
+  });
+
+  it("defaults to Full map and preserves explicit Explore and Research links", () => {
+    const ids = new Set(["author:ada"]);
+    const neighborhoods = new Set<string>();
+    expect(universalMapStateFromHash("", ids, neighborhoods).view).toBe("full");
+    for (const view of ["explore", "research"] as const) {
+      const hash = universalMapStateHash("#node=author%3Aada&keep=yes", { view });
+      expect(universalMapStateFromHash(hash, ids, neighborhoods)).toMatchObject({ view, nodeId: "author:ada" });
+      expect(universalMapStateHash(hash, { view: "full" })).toBe("#node=author%3Aada&keep=yes");
+    }
   });
   it.each([
     "author:ada",
