@@ -59,6 +59,7 @@ const LENS_DATA = {
     "1 ASPHERICAL SURFACE",
   ],
 
+  lensMounts: ["arri-standard", "alpa"],
   imageFormat: "35mm-cinema",
   focalLengthMarketing: 9.8,
   focalLengthDesign: 9.784066724,

@@ -68,6 +68,7 @@ const LENS_DATA = {
   /* ── Explicit metadata fields ── */
   focalLengthMarketing: 135,
   focalLengthDesign: 134.3, // computed d-line EFL of this model (patent states 135 mm)
+  lensMounts: ["arri-pl"],
   imageFormat: "super-35-cinema",
   // apertureMarketing omitted: marketed value is T1.9, a transmission stop, not an f-number.
   apertureDesign: 1.8, // patent ¶0078 relative aperture

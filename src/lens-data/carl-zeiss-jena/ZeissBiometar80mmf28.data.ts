@@ -38,6 +38,7 @@ const LENS_DATA = {
   focalLengthDesign: 80.60949895409806,
   apertureMarketing: 2.8,
   apertureDesign: 2.8,
+  lensMounts: ["pentacon-six"],
   imageFormat: "6x6",
   patentNumber: "US 2,968,221",
   patentAuthors: ["Harry Zöllner"],

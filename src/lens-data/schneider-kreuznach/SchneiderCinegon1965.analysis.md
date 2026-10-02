@@ -242,3 +242,10 @@ fourteen patent refracting surfaces are retained; the only added plane is the di
    https://www.hikari-g.co.jp/products/optical_glass/ ;
    https://www.cdgmgd.com/database/toWebDatabase.htm?k=Products_Data&pageIndex=2&url=database ;
    https://oharacorp.com/wp-content/uploads/2025/04/all-detailed-data-20250418.pdf
+
+
+## Production mount assignment
+
+The period Schneider distributor catalog lists Cinegon 1.9/6.5 under 8mm D Mount. This supports the production mount without asserting that every Cinegon or Bolex variant shares this formula. [Manufacturer source](https://www.pacificrimcamera.com/rl/01676/01676.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

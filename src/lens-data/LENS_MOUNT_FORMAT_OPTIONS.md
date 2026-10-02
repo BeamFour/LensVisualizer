@@ -13,11 +13,23 @@ imageFormat: "135-full-frame",
 ## Lens Mount IDs
 
 Use `lensMounts` for production mount variants represented by the optical formula. The field is optional while the
-catalog is being backfilled, but when present it must be a non-empty array of unique known ids.
+catalog is being backfilled, but when present it must be a non-empty array of unique known ids. Supported variants may be a documented subset; describe unrepresented sockets and body-specific compatibility limits in the lens analysis. Adapter compatibility alone is not a native production mount.
 
 | ID | Display Label | Notes |
 |----|---------------|-------|
 | `agfa-ambi-silette` | Agfa Ambi Silette | Agfa Ambi Silette proprietary 35 mm rangefinder bayonet. |
+| `alpa` | ALPA (35 mm SLR) | The proprietary bayonet of the Swiss ALPA 35 mm SLR system. |
+| `arri-pl` | ARRI PL | The Positive Lock cinema mount used by ARRI and many other camera makers. |
+| `arri-standard` | ARRI Standard | The original cylindrical ARRIFLEX lens mount used before ARRI Bayonet and PL. |
+| `c-mount` | C-mount | The one-inch, 32-thread-per-inch screw mount used across cine and imaging systems. |
+| `d-mount` | D-mount | The smaller screw mount used for many interchangeable-lens 8 mm movie cameras. |
+| `fujica-x` | Fujica X | Fuji’s historical Fujica X bayonet for X-Fujinon SLR lenses. |
+| `graflex-xl` | Graflex XL | The Graflex XL combination lens bayonet and focusing-ring interface. |
+| `mamiya-ze` | Mamiya ZE | Mamiya’s electronic bayonet for the Sekor E and EF lens families. |
+| `miranda-bayonet` | Miranda Bayonet | The external Miranda SLR bayonet used by Auto Miranda and Auto EC lenses. |
+| `pentacon-six` | Pentacon Six / Praktisix | The medium-format bayonet shared by Praktisix and Pentacon six lenses. |
+| `praktica-b` | Praktica B | The Praktica B bayonet used by PRAKTICAR lenses. |
+| `voigtlander-prominent` | Voigtländer Prominent | Voigtländer’s interchangeable lens system for the postwar Prominent rangefinder. |
 | `canon-ef` | Canon EF | Canon EF SLR mount. |
 | `canon-ef-s` | Canon EF-S | Canon EF-derived APS-C DSLR mount; pairs with `aps-c`. |
 | `canon-ef-m` | Canon EF-M | Canon EF-M APS-C mirrorless mount; usually pairs with `aps-c`. |

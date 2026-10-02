@@ -576,10 +576,8 @@ the description states no optical function for it, and both faces being flat its
 contribution is exactly zero. The secondary source that makes the claim is recorded as
 uncorroborated.
 
-**Mount.** The production lens uses the Praktica B bayonet, which has no canonical identifier in the
-current taxonomy revision, so the mount field is omitted rather than mislabelled. Declaring
-only the M42 identifier would have been true of the sibling but would have implied that the named
-lens is an M42 lens. The same formula was sold in M42 as the Vario-Pancolar 35–70 mm
+**Mount.** The production lens uses the Praktica B bayonet, recorded as `praktica-b`.
+The M42 identifier would refer to the sibling rather than the named lens. The same formula was sold in M42 as the Vario-Pancolar 35–70 mm
 f/2.7–3.5 MC. The image format is 24 × 36 mm.
 
 **Marketed specifications.** All production figures — 35–70 mm, f/2.7–3.5 to f/22 in half stops,
@@ -641,3 +639,10 @@ lens's switchable close-focus mode, though the patent publishes no data for it.
 with the `opticalglass` package, version 2.0.2, 1 087 rows evaluated at e/F′/C′. Catalogue revision
 dates are those of the package release and were not independently re-verified against vendor sites.
 No historical **Jenaer** Glaswerk catalogue was available. The modern names in the data identify compatible spectral proxies; none establishes a historical production-glass identity.
+
+
+## Production mount assignment
+
+The manufacturer instruction leaflet identifies the Vario-Prakticar production lens and its Praktica B system. The M42 Vario-Pancolar sibling is not the named production variant. [Manufacturer source](https://butkus.org/chinon/praktica/praktica_lenses/b-lenses/cz-vario-prakticar-2-7_3-5_35-70.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

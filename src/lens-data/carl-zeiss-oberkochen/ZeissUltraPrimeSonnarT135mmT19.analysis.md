@@ -258,3 +258,10 @@ The patent cites the Alvarez variable-power lens (US 3,305,294) and Lohmann's eq
 ## Image-format reference
 
 `imageFormat: "super-35-cinema"` records the 24.9 × 18.7 mm ANSI Super 35 Silent aperture in [ARRI’s Ultra Prime technical data](https://www.arri.com/en/cine-lenses/arri-zeiss-fujinon-lenses/legacy/ultra-prime-lenses/arri-ultra-prime-lenses-technical-data). This format’s 31.14 mm diagonal agrees with the existing field reference; production prescription identification remains qualified.
+
+
+## Production mount assignment
+
+ZEISS identifies the Ultra Prime mechanical reference as the PL mount flange. [Manufacturer source](https://www.zeiss.com/photonics-and-optics/en/cinematography/lenses/ultra-prime-lenses.html).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

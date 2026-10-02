@@ -12,7 +12,7 @@ The prescription is the seven-element Example 3 of US 3,037,426. Figure 3 shows 
 
 The identification with the production KINOPTIK 1.9mm f/1.9 SUPER-TEGEA is strong but remains a research correlation rather than a manufacturer statement that the production lens is specifically Example 3. Kinoptik/Karl Heitz literature lists the SUPER-TEGEA as 1.9 mm f/1.9, 197° on an 8.7 mm-diameter image circle, fixed focus, and approximately 9.2 mm optical back focus. Those values closely track the Example 3 patent summary. The same literature documents C-mount and ALPA versions. [2] [3]
 
-The implemented prescription remains at patent scale. No uniform scaling is applied. The data file records the manufacturer’s 8.7 mm circular image as `imageCircleMm`, independent of a projection law. No rectangular format is inferred; historical C-mount and ALPA mounts remain uncatalogued.
+The implemented prescription remains at patent scale. No uniform scaling is applied. The data file records the manufacturer’s 8.7 mm circular image as `imageCircleMm`, independent of a projection law. No rectangular format is inferred; the documented C-mount and ALPA installations are now cataloged separately.
 
 ## Optical Architecture
 
@@ -166,3 +166,10 @@ parabola correction; all other radii, gaps and glass coordinates match.
 Computed EFL 1.955900 vs printed 1.98 and BFL 9.330584 vs 9.28 show
 a residual source inconsistency. The source does not specify designer best
 focus; preserve the image distance and do not further tune the paraboloid.
+
+
+## Production mount assignment
+
+The Kinoptik / Karl Heitz brochure, PDF page 3, explicitly draws C-mount and ALPA versions. The circular image remains independent of the camera’s rectangular format. [Manufacturer source](https://www.pacificrimcamera.com/rl/01254/01254.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

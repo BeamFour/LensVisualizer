@@ -51,6 +51,7 @@ const LENS_DATA = {
     "16 mm CINEMA (MARKETED)",
   ],
 
+  lensMounts: ["c-mount", "arri-standard"],
   imageFormat: "16mm-cinema",
   focalLengthMarketing: 5.7,
   focalLengthDesign: 5.797294665734089,

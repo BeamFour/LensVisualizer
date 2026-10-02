@@ -58,6 +58,7 @@ const LENS_DATA = {
   focalLengthDesign: 49.99988582182795,
   apertureMarketing: 1.5,
   apertureDesign: 1.4999965746548385,
+  lensMounts: ["voigtlander-prominent"],
   imageFormat: "135-full-frame",
   patentNumber: "US 2,646,721 A",
   patentAuthors: ["Albrecht Wilhelm Tronnier"],

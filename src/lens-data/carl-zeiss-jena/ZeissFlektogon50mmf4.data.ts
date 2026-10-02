@@ -48,6 +48,7 @@ const LENS_DATA = {
   focalLengthDesign: 49.999544002841,
   apertureMarketing: 4,
   apertureDesign: 4,
+  lensMounts: ["pentacon-six"],
   imageFormat: "6x6",
   patentNumber: "DE 1 157 000",
   patentAuthors: ["Wolf Dannberg", "Eberhard Dietzsch"],

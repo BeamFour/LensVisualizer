@@ -18,7 +18,7 @@ The production correlation to the Schneider-Kreuznach VARIOGON 2.8/45-100 is str
 3. The patent's worked design has 14 elements, an f/2.8 aperture target, a 24 × 36 mm intended format, an approximately 48-96 mm design range, and a close-focus design example of about 1.2 m.
 4. One material contradiction remains: the period product brochure states 14 elements in 11 groups, whereas the patent prescription has 14 elements in ten air-spaced lens members. No accessed Schneider source states that Table I of US 3,482,900 is the exact production formula.
 
-Accordingly, the data file keeps the marketed 45-100 mm range separate from the unscaled design EFL endpoints of approximately 48.060 and 96.043 mm. The period brochure does enumerate historical sockets, including Nikon F, Leicaflex, Canonflex, Exakta-family, Praktina, Minolta, Konica, C-mount, D-mount, and others. `lensMounts` nevertheless remains unset because the current LensVisualizer taxonomy does not cleanly represent the complete brochure list; authoring only the mappable subset would imply an unsupported exhaustiveness.
+Accordingly, the data file keeps the marketed 45-100 mm range separate from the unscaled design EFL endpoints of approximately 48.060 and 96.043 mm. The period brochure does enumerate historical sockets, including Nikon F, Leicaflex, Canonflex, Exakta-family, Praktina, Minolta, Konica, C-mount, D-mount, and others. `lensMounts` now records the directly supported canonical subset. The production-mount section identifies the remaining unrepresented sockets; this array is not an exhaustive compatibility claim.
 
 ## Optical Architecture
 
@@ -212,3 +212,10 @@ The numerical verification separates four different categories that should not b
 ## Image-format evidence
 
 The period Schneider catalog, [*Schneider Interchangeable Lenses*, p. 9](https://www.pacificrimcamera.com/rl/00068/00068.pdf), lists the Variogon 2.8/45–100 among 35 mm SLR lenses. Its 48.6°–25.4° angle range is consistent with a 24 × 36 mm frame. The existing `135-full-frame` assignment is retained: 43.3 mm is the nominal frame diagonal, not a manufacturer-certified maximum optical circle. The marketed 14/11 construction remains distinct from this patent’s 14/10 arrangement.
+
+
+## Production mount assignment
+
+The catalog, printed page 9, lists interchangeable production sockets for Pentax/Praktica (M42), Exakta, Praktina, Minolta SR, Miranda, Konica F, Canonflex (Canon R), C, D, Nikon F and Leicaflex. These are the documented sockets represented by canonical ids, not a claim of exhaustive compatibility; the separately listed Bolex H8 Reflex and Exakta Real sockets remain unrepresented. Cine sockets do not change the authored 35mm image format or establish a new production prescription. [Manufacturer source](https://www.pacificrimcamera.com/rl/00068/00068.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

@@ -193,4 +193,11 @@ The analysis is consistent with Sigma's published specifications for the product
 
 ## Image-format reference
 
-`imageFormat: "135-full-frame"` follows [Sigma’s official product specifications](https://www.sigma-global.com/en/lenses/a020_85_14/), which identify the production lens as Full-frame [DG]. The format assignment does not assert production prescription identity or select an interchangeable mount.
+`imageFormat: "135-full-frame"` follows [Sigma’s official product specifications](https://www.sigma-global.com/en/lenses/a020_85_14/), which identify the production lens as Full-frame [DG]. The format assignment does not assert production prescription identity. Native production mounts are documented separately below.
+
+
+## Production mount assignment
+
+Sigma lists Sony E and L-Mount production versions of this DG DN Art lens. [Manufacturer source](https://www.sigma-global.com/en/lenses/a020_85_14/).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

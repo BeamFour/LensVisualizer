@@ -69,6 +69,7 @@ const LENS_DATA = {
   focalLengthDesign: 1.9558999761,
   apertureMarketing: 1.9,
   apertureDesign: 1.9,
+  lensMounts: ["c-mount", "alpa"],
   patentNumber: "US 3,037,426",
   patentAuthors: ["Edgard Hugues"],
   patentAssignees: ["Les Appareils de Precision Kinoptik"],

@@ -47,6 +47,7 @@ const LENS_DATA = {
   focalLengthDesign: 49.994722,
   apertureMarketing: 1.4,
   apertureDesign: 1.4,
+  lensMounts: ["praktica-b"],
   imageFormat: "135-full-frame",
   patentNumber: "GB 2 066 504 A",
   patentAuthors: ["Eberhard Dietzsch", "Heinz-Dietrich Siegert", "Erich Greiner"],

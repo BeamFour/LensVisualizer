@@ -204,3 +204,10 @@ prescription gives paraxial BFL 44.761613 mm (offset -0.038387 mm).
 The front 3 mm filter has no infinity-focus power; no rear plate is listed.
 The source evaluates polychromatic finite-aperture MTF, but does not define
 the tabulated plane as paraxial or best focus. Keep its published distance.
+
+
+## Production mount assignment
+
+Leitz specifies the standard PL mount for SUMMILUX-C. The optional iD version retains the PL interface; no LPL version is inferred. [Manufacturer source](https://www.leitz-cine.com/product/summilux-c).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

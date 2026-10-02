@@ -369,3 +369,10 @@ and the already documented aspheric typo interpretations. F1 retains
 plate is listed. The small difference may include finite-aperture and
 spectral design-focus choices, but these are not specified by the source.
 Keep the published image distance rather than adjusting it to focus.
+
+
+## Production mount assignment
+
+Leitz specifies the standard PL mount for SUMMILUX-C. The optional iD version retains the PL interface; no LPL version is inferred. [Manufacturer source](https://www.leitz-cine.com/product/summilux-c).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

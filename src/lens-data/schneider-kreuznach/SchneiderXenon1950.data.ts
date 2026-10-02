@@ -44,6 +44,7 @@ const LENS_DATA = {
 
   focalLengthMarketing: 50,
   focalLengthDesign: 50.00311336153039,
+  lensMounts: ["exakta", "m42"],
   imageFormat: "135-full-frame",
   apertureMarketing: 1.9,
   apertureDesign: 2,

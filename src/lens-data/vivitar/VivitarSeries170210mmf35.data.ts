@@ -51,6 +51,7 @@ const LENS_DATA = {
   focalLengthDesign: [72.662091, 204.940289],
   apertureMarketing: 3.5,
   apertureDesign: 3.65,
+  lensMounts: ["m42", "minolta-sr", "canon-fl", "canon-fd", "nikon-f", "konica-ar", "olympus-om", "pentax-k"],
   imageFormat: "135-full-frame",
   patentNumber: "JP S51-63635 A",
   patentAuthors: ["Rinzo Watanabe", "Ellis I. Betensky"],

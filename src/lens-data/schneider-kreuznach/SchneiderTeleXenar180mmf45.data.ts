@@ -41,6 +41,7 @@ const LENS_DATA = {
   focalLengthDesign: 179.948704,
   apertureMarketing: 4.5,
   apertureDesign: 4.499993,
+  lensMounts: ["large-format-lens-board"],
   imageFormat: "6x9",
   patentNumber: "DE 471565 C",
   patentAuthors: ["Albrecht Wilhelm Tronnier"],

@@ -21,6 +21,11 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-02",
     type: "improvement",
+    summary: "Filled 40 missing lens mounts and added historical and cinema mount families",
+  },
+  {
+    date: "2026-10-02",
+    type: "improvement",
     summary: "Added compact-camera, tube and cinema formats and filled missing lens assignments",
   },
   {

@@ -53,6 +53,7 @@ const LENS_DATA = {
   focalLengthDesign: 12.49993,
   apertureMarketing: 2.8,
   apertureDesign: 2.87,
+  lensMounts: ["canon-ef", "canon-rf", "nikon-f", "nikon-z", "sony-a", "sony-fe", "pentax-k", "l-mount"],
   imageFormat: "135-full-frame",
   patentNumber: "CN 205720849 U",
   patentAuthors: ["Xiaohua Zhang"],

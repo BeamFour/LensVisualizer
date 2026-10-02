@@ -290,3 +290,10 @@ unpublished close-focus or pupil prescription.
   <https://www.cdgmgd.com/database/toWebDatabase.htm?k=Products_Data&pageIndex=25&url=database>.
 - SCHOTT, optical-glass technical/catalog documentation for the international six-digit glass-code convention:
   <https://media.schott.com/api/public/content/ff189abcb12f498aa221f54fd0b2055c>.
+
+
+## Production mount assignment
+
+The Mamiya E/EF manufacturer manual lists the 28–50mm E zoom and describes bayonet mounting with electronic contacts. This is the ZE system, distinct from Mamiya NC. [Manufacturer source](https://www.cameramanuals.org/mamiya_pdf/mamiya-sekor_ze_lenses.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

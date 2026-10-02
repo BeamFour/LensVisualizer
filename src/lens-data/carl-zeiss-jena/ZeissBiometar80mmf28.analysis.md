@@ -185,3 +185,10 @@ revision and do not substitute for measured field-curvature performance.
    [HIKARI](https://www.hikari-g.co.jp/optical_glass/catalog/), and
    [SUMITA](https://www.sumita-opt.co.jp/en/download/). They are used only as class/equivalent evidence; the patent
    itself remains the authority for the modeled `nd/νd` values.
+
+
+## Production mount assignment
+
+The Carl Zeiss Jena brochure identifies the selected 60 × 60 Biometar versions for Praktisix. The 24 × 36 Praktina version of the 120mm lens is a separate production correlation and is not assigned here. [Manufacturer source](https://zoep-entertainment.de/wp-content/uploads/2021/01/1958-Carl-Zeiss-Jena-Biometar-80-120mm.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

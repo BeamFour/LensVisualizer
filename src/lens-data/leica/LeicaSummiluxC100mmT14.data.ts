@@ -73,6 +73,7 @@ const LENS_DATA = {
   patentAuthors: ["Iain A. Neil"],
   patentAssignees: ["ACM Projektentwicklung GmbH"],
   patentYear: 2013,
+  lensMounts: ["arri-pl"],
   imageFormat: "35mm-cinema",
   elementCount: 13,
   groupCount: 10,

@@ -329,3 +329,10 @@ The `.data.ts` file for this lens incorporates several departures from a literal
 4. Camera-wiki.org: Vivitar Series 1 200mm f/3.0 Auto Telephoto.
 5. HOYA Optics Division: Glass Cross Reference Index (hoya-opticalworld.com).
 6. Schott AG: Optical Glass Data Sheets (various editions).
+
+
+## Production mount assignment
+
+The Vivitar Series 1 catalog’s 200mm panel explicitly lists Nikon, Canon, Minolta, Konica, Olympus OM and Pentax S/universal-thread versions. Those period SLR systems map to these ids; a later Pentax K version is not inferred from the Pentax S label. [Manufacturer source](https://www.pacificrimcamera.com/rl/01201/01201.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

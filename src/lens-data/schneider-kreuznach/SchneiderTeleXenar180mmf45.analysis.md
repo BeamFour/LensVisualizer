@@ -177,3 +177,10 @@ resolution remain integration tasks rather than evidence supplied by this analys
 ## Integration audit
 
 The October 2, 2026 UTC audit reviewed the exact local patent figure, checked optical rims against edge and gap constraints, and reviewed compatible catalog dispersion. The sibling audit log records retained dimensions, changes and unresolved source limits. Catalog curves are qualified spectral proxies, with production supplier/melt identity unconfirmed.
+
+
+## Production mount assignment
+
+The Schneider 1937 manufacturer catalog, PDF page 24, lists the 18cm f/4.5 Tele-Xenar with a size 1S shutter in its exchange table. The assignment records the shutter-cell installation in a bellows camera’s lens board; it does not imply a universal board shape or assign a later SLR Tele-Xenar mount. [Source](https://www.cameramanuals.org/booklets/schneider_lenses_1937.pdf).
+
+The assignment records the correlated production installation, not manufacturer confirmation of an exact patent-to-factory prescription.

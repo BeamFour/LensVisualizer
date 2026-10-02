@@ -53,6 +53,7 @@ const LENS_DATA = {
   focalLengthDesign: 39.99869945077084,
   apertureMarketing: 2,
   apertureDesign: 2,
+  lensMounts: ["leica-m"],
   imageFormat: "135-full-frame",
   patentNumber: "DE 2 222 892 A1",
   patentAuthors: ["Georg Knetsch", "Hermann Desch", "Heinz Marquardt", "Walter Watz"],

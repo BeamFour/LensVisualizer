@@ -78,6 +78,7 @@ const LENS_DATA = {
   patentYear: 2013,
   // Example 2 specifies a 28 mm design image diagonal (printed p. 16).
   imageCircleMm: 28,
+  lensMounts: ["arri-pl"],
   imageFormat: "35mm-cinema",
   elementCount: 15,
   groupCount: 11,

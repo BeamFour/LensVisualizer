@@ -133,3 +133,10 @@ At the project's nominal 56 × 56 mm 6x6 corner, corresponding to a 18.3718° pa
 6. OHARA Corporation, **Optical Glass Type Tables / Pocket Catalog**. <https://oharacorp.com/glass-type/>.
 7. Chengdu Guangming Optoelectronic Corp. (CDGM), **Optical Glass Database and Data Sheets**. <https://www.cdgmgd.com/database/toWebDatabase.htm?k=Products_Data&url=database>.
 8. HOYA Optics, **Common Glass Type Lists**. <https://www.hoya-opticalworld.com/english/products/press_01.html>.
+
+
+## Production mount assignment
+
+The Carl Zeiss Jena brochure identifies the selected 60 × 60 Biometar versions for Praktisix. The 24 × 36 Praktina version of the 120mm lens is a separate production correlation and is not assigned here. [Manufacturer source](https://zoep-entertainment.de/wp-content/uploads/2021/01/1958-Carl-Zeiss-Jena-Biometar-80-120mm.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

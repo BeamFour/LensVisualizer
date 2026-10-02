@@ -14,7 +14,7 @@ The implemented prescription is derived from the first numerical construction in
 
 The production correlation is strong but remains an inference rather than a manufacturer-confirmed patent attribution. A Pentacon/Carl Zeiss Jena catalog identifies a **ZEISS FLEKTOGON 4/50** for PENTACON six TL and PRAKTISIX, describes it as a seven-element lens, and gives a 78° used image angle and 0.50 m shortest focusing distance. Those product facts converge with the patent's seven-element f/4 wide-angle construction, while a uniform scale of 0.5 converts the patent's normalized 100 mm design to approximately 50 mm without changing its dimensionless architecture or f-number. No primary source located for this dossier explicitly states that the production Flektogon 4/50 uses DE 1 157 000 Example 1. [1, pp. 1-2] [2, product panel on PDF p. 6]
 
-The LensVisualizer model therefore keeps marketing and design quantities separate. The production identity is 50 mm f/4; the final scaled prescription computes an effective focal length of 49.999544 mm. The data file uses the canonical `6x6` image-format identifier because the manufacturer catalog names the Pentacon Six TL / Praktisix systems, but it deliberately omits a mount identifier because the supplied taxonomy reference contains no Pentacon Six / Praktisix mount ID.
+The LensVisualizer model therefore keeps marketing and design quantities separate. The production identity is 50 mm f/4; the final scaled prescription computes an effective focal length of 49.999544 mm. The data file uses the canonical `6x6` image-format identifier because the manufacturer catalog names the Pentacon Six TL / Praktisix systems, and now records their shared `pentacon-six` mount.
 
 ## Optical Architecture
 
@@ -163,3 +163,10 @@ The following curves are approximate spectral proxies within the catalog coordin
 |---|---|---|---|---|
 | L1 | 1.69806 / 53.6 (d) | N-LAK14 | -0.001260 | 1.810 |
 | L2 | 1.54212 / 59.6 (d) | BAK2 | -0.002158 | 0.100 |
+
+
+## Production mount assignment
+
+The Pentacon / Carl Zeiss Jena catalog, PDF page 6, lists the Flektogon 4/50 for Pentacon six TL and Praktisix. [Manufacturer source](https://allphotolenses.com/public/files/pdfs/61ff8e81ae6c194e951ef186ba3c4e95.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

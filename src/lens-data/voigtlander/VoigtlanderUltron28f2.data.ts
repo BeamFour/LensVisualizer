@@ -33,6 +33,7 @@ const LENS_DATA = {
   focalLengthDesign: 28.5,
   apertureMarketing: 2.0,
   apertureDesign: 2.0,
+  lensMounts: ["leica-m"],
   imageFormat: "135-full-frame",
   patentNumber: "JP 2022-100641 A",
   patentAuthors: ["Yoshihisa Yomogida", "Yuki Shibata"],

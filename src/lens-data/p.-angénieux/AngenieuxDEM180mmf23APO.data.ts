@@ -70,6 +70,7 @@ const LENS_DATA = {
   focalLengthDesign: 179.9270350897788,
   apertureMarketing: 2.3,
   apertureDesign: 2.3,
+  lensMounts: ["canon-fd", "contax-yashica", "leica-r", "nikon-f"],
   imageFormat: "135-full-frame",
   patentNumber: "US 4,726,669",
   patentAuthors: ["Pierre Angénieux"],

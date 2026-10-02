@@ -219,3 +219,10 @@ radius/gap/index at scale ×1.8, with the documented V1=61.2 emendation.
 Native EFL 99.959464 and BFL 44.708683 differ from F=100 and BF=44.79.
 Scaled offset −0.146370 mm is retained as source inconsistency; no plate
 or additional focus adjustment is supported by the published prescription.
+
+
+## Production mount assignment
+
+The Angénieux manufacturer brochure, PDF page 2, lists the 180mm f/2.3 DEM in Canon FD, Contax, Leica R and Nikon mounts. The neighboring autofocus zoom’s Canon AF and Minolta AF mounts are not applied to this manual-focus telephoto. [Manufacturer source](https://www.pacificrimcamera.com/rl/02002/02002.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

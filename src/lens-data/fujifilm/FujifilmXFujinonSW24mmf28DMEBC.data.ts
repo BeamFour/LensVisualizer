@@ -55,6 +55,7 @@ const LENS_DATA = {
   focalLengthDesign: 24.003005,
   apertureMarketing: 2.8,
   apertureDesign: 2.800000054,
+  lensMounts: ["fujica-x"],
   imageFormat: "135-full-frame",
   patentNumber: "US 4,158,482",
   patentAuthors: ["Yoshikazu Doi", "Yutaka Sakai"],

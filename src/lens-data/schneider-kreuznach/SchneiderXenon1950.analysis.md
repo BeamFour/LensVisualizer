@@ -116,4 +116,11 @@ The prescription is entirely spherical. There are no aspheric coefficients, diff
 
 ## Image-format reference
 
-`imageFormat: "135-full-frame"` records the correlated production Xenon 50mm f/1.9’s 35 mm still-camera format. The [Schneider manufacturer catalog](https://www.pacificrimcamera.com/rl/00832/00832.pdf), “Schneider Interchangeable Lenses For 35mm Single Lens Reflex Cameras,” lists the six-element Xenon 1.9/50. Production mount and exact Table A identification remain unconfirmed.
+`imageFormat: "135-full-frame"` records the correlated production Xenon 50mm f/1.9’s 35 mm still-camera format. The [Schneider manufacturer catalog](https://www.pacificrimcamera.com/rl/00832/00832.pdf), “Schneider Interchangeable Lenses For 35mm Single Lens Reflex Cameras,” lists the six-element Xenon 1.9/50. The catalog documents Exakta and M42 production versions; exact Table A identification remains unconfirmed.
+
+
+## Production mount assignment
+
+The Schneider catalog, printed page 13, lists the six-element Xenon 1.9/50 in Exakta and Praktica/Pentax screw-mount versions. No DKL version or different-aperture Xenon is inferred. [Manufacturer source](https://www.pacificrimcamera.com/rl/00832/00832.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

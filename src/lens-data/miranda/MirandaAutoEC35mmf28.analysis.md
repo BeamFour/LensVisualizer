@@ -143,3 +143,10 @@ No rear plate, sensor cover glass, filter, or inactive dummy plane is present in
 4. HOYA Corporation Optics Division, E-FD1L data and optical-glass cross-reference: <https://www.hoya-opticalworld.com/common/pdf2019/E-FD1L.pdf> and <https://www.hoya-opticalworld.com/english/products/crossreference.html>.
 5. SCHOTT Advanced Optics, N-SK16 optical-glass data, used as an additional 620603-family comparison: <https://www.schott.com/shop/medias/SCHOTT-datasheet-N-SK16.pdf>.
 6. HIKARI GLASS CO., LTD., optical-glass catalog, used for cross-vendor coordinate checks: <https://www.hikari-g.co.jp/optical_glass/catalog/document/HIKARI_Catalog.pdf>.
+
+
+## Production mount assignment
+
+The Miranda RE-II manual, PDF pages 21–22, describes the 45° locking attachment and lists these Auto EC lenses. The assignment records the external Miranda bayonet, not the camera’s separate internal 44mm thread; diaphragm coupling varies between Miranda body generations. [Manufacturer source](https://butkus.org/chinon/miranda/miranda_re-ii/miranda_re-ii.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

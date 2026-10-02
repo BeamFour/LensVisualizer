@@ -19,7 +19,7 @@ The identification with a Schneider Cine-Xenon 25 mm f/1.4 is a convergent produ
 4. Table A contains seven elements in four air-spaced members; archival Schneider and ARRIFLEX literature also describes the 25 mm f/1.4 Cine-Xenon as a seven-element lens.
 5. An ARRIFLEX 16 catalog identifies a Schneider Cine Xenon 1:1.4, 25 mm, catalog no. 1117, with a 23° horizontal field and a 0.5 m-to-infinity focusing range.
 
-No reviewed primary source states that US 3,005,379 Table A is the production prescription for catalog no. 1117 or for every 25 mm f/1.4 Cine-Xenon mechanical variant. The patent itself does not name Cine-Xenon, 25 mm, C-thread, ARRIFLEX, or a product catalog number. The data file therefore treats the product match as an inference and does not assign a mount or image-format identifier from the patent.
+No reviewed primary source states that US 3,005,379 Table A is the production prescription for catalog no. 1117 or for every 25 mm f/1.4 Cine-Xenon mechanical variant. The patent itself does not name Cine-Xenon, 25 mm, C-thread, ARRIFLEX, or a product catalog number. The data file treats the product match as an inference. The production C-mount and 16mm format assignments come from the manufacturer catalog, not from the patent.
 
 ## Optical Architecture
 
@@ -139,3 +139,10 @@ The modeled stop and clear apertures are construction inferences. The stop is pl
 - Arnold & Richter / ARRIFLEX, archival *ARRIFLEX 16* 20-page color catalog, https://doczz.net/doc/1273662/arriflex-16-20-page-color-catalog (reviewed September 15, 2026).
 - Deutsches Technikmuseum Berlin, *Film Technology* permanent exhibition, https://technikmuseum.berlin/en/program/permanent-exhibitions/translate-to-english-filmtechnik (reviewed September 15, 2026).
 - SUMITA Optical Glass, *Optical Glass Data Book* ver. 14.02.00; OHARA optical-glass catalog; HOYA optical-glass product/cross-reference data; HIKARI *Optical Glass Catalog 2023*; CDGM colourless optical-glass catalog; SCHOTT optical-glass catalog/search. These were used only for coordinate-equivalence checks, not to assign historical supplier identity.
+
+
+## Production mount assignment
+
+The Schneider manufacturer/distributor catalog, printed page 11, lists the exact focal-length/aperture production lens among the standard C-thread 16mm lenses. The listed Bolex RX ordering option is not assigned as a different mount. [Manufacturer source](https://www.pacificrimcamera.com/rl/00068/00068.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

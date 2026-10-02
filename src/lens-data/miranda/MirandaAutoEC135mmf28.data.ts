@@ -58,6 +58,7 @@ const LENS_DATA = {
   focalLengthDesign: 137.4338610617,
   apertureMarketing: 2.8,
   apertureDesign: 2.8,
+  lensMounts: ["miranda-bayonet"],
   imageFormat: "135-full-frame",
   patentNumber: "JP S51-074627 A",
   patentAuthors: ["Kunio Shimada"],
