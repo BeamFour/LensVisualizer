@@ -16,17 +16,17 @@ export interface ImageFormatDetails {
 
 export const IMAGE_FORMAT_DETAILS: Record<ImageFormatId, ImageFormatDetails> = {
   "1-2.7-inch-type": {
-    summary: "A compact CCD sensor class used by the Nikon COOLPIX SQ.",
+    summary: "A compact CCD sensor class.",
     description:
       "The inch-type name comes from historical optical-format conventions rather than a physical diagonal in inches. This catalog uses a nominal 5.371 × 4.035 mm frame. Individual cameras can use a slightly different active area or crop; the format alone does not identify a sensor part or establish a lens’s corner performance.",
-    commonUses: "Compact digital cameras, including COOLPIX SQ",
+    commonUses: "Compact digital cameras",
     coverageNotes: "Nominal 5.371 × 4.035 mm frame; approximately 6.72 mm diagonal",
   },
   "1-1.8-inch-type": {
-    summary: "A compact-camera sensor class used by the Nikon COOLPIX 4300.",
+    summary: "A compact-camera sensor class.",
     description:
       "The catalog uses a nominal 7.176 × 5.319 mm frame for this optical class. The designation is not the physical diagonal in inches. Production recording dimensions and electronic crops can differ, so this reference does not replace source-listed patent image heights.",
-    commonUses: "Compact CCD cameras, including COOLPIX 4300",
+    commonUses: "Compact CCD cameras",
     coverageNotes: "Nominal 7.176 × 5.319 mm frame; approximately 8.93 mm diagonal",
   },
   "2-3-inch-type": {
