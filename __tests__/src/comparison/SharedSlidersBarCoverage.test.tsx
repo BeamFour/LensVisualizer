@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, fireEvent, render, renderHook, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import useStickySliders from "../../../src/comparison/useStickySliders.js";
 import SharedSlidersBar from "../../../src/comparison/SharedSlidersBar.js";
 import { buildSimplePositiveElementLens, buildVariableStopGapLens } from "../optics/testLensFixtures.js";
 import themes from "../../../src/utils/theme/themes.js";
@@ -158,6 +159,32 @@ function renderSharedSliders({
 
 describe("SharedSlidersBar", () => {
   afterEach(() => cleanup());
+
+  it("lets presets and keyboard changes pass a sticky limit while drags still stop", () => {
+    const dispatch = vi.fn();
+    const { result } = renderHook(() => useStickySliders(dispatch, focusPair, aperturePair));
+    renderSharedSliders({
+      onSharedFocusChange: result.current.handleSharedFocusChange,
+      onSharedStopdownChange: result.current.handleSharedStopdownChange,
+      onFocusPointerDown: result.current.handleFocusPointerDown,
+      onAperturePointerDown: result.current.handleAperturePointerDown,
+    });
+    const slider = screen.getByRole("slider", { name: "FOCUS" });
+    fireEvent.pointerDown(slider);
+    fireEvent.change(slider, { target: { value: "0.7" } });
+    expect(dispatch).toHaveBeenLastCalledWith({ type: "SET_SHARED_FOCUS_T", value: 0.5 });
+    fireEvent.pointerUp(slider);
+    fireEvent.keyDown(slider, { key: "End" });
+    fireEvent.change(slider, { target: { value: "1" } });
+    expect(dispatch).toHaveBeenLastCalledWith({ type: "SET_SHARED_FOCUS_T", value: 1 });
+    for (const f of [4, 8, 16]) {
+      fireEvent.click(screen.getByRole("button", { name: `Set aperture to f/${f}` }));
+      expect(dispatch).toHaveBeenLastCalledWith({
+        type: "SET_SHARED_STOPDOWN_T",
+        value: Math.log(f / 1.4) / Math.log(16 / 1.4),
+      });
+    }
+  });
 
   it.each([true, false])("labels unsupported focus and disables only all-static comparisons (wide: %s)", (isWide) => {
     const fixed = buildSimplePositiveElementLens();
@@ -384,7 +411,7 @@ describe("SharedSlidersBar", () => {
 
     fireEvent.click(screen.getByText("f/4"));
 
-    expect(onSharedStopdownChange).toHaveBeenCalledWith(expect.any(Number));
+    expect(onSharedStopdownChange).toHaveBeenCalledWith(expect.any(Number), true);
     expect(onSliderPointerUp).toHaveBeenCalledTimes(1);
   });
 

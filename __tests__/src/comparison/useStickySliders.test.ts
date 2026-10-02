@@ -113,6 +113,16 @@ describe("useStickySliders", () => {
     expect(result.current.flashPanel).toBe("a");
   });
 
+  it("direct selections clear an existing detent and do not snap nearby values", () => {
+    const { result } = renderHook(() => useStickySliders(dispatch, makeFocusPair(0.5), makeAperturePair(0.5)));
+    act(() => result.current.handleSharedStopdownChange(0.7));
+    act(() => result.current.handleSharedStopdownChange(0.504, true));
+    expect(dispatchMock).toHaveBeenLastCalledWith({ type: SET_SHARED_STOPDOWN_T, value: 0.504 });
+    act(() => result.current.handleSharedFocusChange(0.7));
+    act(() => result.current.handleSharedFocusChange(0.504, true));
+    expect(dispatchMock).toHaveBeenLastCalledWith({ type: SET_SHARED_FOCUS_T, value: 0.504 });
+  });
+
   it("resetSticky clears stuck state", () => {
     const focusPair = makeFocusPair(0.5);
     const { result } = renderHook(() => useStickySliders(dispatch, focusPair, null));

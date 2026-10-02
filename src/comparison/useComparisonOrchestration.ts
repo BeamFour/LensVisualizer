@@ -43,8 +43,8 @@ export interface ComparisonOrchestration {
   maxHeaderHeight: number;
   handleHeaderHeight: (panelId: string, height: number) => void;
   flashPanel: string | null;
-  handleSharedFocusChange: (value: number) => void;
-  handleSharedStopdownChange: (value: number) => void;
+  handleSharedFocusChange: (value: number, direct?: boolean) => void;
+  handleSharedStopdownChange: (value: number, direct?: boolean) => void;
   handleSharedShiftChange: (value: number) => void;
   handleSharedTiltChange: (value: number) => void;
   handleFocusPointerDown: () => void;

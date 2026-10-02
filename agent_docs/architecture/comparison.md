@@ -44,6 +44,9 @@ follow the current zoom limits, with no common-point marker when the aperture ra
 Focus ranges include only lenses with modeled focus travel. Unsupported panes receive infinity focus and display
 "Not modeled"; the shared control is disabled when neither lens supports focusing.
 
+Sticky common-point detents apply only to pointer drags. Keyboard adjustments and aperture presets select their
+requested value directly and release an existing detent.
+
 ## Scale Modes
 
 Comparison mode can normalize the two panels so users can compare physical scale or framing. Scale ratios are computed

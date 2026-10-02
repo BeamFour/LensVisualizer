@@ -38,8 +38,8 @@ interface ComparisonContentProps {
   sharedZoomT: number;
   sharedShiftMm: number;
   sharedTiltDeg: number;
-  onSharedFocusChange: (value: number) => void;
-  onSharedStopdownChange: (value: number) => void;
+  onSharedFocusChange: (value: number, direct?: boolean) => void;
+  onSharedStopdownChange: (value: number, direct?: boolean) => void;
   onSharedShiftChange: (value: number) => void;
   onSharedTiltChange: (value: number) => void;
   onFocusPointerDown: () => void;

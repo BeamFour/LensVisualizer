@@ -17,8 +17,8 @@ import { SET_SHARED_FOCUS_T, SET_SHARED_STOPDOWN_T } from "./comparisonReducer.j
 import type { LensAction } from "../types/state.js";
 
 interface UseStickySliderResult {
-  handleSharedFocusChange: (rawT: number) => void;
-  handleSharedStopdownChange: (rawT: number) => void;
+  handleSharedFocusChange: (rawT: number, direct?: boolean) => void;
+  handleSharedStopdownChange: (rawT: number, direct?: boolean) => void;
   handleFocusPointerDown: () => void;
   handleAperturePointerDown: () => void;
   flashPanel: string | null;
@@ -51,7 +51,14 @@ export default function useStickySliders(
   }, []);
 
   const handleSharedFocusChange = useCallback(
-    (rawT: number): void => {
+    (rawT: number, direct = false): void => {
+      // Presets and keyboard input select exactly; the detent belongs to pointer drags.
+      if (direct) {
+        focusStuck.current = false;
+        prevFocusT.current = rawT;
+        dispatch({ type: SET_SHARED_FOCUS_T, value: rawT });
+        return;
+      }
       const cp = focusPair?.commonPoint;
       const stickyActive = cp != null && cp > 0.01 && cp < 0.99;
 
@@ -78,7 +85,14 @@ export default function useStickySliders(
   );
 
   const handleSharedStopdownChange = useCallback(
-    (rawT: number): void => {
+    (rawT: number, direct = false): void => {
+      // Presets and keyboard input select exactly; the detent belongs to pointer drags.
+      if (direct) {
+        apertureStuck.current = false;
+        prevStopdownT.current = rawT;
+        dispatch({ type: SET_SHARED_STOPDOWN_T, value: rawT });
+        return;
+      }
       const cp = aperturePair?.commonPoint;
       const stickyActive = cp != null && cp > 0.01 && cp < 0.99;
 

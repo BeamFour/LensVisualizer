@@ -49,8 +49,8 @@ interface SharedSlidersBarProps {
   sharedZoomT: number;
   sharedShiftMm: number;
   sharedTiltDeg: number;
-  onSharedFocusChange: (value: number) => void;
-  onSharedStopdownChange: (value: number) => void;
+  onSharedFocusChange: (value: number, direct?: boolean) => void;
+  onSharedStopdownChange: (value: number, direct?: boolean) => void;
   onSharedZoomChange: (value: number) => void;
   onSharedShiftChange: (value: number) => void;
   onSharedTiltChange: (value: number) => void;
@@ -165,7 +165,7 @@ export default function SharedSlidersBar({
   ];
   const quickStopSelect = (value: number) => {
     const stopT = Math.log(value / widerFOPEN) / Math.log(sharedMaxFstop / widerFOPEN);
-    onSharedStopdownChange(Math.max(0, stopT));
+    onSharedStopdownChange(Math.max(0, Math.min(1, stopT)), true);
     onSliderPointerUp?.();
   };
   const handleSharedShiftChange = (value: number) => {
@@ -346,6 +346,7 @@ export default function SharedSlidersBar({
           disabled={!focusEnabled}
           disabledReason="No modeled focus travel data"
           onSliderChange={onSharedFocusChange}
+          onDirectChange={(value) => onSharedFocusChange(value, true)}
           onPointerDown={onFocusPointerDown}
           onPointerUp={onSliderPointerUp}
           markerPositions={showFocusCP ? [focusCP] : []}
@@ -379,6 +380,7 @@ export default function SharedSlidersBar({
           maxLabel={`f/${formatFNumber(sharedMaxFstop)}`}
           sliderValue={sharedStopdownT}
           onSliderChange={onSharedStopdownChange}
+          onDirectChange={(value) => onSharedStopdownChange(value, true)}
           onPointerDown={onAperturePointerDown}
           onPointerUp={onSliderPointerUp}
           markerPositions={showApertureCP ? [apertureCP] : []}
