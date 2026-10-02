@@ -95,7 +95,7 @@ export default function UniversalMapResearch(props: UniversalMapResearchProps) {
   );
   return (
     <div>
-      <UniversalPathFinder key={`${props.fromId}:${props.toId}`} {...props} />
+      <UniversalPathFinder {...props} />
       <section aria-label="Research records" style={{ marginTop: 20 }}>
         <div style={mapRow}>
           {(["entities", "relationships"] as const).map((kind) => (
@@ -234,6 +234,14 @@ function UniversalPathFinder({
   const [from, setFrom] = useState(fromId ?? selectedNodeId);
   const [to, setTo] = useState(toId);
   const [alternative, setAlternative] = useState(0);
+  const [savedEndpoints, setSavedEndpoints] = useState({ fromId, toId });
+  // Sync changed URL endpoints independently so a new map selection keeps the destination draft.
+  if (savedEndpoints.fromId !== fromId || savedEndpoints.toId !== toId) {
+    setSavedEndpoints({ fromId, toId });
+    if (savedEndpoints.fromId !== fromId) setFrom(fromId ?? selectedNodeId);
+    if (savedEndpoints.toId !== toId) setTo(toId);
+    setAlternative(0);
+  }
   const nodes = useMemo(() => new Map(graph.nodes.map((n) => [n.id, n])), [graph]);
   const edgeById = useMemo(() => new Map(graph.edges.map((e) => [e.id, e])), [graph]);
   const paths = useMemo(

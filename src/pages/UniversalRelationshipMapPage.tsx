@@ -107,8 +107,14 @@ export default function UniversalRelationshipMapPage() {
   const selectNode = (nodeId: string | null, center = false, keyboard = false) =>
     updateMap({ nodeId }, center, keyboard);
   const focusNode = (nodeId: string, keyboard = false) => selectNode(nodeId, true, keyboard);
-  const changeView = (view: UniversalMapView) =>
-    updateMap({ view }, view === "full" && selectedNodeId !== lastFullSelection.current);
+  const changeView = (nextView: UniversalMapView) =>
+    updateMap(
+      {
+        view: nextView,
+        ...(nextView === "research" && view !== "research" && selectedNodeId ? { fromId: selectedNodeId } : {}),
+      },
+      nextView === "full" && selectedNodeId !== lastFullSelection.current,
+    );
 
   // Selection derives from the committed URL: Back can cancel a concurrent
   // navigation before it renders. Only consume its camera intent if it commits.
@@ -330,6 +336,10 @@ export default function UniversalRelationshipMapPage() {
                         }
                         edgeKinds={mapState.edgeKinds}
                         onSelectNode={focusNode}
+                        onOpenFullMap={(nodeId) => {
+                          updateMap({ view: "full", nodeId }, true);
+                          document.getElementById("map-tab-full")?.focus();
+                        }}
                         onOpenNeighborhood={(neighborhoodId, nodeId) => updateMap({ neighborhoodId, nodeId }, true)}
                       />
                     </div>

@@ -23,6 +23,7 @@ interface UniversalMapExploreProps {
   neighborhoodId: string | null;
   edgeKinds: readonly UniversalEdgeKind[];
   onSelectNode: (id: string) => void;
+  onOpenFullMap: (id: string) => void;
   onOpenNeighborhood: (id: string | null, anchorId: string | null) => void;
 }
 
@@ -34,6 +35,7 @@ export default function UniversalMapExplore({
   neighborhoodId,
   edgeKinds,
   onSelectNode,
+  onOpenFullMap,
   onOpenNeighborhood,
 }: UniversalMapExploreProps) {
   const wide = useMediaQuery("(min-width: 900px)", { ssrDefault: false });
@@ -106,6 +108,7 @@ export default function UniversalMapExplore({
             edgeKinds={edgeKinds}
             theme={t}
             onSelectNode={onSelectNode}
+            onOpenFullMap={onOpenFullMap}
           />
         </>
       ) : (
@@ -336,6 +339,7 @@ interface UniversalLocalConnectionsProps {
   edgeKinds: readonly UniversalEdgeKind[];
   theme: Theme;
   onSelectNode: (id: string) => void;
+  onOpenFullMap: (id: string) => void;
 }
 
 function UniversalLocalConnections({
@@ -344,6 +348,7 @@ function UniversalLocalConnections({
   edgeKinds,
   theme: t,
   onSelectNode,
+  onOpenFullMap,
 }: UniversalLocalConnectionsProps) {
   const [query, setQuery] = useState("");
   const [page, setPage] = useState(0);
@@ -356,11 +361,23 @@ function UniversalLocalConnections({
   );
   const shown = filtered.slice(page * 25, (page + 1) * 25);
   const center = nodes.get(centerId)!;
-  const height = Math.max(130, Math.ceil(shown.length / 2) * 66 + 24);
+  const height = Math.max(180, Math.ceil(shown.length / 2) * 66 + 24);
   const evidence = (adjacency.get(centerId) ?? []).filter((n) => n.nodeId === evidenceId);
   return (
     <section aria-label="Local connections">
-      <h2 style={{ color: t.title, fontSize: "1rem", overflowWrap: "anywhere" }}>{center.name}</h2>
+      <div style={{ ...mapRow, justifyContent: "space-between" }}>
+        <h2 style={{ color: t.title, fontSize: "1rem", overflowWrap: "anywhere", minWidth: 0 }}>{center.name}</h2>
+        <button
+          type="button"
+          style={{ ...mapButton(t), fontSize: "0.75rem", textDecoration: "underline" }}
+          onClick={() => onOpenFullMap(centerId)}
+        >
+          Open full map <span aria-hidden="true">→</span>
+        </button>
+      </div>
+      <p style={{ color: t.muted, fontSize: "0.72rem", margin: "0 0 14px" }}>
+        Open the full map with this entity selected and your filters preserved.
+      </p>
       <div style={mapRow}>
         <label style={{ color: t.label, fontSize: "0.75rem" }}>
           Search all {neighbors.length} neighbors{" "}
@@ -404,10 +421,45 @@ function UniversalLocalConnections({
               fill="none"
             />
           ))}
-          <circle cx={360} cy={height / 2} r={27} fill={t.toggleActiveBg} stroke={t.sliderAccent} strokeWidth={2} />
-          <text x={360} y={height / 2 + 4} textAnchor="middle" fontSize={11} fill={t.title}>
-            Selected
-          </text>
+          <foreignObject x={284} y={height / 2 - 80} width={152} height={160}>
+            <div style={{ display: "flex", alignItems: "center", height: "100%", padding: 4, boxSizing: "border-box" }}>
+              <button
+                type="button"
+                aria-label={`Open full map with ${center.name} selected`}
+                title={center.name}
+                onClick={() => onOpenFullMap(centerId)}
+                style={{
+                  ...mapButton(t, true),
+                  width: "100%",
+                  padding: "12px 8px",
+                  border: `2px solid ${t.sliderAccent}`,
+                  borderRadius: 8,
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                }}
+              >
+                <span
+                  style={{
+                    color: t.title,
+                    fontSize: 14,
+                    lineHeight: "18px",
+                    fontWeight: 600,
+                    overflowWrap: "anywhere",
+                    display: "-webkit-box",
+                    WebkitBoxOrient: "vertical",
+                    WebkitLineClamp: 4,
+                    overflow: "hidden",
+                  }}
+                >
+                  {center.name}
+                </span>
+                <span style={{ fontSize: 12, textDecoration: "underline" }}>
+                  Open full map <span aria-hidden="true">→</span>
+                </span>
+              </button>
+            </div>
+          </foreignObject>
           {shown.map((id, i) => {
             const n = nodes.get(id)!;
             const x = i % 2 ? 444 : 12,

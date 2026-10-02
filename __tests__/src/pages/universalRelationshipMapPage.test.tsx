@@ -251,6 +251,78 @@ describe("UniversalRelationshipMapPage", () => {
     router.dispose();
   });
 
+  it("opens the explored entity in Full map, preserving filters and history and framing repeated selections", async () => {
+    const node = buildUniversalRelationshipGraph().nodes.find((n) => n.kind === "assignee")!;
+    const fragment = new URLSearchParams({ view: "explore", node: node.id, relations: "assignment", keep: "yes" });
+    const router = createMemoryRouter([{ path: "/relationships/universal", Component: UniversalRelationshipMapPage }], {
+      initialEntries: [`/relationships/universal#${fragment}`],
+    });
+    render(<RouterProvider router={router} />);
+    const action = await screen.findByRole("button", { name: `Open full map with ${node.name} selected` });
+    action.focus();
+    fireEvent.click(action);
+    const map = await screen.findByRole("group", { name: "Universal relationship map test double" });
+    expect(map.getAttribute("data-selected")).toBe(node.id);
+    expect(map.getAttribute("data-focus")).toBe(node.id);
+    expect(document.activeElement).toBe(screen.getByRole("tab", { name: "Full map" }));
+    expect(Object.fromEntries(new URLSearchParams(router.state.location.hash.slice(1)))).toEqual({
+      keep: "yes",
+      node: node.id,
+      relations: "assignment",
+    });
+    const firstRequest = Number(map.getAttribute("data-request"));
+    await act(async () => {
+      await router.navigate(-1);
+    });
+    expect(router.state.location.hash).toBe(`#${fragment}`);
+    expect(screen.getByRole("tab", { name: "Explore" }).getAttribute("aria-selected")).toBe("true");
+    fireEvent.click(screen.getByRole("button", { name: "Open full map" }));
+    await waitFor(() => expect(Number(map.getAttribute("data-request"))).toBeGreaterThan(firstRequest));
+    expect(map.getAttribute("data-selected")).toBe(node.id);
+    expect(map.getAttribute("data-focus")).toBe(node.id);
+    router.dispose();
+  });
+
+  it.each(["full", "explore"])(
+    "prefills Research from the selection in %s and preserves its saved destination",
+    async (view) => {
+      const graph = buildUniversalRelationshipGraph();
+      const node = graph.nodes.find((n) => n.kind === "assignee")!;
+      const destination = graph.nodes.find((n) => n.kind === "patent")!;
+      const fragment = new URLSearchParams({
+        view,
+        node: node.id,
+        to: destination.id,
+        relations: "assignment",
+        keep: "yes",
+      });
+      const router = createMemoryRouter(
+        [{ path: "/relationships/universal", Component: UniversalRelationshipMapPage }],
+        {
+          initialEntries: [`/relationships/universal#${fragment}`],
+        },
+      );
+      render(<RouterProvider router={router} />);
+      fireEvent.click(await screen.findByRole("tab", { name: "Research" }));
+      await waitFor(() => expect(new URLSearchParams(router.state.location.hash.slice(1)).get("from")).toBe(node.id));
+      const finder = screen.getByRole("region", { name: "Find a connection" });
+      expect(within(finder).getByText(node.name)).toBeDefined();
+      expect(within(finder).getByText(destination.name)).toBeDefined();
+      expect(new URLSearchParams(router.state.location.hash.slice(1)).get("to")).toBe(destination.id);
+      expect(router.state.location.hash).toContain("relations=assignment");
+      expect(router.state.location.hash).toContain("keep=yes");
+      await act(async () => {
+        await router.navigate(-1);
+      });
+      expect(router.state.location.hash).toBe(`#${fragment}`);
+      await act(async () => {
+        await router.navigate(1);
+      });
+      expect(within(screen.getByRole("region", { name: "Find a connection" })).getByText(node.name)).toBeDefined();
+      router.dispose();
+    },
+  );
+
   it("keeps selection consistent when Back interrupts a pending data-router navigation", async () => {
     const router = createMemoryRouter([{ path: "/relationships/universal", Component: UniversalRelationshipMapPage }], {
       initialEntries: ["/relationships/universal#view=full"],

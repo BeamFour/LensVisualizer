@@ -178,9 +178,13 @@ to one summary; each edge appears once in either a neighborhood or a typed inter
 always describe the complete neighborhood; relationship filters select the bridge evidence and local adjacency without
 reassigning nodes. Below 900 pixels, a searchable card directory replaces the summary SVG. Opening a neighborhood or
 selecting an entity shows at most 25 direct neighbors per page, ordered by role, patent year, and name. The accompanying
-searchable list exposes full names and each recorded edge, including parallel relationships.
+searchable list exposes full names and each recorded edge, including parallel relationships. The named center card and
+heading offer Open full map, which retains the entity and active filters, explicitly frames the entity, and moves
+keyboard focus to the Full map tab. The heading action remains available when the local diagram is scrolled.
 
 `UniversalMapResearch` provides sortable, searchable 50-row entity/relationship tables and a two-endpoint path finder.
+Opening the Research tab from another view uses the selected entity as the starting endpoint. The destination stays
+intact, including an unsubmitted picker choice; explicit Research URLs and Back/Forward restore their recorded endpoints.
 `universalRelationshipQueries.ts` runs BFS on original edges, then enumerates at most three shortest paths through the
 resulting distance DAG. Traversal is bidirectional, but `UniversalRelationshipEvidence` phrases each step in the source
 edge's direction, showing dates, notes, corporate sources, patent links, or the explicit catalog grouping provenance.

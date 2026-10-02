@@ -24,13 +24,15 @@ afterEach(() => {
 describe("universal workspace views", () => {
   it("offers a narrow-screen directory and paginates all local neighbors with searchable evidence", () => {
     const open = vi.fn(),
-      select = vi.fn();
+      select = vi.fn(),
+      openFullMap = vi.fn();
     const props = {
       graph,
       layout,
       theme: themes.light,
       edgeKinds: UNIVERSAL_EDGE_KINDS,
       onSelectNode: select,
+      onOpenFullMap: openFullMap,
       onOpenNeighborhood: open,
     };
     const { rerender } = renderWithRouter(
@@ -42,6 +44,11 @@ describe("universal workspace views", () => {
     fireEvent.click(screen.getByRole("button", { name: "Open neighborhood" }));
     expect(open).toHaveBeenCalledWith("cluster:Alpha", "Alpha");
     rerender(<UniversalMapExplore {...props} selectedNodeId="Alpha" neighborhoodId="cluster:Alpha" />);
+    const center = screen.getByRole("button", { name: "Open full map with Alpha selected" });
+    expect(center.textContent).toContain("Alpha");
+    expect(screen.queryByText("Selected")).toBeNull();
+    fireEvent.click(center);
+    expect(openFullMap).toHaveBeenLastCalledWith("Alpha");
     expect(screen.getByRole("status").textContent).toContain("1–25 of 60");
     fireEvent.click(screen.getByRole("button", { name: "Next neighbors" }));
     expect(screen.getByRole("status").textContent).toContain("26–50 of 60");
@@ -53,6 +60,12 @@ describe("universal workspace views", () => {
     expect(screen.getByText("US 1059 is assigned to Alpha")).toBeDefined();
     fireEvent.click(screen.getByRole("button", { name: /US 1059 · Patent/ }));
     expect(select).toHaveBeenCalledWith("US 1059");
+    rerender(<UniversalMapExplore {...props} selectedNodeId="US 1059" neighborhoodId="cluster:Alpha" />);
+    fireEvent.click(screen.getByRole("button", { name: "Open full map" }));
+    expect(openFullMap).toHaveBeenLastCalledWith("US 1059");
+    rerender(<UniversalMapExplore {...props} selectedNodeId={null} neighborhoodId="cluster:Alpha" />);
+    fireEvent.click(screen.getByRole("button", { name: "Open full map" }));
+    expect(openFullMap).toHaveBeenLastCalledWith("Alpha");
   });
   it("provides table pagination, filtering, sorting and source evidence", () => {
     renderWithRouter(
@@ -81,6 +94,30 @@ describe("universal workspace views", () => {
     fireEvent.click(within(table).getByRole("button", { name: /^From/ }));
     expect(within(table).getByRole("columnheader", { name: /^From/ }).getAttribute("aria-sort")).toBe("descending");
   });
+  it("prefills a new starting endpoint without discarding the unsubmitted destination", () => {
+    const find = vi.fn();
+    const props = {
+      graph,
+      theme: themes.light,
+      edgeKinds: UNIVERSAL_EDGE_KINDS,
+      selectedNodeId: null,
+      fromId: null,
+      toId: null,
+      onSelectNode: vi.fn(),
+      onFindPath: find,
+    };
+    const { rerender } = renderWithRouter(<UniversalMapResearch {...props} />);
+    const end = screen.getByRole("combobox", { name: "Connection end" });
+    fireEvent.change(end, { target: { value: "US 1000" } });
+    fireEvent.keyDown(end, { key: "Enter" });
+    rerender(<UniversalMapResearch {...props} selectedNodeId="Alpha" fromId="Alpha" />);
+    fireEvent.click(screen.getByRole("button", { name: "Find connection" }));
+    expect(find).toHaveBeenLastCalledWith("Alpha", "US 1000");
+    rerender(<UniversalMapResearch {...props} selectedNodeId="Alpha" fromId="Unconnected" toId="US 1001" />);
+    fireEvent.click(screen.getByRole("button", { name: "Find connection" }));
+    expect(find).toHaveBeenLastCalledWith("Unconnected", "US 1001");
+  });
+
   it("explains reversed paths and distinguishes filtered-out from missing connections", () => {
     const props = {
       graph,
