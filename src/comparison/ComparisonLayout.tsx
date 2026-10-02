@@ -3,6 +3,8 @@
  * (desktop) or stacked (mobile) with a divider between them.
  */
 
+import { useState, type ComponentProps } from "react";
+import useMediaQuery from "../utils/useMediaQuery.js";
 import LensDiagramPanel from "../components/layout/LensDiagramPanel.js";
 import type { Theme } from "../types/theme.js";
 import type { FocusPairResult, AperturePairResult, ZoomPairResult, MovementPairResult } from "./comparisonSliders.js";
@@ -24,6 +26,22 @@ interface ComparisonLayoutProps {
   flashPanel: string | null;
 }
 
+/** Keyed by lens so only the replaced pane loses its local disclosure choice. */
+function ComparisonPane({
+  defaultExpanded,
+  ...props
+}: ComponentProps<typeof LensDiagramPanel> & { defaultExpanded: boolean }) {
+  const [expanded, setExpanded] = useState<boolean | null>(null);
+  return (
+    <LensDiagramPanel
+      {...props}
+      comparisonDetails={
+        props.fillAvailableHeight ? { expanded: expanded ?? defaultExpanded, onChange: setExpanded } : undefined
+      }
+    />
+  );
+}
+
 export default function ComparisonLayout({
   theme: t,
   isWide,
@@ -39,7 +57,8 @@ export default function ComparisonLayout({
   onHeaderHeight,
   flashPanel,
 }: ComparisonLayoutProps) {
-  const maxSvgHeight = isWide ? "calc(100vh - 260px)" : "42vh";
+  const shortViewport = useMediaQuery("(max-height: 800px)", { ssrDefault: false, clientOnly: true });
+  const maxSvgHeight = isWide ? "none" : "42vh";
   const minHeaderHeight = isWide && maxHeaderHeight > 0 ? maxHeaderHeight : undefined;
 
   return (
@@ -47,22 +66,25 @@ export default function ComparisonLayout({
       style={{
         display: "flex",
         flexDirection: isWide ? "row" : "column",
-        height: isWide ? "100%" : undefined,
-        minHeight: isWide ? 0 : undefined,
-        overflow: isWide ? "hidden" : undefined,
+        flex: isWide ? "1 1 0px" : undefined,
+        minWidth: 0,
       }}
     >
       <div
         style={{
           flex: isWide ? "0 0 50%" : "none",
+          boxSizing: "border-box",
           borderRight: isWide ? `1px solid ${t.panelDivider}` : "none",
           borderBottom: !isWide ? `1px solid ${t.panelDivider}` : "none",
           minWidth: 0,
-          minHeight: isWide ? 0 : undefined,
-          overflow: "hidden",
+          display: isWide ? "flex" : undefined,
+          flexDirection: "column",
         }}
       >
-        <LensDiagramPanel
+        <ComparisonPane
+          key={lensKeyA}
+          defaultExpanded={!shortViewport}
+          minDiagramHeight={isWide ? 280 : undefined}
           lensKey={lensKeyA}
           runtimeLens={comparisonLenses?.LA}
           focusT={focusPair.focusA}
@@ -86,12 +108,16 @@ export default function ComparisonLayout({
       <div
         style={{
           flex: isWide ? "0 0 50%" : "none",
+          boxSizing: "border-box",
           minWidth: 0,
-          minHeight: isWide ? 0 : undefined,
-          overflow: "hidden",
+          display: isWide ? "flex" : undefined,
+          flexDirection: "column",
         }}
       >
-        <LensDiagramPanel
+        <ComparisonPane
+          key={lensKeyB}
+          defaultExpanded={!shortViewport}
+          minDiagramHeight={isWide ? 280 : undefined}
           lensKey={lensKeyB}
           runtimeLens={comparisonLenses?.LB}
           focusT={focusPair.focusB}

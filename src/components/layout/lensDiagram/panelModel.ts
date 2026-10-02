@@ -82,6 +82,7 @@ export interface PanelDisplayFlagsModel {
   maxSvgHeight: string;
   useSideLayout: boolean;
   fillAvailableHeight: boolean;
+  minDiagramHeight?: number;
   zoomPanActive: boolean;
   showOnAxis: boolean;
   showOffAxis: OffAxisMode;

@@ -142,6 +142,19 @@ describe("DiagramHeader", () => {
     expect(screen.getByText("f/2.0")).toBeTruthy();
   });
 
+  it("collapses comparison details while retaining lens identity", () => {
+    const onChange = vi.fn();
+    renderHeader({ compact: true, comparisonDetails: { expanded: false, onChange } });
+    expect(screen.queryByText("6 elements")).toBeNull();
+    expect(screen.getByText("Header Test Lens")).toBeTruthy();
+    expect(screen.queryByText("f/2.0")).toBeNull();
+    expect(screen.queryByText(/EFL \d+\.\d/)).toBeNull();
+    const toggle = screen.getByRole("button", { name: /DETAILS/ });
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(toggle);
+    expect(onChange).toHaveBeenCalledWith(true);
+  });
+
   it("uses fisheye projection focal length in compact readouts", () => {
     renderHeader({
       compact: true,

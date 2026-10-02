@@ -32,6 +32,12 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-02",
     type: "improvement",
+    summary:
+      "Added collapsible comparison details, a compact desktop toolbar, and scrolling that preserves diagram space",
+  },
+  {
+    date: "2026-10-02",
+    type: "improvement",
     summary: "Filled 40 missing lens mounts and added historical and cinema mount families",
   },
   {

@@ -71,6 +71,7 @@ export default function LensDiagramLoadedState({
     maxSvgHeight,
     useSideLayout,
     fillAvailableHeight,
+    minDiagramHeight,
     headerHeight,
     zoomPanActive,
     showOnAxis,
@@ -109,11 +110,12 @@ export default function LensDiagramLoadedState({
   const rootStyle = fillAvailableHeight
     ? {
         position: "relative" as const,
-        height: "100%",
-        minHeight: 0,
+        height: minDiagramHeight ? undefined : "100%",
+        flex: minDiagramHeight ? "1 0 auto" : undefined,
+        minHeight: minDiagramHeight ? "auto" : 0,
         display: "flex",
         flexDirection: "column" as const,
-        overflow: "hidden",
+        overflow: minDiagramHeight ? "visible" : "hidden",
       }
     : { position: "relative" as const };
   const bodyStyle = fillAvailableHeight
@@ -121,8 +123,8 @@ export default function LensDiagramLoadedState({
         display: "flex",
         flexDirection: useSideLayout ? ("row" as const) : ("column" as const),
         flex: "1 1 auto",
-        minHeight: 0,
-        overflow: "hidden",
+        minHeight: minDiagramHeight ? "auto" : 0,
+        overflow: minDiagramHeight ? "visible" : "hidden",
       }
     : useSideLayout
       ? { display: "flex", minHeight: 0 }
@@ -179,6 +181,7 @@ export default function LensDiagramLoadedState({
             maxSvgHeight={maxSvgHeight}
             useSideLayout={useSideLayout}
             fillAvailableHeight={fillAvailableHeight}
+            minDiagramHeight={minDiagramHeight}
             headerHeight={headerHeight}
             compact={compact}
             flashVisible={flashVisible}
@@ -226,7 +229,7 @@ export default function LensDiagramLoadedState({
               compact={compact}
               isWide={isWide}
               useSideLayout={useSideLayout}
-              fillAvailableHeight={fillAvailableHeight}
+              fillAvailableHeight={fillAvailableHeight && !minDiagramHeight}
               headerHeight={headerHeight}
               showSliders={showSliders}
               zoomT={zoomT}

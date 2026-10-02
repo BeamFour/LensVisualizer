@@ -53,3 +53,17 @@ variant, follow `agent_docs/adding_url_state.md`.
 Compare identity may be a hidden member of a visible lens's `opticalConfiguration` group. The selector allow-list is
 the visible catalog plus those group members; unrelated hidden debug/reference fixtures remain unavailable. This makes
 configurations such as TC OUT versus TC IN directly comparable without an ambiguous pane-specific `cfg` query.
+
+## Header Details And Vertical Space
+
+Desktop comparison panes expose an independent Details disclosure for specifications and current optical readouts.
+The lens name, patent link, and inventors remain visible. Details default to collapsed at viewport heights up to 800px,
+and expanded above that height. Manual choices survive resizing and slider changes; replacing a lens resets only its
+pane's choice. Mobile retains the existing header preference.
+
+The comparison content owns vertical scrolling. Each desktop diagram reserves at least 280px and grows into additional
+space; analysis controls and shared sliders follow in the same scroll region. The header measurement observes natural
+content inside the alignment spacer, allowing both panes to shrink after details collapse.
+
+Desktop comparison toolbar groups use their natural label widths, with cardinal and dimension controls side by side.
+This keeps the full controls on one row at ordinary desktop widths while allowing wrapping on smaller screens.
