@@ -27,7 +27,7 @@ import type {
 } from "../../utils/catalog/universalRelationshipGraph.js";
 import { isUniversalCorporateEdge } from "../../utils/catalog/universalRelationshipGraph.js";
 import { pluralize } from "../../utils/text.js";
-import { toggleBtn } from "../../utils/style/styles.js";
+import { mapButton, mapRow } from "./universalMapStyles.js";
 import { ENABLE_REVISED_UNIVERSAL_MAP, ENABLE_UNIVERSAL_MAP_EXTRA_VIEWS } from "../../utils/featureFlags.js";
 import useViewBoxZoom from "../hooks/useViewBoxZoom.js";
 import useSvgViewport from "../hooks/useSvgViewport.js";
@@ -46,6 +46,7 @@ interface UniversalRelationshipMapProps {
   theme: Theme;
   selectedNodeId: string | null;
   onSelectNode: (nodeId: string | null) => void;
+  onShowDetails?: () => void;
   focusRequest?: { nodeId: string; requestId: number };
   viewResetRequest?: number;
   layout?: UniversalRelationshipLayout;
@@ -117,6 +118,7 @@ export default function UniversalRelationshipMap({
   theme: t,
   selectedNodeId,
   onSelectNode,
+  onShowDetails,
   focusRequest,
   viewResetRequest,
   layout: providedLayout,
@@ -128,10 +130,13 @@ export default function UniversalRelationshipMap({
   const revised = ENABLE_REVISED_UNIVERSAL_MAP;
   const layout = useMemo(() => providedLayout ?? layoutUniversalRelationshipGraph(graph), [graph, providedLayout]);
   const svgRef = useRef<SVGSVGElement>(null);
+  const fitAllRef = useRef<HTMLButtonElement>(null);
   const zoom = useViewBoxZoom(layout.width, layout.height, true, svgRef);
   const viewport = useSvgViewport(svgRef, zoom.viewBox);
   const overviewId = useId();
+  const selectionToolsId = useId();
   const [showOverview, setShowOverview] = useState(true);
+  const [showSelectionTools, setShowSelectionTools] = useState(false);
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null);
   const [emphasizeConnections, setEmphasizeConnections] = useState(false);
   const [keyboardNodeId, setKeyboardNodeId] = useState<string | null>(null);
@@ -295,19 +300,34 @@ export default function UniversalRelationshipMap({
       onFitAll={zoom.reset}
     />
   );
-  const controlStyle = (active = false, disabled = false): CSSProperties => {
-    const base = toggleBtn(t, active, { flex: 0, hasRightBorder: false, padding: "8px 12px" });
-    // Standalone controls use a full border, so omit the shared segmented-control edge.
-    delete base.borderRight;
-    return {
-      ...base,
-      minHeight: 44,
-      borderRadius: 4,
-      border: `1px solid ${t.toggleBorder}`,
-      opacity: disabled ? 0.5 : 1,
-      cursor: disabled ? "default" : "pointer",
-    };
-  };
+  const controlStyle = (active = false, disabled = false): CSSProperties => ({
+    ...mapButton(t, active),
+    fontSize: "0.8rem",
+    opacity: disabled ? 0.5 : 1,
+    cursor: disabled ? "default" : "pointer",
+  });
+  const selectedNode = selectedNodeId ? layout.nodeById[selectedNodeId] : undefined;
+  const compactControls = viewport.width > 0 && viewport.width < 600;
+  const selectionActions = selectedNode && (
+    <>
+      {revised && (
+        <button type="button" onClick={fitNeighborhood} style={controlStyle()}>
+          Fit neighborhood
+        </button>
+      )}
+      <button type="button" onClick={() => focusNode(selectedNode.id)} style={controlStyle()}>
+        Center selection
+      </button>
+      <button
+        type="button"
+        aria-pressed={emphasizeConnections}
+        onClick={() => setEmphasizeConnections((value) => !value)}
+        style={controlStyle(emphasizeConnections)}
+      >
+        Emphasize connections
+      </button>
+    </>
+  );
   const legendSwatch = (stroke: string, shape: "circle" | "square" | "diamond" | "hexagon"): CSSProperties => ({
     display: "inline-block",
     width: 11,
@@ -324,53 +344,119 @@ export default function UniversalRelationshipMap({
       <div
         role="group"
         aria-label="Map navigation"
-        style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}
+        style={{ ...mapRow, justifyContent: "space-between", marginBottom: 8 }}
       >
-        {[
-          { label: "Zoom in", action: zoom.zoomIn, disabled: !zoom.canZoomIn },
-          { label: "Zoom out", action: zoom.zoomOut, disabled: !zoom.canZoomOut },
-          { label: "Fit all", action: zoom.reset, disabled: false },
-          ...(revised ? [{ label: "Fit neighborhood", action: fitNeighborhood, disabled: !selectedNodeId }] : []),
-          {
-            label: "Center selection",
-            action: () => {
-              if (selectedNodeId) focusNode(selectedNodeId);
-            },
-            disabled: !selectedNodeId,
-          },
-        ].map(({ label, action, disabled }) => (
-          <button key={label} type="button" onClick={action} disabled={disabled} style={controlStyle(false, disabled)}>
-            {label}
+        <span style={{ color: t.label, fontSize: "0.75rem", padding: "4px 0" }}>
+          {graph.nodes.length.toLocaleString("en-US")} entities · {layout.clusters.length} neighborhoods
+        </span>
+        <div style={{ ...mapRow, gap: 6 }}>
+          {[
+            { label: "Zoom out", text: "−", action: zoom.zoomOut, disabled: !zoom.canZoomOut },
+            { label: "Zoom in", text: "+", action: zoom.zoomIn, disabled: !zoom.canZoomIn },
+          ].map(({ label, text, action, disabled }) => (
+            <button
+              key={label}
+              type="button"
+              aria-label={label}
+              title={label}
+              onClick={action}
+              disabled={disabled}
+              style={{ ...controlStyle(false, disabled), width: 44, fontSize: "1.25rem", padding: 0 }}
+            >
+              {text}
+            </button>
+          ))}
+          <button
+            ref={fitAllRef}
+            type="button"
+            onClick={zoom.reset}
+            style={controlStyle()}
+            title="Fit the complete network in the map"
+          >
+            Fit all
           </button>
-        ))}
-        <button
-          type="button"
-          aria-pressed={emphasizeConnections}
-          disabled={!selectedNodeId}
-          onClick={() => setEmphasizeConnections((value) => !value)}
-          style={controlStyle(emphasizeConnections, !selectedNodeId)}
-        >
-          Emphasize connections
-        </button>
-        <button
-          type="button"
-          aria-expanded={showOverview}
-          aria-controls={showOverview ? overviewId : undefined}
-          onClick={() => setShowOverview((value) => !value)}
-          style={controlStyle(showOverview)}
-        >
-          Overview
-        </button>
+          <button
+            type="button"
+            title="Show or hide the mini map"
+            aria-expanded={showOverview}
+            aria-controls={showOverview ? overviewId : undefined}
+            onClick={() => setShowOverview((value) => !value)}
+            style={controlStyle(showOverview)}
+          >
+            Mini map
+          </button>
+        </div>
       </div>
-
+      {selectedNode && (
+        <div
+          style={{
+            ...mapRow,
+            padding: "8px 10px",
+            marginBottom: 8,
+            background: t.toggleActiveBg,
+            border: `1px solid ${t.panelBorder}`,
+            borderRadius: 8,
+          }}
+        >
+          <div style={{ flex: compactControls ? "1 1 100%" : "1 1 180px", minWidth: 0 }}>
+            <span
+              style={{
+                display: "block",
+                color: t.label,
+                fontSize: "0.7rem",
+                textTransform: "capitalize",
+                marginBottom: 3,
+              }}
+            >
+              {nodeRoleLabel(selectedNode.kind)}
+            </span>
+            <strong style={{ color: t.title, fontSize: "0.85rem", overflowWrap: "anywhere" }}>
+              {selectedNode.fullLabel}
+            </strong>
+          </div>
+          {onShowDetails && (
+            <button type="button" onClick={onShowDetails} style={controlStyle()}>
+              View details
+            </button>
+          )}
+          {!compactControls && selectionActions}
+          {compactControls && (
+            <button
+              type="button"
+              aria-label="Selection tools"
+              aria-expanded={showSelectionTools}
+              aria-controls={showSelectionTools ? selectionToolsId : undefined}
+              onClick={() => setShowSelectionTools((value) => !value)}
+              style={controlStyle(showSelectionTools)}
+            >
+              Tools <span aria-hidden="true">{showSelectionTools ? "−" : "+"}</span>
+            </button>
+          )}
+          <button
+            type="button"
+            aria-label="Clear selection"
+            title="Clear selection"
+            onClick={() => {
+              onSelectNode(null);
+              fitAllRef.current?.focus({ preventScroll: true });
+            }}
+            style={{ ...controlStyle(), minWidth: 44, fontSize: "1.1rem" }}
+          >
+            ×
+          </button>
+          {compactControls && showSelectionTools && (
+            <div id={selectionToolsId} style={{ ...mapRow, flex: "1 1 100%" }}>
+              {selectionActions}
+            </div>
+          )}
+        </div>
+      )}
       <div
         style={{
           border: `1px solid ${t.panelBorder}`,
           borderRadius: 8,
           overflow: "hidden",
-          height: "70vh",
-          minHeight: 520,
-          maxHeight: 760,
+          height: "clamp(360px, calc(100svh - 310px), 760px)",
           background: t.panelBg,
           position: "relative",
         }}
@@ -618,55 +704,62 @@ export default function UniversalRelationshipMap({
         )}
       </div>
       {showOverview && viewport.width < 600 && <div style={{ marginTop: 8 }}>{overview}</div>}
-      {revised && (
-        <p style={{ color: t.muted, fontSize: "0.72rem" }}>
-          Arrow keys move between visible nodes; Enter selects.{" "}
-          {ENABLE_UNIVERSAL_MAP_EXTRA_VIEWS
-            ? "Search or Research lists reach every entity."
-            : "Search reaches every entity."}{" "}
-          Labels are spaced automatically.
-        </p>
-      )}
-
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "0.8rem",
-          marginTop: "0.55rem",
-          fontSize: "0.68rem",
-          color: t.muted,
-        }}
-      >
-        <span style={legendItemStyle}>
-          <span style={legendSwatch(t.rayWarm, "circle")} /> Inventor
-        </span>
-        <span style={legendItemStyle}>
-          <span style={legendSwatch(t.rayCool, "square")} /> Assignee
-        </span>
-        <span style={legendItemStyle}>
-          <span style={legendSwatch(t.stop, "circle")} /> Patent
-        </span>
-        <span style={legendItemStyle}>
-          <span style={legendSwatch(t.pupilExit, "diamond")} /> Organization
-        </span>
-        <span style={legendItemStyle}>
-          <span style={legendSwatch(t.sliderAccent, "hexagon")} /> Corporate family
-        </span>
-        {graph.stats.lenses > 0 && (
-          <>
-            <span style={legendItemStyle}>
-              <span style={legendSwatch(t.pupilExit, "square")} /> Catalog maker
-            </span>
-            <span style={legendItemStyle}>
-              <span style={legendSwatch(t.imgLine, "diamond")} /> Non-patent model
-            </span>
-            <span style={legendItemStyle}>Dotted links · catalog maker grouping</span>
-          </>
+      <p style={{ color: t.label, fontSize: "0.72rem", lineHeight: 1.7, margin: "8px 0 0" }}>
+        Drag to move · Scroll or pinch to zoom · Select a node for details
+      </p>
+      <details style={{ color: t.label, fontSize: "0.75rem", borderBottom: `1px solid ${t.panelBorder}` }}>
+        <summary style={{ cursor: "pointer", minHeight: 44, boxSizing: "border-box", padding: "12px 0" }}>
+          Map key & keyboard help
+        </summary>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: "0.8rem",
+            marginBottom: 12,
+            fontSize: "0.75rem",
+            color: t.label,
+          }}
+        >
+          <span style={legendItemStyle}>
+            <span style={legendSwatch(t.rayWarm, "circle")} /> Inventor
+          </span>
+          <span style={legendItemStyle}>
+            <span style={legendSwatch(t.rayCool, "square")} /> Assignee
+          </span>
+          <span style={legendItemStyle}>
+            <span style={legendSwatch(t.stop, "circle")} /> Patent
+          </span>
+          <span style={legendItemStyle}>
+            <span style={legendSwatch(t.pupilExit, "diamond")} /> Organization
+          </span>
+          <span style={legendItemStyle}>
+            <span style={legendSwatch(t.sliderAccent, "hexagon")} /> Corporate family
+          </span>
+          {graph.stats.lenses > 0 && (
+            <>
+              <span style={legendItemStyle}>
+                <span style={legendSwatch(t.pupilExit, "square")} /> Catalog maker
+              </span>
+              <span style={legendItemStyle}>
+                <span style={legendSwatch(t.imgLine, "diamond")} /> Non-patent model
+              </span>
+              <span style={legendItemStyle}>Dotted links · catalog maker grouping</span>
+            </>
+          )}
+          <span style={legendItemStyle}>Solid/dashed colored links · corporate history</span>
+          <span style={legendItemStyle}>Soft halos · hub neighborhoods</span>
+        </div>
+        {revised && (
+          <p style={{ fontSize: "0.75rem", lineHeight: 1.7 }}>
+            Use Tab to enter the map, arrow keys to move between visible nodes, and Enter to select.{" "}
+            {ENABLE_UNIVERSAL_MAP_EXTRA_VIEWS
+              ? "Search or Research lists reach every entity."
+              : "Search reaches every entity."}{" "}
+            On the mini map, arrow keys move the view and Home fits the full network.
+          </p>
         )}
-        <span style={legendItemStyle}>Solid/dashed colored links · corporate history</span>
-        <span style={legendItemStyle}>Soft halos · hub neighborhoods</span>
-      </div>
+      </details>
     </div>
   );
 }

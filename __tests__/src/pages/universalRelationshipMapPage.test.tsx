@@ -32,6 +32,7 @@ vi.mock("../../../src/components/relationshipMap/UniversalRelationshipMap.js", (
   default: function UniversalRelationshipMapMock({
     graph,
     onSelectNode,
+    onShowDetails,
     selectedNodeId,
     focusRequest,
     viewResetRequest,
@@ -39,6 +40,7 @@ vi.mock("../../../src/components/relationshipMap/UniversalRelationshipMap.js", (
   }: {
     graph: UniversalRelationshipGraph;
     onSelectNode: (nodeId: string) => void;
+    onShowDetails?: () => void;
     selectedNodeId: string | null;
     focusRequest?: { nodeId: string; requestId: number };
     viewResetRequest?: number;
@@ -66,6 +68,11 @@ vi.mock("../../../src/components/relationshipMap/UniversalRelationshipMap.js", (
         <button type="button" onClick={() => onSelectNode(family.id)}>
           Select test family
         </button>
+        {selectedNodeId && onShowDetails && (
+          <button type="button" onClick={onShowDetails}>
+            View details
+          </button>
+        )}
       </div>
     );
   },
@@ -157,6 +164,7 @@ describe("UniversalRelationshipMapPage", () => {
     renderUniversalPage(`/relationships/universal#${fragment}`);
     const map = await screen.findByRole("group", { name: "Universal relationship map test double" });
     expect(map.getAttribute("data-path")).toBe(`${edge.from},${edge.to}`);
+    fireEvent.click(screen.getByRole("button", { name: /^Filters/ }));
     expect((screen.getByRole("checkbox", { name: "Patent relationships" }) as HTMLInputElement).indeterminate).toBe(
       true,
     );
@@ -168,6 +176,48 @@ describe("UniversalRelationshipMapPage", () => {
     );
   });
 
+  it("keeps filters out of the initial workspace and exposes hidden relationships with a reset", async () => {
+    mapFlags.extraViews = false;
+    renderUniversalPage("/relationships/universal#relations=&keep=yes");
+    const toggle = await screen.findByRole("button", { name: /^Filters · None/ });
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByRole("checkbox", { name: "Corporate history" })).toBeNull();
+    expect(screen.getByText(/All connections are hidden/)).toBeDefined();
+    const location = screen.getByRole("status", { name: "Current location" }).textContent;
+    fireEvent.click(toggle);
+    expect(screen.getByRole("status", { name: "Current location" }).textContent).toBe(location);
+    fireEvent.click(screen.getByRole("button", { name: "Show all relationships" }));
+    await waitFor(() => expect(toggle.textContent).toContain("All"));
+    expect(screen.queryByText(/All connections are hidden/)).toBeNull();
+    expect((screen.getByRole("checkbox", { name: "Corporate history" }) as HTMLInputElement).checked).toBe(true);
+    expect(screen.getByRole("status", { name: "Current location" }).textContent).toContain("keep=yes");
+    fireEvent.click(toggle);
+    expect(screen.queryByRole("checkbox", { name: "Corporate history" })).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Back" }));
+    await waitFor(() => expect(toggle.textContent).toContain("None"));
+    expect(toggle.getAttribute("aria-expanded")).toBe("false");
+  });
+
+  it("opens details and returns to the map on narrow screens without changing selection or history", async () => {
+    mapFlags.extraViews = false;
+    renderUniversalPage();
+    fireEvent.click(await screen.findByRole("button", { name: "Select test assignee" }));
+    const details = screen.getByText("Details & sources").closest("details")!;
+    const map = screen.getByRole("region", { name: "Full map" });
+    details.scrollIntoView = vi.fn();
+    map.scrollIntoView = vi.fn();
+    details.open = false;
+    const location = screen.getByRole("status", { name: "Current location" }).textContent;
+    fireEvent.click(screen.getByRole("button", { name: "View details" }));
+    expect(details.open).toBe(true);
+    expect(details.scrollIntoView).toHaveBeenCalledOnce();
+    expect(document.activeElement).toBe(within(details).getByRole("heading", { level: 3 }));
+    fireEvent.click(screen.getByRole("button", { name: "Back to map" }));
+    expect(map.scrollIntoView).toHaveBeenCalledOnce();
+    expect(document.activeElement).toBe(map);
+    expect(screen.getByRole("status", { name: "Current location" }).textContent).toBe(location);
+  });
+
   it("defaults legacy node links to Explore and shares selection and filters across views and history", async () => {
     const node = buildUniversalRelationshipGraph().nodes.find((n) => n.kind === "assignee")!;
     const router = createMemoryRouter([{ path: "/relationships/universal", Component: UniversalRelationshipMapPage }], {
@@ -176,6 +226,7 @@ describe("UniversalRelationshipMapPage", () => {
     render(<RouterProvider router={router} />);
     expect((await screen.findByRole("tab", { name: "Explore" })).getAttribute("aria-selected")).toBe("true");
     expect(screen.getByRole("heading", { level: 3, name: node.name })).toBeDefined();
+    fireEvent.click(screen.getByRole("button", { name: /^Filters/ }));
     fireEvent.click(screen.getByRole("checkbox", { name: "Corporate history" }));
     fireEvent.click(screen.getByRole("tab", { name: "Research" }));
     expect(router.state.location.hash).toContain("view=research");
@@ -298,8 +349,8 @@ describe("UniversalRelationshipMapPage", () => {
   it("renders catalog totals and the client map", async () => {
     renderUniversalPage();
     expect(screen.getByRole("heading", { level: 1, name: "Universal Relationship Map" })).toBeDefined();
-    expect(screen.getByText("corporate links")).toBeDefined();
-    expect(screen.getByText("connected networks")).toBeDefined();
+    expect(screen.getByText(/corporate links ·/)).toBeDefined();
+    expect(screen.getByText(/connected networks$/)).toBeDefined();
     expect(await screen.findByRole("group", { name: "Universal relationship map test double" })).toBeDefined();
   });
 

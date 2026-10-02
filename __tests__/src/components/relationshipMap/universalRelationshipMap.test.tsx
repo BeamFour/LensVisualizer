@@ -174,6 +174,23 @@ function makeMultiHubGraph(): UniversalRelationshipGraph {
 }
 
 describe("UniversalRelationshipMap", () => {
+  it("reveals selection actions only after selecting a node and clears through the shared callback", () => {
+    const onSelectNode = vi.fn();
+    const props = { graph, theme: themes.dark, onSelectNode };
+    const { getByRole, queryByRole, rerender } = renderWithRouter(
+      <UniversalRelationshipMap {...props} selectedNodeId={null} />,
+    );
+    expect(queryByRole("button", { name: "Center selection" })).toBeNull();
+    expect(queryByRole("button", { name: "Fit neighborhood" })).toBeNull();
+    expect(queryByRole("button", { name: "Emphasize connections" })).toBeNull();
+    rerender(<UniversalRelationshipMap {...props} selectedNodeId={author.id} />);
+    expect(getByRole("button", { name: "Center selection" })).toBeDefined();
+    expect(getByRole("button", { name: "Fit neighborhood" })).toBeDefined();
+    fireEvent.click(getByRole("button", { name: "Clear selection" }));
+    expect(onSelectNode).toHaveBeenCalledWith(null);
+    expect(document.activeElement).toBe(getByRole("button", { name: "Fit all" }));
+  });
+
   it.each([false, true])("restores previous rendering independently of extra views=%s", (extraViews) => {
     mapFlags.revised = false;
     mapFlags.extraViews = extraViews;
@@ -312,11 +329,17 @@ describe("UniversalRelationshipMap", () => {
     expect(main.parentElement?.contains(overview)).toBe(true);
     width = 390;
     act(() => observer.trigger(main));
+    const tools = getByRole("button", { name: "Selection tools" });
+    expect(tools.getAttribute("aria-expanded")).toBe("false");
+    expect(container.textContent).not.toContain("Fit neighborhood");
+    fireEvent.click(tools);
+    expect(getByRole("button", { name: "Fit neighborhood" })).toBeDefined();
+    fireEvent.click(tools);
     overview = getByRole("group", { name: "Map overview" });
     expect(main.parentElement?.contains(overview)).toBe(false);
-    fireEvent.click(getByRole("button", { name: "Overview" }));
+    fireEvent.click(getByRole("button", { name: "Mini map" }));
     expect(container.querySelector('[aria-label="Map overview"]')).toBeNull();
-    fireEvent.click(getByRole("button", { name: "Overview" }));
+    fireEvent.click(getByRole("button", { name: "Mini map" }));
     expect(getByRole("group", { name: "Map overview" })).toBeDefined();
   });
   it("moves the main viewport through the overview while retaining zoom, selection, and emphasis", () => {
@@ -376,10 +399,10 @@ describe("UniversalRelationshipMap", () => {
       [...container.querySelectorAll("circle")].map((node) => [node.getAttribute("cx"), node.getAttribute("cy")]),
     ).toEqual(positions);
     rerender(<UniversalRelationshipMap {...props} selectedNodeId={null} />);
-    expect((toggle as HTMLButtonElement).disabled).toBe(true);
-    expect(toggle.getAttribute("aria-pressed")).toBe("true");
+    expect(container.contains(toggle)).toBe(false);
     expect(assigneeButton.getAttribute("opacity")).toBe("1");
     rerender(<UniversalRelationshipMap {...props} selectedNodeId={"family:example"} />);
+    expect(getByRole("button", { name: "Emphasize connections" }).getAttribute("aria-pressed")).toBe("true");
     expect(getByRole("button", { name: "Select inventor Ada Inventor" }).getAttribute("opacity")).toBe("0.15");
     expect(assigneeButton.getAttribute("opacity")).toBe("1");
   });
@@ -444,7 +467,7 @@ describe("UniversalRelationshipMap", () => {
     const svg = container.querySelector("svg")!;
     const initial = svg.getAttribute("viewBox");
     expect((getByRole("button", { name: "Zoom out" }) as HTMLButtonElement).disabled).toBe(true);
-    expect((getByRole("button", { name: "Center selection" }) as HTMLButtonElement).disabled).toBe(true);
+    expect(container.querySelector('[aria-label="Clear selection"]')).toBeNull();
     Object.defineProperties(svg, { setPointerCapture: { value: vi.fn() }, releasePointerCapture: { value: vi.fn() } });
     fireEvent.pointerDown(svg, { button: 0, clientX: 200, clientY: 200, pointerId: 1 });
     fireEvent.pointerMove(svg, { clientX: 250, clientY: 230, pointerId: 1 });

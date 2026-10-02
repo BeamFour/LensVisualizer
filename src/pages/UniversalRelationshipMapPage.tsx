@@ -19,7 +19,11 @@ import UniversalMapExplore from "../components/relationshipMap/UniversalMapExplo
 import UniversalMapResearch from "../components/relationshipMap/UniversalMapResearch.js";
 import { layoutUniversalRelationshipGraph } from "../components/relationshipMap/universalLayout.js";
 import { mapButton, mapRow } from "../components/relationshipMap/universalMapStyles.js";
-import { findUniversalPaths, UNIVERSAL_RELATION_GROUPS } from "../utils/catalog/universalRelationshipQueries.js";
+import {
+  findUniversalPaths,
+  UNIVERSAL_EDGE_KINDS,
+  UNIVERSAL_RELATION_GROUPS,
+} from "../utils/catalog/universalRelationshipQueries.js";
 import type { UniversalMapState, UniversalMapView } from "../types/universalMap.js";
 import useMediaQuery from "../utils/useMediaQuery.js";
 import { ENABLE_UNIVERSAL_MAP_EXTRA_VIEWS } from "../utils/featureFlags.js";
@@ -51,12 +55,14 @@ export default function UniversalRelationshipMapPage() {
   const navigate = useNavigate();
   const navigationType = useNavigationType();
   const [mounted, setMounted] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   useEffect(() => setMounted(true), []);
   const mapState = useMemo(
     () => universalMapStateFromHash(mounted ? location.hash : "", UNIVERSAL_NODE_IDS, UNIVERSAL_NEIGHBORHOOD_IDS),
     [mounted, location.hash],
   );
   const selectedNodeId = mapState.nodeId;
+  const allRelationships = mapState.edgeKinds.length === UNIVERSAL_EDGE_KINDS.length;
   // Disabled views cannot be exposed by a saved fragment; keep the fragment intact for re-enabling.
   const view = ENABLE_UNIVERSAL_MAP_EXTRA_VIEWS ? mapState.view : "full";
   const connectionPaths = useMemo(
@@ -78,6 +84,8 @@ export default function UniversalRelationshipMapPage() {
   const handledLocationKey = useRef<string | undefined>(undefined);
   const committedNode = useRef<string | null | undefined>(undefined);
   const detailsHeadingRef = useRef<HTMLHeadingElement>(null);
+  const detailsRef = useRef<HTMLDetailsElement>(null);
+  const fullMapRef = useRef<HTMLDivElement>(null);
   const focusDetails = useRef(false);
   const requestNodeFocus = useCallback((nodeId: string) => {
     setFocusRequest({ nodeId, requestId: ++focusSequence.current });
@@ -166,44 +174,11 @@ export default function UniversalRelationshipMapPage() {
       {({ theme: t }) => (
         <>
           <h1 style={H1_STYLE}>Universal Relationship Map</h1>
-          <p style={{ color: t.muted, fontSize: "0.85rem", lineHeight: 1.6, margin: "0 0 0.6rem" }}>
+          <p style={{ color: t.label, fontSize: "0.85rem", lineHeight: 1.6, margin: "0 0 16px" }}>
             {ENABLE_UNIVERSAL_MAP_EXTRA_VIEWS
               ? "Explore neighborhoods, inspect the complete map, or trace the evidence connecting two entities."
-              : "Inspect the complete network of patents, inventors, assignees, and corporate relationships."}
+              : "Start with a name or patent. Follow the connections between inventors and companies."}
           </p>
-
-          <div
-            style={{
-              ...mapRow,
-              gap: "0.4rem 1rem",
-              marginBottom: "0.6rem",
-            }}
-          >
-            {[
-              [UNIVERSAL_GRAPH.stats.patents, "patents"],
-              [UNIVERSAL_GRAPH.stats.lenses, "non-patent models"],
-              [UNIVERSAL_GRAPH.stats.authors, "inventors"],
-              [UNIVERSAL_GRAPH.stats.assignees, "assignees"],
-              [UNIVERSAL_GRAPH.stats.corporateRelationships, "corporate links"],
-              [UNIVERSAL_GRAPH.stats.components, "connected networks"],
-            ].map(([value, label]) => (
-              <div key={label} style={{ fontSize: "0.72rem" }}>
-                <strong style={{ color: t.title }}>{value}</strong> <span style={{ color: t.muted }}>{label}</span>
-              </div>
-            ))}
-          </div>
-
-          <details style={{ color: t.muted, fontSize: "0.75rem", lineHeight: 1.6, marginBottom: 12 }}>
-            <summary style={{ cursor: "pointer", minHeight: 30 }}>About the map and its evidence</summary>
-            <p>
-              Patents connect their named inventors and assignees. Dated corporate records describe succession,
-              acquisition, subsidiaries, and corporate families. Shared inventors and spatial proximity do not establish
-              ownership. Non-patent models connect to their explicit catalog maker. Neighborhood placement prioritizes
-              corporate connections, then patent links. The full map retains every entity.
-              {ENABLE_UNIVERSAL_MAP_EXTRA_VIEWS &&
-                " Explore summarizes these records; Research explains each connection with its available sources."}
-            </p>
-          </details>
 
           <ClientOnly
             fallback={
@@ -213,7 +188,23 @@ export default function UniversalRelationshipMapPage() {
             }
           >
             <PanelErrorBoundary lensKey="universal-relationship-map">
-              <UniversalMapSearch graph={UNIVERSAL_GRAPH} theme={t} onSelectNode={focusNode} />
+              <div style={{ ...mapRow, alignItems: "stretch", marginBottom: 12 }}>
+                <div style={{ flex: "1 1 320px", minWidth: 0 }}>
+                  <UniversalMapSearch graph={UNIVERSAL_GRAPH} theme={t} onSelectNode={focusNode} compact />
+                </div>
+                <button
+                  type="button"
+                  aria-expanded={showFilters}
+                  aria-controls="universal-map-filters"
+                  onClick={() => setShowFilters((value) => !value)}
+                  style={{ ...mapButton(t, showFilters || !allRelationships), fontSize: "0.8rem", minHeight: 48 }}
+                >
+                  Filters · {allRelationships ? "All" : mapState.edgeKinds.length === 0 ? "None" : "Custom"}
+                  <span aria-hidden="true" style={{ marginLeft: 10 }}>
+                    {showFilters ? "−" : "+"}
+                  </span>
+                </button>
+              </div>
               {ENABLE_UNIVERSAL_MAP_EXTRA_VIEWS && (
                 <div role="tablist" aria-label="Relationship map views" style={{ ...mapRow, marginBottom: 10 }}>
                   {MAP_VIEWS.map((tab, index) => (
@@ -246,7 +237,19 @@ export default function UniversalRelationshipMapPage() {
                   ))}
                 </div>
               )}
-              <fieldset style={{ ...mapRow, border: 0, padding: 0, margin: "0 0 14px" }}>
+              <fieldset
+                id="universal-map-filters"
+                hidden={!showFilters}
+                style={{
+                  ...mapRow,
+                  display: showFilters ? "flex" : "none",
+                  border: `1px solid ${t.panelBorder}`,
+                  borderRadius: 8,
+                  padding: 12,
+                  margin: "0 0 12px",
+                  background: t.panelBg,
+                }}
+              >
                 <legend style={{ color: t.label, fontSize: "0.72rem", marginBottom: 6 }}>Relationship filters</legend>
                 {UNIVERSAL_RELATION_GROUPS.map((group) => (
                   <label
@@ -254,15 +257,17 @@ export default function UniversalRelationshipMapPage() {
                     style={{
                       ...mapRow,
                       minHeight: 44,
-                      fontSize: "0.75rem",
+                      fontSize: "0.8rem",
                       color: t.label,
                       padding: "0 8px",
                       border: `1px solid ${t.panelBorder}`,
                       borderRadius: 6,
+                      cursor: "pointer",
                     }}
                   >
                     <input
                       type="checkbox"
+                      style={{ accentColor: t.sliderAccent, width: 16, height: 16 }}
                       ref={(input) => {
                         if (input)
                           input.indeterminate =
@@ -281,7 +286,23 @@ export default function UniversalRelationshipMapPage() {
                     {group.label}
                   </label>
                 ))}
+                {!allRelationships && (
+                  <button
+                    type="button"
+                    onClick={() => updateMap({ edgeKinds: [...UNIVERSAL_EDGE_KINDS] })}
+                    style={mapButton(t)}
+                  >
+                    Show all relationships
+                  </button>
+                )}
               </fieldset>
+              {!allRelationships && (
+                <p role="status" style={{ color: t.label, fontSize: "0.75rem", margin: "0 0 12px" }}>
+                  {mapState.edgeKinds.length === 0
+                    ? "All connections are hidden. Open Filters to show relationships."
+                    : "Some relationship types are hidden. Filters apply across the map."}
+                </p>
+              )}
               <div
                 style={{
                   display: "grid",
@@ -315,6 +336,9 @@ export default function UniversalRelationshipMapPage() {
                   )}
                   <div
                     id="map-panel-full"
+                    ref={fullMapRef}
+                    tabIndex={-1}
+                    style={{ scrollMarginTop: 60 }}
                     role={ENABLE_UNIVERSAL_MAP_EXTRA_VIEWS ? "tabpanel" : "region"}
                     aria-label={ENABLE_UNIVERSAL_MAP_EXTRA_VIEWS ? undefined : "Full map"}
                     aria-labelledby={ENABLE_UNIVERSAL_MAP_EXTRA_VIEWS ? "map-tab-full" : undefined}
@@ -330,6 +354,17 @@ export default function UniversalRelationshipMapPage() {
                       theme={t}
                       selectedNodeId={selectedNodeId}
                       onSelectNode={(nodeId) => selectNode(nodeId)}
+                      onShowDetails={
+                        sideDetails
+                          ? undefined
+                          : () => {
+                              if (detailsRef.current) {
+                                detailsRef.current.open = true;
+                                detailsRef.current.scrollIntoView({ block: "start" });
+                                detailsHeadingRef.current?.focus({ preventScroll: true });
+                              }
+                            }
+                      }
                       focusRequest={focusRequest}
                       viewResetRequest={viewResetRequest}
                     />
@@ -357,6 +392,7 @@ export default function UniversalRelationshipMapPage() {
                 </div>
                 {selectedNode && (
                   <details
+                    ref={detailsRef}
                     key={selectedNodeId}
                     open
                     style={{
@@ -365,11 +401,33 @@ export default function UniversalRelationshipMapPage() {
                       top: sideDetails ? 60 : undefined,
                       maxHeight: sideDetails ? "calc(100vh - 80px)" : undefined,
                       overflowY: sideDetails ? "auto" : undefined,
+                      scrollMarginTop: 60,
                     }}
                   >
-                    <summary style={{ color: t.label, fontSize: "0.8rem", cursor: "pointer", minHeight: 44 }}>
-                      Selected entity details
+                    <summary
+                      style={{
+                        color: t.label,
+                        fontSize: "0.8rem",
+                        cursor: "pointer",
+                        minHeight: 44,
+                        boxSizing: "border-box",
+                        padding: "12px 0",
+                      }}
+                    >
+                      Details & sources
                     </summary>
+                    {!sideDetails && view === "full" && (
+                      <button
+                        type="button"
+                        style={mapButton(t)}
+                        onClick={() => {
+                          fullMapRef.current?.scrollIntoView({ block: "start" });
+                          fullMapRef.current?.focus({ preventScroll: true });
+                        }}
+                      >
+                        Back to map
+                      </button>
+                    )}
                     {selectedNode?.kind === "patent" && (
                       <PatentDetailCard
                         patent={selectedNode.patent}
@@ -395,6 +453,25 @@ export default function UniversalRelationshipMapPage() {
               </div>
             </PanelErrorBoundary>
           </ClientOnly>
+          <details style={{ color: t.label, fontSize: "0.75rem", lineHeight: 1.8, marginTop: 8 }}>
+            <summary style={{ cursor: "pointer", minHeight: 44, boxSizing: "border-box", padding: "12px 0" }}>
+              About the map and its evidence
+            </summary>
+            <p style={{ margin: "0 0 8px" }}>
+              {UNIVERSAL_GRAPH.stats.patents} patents · {UNIVERSAL_GRAPH.stats.authors} inventors ·{" "}
+              {UNIVERSAL_GRAPH.stats.assignees} assignees · {UNIVERSAL_GRAPH.stats.corporateRelationships} corporate
+              links · {UNIVERSAL_GRAPH.stats.lenses} non-patent models · {UNIVERSAL_GRAPH.stats.components} connected
+              networks
+            </p>
+            <p style={{ maxWidth: 900 }}>
+              Patents connect their named inventors and assignees. Dated corporate records describe succession,
+              acquisition, subsidiaries, and corporate families. Shared inventors and spatial proximity do not establish
+              ownership. Non-patent models connect to their explicit catalog maker. Neighborhood placement prioritizes
+              corporate connections, then patent links. The full map retains every entity.
+              {ENABLE_UNIVERSAL_MAP_EXTRA_VIEWS &&
+                " Explore summarizes these records; Research explains each connection with its available sources."}
+            </p>
+          </details>
         </>
       )}
     </StaticPageShell>

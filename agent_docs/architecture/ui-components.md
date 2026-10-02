@@ -164,6 +164,12 @@ node tab stops; Fit neighborhood is omitted. Selection, search, filters, the min
 When extra views are enabled, panels stay mounted across tab switches, preserving cameras and local query/pagination state; entering Full map with
 a different selection frames it. Details sit beside the workspace from 1100 CSS pixels, or in an expandable panel below.
 `StaticPageShell.maxWidth` lets this workspace use 1600 pixels without changing other page widths.
+The workspace starts with search and a collapsed relationship-filter panel; its button reports all or partial
+coverage, and hidden relationships remain called out even when the panel is closed. The initial toolbar contains
+zoom, fit-all, and minimap controls. Selection adds the entity name and relevant actions; below 600 map pixels,
+secondary actions collapse under Tools. Below the side-panel breakpoint, View details and Back to map move focus
+and scroll between the diagram and the expanded evidence panel without changing history or the camera.
+The map key, keyboard help, and evidence explanation are collapsed below the diagram. Disclosure state is local.
 
 `UniversalMapExplore` uses `universalExploreLayout.ts` to contract the complete layout into fixed-size neighborhood
 cards, ordered by the existing corporate/patent affinities and packed into separate network regions. Every node belongs

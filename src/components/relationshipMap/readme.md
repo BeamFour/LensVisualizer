@@ -77,7 +77,7 @@ flowchart LR
 
 - Direct source files: 17
 - Direct subfolders: 0
-- Main outbound areas: src/utils/catalog (34), same folder (18), src/types (15), package:react (11), src/utils/style (9), src/components/content (5), src/components/hooks (5), src/utils/text.ts (5), +5 more
+- Main outbound areas: src/utils/catalog (34), same folder (19), src/types (15), package:react (11), src/utils/style (8), src/components/content (5), src/components/hooks (5), src/utils/text.ts (5), +5 more
 - External consumers: src/pages/RelationshipMapPage.tsx, src/pages/UniversalRelationshipMapPage.tsx
 
 ## Files
@@ -98,6 +98,6 @@ flowchart LR
 | `UniversalMapOverview.tsx` | React component module | package:react, same folder, src/components/hooks, src/types, src/utils/style, +1 more | same folder | default, UniversalMapOverview |
 | `UniversalMapResearch.tsx` | React component module | src/utils/catalog (4), same folder (3), src/types (2), package:react, src/utils/style | src/pages/UniversalRelationshipMapPage.tsx | default, UniversalMapResearch |
 | `UniversalMapSearch.tsx` | React component module | src/utils/catalog (2), package:react, src/components/layout, src/types, src/utils/style | same folder, src/pages/UniversalRelationshipMapPage.tsx | default, UniversalMapSearch |
-| `universalMapStyles.ts` | Universal Map Styles helper module | package:react, src/types | same folder (2), src/pages/UniversalRelationshipMapPage.tsx | mapButton, mapRow |
+| `universalMapStyles.ts` | Universal Map Styles helper module | package:react, src/types | same folder (3), src/pages/UniversalRelationshipMapPage.tsx | mapButton, mapRow |
 | `UniversalRelationshipEvidence.tsx` | React component module | src/utils/catalog (2), src/components/content, src/types | same folder (2) | default, UniversalRelationshipEvidence |
-| `UniversalRelationshipMap.tsx` | React component module | same folder (3), src/utils/catalog (3), src/components/hooks (2), package:react, src/types, +3 more | src/pages/UniversalRelationshipMapPage.tsx | default, UniversalRelationshipMap |
+| `UniversalRelationshipMap.tsx` | React component module | same folder (4), src/utils/catalog (3), src/components/hooks (2), package:react, src/types, +2 more | src/pages/UniversalRelationshipMapPage.tsx | default, UniversalRelationshipMap |
