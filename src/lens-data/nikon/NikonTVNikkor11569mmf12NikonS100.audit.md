@@ -22,3 +22,7 @@ Display names were reviewed against the documented product correlations. Schneid
 ### Retained limits
 
 The source/analysis notes retain static-focus, rounded-prescription and pupil-coverage limits. Production-format metadata is a nominal frame reference and does not establish full-field coverage. The S-100 pickup-tube size remains source-unresolved; Nikon’s tape-width specifications cannot establish its image format.
+
+### Diagram and travel review
+
+Fig. 1 confirms the L1/L4/L7/L9 cemented-component labels and the separate half-prism P. The published zoom gaps are ordered wide → intermediate → tele; G2 moves imageward while G3 reverses around the intermediate station. The local viewer reproduces that ordering. No numerical finite-focus motion is published, so focus stays disabled. The one unmatched 1.74000/44.9 glass remains unresolved; no current or obsolete vendor curve passed both guards.

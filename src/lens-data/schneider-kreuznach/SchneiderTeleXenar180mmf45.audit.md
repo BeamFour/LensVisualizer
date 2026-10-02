@@ -25,3 +25,9 @@ Display names were reviewed against the documented product correlations. Schneid
 ### Retained limits
 
 The source/analysis notes retain static-focus, rounded-prescription and pupil-coverage limits. Production-format metadata is a nominal frame reference and does not establish full-field coverage.
+
+### Diagram and travel review
+
+The local diagram was rechecked against Abb. 1: the rear elements are approximately 85–90% of the front radius, with L1–L5 and both cemented-pair labels intact. The static model has no zoom or finite-focus travel. Historical yellow-ray coordinates still cannot justify modern d/e-line catalog identities or patent APD tags; all five glasses remain explicitly unmatched.
+
+The element inspector now presents the historical yellow-ray coordinates as `n (source)` / `ν (source)` with a spectral-line uncertainty note. Derived chromatic channels remain explicitly approximate; no modern d-line source identity is asserted.

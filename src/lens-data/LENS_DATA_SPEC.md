@@ -723,6 +723,11 @@ resolved from a coordinate-compatible `glass` name → partial explicit `nC`/`nF
 next. For apochromatic designs where the patent publishes partial dispersion or line indices,
 prefer transcribing them.
 
+For a historical source whose spectral line is unspecified, retain an explicit `Unmatched (...)` glass disposition
+and add `indexReferenceNote` to explain the uncertainty and approximate tracing reference. The inspector then labels
+the authored values `n (source)` / `ν (source)` instead of asserting d/e identity. This display note does not change
+the tracing convention or enable catalog resolution.
+
 `indexReference` describes what the schema's historical `nd` / `vd` slots actually contain. Omit it (or use `"d"`)
 for ordinary d-line data. Use `"e"` only when the stored values preserve a source's native `ne` / `νe` coordinates.
 Native e-line elements can use catalog Sellmeier data only when an explicit glass name or alias reproduces their

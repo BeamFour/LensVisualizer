@@ -22,3 +22,9 @@ Display names were reviewed against the documented product correlations. Schneid
 ### Retained limits
 
 The source/analysis notes retain static-focus, rounded-prescription and pupil-coverage limits. Production-format metadata is a nominal frame reference and does not establish full-field coverage.
+
+### Diagram and travel review
+
+The local viewer was compared with Fig. 2 rather than the different Fig. 1 embodiment: the first moving doublet is taller than the second, and I′–V′ and L1′–L14′ retain their source identifiers. Reconstructed stations are ordered 80 → 240 mm, with the two negative components moving according to the source-constrained zoom solution; this remains reconstructed intermediate motion, not a patent-tabulated cam law. Focus stays disabled without published finite-focus spacings. L2′ retains the source’s repeated 76.7 Abbe value and remains unmatched; it is not replaced by the 66.7 value of the other embodiment.
+
+The rendered field audit still exposes front-aperture vignetting: the reachable image radius at 240 mm is about 15.69 mm of the nominal 21.65 mm full-frame diagonal. A 35.5 mm front singlet and 33 mm front doublet pass geometry checks, but their absolute scale depends on schematic axial spacing; that alone does not justify increasing the original rims to fill the nominal format. The source-fit relative rim ordering and explicit full-field limitation are retained.

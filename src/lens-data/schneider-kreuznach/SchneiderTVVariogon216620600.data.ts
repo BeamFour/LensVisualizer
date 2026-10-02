@@ -277,7 +277,7 @@ const LENS_DATA = {
       vd: 66.8,
       indexReference: "e",
       fl: 56.602683,
-      glass: "Unmatched (native e-line ne=1.499, νe=66.8; vendor unresolved)",
+      glass: "BSC3 — native e-line compatible spectral proxy (supplier unresolved)",
       role: "Positive member of post-iris cemented doublet.",
       cemented: "D3",
     },

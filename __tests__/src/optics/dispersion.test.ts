@@ -300,6 +300,13 @@ describe("glass catalog", () => {
     }
   });
 
+  it("keeps obsolete BSC3 distinct from the incompatible E-C3 crown", () => {
+    expect(resolveGlass("BSC3")?.name).toBe("BSC3");
+    expect(resolveCompatibleGlass("BSC3", 1.499, 66.8, "e")?.name).toBe("BSC3");
+    expect(resolveCompatibleGlass("BSC3", 1.51823, 59)).toBeNull();
+    expect(resolveCompatibleGlass("E-C3", 1.51823, 59)?.name).toBe("E-C3");
+  });
+
   it("evaluates vendor polynomial catalog entries", () => {
     const tafd45 = resolveGlass("TAFD45 (HOYA)");
     expect(tafd45).not.toBeNull();

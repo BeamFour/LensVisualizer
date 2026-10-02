@@ -65,7 +65,7 @@ concave rear face supplies the negative power; its sign is directly sourced.
 ### L4 and L5 — First Cemented Doublet
 
 L4: nd = 1.62004, νd = 36.3; F2 catalog equivalent, supplier unspecified.
-L5: nd = 1.51823, νd = 59.0; BSC3 catalog comparison, supplier unspecified.
+L5: nd = 1.51823, νd = 59.0; E-C3 catalog comparison, supplier unspecified.
 Their authored isolated focal lengths are approximately +17.3 and −76.7 mm.
 
 A positive biconvex flint component is cemented to a negative meniscus crown.

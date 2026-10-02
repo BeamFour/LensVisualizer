@@ -21,3 +21,7 @@ Display names were reviewed against the documented product correlations. Schneid
 ### Retained limits
 
 The source/analysis notes retain static-focus, rounded-prescription and pupil-coverage limits. Production-format metadata is a nominal frame reference and does not establish full-field coverage.
+
+### Diagram and travel review
+
+The local wide/tele diagrams retain Example 1’s published effective radii and Fig. 1’s group ordering. Element diagram labels now explicitly use the patent’s L1–L9 identifiers rather than generic ordinal numbers. G2 moves objectward relative to fixed G3 as d8 decreases and d16 increases; G1’s smaller imageward shift follows their combined change. Focus remains disabled without numerical G3 focus rows. The L6/L7 cemented pair, aspheric surface 10A, and nine compatible glass curves are retained.

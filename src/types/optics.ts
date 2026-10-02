@@ -202,6 +202,8 @@ export interface ElementData {
    * helium d line; use `"e"` when those schema slots preserve patent ne / νe.
    */
   indexReference?: RefractiveIndexReferenceLine;
+  /** Historical source-line uncertainty; displays source coordinates without claiming d/e identity. Does not alter tracing. */
+  indexReferenceNote?: string;
   fl?: number;
   glass?: string;
   role?: string;

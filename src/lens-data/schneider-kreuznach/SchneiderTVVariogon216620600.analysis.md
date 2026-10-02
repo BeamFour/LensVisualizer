@@ -148,7 +148,7 @@ L16 is the second positive singlet and lies immediately ahead of the inferred st
 
 #### L17-L18 - Cemented Doublet D3
 
-**L17:** n_e = 1.499, ν_e = 66.8. Glass: Unmatched (native e-line ne=1.499, νe=66.8; vendor unresolved). Isolated f = +56.603 mm.
+**L17:** n_e = 1.499, ν_e = 66.8. Glass: BSC3 — native e-line compatible spectral proxy (supplier unresolved). Isolated f = +56.603 mm.
 
 **L18:** n_e = 1.761, ν_e = 27.4. Glass: SF4 — native e-line compatible spectral proxy (supplier unresolved). Isolated f = -93.517 mm.
 
@@ -233,7 +233,7 @@ L31 is the final positive meniscus before the rear airspace and plane-parallel p
 
 ## Glass Identification / Selection
 
-TABLE I is explicitly tabulated in native **n_e / ν_e** coordinates. The data preserves those values with `indexReference: "e"`. Catalog curves are evaluated at C′/e/F′ before comparison; named curves below are compatible spectral proxies, not historical supplier or melt identifications. No source line indices or anomalous partial-dispersion values are invented. L17 remains unresolved because its best existing candidate lies near the Abbe tolerance boundary.
+TABLE I is explicitly tabulated in native **n_e / ν_e** coordinates. The data preserves those values with `indexReference: "e"`. Catalog curves are evaluated at C′/e/F′ before comparison; named curves below are compatible spectral proxies, not historical supplier or melt identifications. No source line indices or anomalous partial-dispersion values are invented. L17 uses the obsolete HOYA BSC3 polynomial as a qualified native e-line proxy: Δne = +0.001136 and Δνe = −1.826, within the unchanged compatibility guards. This identifies a usable dispersion curve, not the production supplier. Coefficients: [HOYA July 7, 2026 Zemax catalog including obsolete glasses](https://www.hoya-opticalworld.com/common/agf/HOYA20260707_include_obsolete.agf), BSC3 row.
 
 | Native coordinate | Elements / optical block | Identification status |
 |---|---|---|
@@ -247,7 +247,7 @@ TABLE I is explicitly tabulated in native **n_e / ν_e** coordinates. The data p
 | n_e 1.723, ν_e 29.3 | L12 | SF1 spectral proxy |
 | n_e 1.727, ν_e 29.0 | L14 | S-TIH18 spectral proxy |
 | n_e 1.503, ν_e 56.2 | L15, L16 | K10 spectral proxy |
-| n_e 1.499, ν_e 66.8 | L17 | Unmatched native e-line |
+| n_e 1.499, ν_e 66.8 | L17 | BSC3 native e-line proxy |
 | n_e 1.734, ν_e 28.5 | L20 | S-TIH10 spectral proxy |
 | n_e 1.489, ν_e 70.2 | L24, L25, L27, L30, L31 | N-FK5 spectral proxy |
 | n_e 1.518, ν_e 64.0 | Prism P | N-BK7 spectral proxy |

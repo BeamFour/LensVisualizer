@@ -21,3 +21,7 @@ Display names were reviewed against the documented product correlations. Schneid
 ### Retained limits
 
 The source/analysis notes retain static-focus, rounded-prescription and pupil-coverage limits. Production-format metadata is a nominal frame reference and does not establish full-field coverage.
+
+### Diagram and travel review
+
+The local wide and tele diagrams preserve Fig. 1’s G1 > G2 and G3 > G2 rim ordering, L11–L31 labels, the L22/L23 cemented pair, and the two aspheric surfaces. Source d6/d12 rows are ordered 5.97 → 10.00 → 16.88 mm; G1 reverses around the intermediate station and G2 moves objectward relative to fixed G3. No unsupported APD tag or numerical focus travel is added. All seven visible bodies retain compatible dispersion curves.
