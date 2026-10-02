@@ -30,8 +30,8 @@ import type { LensDataInput } from "../../types/optics.js";
  * ║                                                                            ║
  * ║  PRODUCT CORRELATION: The 50 mm / f/1.9 Xenon identification remains an  ║
  * ║  inference rather than manufacturer-confirmed attribution of Table A.     ║
- * ║  Historical mount/format metadata are intentionally omitted because the   ║
- * ║  selected source/job does not uniquely establish a production variant.    ║
+ * ║  Format: the correlated production Xenon 1.9/50 covers 35 mm still film.  ║
+ * ║  Production mount and exact patent/product attribution remain uncertain. ║
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
@@ -44,6 +44,8 @@ const LENS_DATA = {
 
   focalLengthMarketing: 50,
   focalLengthDesign: 50.00311336153039,
+  lensMounts: ["exakta", "m42"],
+  imageFormat: "135-full-frame",
   apertureMarketing: 1.9,
   apertureDesign: 2,
   patentNumber: "CH 346706",

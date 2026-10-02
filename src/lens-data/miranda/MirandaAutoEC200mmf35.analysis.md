@@ -127,7 +127,7 @@ The patent also publishes no clear-aperture or semi-diameter table. Every surfac
 
 The corrected final prescription reproduces the patent's printed Petzval result closely. Surface-by-surface `φ/(n·n′)` sums to -0.0002674327 mm⁻¹ in the 2× model; normalized by the scaled patent focal length `f = 200`, this is -0.0534865 versus the patent's -0.053. This agreement is one of the independent numerical reasons for treating `N5 = 1.59680` as a source error rather than as the implemented glass index. [1]
 
-The data revision analyzed here does not include sensor cover glass, filters, inactive dummy planes, or mechanical parts. No close-focus prescription is reconstructed. The Miranda mount is also not encoded because the current project taxonomy has no canonical Miranda-specific mount identifier; the image format is `135-full-frame`, supported by the manufacturer's 24×36 mm specification. [2]
+The data revision analyzed here does not include sensor cover glass, filters, inactive dummy planes, or mechanical parts. No close-focus prescription is reconstructed. The external Miranda bayonet is recorded as `miranda-bayonet`; the image format is `135-full-frame`, supported by the manufacturer's 24×36 mm specification. [2]
 
 ## Sources
 
@@ -135,3 +135,10 @@ The data revision analyzed here does not include sensor cover glass, filters, in
 2. **Miranda Camera Co., Ltd.** *Miranda dx-3 Owners' Manual*. Technical data and 35 mm format: PDF p.17; Miranda Auto EC lens table: PDF p.27. Archived scan: https://www.cameramanuals.org/miranda_pdf/miranda_dx-3.pdf
 3. **OHARA INC.** Optical Glass / Glass Type catalog, used for coordinate-class comparison including S-BSL7, S-TIH18, S-TIL27, S-LAL14, and S-TIM5: https://www.ohara-inc.co.jp/en/product/01000/
 4. **SUMITA OPTICAL GLASS, Inc.** Zemax optical-glass catalog, used for KF3 and K-LaK14 coordinate checks: https://www.sumita-opt.co.jp/download_files/en/data/zemax.agf
+
+
+## Production mount assignment
+
+The Miranda RE-II manual, PDF pages 21–22, describes the 45° locking attachment and lists these Auto EC lenses. The assignment records the external Miranda bayonet, not the camera’s separate internal 44mm thread; diaphragm coupling varies between Miranda body generations. [Manufacturer source](https://butkus.org/chinon/miranda/miranda_re-ii/miranda_re-ii.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

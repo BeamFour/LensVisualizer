@@ -19,6 +19,26 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-10-02",
+    type: "improvement",
+    summary: "Filled 40 missing lens mounts and added historical and cinema mount families",
+  },
+  {
+    date: "2026-10-02",
+    type: "improvement",
+    summary: "Added compact-camera, tube and cinema formats and filled missing lens assignments",
+  },
+  {
+    date: "2026-10-02",
+    type: "lens",
+    summary: "Added Nikon S-100, COOLPIX SQ and COOLPIX 4300 patent lens models",
+  },
+  {
+    date: "2026-10-02",
+    type: "lens",
+    summary: "Added Schneider TV-Variogon 20–600mm, Tele-Variogon 80–240mm and Tele-Xenar 180mm",
+  },
+  {
     date: "2026-10-01",
     type: "lens",
     summary: "Added the Konica Varifocal Hexanon AR 35–100mm f/2.8 patent model",

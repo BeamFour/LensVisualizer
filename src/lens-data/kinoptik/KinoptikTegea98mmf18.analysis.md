@@ -213,3 +213,10 @@ the R=15, K=-1 paraboloid and the split 5.97 mm stop gap. The source
 prints EFL 9.759 and image distance 21.841 mm; independent values are
 9.784067 and 22.377889 mm. Retain this source contradiction (+0.536889
 mm defocus); no supported single misprint resolves it. See audit.
+
+
+## Production mount assignment
+
+The Kinoptik brochure, PDF page 6, draws period ARRIFLEX and ALPA versions. Its separate barrel mounting is not a standardized interchangeable camera interface. No C-mount or modern PL variant is inferred from other Kinoptik products. [Manufacturer source](https://www.pacificrimcamera.com/rl/01254/01254.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

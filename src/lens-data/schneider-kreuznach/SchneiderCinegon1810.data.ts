@@ -49,6 +49,7 @@ const LENS_DATA = {
   focalLengthMarketing: 10,
   focalLengthDesign: 10.020549950705151,
   apertureMarketing: 1.8,
+  lensMounts: ["c-mount"],
   imageFormat: "16mm-cinema",
   apertureDesign: 1.8,
   patentNumber: "US 3,038,379",

@@ -166,3 +166,10 @@ The following curves are approximate spectral proxies within the catalog coordin
 | L2 | 1.7007 / 46.7 (e) | LAFN2 | -0.000279 | 1.475 |
 
 The final L6 element now uses a 15.3 mm inferred semi-diameter on both faces, measured from Fig. 1 (previously 19 mm). Source-label annotations consistently use L1, L2, L3, L4a, L4b, L5, and L6. The revised rim passes the surface and image-circle audits and the sampled full on-axis pupil; this does not establish full-pupil edge-field illumination.
+
+
+## Production mount assignment
+
+The JENOPTIK manufacturer datasheet specifies PRAKTICAR lenses for PRAKTICA-B cameras and lists the 1.4/50. This is the B bayonet, not M42 or Praktina. [Manufacturer source](https://prakticar-user.de/wp-content/uploads/2024/11/88140.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

@@ -39,9 +39,8 @@ There is a nomenclature conflict between the fixed job-card label and Fuji's own
 “X-Fujinon-SW 24mm f2.8 DM EBC,” whereas the Fuji-authored interchangeable-lens table designates the 24 mm f/2.8 as
 **EBC X-FUJINON W 24mm f/2.8 DM** and uses **SW** for the 19 mm f/3.5. The modeled lens name therefore follows the manufacturer-supported `W` designation.
 
-The production system was the historical Fujica-X bayonet. The data file does not assign `lensMounts` because the
-current taxonomy has no historical Fujica-X id; the modern `fujifilm-x` id denotes the later APS-C mirrorless mount and
-is not equivalent. The modeled image format is `135-full-frame`, consistent with the patent's explicit 24 × 36 mm film
+The production system was the historical Fujica-X bayonet, recorded as `fujica-x`; the modern
+`fujifilm-x` id denotes the later APS-C mirrorless mount and is not equivalent. The modeled image format is `135-full-frame`, consistent with the patent's explicit 24 × 36 mm film
 application.
 
 ## Optical Architecture
@@ -270,3 +269,10 @@ L1, L4, and L6 now name qualified S-BSM10, BAF22, and J-LAK01 catalog equivalent
 US4158482.pdf, page 2, Fig. 1 was visually inspected at 600 dpi. The first and third negative menisci have mechanical steps that must not be mistaken for optical rims. The direct L6 measurement below supersedes the contaminated automated reading. Other estimated apertures are retained within figure uncertainty and the existing slope/gap constraints. Surface validation and image-circle audits pass.
 
 The local-diagram rim recheck uses 7.5 mm for L6 (S10–S11), reduced from 9.5 mm. On the 600-dpi Fig. 1 crop, its rim half-width is approximately 533 pixels; the S2–S17 vertex span is approximately 3390 pixels for 46.82 mm, giving 7.36 mm. Its independent diameter ratio to L2 is approximately 0.60. The rounded 7.5 mm estimate excludes dimension labels and preserves the published prescription. L1–L9 diagram labels now follow Fig. 1.
+
+
+## Production mount assignment
+
+The Fujica AX-5 manual specifies the Fujica X bayonet and its X-Fujinon lens system. The historical 35mm SLR interface is distinct from modern Fujifilm X. [Manufacturer source](https://cameramanuals.org/fuji_pdf/fujica_ax-5.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

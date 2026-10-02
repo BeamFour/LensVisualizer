@@ -49,6 +49,7 @@ const LENS_DATA = {
   focalLengthDesign: [48.060354, 96.04305],
   apertureMarketing: 2.8,
   apertureDesign: 2.8,
+  lensMounts: ["m42", "exakta", "praktina", "minolta-sr", "miranda-bayonet", "konica-f", "canon-r", "c-mount", "d-mount", "nikon-f", "leica-r"],
   imageFormat: "135-full-frame",
   patentNumber: "US 3,482,900",
   patentAuthors: ["Werner Wagner"],

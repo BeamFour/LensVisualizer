@@ -242,3 +242,10 @@ These first-order calculations describe the retained prescription; they do not p
 
 The glass references are used only to establish coordinate/class compatibility. They do not override the patent's nd/νd
 values and do not establish the actual Zeiss glass supplier or melt.
+
+
+## Production mount assignment
+
+The Graflex XL guidebook describes its combination bayonet and focusing ring and lists the 80mm Planar. This is the XL interface, not a generic lens board. [Manufacturer source](https://www.cameramanuals.org/prof_pdf/graflex_xi_camera_guidebook.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

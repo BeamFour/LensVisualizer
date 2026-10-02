@@ -6,6 +6,26 @@ import type { GlassEntry } from "../glassCatalogTypes.js";
 
 export const HOYA_GLASS_ENTRIES: readonly GlassEntry[] = [
   {
+    name: "BSC3",
+    vendor: "Hoya",
+    polynomial: [2.2184621, -0.010480003, 0.0098211065, 0.00023795415, -0.000017796854, 0.0000010475444],
+    nd: 1.498309,
+    vd: 65.130542,
+    code6: "498651",
+    source:
+      "HOYA Zemax catalog 2026-07-07 including obsolete glasses; formula 1 polynomial for BSC3, accessed 2026-10-02. https://www.hoya-opticalworld.com/common/agf/HOYA20260707_include_obsolete.agf",
+  },
+  {
+    name: "BACD2",
+    vendor: "Hoya",
+    polynomial: [2.5393255, -0.0087207883, 0.015909566, 0.000088163036, 0.000025876593, -0.0000011733523],
+    nd: 1.60738,
+    vd: 56.72,
+    code6: "607567",
+    source:
+      "HOYA Zemax catalog 2026-07-07 including obsolete glasses; formula 1 polynomial for BACD2, accessed 2026-10-02. https://www.hoya-opticalworld.com/common/agf/HOYA20260707_include_obsolete.agf",
+  },
+  {
     name: "NBFD265",
     vendor: "Hoya",
     polynomial: [3.6415592, -0.017833211, 0.049779099, 0.0043665512, -0.00035538803, 4.031812e-5],
@@ -1208,8 +1228,6 @@ export const HOYA_GLASS_ENTRIES: readonly GlassEntry[] = [
   },
   /* Phase 23 named-token additions (June 2026)
    * Direct records from Hoya/Ohara Zemax data mirrored by refractiveindex.info.
-   * BSC3 is resolved through the legacy Hoya E-C3 optical constants; incompatible
-   * 583/594 annotations must use their own matching catalog row instead.
    */
   {
     name: "E-FD13",

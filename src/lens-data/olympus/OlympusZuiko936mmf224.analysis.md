@@ -239,3 +239,9 @@ Patent table errata used in the transcription are: nd11 is printed without the l
 - Olympus CAMEDIA E-10 reference/specification material. Source for the marketed 9-36 mm f/2.0-2.4 lens, 14 elements in 11 groups, 62 mm filter thread, 2/3-inch CCD, and published working ranges.
 - OHARA S-TIH53, S-PHM52, S-LAH66, S-FSL5, S-TIH6, and S-LAL13 catalog datasheets.
 - HIKARI J-LAK13 datasheet and OHARA/Hoya cross-reference material for the 694532 S-LAL13 / J-LAK13 equivalence.
+
+## Image-format reference
+
+`imageFormat: "2-3-inch-type"` records the correlated E-10/E-20 camera family’s 2/3-inch CCD class, supported by [Olympus’s E-10 release listing](https://olycojp.olympus-global.com/news/imaging/2000/). Nominal frame dimensions are 8.8 × 6.6 mm; this is production-format metadata, not proof of exact patent prescription identity.
+
+At wide infinity, the current aperture-contained chief-ray edge reaches about 4.74 mm, 86% of the nominal 5.50 mm format corner. Surface 6 limits that field; the unclipped corner path would require roughly 13.30 mm radius there versus the authored 11.3 mm. The format assignment is not a claim of unvignetted production coverage.

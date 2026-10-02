@@ -46,6 +46,7 @@ const LENS_DATA = {
   focalLengthDesign: 79.9996065,
   apertureMarketing: 2.8,
   apertureDesign: 2.8,
+  lensMounts: ["graflex-xl"],
   imageFormat: "6x7",
   patentNumber: "US 2,799,207",
   patentAuthors: ["Günther Lange"],

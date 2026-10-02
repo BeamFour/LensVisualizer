@@ -83,6 +83,21 @@ describe("ElementInspector", () => {
     expect(screen.getByText("S-BSL7")).toBeTruthy();
   });
 
+  it("does not label historical source coordinates as a confirmed d line", () => {
+    render(
+      <ElementInspector
+        info={{ ...basicElement, indexReferenceNote: "Source spectral line unspecified" }}
+        L={mockLens}
+        t={mockTheme}
+        showChromatic={false}
+      />,
+    );
+    expect(screen.getByText("n (source) =")).toBeTruthy();
+    expect(screen.getByText("ν (source) =")).toBeTruthy();
+    expect(screen.getByText("Source spectral line unspecified")).toBeTruthy();
+    expect(screen.queryByText("nd =")).toBeNull();
+  });
+
   it("discloses bulk absorption on absorbing glass", () => {
     render(
       <ElementInspector

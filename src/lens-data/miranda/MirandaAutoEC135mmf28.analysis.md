@@ -140,3 +140,10 @@ No aspherical coefficients, diffractive phase data, sensor cover plate, filter, 
 6. SCHOTT. Current optical-glass catalog, used for N-SF11 coordinate comparison: https://media.schott.com/api/public/content/e13dfb26ab7e44c792ba5c12f7382f1f?download=true&v=93796fb8
 7. CDGM / 成都光明光电股份有限公司. Current optical-glass database, used for H-ZF3 and H-ZK9B coordinate comparison: https://www.cdgmgd.com/database/toWebDatabase.htm?url=database
 8. HOYA Group Optics Division, **Glass Cross Reference Index**, and Sumita Optical Glass, **Optical Glass Catalog 2024-07**, were consulted for cross-vendor coverage in the glass-coordinate audit. https://www.hoya-opticalworld.com/english/products/crossreference.html ; https://www.sumita-opt.co.jp/download_files/cn/catalog/cn-catalog-2407.pdf
+
+
+## Production mount assignment
+
+The Miranda RE-II manual, PDF pages 21–22, describes the 45° locking attachment and lists these Auto EC lenses. The assignment records the external Miranda bayonet, not the camera’s separate internal 44mm thread; diaphragm coupling varies between Miranda body generations. [Manufacturer source](https://butkus.org/chinon/miranda/miranda_re-ii/miranda_re-ii.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

@@ -173,3 +173,10 @@ No aspherical surfaces, diffractive structures, cover glass, filter plate, dummy
 5. **CDGM Optical Glass Database**, used for the retained H-ZK1 coordinate comparison: https://www.cdgmgd.com/database/toWebDatabase.htm?typeId=7&url=database
 6. **SUMITA Optical Glass** downloads, used for the retained K-LaK6 / LAK6 coordinate comparison: https://www.sumita-opt.co.jp/en/download/
 7. Additional catalog coverage recorded in the dossier: OHARA, HOYA, and HIKARI current optical-glass catalogs. Their absence from the retained class labels should not be read as evidence that they were excluded as possible historical suppliers.
+
+
+## Production mount assignment
+
+The Schneider manufacturer/distributor catalog, printed page 11, lists the exact focal-length/aperture production lens among the standard C-thread 16mm lenses. The listed Bolex RX ordering option is not assigned as a different mount. [Manufacturer source](https://www.pacificrimcamera.com/rl/00068/00068.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

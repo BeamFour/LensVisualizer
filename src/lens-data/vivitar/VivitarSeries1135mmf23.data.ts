@@ -46,6 +46,7 @@ const LENS_DATA = {
   focalLengthDesign: 135.2107,
   apertureMarketing: 2.3,
   apertureDesign: 2.3,
+  lensMounts: ["canon-fd", "nikon-f", "minolta-sr", "olympus-om"],
   imageFormat: "135-full-frame",
   patentNumber: "GB 1,408,910",
   patentAuthors: ["Ellis I. Betensky"],

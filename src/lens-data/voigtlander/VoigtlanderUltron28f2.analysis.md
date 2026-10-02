@@ -82,3 +82,10 @@ At infinity ZD18=18.40; computed d-line BFL=18.469147 and EFL=28.579770
 versus printed 28.50. All radii/gaps/indices match. Preserve the source
 image distance and documented malformed A6; no evidence establishes a
 designer best-focus plane or supplies parameters for the depicted filter.
+
+
+## Production mount assignment
+
+Cosina identifies the Vintage Line lens as VM, its Leica-M-compatible rangefinder bayonet. [Manufacturer source](https://www.cosina.co.jp/voigtlander/vm-mount/ultron-vintage-line-28mm-f2-aspherical/).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

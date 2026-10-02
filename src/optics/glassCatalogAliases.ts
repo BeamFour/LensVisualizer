@@ -139,12 +139,6 @@ export const ALIAS_RECORDS: readonly GlassAliasRecord[] = [
     note: "Hoya precision-molding preform variant sharing the M-TAFD305 coefficient set.",
   },
   {
-    alias: "BSC3",
-    target: "E-C3",
-    kind: "vendor-equivalent",
-    note: "Historical Hoya crown annotations use the 518/590 E-C3 row; incompatible barium rows stay unmatched.",
-  },
-  {
     alias: "TAF1",
     target: "S-LAH66",
     kind: "vendor-equivalent",

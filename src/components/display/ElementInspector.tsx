@@ -229,16 +229,16 @@ export default function ElementInspector({ info, L, t, showChromatic, onOpenAsph
         })()}
       </div>
       <div style={{ fontSize: 10.5, color: t.elemType, marginBottom: 5, transition: "color 0.3s" }}>{info.type}</div>
+      {info.indexReferenceNote && (
+        <div style={{ fontSize: 10.5, color: t.muted, marginBottom: 5 }}>{info.indexReferenceNote}</div>
+      )}
       <div style={INSPECTOR_GRID}>
         <div>
-          <span style={{ color: t.propLabel }}>n{indexReference} = </span>
+          <span style={{ color: t.propLabel }}>{info.indexReferenceNote ? "n (source)" : `n${indexReference}`} = </span>
           <span style={{ color: t.value }}>{info.nd}</span>
         </div>
         <div>
-          <span style={{ color: t.propLabel }}>
-            {"\u03bd"}
-            {indexReference} ={" "}
-          </span>
+          <span style={{ color: t.propLabel }}>{info.indexReferenceNote ? "ν (source)" : `ν${indexReference}`} = </span>
           <span style={{ color: t.value }}>{info.vd}</span>
         </div>
         <div>

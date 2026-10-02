@@ -34,8 +34,7 @@ import type { LensDataInput } from "../../types/optics.js";
  * ║ shared-gap intrusion, ray containment, and render-trim policy. The S15/S16 apertures are limited      ║
  * ║ by the 2.10 mm shared air gap rather than by obsolete sd/|R| or element-ratio rules.                  ║
  * ║                                                                                                      ║
- * ║ lensMounts uses the canonical fixed-lens-camera id. imageFormat is intentionally omitted because     ║
- * ║ the current taxonomy has no 2/3-inch-type id.                                                         ║
+ * ║ Format: production X10 2/3-inch type; patent correlation remains qualified.                          ║
  * ╚══════════════════════════════════════════════════════════════════════════════════════════════════════╝
  */
 
@@ -54,6 +53,7 @@ const LENS_DATA = {
 
   focalLengthMarketing: [7.1, 28.4],
   focalLengthDesign: [7.3421119019253425, 27.68224301655568],
+  imageFormat: "2-3-inch-type",
   apertureMarketing: 2,
   apertureDesign: 2.0635977497452442,
   lensMounts: ["fixed-lens-camera"],

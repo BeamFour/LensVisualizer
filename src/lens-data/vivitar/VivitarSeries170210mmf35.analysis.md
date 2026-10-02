@@ -274,3 +274,10 @@ The production owner’s manual specifies a 70–210mm f/3.5 lens with 15 elemen
 - Vivitar, *Vivitar Series 1 70mm–210mm f3.5 Macro Focusing Auto Zoom Lens — Owner’s Manual*, dated March 1975.
 - SUMITA Optical Glass, official all-glass Zemax catalog, including discontinued standard types SF1, SK5, BK1, SF11, BAF11, K5, F1, FK5, SF6, BAF9, LAFN2, and LF2.
 - HIKARI Glass Co., Ltd., official optical-glass catalog, used as an independent cross-check for current J-series equivalents where available.
+
+
+## Production mount assignment
+
+Vivitar’s service manual 3746004C / Revision D (May 1980), PDF page 6, explicitly lists seven mount configurations: universal thread, Minolta MD/SRT/SR, Canon FL/FD, Nikon F/AI, Konica Autoreflex, Olympus OM and Pentax K/M. Canon FL and FD are two catalog ids for one listed configuration. This is the first 15-element 70–210mm f/3.5 family; later f/2.8–4 models are not inferred from it. [Source](https://allphotolenses.com/public/files/pdfs/1aa8836d8ab55113cf3fd62c6b9f17cc.pdf).
+
+The assignment records the correlated production installation, not manufacturer confirmation of an exact patent-to-factory prescription.

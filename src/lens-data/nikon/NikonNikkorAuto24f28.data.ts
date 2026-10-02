@@ -95,7 +95,7 @@ const LENS_DATA = {
       nd: 1.51823,
       vd: 59.0,
       fl: -76.7,
-      glass: "BSC3 equivalent (catalog comparison; supplier unspecified)",
+      glass: "E-C3 equivalent (catalog comparison; supplier unspecified)",
       cemented: "D1",
       apd: false,
       role: "Completes first cemented doublet. Large Δn at junction (0.102) provides dispersive correction. Low-index crown in negative role.",

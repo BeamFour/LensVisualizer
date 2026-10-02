@@ -161,3 +161,10 @@ The surface-by-surface Petzval sum from the final model is +0.005139 mm⁻¹. Th
 ## Image coverage
 
 The [manufacturer brochure, page 4](https://www.pacificrimcamera.com/rl/00030/00030.pdf) specifies standard 16 mm cinema coverage. The authored 10.26 × 7.49 mm format requires a 12.70 mm diagonal; this is not a measured maximum image circle or a Super 16 claim.
+
+
+## Production mount assignment
+
+The Kinoptik brochure, PDF page 4, draws C-mount and period ARRIFLEX versions. The illustrated pre-PL cylindrical ARRIFLEX interface is recorded as ARRI Standard; a later PL conversion is not a factory variant established by this source. [Manufacturer source](https://www.pacificrimcamera.com/rl/00030/00030.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

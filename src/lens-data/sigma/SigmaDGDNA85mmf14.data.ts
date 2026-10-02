@@ -65,6 +65,8 @@ const LENS_DATA = {
   /* ── Explicit metadata fields ── */
   focalLengthMarketing: 85,
   focalLengthDesign: 82.96,
+  lensMounts: ["sony-fe", "l-mount"],
+  imageFormat: "135-full-frame",
   apertureMarketing: 1.4,
   apertureDesign: 1.46,
   patentNumber: "JP 2021-085935 A",

@@ -101,6 +101,13 @@ describe("lensTaxonomy", () => {
   it("includes image formats for the added mount families", () => {
     expect(IMAGE_FORMATS.map((format) => format.id)).toEqual(
       expect.arrayContaining([
+        "1-2.7-inch-type",
+        "1-1.8-inch-type",
+        "2-3-inch-type",
+        "1.25-inch-tube",
+        "1.5-inch-type",
+        "super-35-cinema",
+        "super-35-1.9",
         "1-2.3-inch-type",
         "1-1.7-inch-type",
         "1-inch-type",

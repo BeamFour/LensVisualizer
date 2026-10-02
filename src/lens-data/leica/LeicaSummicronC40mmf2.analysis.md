@@ -35,9 +35,9 @@ No located manufacturer document explicitly states that DE 2 222 892 Example 3 i
 f/2. The production correlation should therefore not be read as a documented factory patent assignment.
 
 The manufacturer brochure describes the LEICA CL bayonet as being of the LEICA M type, but separately states that the
-SUMMICRON-C 1:2/40 mm cannot be used on a LEICA M. The data file consequently records the 135 full-frame image format but
-leaves the mount taxonomy unset rather than collapsing that historical compatibility caveat into an ordinary Leica-M
-classification.
+SUMMICRON-C 1:2/40 mm cannot be used on a LEICA M. The data file records the 135 full-frame image format and the mechanical `leica-m` interface,
+while preserving this historical compatibility caveat. The mount tag is not a claim that every M body provides correct
+rangefinder coupling or 40mm framing for the lens.
 
 ## Optical Architecture
 
@@ -220,3 +220,10 @@ clear apertures or a claim of an unvignetted f/2 corner pupil.
    https://www.hoya-opticalworld.com/english/datadownload/index.html ; HIKARI Optical Glass,
    https://www.hikari-g.co.jp/optical_glass/catalog/ ; SUMITA Optical Glass,
    https://www.sumita-opt.co.jp/en/download/ .
+
+
+## Production mount assignment
+
+The Leitz CL instruction manual, page 25, identifies the bayonet as identical to Leica M. The CL brochure’s warning about use of the Summicron-C on M bodies concerns the production compatibility boundary; it does not create a different mechanical mount. The mount assignment retains that warning and does not certify rangefinder coupling or framelines on every M body. [Source](https://www.manualslib.com/manual/4398437/Leica-Cl.html?page=25).
+
+The assignment records the correlated production installation, not manufacturer confirmation of an exact patent-to-factory prescription.

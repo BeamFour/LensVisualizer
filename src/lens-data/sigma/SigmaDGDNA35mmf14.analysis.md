@@ -447,3 +447,14 @@ The AF actuator choice is consistent with this minimum-mass philosophy. Sigma us
 ---
 
 *Analysis completed by independent verification of the patent prescription against the production lens specifications. All numerical claims are computationally checked; all 15 patent conditional expressions reproduce to within rounding; all seven sub-group focal lengths reproduce to within 0.005 mm; the focus-element displacement reproduces the patent's tabulated value to 0.4 µm. Glass identifications are tier-tagged for confidence: high (catalog match within ±0.0005 in nd and ±0.5 in νd, vendor confirmable through multiple cross-reference sources), medium (catalog 6-digit code match, vendor inferred from family conventions), or low (no exact catalog equivalent — class characterisation only). The public FF5 curve now resolves the former L5 gap as a spectral equivalent while leaving the production supplier unspecified.*
+
+## Image-format reference
+
+`imageFormat: "135-full-frame"` follows [Sigma’s official product specifications](https://www.sigma-global.com/en/lenses/a021_35_14/), which identify the production lens as Full-frame [DG]. The format assignment does not assert production prescription identity. Native production mounts are documented separately below.
+
+
+## Production mount assignment
+
+Sigma lists Sony E and L-Mount production versions of this DG DN Art lens. [Manufacturer source](https://www.sigma-global.com/en/lenses/a021_35_14/).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

@@ -34,6 +34,8 @@ const LENS_DATA = {
 
   focalLengthMarketing: 40,
   focalLengthDesign: 41.2,
+  lensMounts: ["canon-ef", "nikon-f", "sigma-sa", "sony-fe", "l-mount"],
+  imageFormat: "135-full-frame",
   apertureMarketing: 1.4,
   apertureDesign: 1.45,
   patentNumber: "JP 2020-012952 A",

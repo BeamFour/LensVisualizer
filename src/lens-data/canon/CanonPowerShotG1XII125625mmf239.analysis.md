@@ -244,3 +244,9 @@ infinity, EFL 12.571053 differs from printed 12.84; air BFL 7.962884
 differs from printed BF 7.75 and rear reduced path 7.742205 mm.
 Paragraph 0085 explicitly calls BF paraxial. Preserve the source values
 and residual +0.220679 mm offset; this is not established designer best focus.
+
+## Image-format reference
+
+`imageFormat: "1.5-inch-type"` records the nominal 18.7 × 14.0 mm sensor envelope from [Canon’s Mark II sales sheet](https://device.report/m/a4df8e71c17310fa51e7f6b594febf20fec3401f37c55af516a88ccecd3977b1.pdf). The production camera crops this multi-aspect sensor for 3:2 and 4:3 recording. The metadata does not reconstruct those crops or replace the patent’s zoom-dependent image heights with sensor dimensions.
+
+At the modeled wide infinity station, the aperture-contained chief-ray edge reaches about 7.94 mm image height, 68% of the nominal 11.68 mm sensor-envelope corner. Surface 4 limits the edge, and the corner solve is unreachable in the present model. This is a limit of the authored optical model, not a measurement of production sensor cropping or camera performance.

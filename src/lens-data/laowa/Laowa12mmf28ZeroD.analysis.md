@@ -260,3 +260,10 @@ The corrected interpretation is internally consistent: Example 2 is a 16-element
 5. **OHARA S-FPL51 and S-BAL42 data sheets**, used for low-dispersion and barium-crown cross-vendor class checks.
 6. **CDGM H-FK61 data sheet**, used for the 497/816 ED-class equivalence check.
 7. **SCHOTT N-SF66 data sheet**, used for the 923/209 dense-flint equivalence check.
+
+
+## Production mount assignment
+
+Venus Optics lists these eight mounts for the original 12mm f/2.8 Zero-D; this is not the separate Lite or cine model. [Manufacturer source](https://www.venuslens.net/product/laowa-12mm-f2-8-zero-d/).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.

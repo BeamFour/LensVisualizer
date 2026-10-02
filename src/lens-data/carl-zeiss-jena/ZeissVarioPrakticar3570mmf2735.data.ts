@@ -161,6 +161,7 @@ const LENS_DATA = {
   focalLengthDesign: [34.998, 65.241],
   apertureMarketing: 2.7,
   apertureDesign: 2.7, // wide station; calibrated to the patent's published k = 2.7 (see header)
+  lensMounts: ["praktica-b"],
   imageFormat: "135-full-frame",
   patentNumber: "DE 3602859 A1",
   patentAuthors: ["Utz Schneider", "Volker Tautz", "Karin Holota"],

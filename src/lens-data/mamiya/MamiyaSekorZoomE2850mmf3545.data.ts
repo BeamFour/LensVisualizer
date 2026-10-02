@@ -49,6 +49,7 @@ const LENS_DATA = {
 
   focalLengthMarketing: [28, 50],
   focalLengthDesign: [28.0021, 47.5505],
+  lensMounts: ["mamiya-ze"],
   imageFormat: "135-full-frame",
   patentNumber: "JP 1981-119109 A",
   patentAuthors: ["Yusuke Nanjo"],

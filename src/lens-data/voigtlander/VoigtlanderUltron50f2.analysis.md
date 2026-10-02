@@ -65,8 +65,15 @@ Manual inspection puts the front optical radius around12.4mm versus14mm modeled,
 
 ## Limitations and Sources
 
-The source numerical example is authoritative for prescription and stop location. Semi-diameters, finite focus, production association and catalog counterparts remain qualified. Its55° useful field is not silently presented as the35mm-format diagonal. The mount taxonomy does not currently provide a Prominent-specific identifier, so none is invented.
+The source numerical example is authoritative for prescription and stop location. Semi-diameters, finite focus, production association and catalog counterparts remain qualified. Its55° useful field is not silently presented as the35mm-format diagonal. The documented Prominent production context is now recorded as `voigtlander-prominent`.
 
 - [Original US2627204 patent PDF](https://patentimages.storage.googleapis.com/b9/af/79/9003ea70ba704d/US2627204.pdf), retrieved because the local publication was missing; stored as ignored patents/US2627204.pdf. Figure3 p.2, numerical ExampleII p.6, conflicting claim4 p.9; descriptive field discussion p.5.
 - [US2627204A publication](https://patents.google.com/patent/US2627204A/en).
 - Existing local vendor-catalog entries: SUMITA K-LaK11, OHARA S-TIM6/S-BAH28 and HOYA LAC13. Their source metadata is retained in the catalog; these are coordinate proxies only.
+
+
+## Production mount assignment
+
+The Voigtländer Prominent manual identifies the Ultron 2/50 and Nokton 1.5/50 as interchangeable standard lenses and describes their quick-change bayonet. This assignment selects the documented Prominent production context, not later Cosina VM lenses. [Manufacturer source](https://butkus.org/chinon/voigtlander_pdf/prominent/voigtlander_prominent.pdf).
+
+`lensMounts` records the correlated production installation; it does not establish that the patent example is the exact factory prescription or certify every body’s mechanical, metering or rangefinder compatibility.
