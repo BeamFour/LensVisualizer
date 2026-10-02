@@ -8,13 +8,16 @@ import { ARTICLE_CONTENT } from "../../../../src/utils/content/homepageContent.j
 import { renderWithRouter } from "../../../testUtils.js";
 
 describe("ThemedMarkdown article links", () => {
-  it("opens external and lens links in a new tab while keeping internal articles in place", () => {
+  it("preserves article-to-lens referrers while keeping external links private and articles in place", () => {
     renderWithRouter(
       <ThemedMarkdown
         markdown={[
           "[Manufacturer article](https://example.com/lens-story)",
           "[Series index](/articles/manufacturer-lens-stories)",
           "[Lens diagram](/lens/example-lens)",
+          "[Lens state](/lens/example-lens?v=1#diagram)",
+          "[External lens](https://example.com/lens/example-lens)",
+          "[Article section](#section)",
         ].join("\n\n")}
         theme={themes.dark}
         variant="article"
@@ -25,8 +28,39 @@ describe("ThemedMarkdown article links", () => {
     expect(manufacturerLink.getAttribute("target")).toBe("_blank");
     expect(manufacturerLink.getAttribute("rel")).toBe("noopener noreferrer");
 
-    expect(screen.getByRole("link", { name: "Series index" }).getAttribute("target")).toBeNull();
-    expect(screen.getByRole("link", { name: "Lens diagram" }).getAttribute("target")).toBe("_blank");
+    const seriesLink = screen.getByRole("link", { name: "Series index" });
+    expect(seriesLink.getAttribute("href")).toBe("/articles/manufacturer-lens-stories/");
+    expect(seriesLink.getAttribute("target")).toBeNull();
+
+    for (const [name, href] of [
+      ["Lens diagram", "/lens/example-lens/"],
+      ["Lens state", "/lens/example-lens/?v=1#diagram"],
+    ]) {
+      const lensLink = screen.getByRole("link", { name });
+      expect(lensLink.getAttribute("href")).toBe(href);
+      expect(lensLink.getAttribute("target")).toBe("_blank");
+      expect(lensLink.getAttribute("rel")).toBe("noopener");
+      expect(lensLink.getAttribute("referrerpolicy")).toBeNull();
+    }
+
+    const externalLensLink = screen.getByRole("link", { name: "External lens" });
+    expect(externalLensLink.getAttribute("target")).toBe("_blank");
+    expect(externalLensLink.getAttribute("rel")).toBe("noopener noreferrer");
+
+    const sectionLink = screen.getByRole("link", { name: "Article section" });
+    expect(sectionLink.getAttribute("href")).toBe("#section");
+    expect(sectionLink.getAttribute("target")).toBeNull();
+  });
+
+  it("keeps the existing referrer policy for lens-description links", () => {
+    renderWithRouter(
+      <ThemedMarkdown markdown="[Related lens](/lens/example-lens)" theme={themes.dark} variant="description" />,
+    );
+
+    const descriptionLink = screen.getByRole("link", { name: "Related lens" });
+    expect(descriptionLink.getAttribute("href")).toBe("/lens/example-lens");
+    expect(descriptionLink.getAttribute("target")).toBe("_blank");
+    expect(descriptionLink.getAttribute("rel")).toBe("noopener noreferrer");
   });
 });
 

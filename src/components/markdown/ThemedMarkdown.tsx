@@ -121,8 +121,9 @@ export default function ThemedMarkdown({
         };
 
         if (article && href?.startsWith("/lens/")) {
+          /* Preserve the source article referrer while isolating the new tab. */
           return (
-            <a id={id} href={canonicalPagePath(href)} target="_blank" rel="noopener noreferrer" style={linkStyle}>
+            <a id={id} href={canonicalPagePath(href)} target="_blank" rel="noopener" style={linkStyle}>
               {children}
             </a>
           );
