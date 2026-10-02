@@ -10,8 +10,8 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 ## Summary
 
 - **858** lenses scanned
-- **1902** total code-only elements found
-- **1902** elements in this report
+- **1904** total code-only elements found
+- **1904** elements in this report
 - **305** distinct lens files affected
 
 ## Codes by Frequency
@@ -168,6 +168,7 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 930240 | 3 | 3 | patents/WO2021200206A1.pdf<br>patents/WO_2025263124_A1.pdf<br>patents/WO_2024247472_A1.pdf | All rows have review records |
 | 001254 | 2 | 2 | patents/US20220011542A1.pdf<br>patents/CN_121091494_A.pdf | No review-record hit |
 | 003193 | 2 | 2 | patents/US20220011542A1.pdf<br>patents/WO2024166548A1.pdf | No review-record hit |
+| 009291 | 2 | 2 | patents/WO2021200206A1.pdf<br>patents/JP2023039817A.pdf | All rows explicitly disposed |
 | 439950 | 2 | 2 | patents/US20180164556A1.pdf<br>patents/US8228605.pdf | No review-record hit |
 | 465658 | 2 | 1 | patents/US3481666.pdf | No review-record hit |
 | 510634 | 2 | 1 | patents/DE_927540_C.pdf | No review-record hit |
@@ -237,7 +238,6 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 850323 | 2 | 1 | patents/JPWO2017221949A1.pdf | No review-record hit |
 | 892371 | 2 | 2 | patents/US20220011542A1.pdf<br>patents/JPWO2019187633A1.pdf | No review-record hit |
 | 933209 | 2 | 2 | patents/WO2021199923A1.pdf<br>patents/JP2023039817A.pdf | All rows have review records |
-| 009291 | 1 | 1 | patents/WO2021200206A1.pdf | All rows explicitly disposed |
 | 010255 | 1 | 1 | patents/WO_2024247472_A1.pdf | All rows explicitly disposed |
 | 051269 | 1 | 1 | patents/US20210033835A1.pdf | No review-record hit |
 | 446672 | 1 | 1 | patents/US3771853.pdf | All rows explicitly disposed |
@@ -355,6 +355,7 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 682575 | 1 | 1 | patents/US7542219.pdf | All rows explicitly disposed |
 | 683309 | 1 | 1 | patents/US2983193.pdf | All rows explicitly disposed |
 | 683321 | 1 | 1 | patents/US4444473.pdf | All rows explicitly disposed |
+| 683330 | 1 | 1 | patents/US20160266350A1.pdf | All rows have review records |
 | 684316 | 1 | 1 | patents/US20100149663A1.pdf | All rows explicitly disposed |
 | 685309 | 1 | 1 | patents/US20160154221A1.pdf | All rows explicitly disposed |
 | 689313 | 1 | 1 | No patent number parsed from lens metadata | All rows explicitly disposed |
@@ -1716,6 +1717,7 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
 |---|---|---|---|---|---|---|---|
 | L6 (Element 6) | 12A | `877370 — high-index lanthanum glass (catalog unresolved; patent nd=1.87722, νd=37.0)` | 1.87722 / 37.00 | No catalog entry | abbe | patents/US20160266350A1.pdf | Reviewed sidecar hit |
+| L11 (Element 11) | 20A | `683330 — dense flint (catalog unresolved; patent nd=1.68250, νd=33.0; prior H-ZF52A label rejected)` | 1.68250 / 33.00 | No catalog entry | abbe | patents/US20160266350A1.pdf | Audit-log hit |
 
 ### [LEICA SUPER-VARIO-ELMAR-TL 11-23mm f/3.5-4.5 ASPH.](../../src/lens-data/leica/LeicaSuperVarioElmarTL1123mmf3545Asph.data.ts) - JP 2016-133764 A
 
@@ -3397,6 +3399,7 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | L61 (Element 13) | 24 | `933209 — ultra-dense flint (patent nd=1.93323, nu_d=20.9)` | 1.93323 / 20.90 | No catalog entry | abbe | patents/JP2023039817A.pdf | Audit-log hit |
 | L62 (Element 14) | 25 | `658397 — short flint (patent nd=1.65803, nu_d=39.7)` | 1.65803 / 39.70 | No catalog entry | abbe | patents/JP2023039817A.pdf | Audit-log hit |
 | L71 (Element 15) | 27 | `617443 — flint/crown-boundary glass (patent coordinate; vendor unspecified)` | 1.61669 / 44.30 | No catalog entry | abbe | patents/JP2023039817A.pdf | Audit-log hit |
+| L82 (Element 17) | 31 | `Unmatched (ultra-high-index lanthanum flint, 009/291; prior FD225 annotation rejected)` | 2.00912 / 29.10 | No catalog entry | abbe | patents/JP2023039817A.pdf | Explicit disposition in data |
 
 ### [SONY FE 70-200mm f/4 Macro G OSS II](../../src/lens-data/sony/SonyFE70200mmF4MacroGOSSII.data.ts) - WO 2024/247472 A1
 

@@ -269,7 +269,7 @@ export function extractSixDigitCodes(glassString: string): string[] {
 
 /** True when the annotation names an actual glass type (not just labels/codes). */
 export function hasActualGlassTypeToken(glassString: string): boolean {
-  const tokens = glassString.match(/[A-Za-z][A-Za-z0-9-]*\d[A-Za-z0-9]*/g) ?? [];
+  const tokens = activeGlassAnnotation(glassString).match(/[A-Za-z][A-Za-z0-9-]*\d[A-Za-z0-9]*/g) ?? [];
   return tokens.some((tokenRaw) => {
     const token = tokenRaw.toUpperCase();
     if (/^L\d+$/.test(token)) return false;
@@ -280,6 +280,19 @@ export function hasActualGlassTypeToken(glassString: string): boolean {
     if (/^F\d+$/.test(token)) return true;
     return (token.match(/[A-Z]/g) ?? []).length >= 2;
   });
+}
+
+/**
+ * Report candidates must not revive labels the annotation explicitly rejected.
+ * Remove only a named token directly qualified by rejection; preserve coordinate
+ * codes, active proxy names, and historical references with no explicit verdict.
+ * Runtime glass resolution deliberately continues to use the original annotation.
+ */
+export function activeGlassAnnotation(glassString: string): string {
+  return glassString.replace(
+    /\b[A-Za-z][A-Za-z0-9-]*\d[A-Za-z0-9]*(?:\s+(?:label|annotation|attribution))?\s+(?:(?:was|is)\s+)?(?:rejected|unsupported|not\s+coefficient-backed)\b/gi,
+    "",
+  );
 }
 
 /** True for annotations that carry only a six-digit code, no glass name. */

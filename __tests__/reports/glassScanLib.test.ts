@@ -6,6 +6,9 @@
 import { describe, expect, it } from "vitest";
 import {
   classifyMissingMaterial,
+  activeGlassAnnotation,
+  extractSixDigitCodes,
+  isCodeOnlyGlassAnnotation,
   extractPatentNumber,
   findLocalPatent,
   hasReviewRecord,
@@ -56,6 +59,38 @@ describe("patent-number matching", () => {
 });
 
 describe("opportunity classification", () => {
+  it("keeps coordinate codes without reviving explicitly rejected glass labels", () => {
+    const annotation =
+      "683330 — dense flint (catalog unresolved; patent nd=1.68250, vd=33.0; prior H-ZF52A label rejected)";
+    expect(activeGlassAnnotation(annotation)).not.toContain("H-ZF52A");
+    expect(activeGlassAnnotation(annotation)).toContain("patent nd=1.68250, vd=33.0");
+    expect(extractSixDigitCodes(activeGlassAnnotation(annotation))).toEqual(["683330"]);
+    expect(isCodeOnlyGlassAnnotation(annotation)).toBe(true);
+  });
+
+  it("filters only the rejected token, retaining a valid spectral proxy", () => {
+    for (const rejected of [
+      "H-ZF52A label rejected",
+      "S-NPH7 attribution unsupported",
+      "S-NPH85 annotation not coefficient-backed",
+      "CDGM H-ZBaF4 rejected by partial dispersion",
+    ]) {
+      const annotation = `S-LAH66 (supplier unresolved; prior ${rejected})`;
+      expect(activeGlassAnnotation(annotation)).toContain("S-LAH66");
+      expect(activeGlassAnnotation(annotation)).not.toMatch(/H-ZF52A|S-NPH7|S-NPH85|H-ZBaF4/);
+      expect(isCodeOnlyGlassAnnotation(annotation)).toBe(false);
+    }
+  });
+
+  it("preserves unresolved suppliers and historical names without an explicit rejection", () => {
+    for (const annotation of [
+      "BACD4 spectral proxy (Lenzos L-24 / historical SK4 class; production melt unresolved)",
+      "683330 (historical H-ZF52A label; unresolved attribution)",
+      "H-ZF52A label not rejected",
+    ])
+      expect(activeGlassAnnotation(annotation)).toBe(annotation);
+  });
+
   it("separates glass opportunities from resin, cement, plastic, and other optical media", () => {
     expect(classifyMissingMaterial("Element 2 synthetic-resin layer", "Proprietary optical resin")).toBe("resin");
     expect(classifyMissingMaterial("Bond layer 1", "UV-curing adhesive")).toBe("cement");
