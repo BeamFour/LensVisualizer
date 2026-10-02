@@ -15,12 +15,6 @@ import { snapToCommon } from "./comparisonSliders.js";
 import type { FocusPairResult, AperturePairResult } from "./comparisonSliders.js";
 import { SET_SHARED_FOCUS_T, SET_SHARED_STOPDOWN_T } from "./comparisonReducer.js";
 import type { LensAction } from "../types/state.js";
-import type { RuntimeLens } from "../types/optics.js";
-
-interface ComparisonLenses {
-  LA: RuntimeLens;
-  LB: RuntimeLens;
-}
 
 interface UseStickySliderResult {
   handleSharedFocusChange: (rawT: number) => void;
@@ -36,7 +30,6 @@ export default function useStickySliders(
   dispatch: Dispatch<LensAction>,
   focusPair: FocusPairResult | null,
   aperturePair: AperturePairResult | null,
-  comparisonLenses: ComparisonLenses | null,
 ): UseStickySliderResult {
   const focusStuck = useRef<boolean>(false);
   const apertureStuck = useRef<boolean>(false);
@@ -100,8 +93,7 @@ export default function useStickySliders(
           dispatch({ type: SET_SHARED_STOPDOWN_T, value: cp });
           prevStopdownT.current = cp;
           apertureStuck.current = true;
-          const { LA, LB } = comparisonLenses!;
-          triggerFlash(LA.FOPEN > LB.FOPEN ? "a" : "b");
+          if (aperturePair?.limitingPanel) triggerFlash(aperturePair.limitingPanel);
           return;
         }
       }
@@ -109,7 +101,7 @@ export default function useStickySliders(
       prevStopdownT.current = v;
       dispatch({ type: SET_SHARED_STOPDOWN_T, value: v });
     },
-    [aperturePair, comparisonLenses, triggerFlash, dispatch],
+    [aperturePair, triggerFlash, dispatch],
   );
 
   const handleFocusPointerDown = useCallback((): void => {

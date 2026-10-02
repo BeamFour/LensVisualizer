@@ -21,6 +21,11 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-02",
     type: "fix",
+    summary: "Corrected comparison aperture readouts and limit markers when zooming",
+  },
+  {
+    date: "2026-10-02",
+    type: "fix",
     summary: "Improved lens search for focal lengths and f-numbers, including equivalent notation and zoom endpoints",
   },
   {

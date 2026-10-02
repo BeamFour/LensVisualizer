@@ -60,6 +60,9 @@ describe("ComparisonLayout", () => {
         aperturePair: {
           stopdownA: 0.2,
           stopdownB: 0.6,
+          fNumberA: 2,
+          fNumberB: 2,
+          limitingPanel: "b",
           commonPoint: 0.3,
           widerFOPEN: 1.4,
           narrowerFOPEN: 2,
@@ -144,6 +147,9 @@ describe("ComparisonLayout", () => {
       aperturePair: {
         stopdownA: 0,
         stopdownB: 0,
+        fNumberA: 2,
+        fNumberB: 2.8,
+        limitingPanel: "b",
         commonPoint: 0,
         widerFOPEN: 2,
         narrowerFOPEN: 2.8,
@@ -187,6 +193,9 @@ describe("ComparisonLayout", () => {
         aperturePair: {
           stopdownA: 0.1,
           stopdownB: 0.3,
+          fNumberA: 2.8,
+          fNumberB: 2.8,
+          limitingPanel: "b",
           commonPoint: 0.2,
           widerFOPEN: 2,
           narrowerFOPEN: 2.8,

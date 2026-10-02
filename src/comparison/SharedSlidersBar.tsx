@@ -30,7 +30,7 @@
 
 import { formatSharedFocusDist, sharedFNumber } from "./comparisonSliders.js";
 import type { FocusPairResult, AperturePairResult, ZoomPairResult, MovementPairResult } from "./comparisonSliders.js";
-import { formatDist, eflAtZoom } from "../optics/optics.js";
+import { formatDist, formatFNumber, eflAtZoom } from "../optics/optics.js";
 import { getGroupMovementAvailability } from "../optics/groupMovement.js";
 import { isMovementAxisEnabled } from "../optics/lensMovement.js";
 import { snapToZeroStop } from "../utils/style/sliderStops.js";
@@ -107,8 +107,9 @@ export default function SharedSlidersBar({
   isWide,
 }: SharedSlidersBarProps) {
   const { commonPoint: focusCP, minCloseFocus } = focusPair;
-  const { commonPoint: apertureCP, widerFOPEN, sharedMaxFstop } = aperturePair;
+  const { commonPoint: apertureCP, widerFOPEN, sharedMaxFstop, fNumberA, fNumberB } = aperturePair;
   const fNum = sharedFNumber(sharedStopdownT, widerFOPEN, sharedMaxFstop);
+  const apertureLimited = Math.abs(fNumberA - fNum) > 0.005 || Math.abs(fNumberB - fNum) > 0.005;
   const focusDistStr = formatSharedFocusDist(sharedFocusT, minCloseFocus);
   /* Only show the common-point marker when it falls in a visible range
    * (not at the extreme ends of the slider where it would be meaningless) */
@@ -370,31 +371,39 @@ export default function SharedSlidersBar({
         <SharedSliderSection
           theme={t}
           label="APERTURE"
-          valueLabel={`f/${fNum < 10 ? fNum.toFixed(1) : Math.round(fNum)}`}
-          minLabel={`f/${widerFOPEN.toFixed(1)}`}
-          maxLabel={`f/${sharedMaxFstop}`}
+          valueLabel={`${apertureLimited ? "Requested " : ""}f/${formatFNumber(fNum)}`}
+          minLabel={`f/${formatFNumber(widerFOPEN)}`}
+          maxLabel={`f/${formatFNumber(sharedMaxFstop)}`}
           sliderValue={sharedStopdownT}
           onSliderChange={onSharedStopdownChange}
           onPointerDown={onAperturePointerDown}
           onPointerUp={onSliderPointerUp}
           markerPositions={showApertureCP ? [apertureCP] : []}
           readouts={
-            <SharedFStopQuickSelect
-              fstopSeriesA={LA.fstopSeries}
-              fstopSeriesB={LB.fstopSeries}
-              widerFopen={widerFOPEN}
-              sharedMaxFstop={sharedMaxFstop}
-              currentFNumber={fNum}
-              onSelect={quickStopSelect}
-            />
+            <div>
+              {apertureLimited && (
+                <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+                  <span>A: f/{formatFNumber(fNumberA)}</span>
+                  <span>B: f/{formatFNumber(fNumberB)}</span>
+                </div>
+              )}
+              <SharedFStopQuickSelect
+                fstopSeriesA={LA.fstopSeries}
+                fstopSeriesB={LB.fstopSeries}
+                widerFopen={widerFOPEN}
+                sharedMaxFstop={sharedMaxFstop}
+                currentFNumber={fNum}
+                onSelect={quickStopSelect}
+              />
+            </div>
           }
           footer={
             <>
               {showEffectiveAperture &&
-                (Math.abs(effectiveFNumA - fNum) > 0.05 || Math.abs(effectiveFNumB - fNum) > 0.05) && (
+                (Math.abs(effectiveFNumA - fNumberA) > 0.05 || Math.abs(effectiveFNumB - fNumberB) > 0.05) && (
                   <div style={{ marginTop: 6, display: "flex", gap: 16, fontSize: 9, color: t.spacingVal }}>
-                    <span>A eff. f/{effectiveFNumA < 10 ? effectiveFNumA.toFixed(1) : Math.round(effectiveFNumA)}</span>
-                    <span>B eff. f/{effectiveFNumB < 10 ? effectiveFNumB.toFixed(1) : Math.round(effectiveFNumB)}</span>
+                    <span>A eff. f/{formatFNumber(effectiveFNumA)}</span>
+                    <span>B eff. f/{formatFNumber(effectiveFNumB)}</span>
                   </div>
                 )}
               <button

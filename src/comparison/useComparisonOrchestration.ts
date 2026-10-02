@@ -10,7 +10,7 @@
 
 import { useCallback, useEffect, useRef, type Dispatch } from "react";
 import type { NavigateFunction } from "react-router";
-import useComparisonMode, { isComparisonOk, type ComparisonLensesResult } from "./useComparisonMode.js";
+import useComparisonMode, { type ComparisonLensesResult } from "./useComparisonMode.js";
 import useStickySliders from "./useStickySliders.js";
 import {
   SET_SHARED_STOPDOWN_T,
@@ -94,7 +94,7 @@ export default function useComparisonOrchestration({
     flashPanel,
     resetSticky,
     prevStopdownT,
-  } = useStickySliders(dispatch, focusPair, aperturePair, comparisonLenses as Parameters<typeof useStickySliders>[3]);
+  } = useStickySliders(dispatch, focusPair, aperturePair);
 
   const handleSharedShiftChange = useCallback(
     (value: number) => dispatch({ type: SET_SHARED_SHIFT_MM, value }),
@@ -107,19 +107,12 @@ export default function useComparisonOrchestration({
 
   /* ── Set default aperture to slowest lens wide-open when entering comparison ── */
   useEffect(() => {
-    if (!justEnteredCompare.current || !isComparisonOk(comparisonLenses)) return;
+    if (!justEnteredCompare.current || !aperturePair) return;
     justEnteredCompare.current = false;
-    const { LA, LB } = comparisonLenses;
-    const widerFOPEN = Math.min(LA.FOPEN, LB.FOPEN);
-    const narrowerFOPEN = Math.max(LA.FOPEN, LB.FOPEN);
-    const sharedMaxFstop = Math.max(LA.maxFstop, LB.maxFstop);
-    const cp =
-      Math.abs(widerFOPEN - narrowerFOPEN) < 0.01
-        ? 0
-        : Math.log(narrowerFOPEN / widerFOPEN) / Math.log(sharedMaxFstop / widerFOPEN);
+    const cp = aperturePair.commonPoint;
     prevStopdownT.current = cp;
     dispatch({ type: SET_SHARED_STOPDOWN_T, value: cp });
-  }, [comparisonLenses, dispatch, prevStopdownT]);
+  }, [aperturePair, dispatch, prevStopdownT]);
 
   /* ── Enter/exit comparison mode ── */
   const toggleCompare = useCallback(() => {

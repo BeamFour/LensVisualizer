@@ -107,6 +107,41 @@ describe("computeAperturePair", () => {
     expect(r.commonPoint).toBe(0);
     expect(r.stopdownA).toBeCloseTo(r.stopdownB, 5);
   });
+
+  it("moves the zoom limit marker without changing the request scale or panel slider positions", () => {
+    const a = { ...lensA, FOPEN: 2, isZoom: true, zoomFOPENs: [2, 8] } as RuntimeLens;
+    const b = { ...lensB, FOPEN: 4, isZoom: true, zoomFOPENs: [4, 10] } as RuntimeLens;
+    const requestedT = Math.log(8 / 2) / Math.log(16 / 2);
+    const wide = computeAperturePair(requestedT, a, b, 0, 0);
+    const tele = computeAperturePair(requestedT, a, b, 1, 1);
+    expect(wide.fNumberA).toBeCloseTo(8, 10);
+    expect(wide.fNumberB).toBeCloseTo(8, 10);
+    expect(tele.fNumberA).toBeCloseTo(8, 10);
+    expect(tele.fNumberB).toBeCloseTo(10, 10);
+    expect(tele.stopdownA).toBe(wide.stopdownA);
+    expect(tele.stopdownB).toBe(wide.stopdownB);
+    expect(tele.widerFOPEN).toBe(wide.widerFOPEN);
+    expect(sharedFNumber(tele.commonPoint, tele.widerFOPEN, tele.sharedMaxFstop)).toBeCloseTo(10, 10);
+    expect(tele.commonPoint).toBeGreaterThan(wide.commonPoint);
+    expect(tele.limitingPanel).toBe("b");
+  });
+
+  it("tracks which lens limits the aperture when their zoom schedules cross", () => {
+    const a = { ...lensA, FOPEN: 2, isZoom: true, zoomFOPENs: [2, 8] } as RuntimeLens;
+    const b = { ...lensB, FOPEN: 4 } as RuntimeLens;
+    expect(computeAperturePair(0, a, b, 0, 0).limitingPanel).toBe("b");
+    expect(computeAperturePair(0, a, b, 1, 0).limitingPanel).toBe("a");
+  });
+
+  it("reports each stopped-down limit and omits a marker for disjoint or fixed ranges", () => {
+    const a = { ...lensA, FOPEN: 2, maxFstop: 8 } as RuntimeLens;
+    const b = { ...lensB, FOPEN: 10, maxFstop: 16 } as RuntimeLens;
+    const pair = computeAperturePair(1, a, b);
+    expect([pair.fNumberA, pair.fNumberB]).toEqual([8, 16]);
+    expect(pair.commonPoint).toBe(0);
+    const fixed = { ...a, maxFstop: 2 };
+    expect(computeAperturePair(0, fixed, fixed).commonPoint).toBe(0);
+  });
 });
 
 describe("formatSharedFocusDist", () => {

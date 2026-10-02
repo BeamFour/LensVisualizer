@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import SharedSlidersBar from "../../../src/comparison/SharedSlidersBar.js";
 import themes from "../../../src/utils/theme/themes.js";
 import type { RuntimeLens } from "../../../src/types/optics.js";
+import { computeAperturePair } from "../../../src/comparison/comparisonSliders.js";
 import type {
   AperturePairResult,
   FocusPairResult,
@@ -36,6 +37,9 @@ const focusPair: FocusPairResult = {
 const aperturePair: AperturePairResult = {
   stopdownA: 0.2,
   stopdownB: 0.4,
+  fNumberA: 2.1,
+  fNumberB: 2.2,
+  limitingPanel: "b",
   commonPoint: 0.35,
   widerFOPEN: 1.4,
   narrowerFOPEN: 2,
@@ -48,6 +52,9 @@ function renderSharedSliders({
   zoomPair = null,
   movementPair = null,
   sharedZoomT = 0.5,
+  sharedStopdownT = 0.3,
+  currentAperturePair = aperturePair,
+  isWide = true,
   sharedShiftMm = 0,
   sharedTiltDeg = 0,
   showEffectiveFocalLength = false,
@@ -73,6 +80,9 @@ function renderSharedSliders({
   zoomPair?: ZoomPairResult | null;
   movementPair?: MovementPairResult | null;
   sharedZoomT?: number;
+  sharedStopdownT?: number;
+  currentAperturePair?: AperturePairResult;
+  isWide?: boolean;
   sharedShiftMm?: number;
   sharedTiltDeg?: number;
   showEffectiveFocalLength?: boolean;
@@ -99,7 +109,7 @@ function renderSharedSliders({
         LA={LA}
         LB={LB}
         sharedFocusT={0.25}
-        sharedStopdownT={0.3}
+        sharedStopdownT={sharedStopdownT}
         sharedZoomT={sharedZoomT}
         sharedShiftMm={sharedShiftMm}
         sharedTiltDeg={sharedTiltDeg}
@@ -112,7 +122,7 @@ function renderSharedSliders({
         onAperturePointerDown={onAperturePointerDown}
         onSliderPointerUp={onSliderPointerUp}
         focusPair={focusPair}
-        aperturePair={aperturePair}
+        aperturePair={currentAperturePair}
         zoomPair={zoomPair}
         movementPair={movementPair}
         dynamicEflA={dynamicEflA}
@@ -125,7 +135,7 @@ function renderSharedSliders({
         onToggleEffectiveAperture={onToggleEffectiveAperture}
         onOpenGroupMovement={onOpenGroupMovement}
         theme={themes.dark}
-        isWide={true}
+        isWide={isWide}
       />,
     ),
     callbacks: {
@@ -146,6 +156,53 @@ function renderSharedSliders({
 
 describe("SharedSlidersBar", () => {
   afterEach(() => cleanup());
+
+  it.each([true, false])("shows actual apertures independently of the effective toggle (wide layout: %s)", (isWide) => {
+    const LA = lens({ FOPEN: 2, isZoom: true, zoomFOPENs: [2, 7.2], zoomPositions: [50, 100], zoomEFLs: [50, 100] });
+    const LB = lens({ FOPEN: 4, isZoom: true, zoomFOPENs: [4, 9.18], zoomPositions: [50, 100], zoomEFLs: [50, 100] });
+    const sharedStopdownT = Math.log(8 / 2) / Math.log(16 / 2);
+    renderSharedSliders({
+      LA,
+      LB,
+      isWide,
+      sharedStopdownT,
+      currentAperturePair: computeAperturePair(sharedStopdownT, LA, LB, 1, 1),
+      zoomPair: { zoomA: 1, zoomB: 1, showZoom: true },
+      showEffectiveAperture: false,
+      effectiveFNumA: 8,
+      effectiveFNumB: 9.18,
+    });
+    expect(screen.getByText("Requested f/8.0")).toBeTruthy();
+    expect(screen.getByText("A: f/8.0")).toBeTruthy();
+    expect(screen.getByText("B: f/9.18")).toBeTruthy();
+    expect(screen.queryByText(/A eff\./)).toBeNull();
+  });
+
+  it("does not present a zoom limit as a close-focus effective-aperture correction", () => {
+    const LA = lens({ FOPEN: 2 });
+    const LB = lens({ FOPEN: 4 });
+    renderSharedSliders({
+      LA,
+      LB,
+      sharedStopdownT: 0,
+      currentAperturePair: computeAperturePair(0, LA, LB),
+      effectiveFNumA: 2,
+      effectiveFNumB: 4,
+      showEffectiveAperture: true,
+    });
+    expect(screen.getByText("B: f/4.0")).toBeTruthy();
+    expect(screen.queryByText(/A eff\./)).toBeNull();
+  });
+
+  it("shows one aperture when both lenses can reach the request", () => {
+    const LA = lens({ FOPEN: 2 });
+    const LB = lens({ FOPEN: 4 });
+    const sharedStopdownT = Math.log(11 / 2) / Math.log(16 / 2);
+    renderSharedSliders({ LA, LB, sharedStopdownT, currentAperturePair: computeAperturePair(sharedStopdownT, LA, LB) });
+    expect(screen.queryByText(/Requested f/)).toBeNull();
+    expect(screen.queryByText(/A: f\//)).toBeNull();
+    expect(screen.getAllByText("f/11").length).toBeGreaterThan(0);
+  });
 
   it("renders focus and aperture controls without zoom for two primes", () => {
     const { callbacks } = renderSharedSliders();

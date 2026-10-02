@@ -8,7 +8,8 @@
 
 import { closeFocusAtZoom } from "../optics/focusDistance.js";
 import type { RuntimeLens } from "../types/optics.js";
-import { FOCUS_INFINITY_THRESHOLD } from "../optics/optics.js";
+import { FOCUS_INFINITY_THRESHOLD, fopenAtZoom } from "../optics/optics.js";
+import { fNumberAtStopdown } from "../optics/aperture.js";
 import { clampLensMovement, perspectiveControlSteps } from "../optics/lensMovement.js";
 import { snapToStop } from "../utils/style/sliderStops.js";
 
@@ -23,8 +24,13 @@ export interface FocusPairResult {
 export interface AperturePairResult {
   stopdownA: number;
   stopdownB: number;
+  fNumberA: number;
+  fNumberB: number;
+  limitingPanel: "a" | "b" | null;
   commonPoint: number;
+  /** Fixed request-scale origin, independent of the current zoom positions. */
   widerFOPEN: number;
+  /** Slower of the two current-zoom wide-open apertures. */
   narrowerFOPEN: number;
   sharedMaxFstop: number;
 }
@@ -86,9 +92,17 @@ export function computeFocusPair(
  * sharedT: 0 = fastest lens wide open, 1 = max stopped down
  * The "common point" is where the slower lens reaches its wide-open aperture.
  */
-export function computeAperturePair(sharedT: number, LA: RuntimeLens, LB: RuntimeLens): AperturePairResult {
+export function computeAperturePair(
+  sharedT: number,
+  LA: RuntimeLens,
+  LB: RuntimeLens,
+  zoomA = 0,
+  zoomB = 0,
+): AperturePairResult {
   const widerFOPEN: number = Math.min(LA.FOPEN, LB.FOPEN);
-  const narrowerFOPEN: number = Math.max(LA.FOPEN, LB.FOPEN);
+  const fopenA = fopenAtZoom(zoomA, LA);
+  const fopenB = fopenAtZoom(zoomB, LB);
+  const narrowerFOPEN = Math.max(fopenA, fopenB);
   const sharedMaxFstop: number = Math.max(LA.maxFstop, LB.maxFstop);
 
   /* Shared f-number at this slider position (logarithmic interpolation) */
@@ -98,13 +112,24 @@ export function computeAperturePair(sharedT: number, LA: RuntimeLens, LB: Runtim
   const stopdownA: number = fToStopdownT(fShared, LA.FOPEN, LA.maxFstop);
   const stopdownB: number = fToStopdownT(fShared, LB.FOPEN, LB.maxFstop);
 
-  /* Common point: where the slower lens just reaches its wide-open aperture (stopdownT = 0) */
+  /* Keep the request scale stable while moving the marker to the current zoom limit.
+   * No marker is meaningful when the lenses have no overlapping aperture range. */
   const commonPoint: number =
-    Math.abs(widerFOPEN - narrowerFOPEN) < 0.01
+    sharedMaxFstop <= widerFOPEN || narrowerFOPEN > Math.min(LA.maxFstop, LB.maxFstop)
       ? 0
       : Math.log(narrowerFOPEN / widerFOPEN) / Math.log(sharedMaxFstop / widerFOPEN);
 
-  return { stopdownA, stopdownB, commonPoint, widerFOPEN, narrowerFOPEN, sharedMaxFstop };
+  return {
+    stopdownA,
+    stopdownB,
+    fNumberA: fNumberAtStopdown(stopdownA, zoomA, LA),
+    fNumberB: fNumberAtStopdown(stopdownB, zoomB, LB),
+    limitingPanel: Math.abs(fopenA - fopenB) < 0.01 ? null : fopenA > fopenB ? "a" : "b",
+    commonPoint,
+    widerFOPEN,
+    narrowerFOPEN,
+    sharedMaxFstop,
+  };
 }
 
 /**

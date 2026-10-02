@@ -57,7 +57,7 @@ describe("useComparisonOrchestration", () => {
       comparisonLenses: comparing ? comparisonLenses : null,
       scaleRatios: null,
       focusPair: null,
-      aperturePair: null,
+      aperturePair: comparing ? { commonPoint: Math.log(2.8 / 1.4) / Math.log(22 / 1.4) } : null,
       zoomPair: null,
       movementPair: null,
       handleHeaderHeight: vi.fn(),

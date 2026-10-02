@@ -72,6 +72,11 @@ function renderHeader(overrides: Partial<ComponentProps<typeof DiagramHeader>> =
 }
 
 describe("DiagramHeader", () => {
+  it("preserves the same aperture precision as the sliders", () => {
+    renderHeader({ compact: true, fNumber: 9.18 });
+    expect(screen.getByText("f/9.18")).toBeTruthy();
+    expect(screen.queryByText("f/9.2")).toBeNull();
+  });
   it("renders desktop title, Flickr link, specs, and control groups", () => {
     renderHeader();
 
