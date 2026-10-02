@@ -154,8 +154,8 @@ and families. Explicit focused-map and source links remain available. Keyboard n
 replacement heading without scrolling; pointer navigation leaves page focus alone.
 The page owns selection history and camera intent; see [Routing and content](routing-and-content.md#pages-and-routes)
 for the fragment, hydration, and Back/Forward contract.
-The page currently exposes Full map only. `ENABLE_UNIVERSAL_MAP_EXTRA_VIEWS` in `src/utils/featureFlags.ts` defaults to
-false; enabling it adds Explore (then the default), Full map, and Research tabs with shared selection and filters.
+`ENABLE_UNIVERSAL_MAP_EXTRA_VIEWS` in `src/utils/featureFlags.ts` defaults to true, exposing Explore (the default),
+Full map, and Research tabs with shared selection and filters. It can be disabled to expose Full map only.
 When disabled, Explore/Research are not mounted, path queries do not run, and their saved URL views fall back to Full map
 without rewriting the fragment. Hidden features are omitted from the page's introduction and help.
 `ENABLE_REVISED_UNIVERSAL_MAP` independently defaults to true and controls the Full map presentation described above.
