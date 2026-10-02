@@ -13,7 +13,7 @@
  */
 
 import summariesJson from "../../generated/lens-summaries.json";
-import buildMeta from "../../generated/build-metadata.json";
+import buildMeta from "../../generated/client-metadata.json";
 import type { OpticalConfigurationData } from "../../types/optics.js";
 import type { LensMountId, ImageFormatId } from "./lensTaxonomy.js";
 

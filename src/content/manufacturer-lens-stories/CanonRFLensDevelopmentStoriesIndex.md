@@ -52,13 +52,16 @@ Canon's corporate technology library contains two more substantial RF lens-devel
 
 ## Canon Lens History
 
-Canon's RF Lens World also hosts a [lens history timeline](https://personal.canon.jp/product/camera/rf/rf-lensworld/history) running from the 1946 Serenar 50mm F3.5 to the 2026 RF7–14mm fisheye zoom. Each milestone pairs a lens with the advance it introduced — fluorite elements, ground aspherics, image stabilization, diffractive optics, subwavelength and fluorine coatings, and the recent power-zoom designs. The page is Japanese-language.
+Canon's RF Lens World also hosts a [lens history timeline](https://personal.canon.jp/product/camera/rf/rf-lensworld/history) running from the 1946 Serenar 50mm F3.5 to the 2026 RF fisheye and power-zoom designs. Each milestone pairs a lens with the advance it introduced — fluorite elements, ground aspherics, image stabilization, diffractive optics, subwavelength and fluorine coatings, and the recent power-zoom designs. The page is Japanese-language.
 
 The following milestones have exact catalog matches. Years follow Canon's timeline.
 
 | Year | Milestone lens | Surface & Stop |
 | --- | --- | --- |
+| 2025 | RF-S14–30mm F4–6.3 IS STM PZ | [RF-S14–30mm F4–6.3 IS STM PZ](/lens/canon-rf-s14-30f4-63-is-stm-pz) |
 | 2023 | RF24–105mm F2.8 L IS USM Z | [RF24–105mm F2.8 L Z](/lens/canon-rf24-105f28z) |
+| 2023 | RF200–800mm F6.3–9 IS USM | [RF200–800mm F6.3–9 IS USM](/lens/canon-rf-200-800-f63-9-is-usm) |
+| 2023 | RF10–20mm F4 L IS STM | [RF10–20mm F4 L IS STM](/lens/canon-rf-10-20-f4-l-is-stm) |
 | 2022 | RF135mm F1.8 L IS USM | [RF135mm F1.8 L](/lens/canon-rf-135f18) |
 | 2021 | RF100mm F2.8 L MACRO IS USM | [RF100mm F2.8 L MACRO](/lens/canon-rf100f28-macro) |
 | 2018 | EF400mm F2.8 L IS III USM and EF600mm F4 L IS III USM | [EF400mm F2.8 L IS III](/lens/canon-ef-400mm-f28l-is-iii-usm) · [EF600mm F4 L IS III](/lens/canon-ef-600f4l-is-iii-usm) |

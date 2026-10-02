@@ -20,6 +20,23 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-02",
+    type: "fix",
+    summary: "Improved lens search for focal lengths and f-numbers, including equivalent notation and zoom endpoints",
+  },
+  {
+    date: "2026-10-02",
+    type: "improvement",
+    summary:
+      "Reduced browser downloads by trimming display metadata and separating viewer help from the article registry",
+  },
+  {
+    date: "2026-10-02",
+    type: "improvement",
+    summary:
+      "Added collapsible comparison details, a compact desktop toolbar, and scrolling that preserves diagram space",
+  },
+  {
+    date: "2026-10-02",
     type: "improvement",
     summary: "Filled 40 missing lens mounts and added historical and cinema mount families",
   },

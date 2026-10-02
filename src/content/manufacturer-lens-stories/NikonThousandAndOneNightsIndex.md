@@ -20,7 +20,7 @@ Nikon does not display a publication date on the current index or individual Eng
 | No. 97 | [New Nikkor 50mm F1.4S](https://imaging.nikon.com/imaging/information/story/0097/) | — |
 | No. 96 | [Nikkor-H Auto 85mm F1.8](https://imaging.nikon.com/imaging/information/story/0096/) | — |
 | No. 95 | [Micro-NIKKOR C 5cm F3.5](https://imaging.nikon.com/imaging/information/story/0095/) | — |
-| No. 94 | [Nikon Mini AF600QD / Lite-Touch AF](https://imaging.nikon.com/imaging/information/story/0094/) | — |
+| No. 94 | [Nikon Mini AF600QD / Lite-Touch AF](https://imaging.nikon.com/imaging/information/story/0094/) | [AF600 / AF600 QD 28mm f/3.5](/lens/nikon-af600-28mm-f35) |
 | No. 93 | [Ai AF Zoom Nikkor 24–50mm F3.3–4.5S](https://imaging.nikon.com/imaging/information/story/0093/) | — |
 | No. 92 | [Ai Zoom Nikkor ED 50–300mm F4.5](https://imaging.nikon.com/imaging/information/story/0092/) | [AI Zoom-Nikkor ED 50–300mm](/lens/nikon-ai-zoom-nikkor-ed-50-300-f45) |
 | No. 91 | [Nikon Series E Zoom 36–72mm f/3.5](https://imaging.nikon.com/imaging/information/story/0091/) | [Series E Zoom 36–72mm](/lens/nikon-series-e-zoom-36-72mm-f35) |
@@ -40,7 +40,7 @@ Nikon does not display a publication date on the current index or individual Eng
 | No. 77 | [Nikkor-S 50mm f/1.4](https://imaging.nikon.com/imaging/information/story/0077/) | — |
 | No. 76 | [Nikon Series E 135mm f/2.8](https://imaging.nikon.com/imaging/information/story/0076/) | [Series E 135mm f/2.8](/lens/nikon-series-e-135mm-f28) |
 | No. 75 | [IX-Nikkor 20–60mm f/3.5–5.6](https://imaging.nikon.com/imaging/information/story/0075/) | — |
-| No. 74 | [AI AF Micro-Nikkor 60mm f/2.8S](https://imaging.nikon.com/imaging/information/story/0074/) | — |
+| No. 74 | [AI AF Micro-Nikkor 60mm f/2.8S](https://imaging.nikon.com/imaging/information/story/0074/) | [AF Micro-Nikkor 60mm f/2.8D — 1993 update discussed in the tale](/lens/nikon-af-micro-nikkor-60mm-f28d) |
 | No. 73 | [Nikon Teleconverter TC-1 2×](https://imaging.nikon.com/imaging/information/story/0073/) | — |
 | No. 72 | [AI AF Micro-Nikkor 105mm f/2.8S](https://imaging.nikon.com/imaging/information/story/0072/) | [AI AF Micro-Nikkor 105mm f/2.8S](/lens/nikon-ai-af-micro-nikkor-105mm-f28s) |
 | No. 71 | [AI Zoom-Nikkor 35–105mm f/3.5–4.5S](https://imaging.nikon.com/imaging/information/story/0071/) | [AI Zoom-Nikkor 35–105mm](/lens/nikon-ai-zoom-nikkor-35-105mm-f3-5-4-5s) |
@@ -92,14 +92,14 @@ Nikon does not display a publication date on the current index or individual Eng
 | No. 25 | [Ai Micro Nikkor 55mm F2.8, first part](https://imaging.nikon.com/imaging/information/story/0025/) | [AI Micro-Nikkor 55mm f/2.8](/lens/nikon-ai-micro-nikkor-55f28) |
 | No. 24 | [Converter lenses for COOLPIX 4300](https://imaging.nikon.com/imaging/information/story/0024/) | — |
 | No. 23 | [AI AF Nikkor 80mm F2.8S](https://imaging.nikon.com/imaging/information/story/0023/) | — |
-| No. 22 | [COOLPIX 4300](https://imaging.nikon.com/imaging/information/story/0022/) | — |
+| No. 22 | [COOLPIX 4300](https://imaging.nikon.com/imaging/information/story/0022/) | [COOLPIX 4300 8–24mm](/lens/nikon-zoom-nikkor-8-24-f28-49-coolpix-4300) · [COOLPIX SQ 5.6–16.8mm — comparison design in Fig. 2](/lens/nikon-zoom-nikkor-56-168-f27-48-coolpix-sq) |
 | No. 21 | [Nikkor-T 10.5cm F4](https://imaging.nikon.com/imaging/information/story/0021/) | — |
 | No. 20 | [Nikkor Auto 20mm f/4 from New Nikkor-UD Auto 20mm f/3.5](https://imaging.nikon.com/imaging/information/story/0020/) | — |
 | No. 19 | [Nikkor-S·C 8.5cm F1.5](https://imaging.nikon.com/imaging/information/story/0019/) | — |
 | No. 18 | [AF Zoom-Micro Nikkor ED 70–180mm F4.5–5.6D](https://imaging.nikon.com/imaging/information/story/0018/) | [AF Zoom-Micro 70–180mm](/lens/nikon-af-zoom-micro-70-180mm-f45-56d) |
 | No. 17 | [New PC-Nikkor 28mm F4](https://imaging.nikon.com/imaging/information/story/0017/) | — |
 | No. 16 | [AI Noct Nikkor 58mm F1.2](https://imaging.nikon.com/imaging/information/story/0016/) | — |
-| No. 15 | [New Zoom Nikkor 28–45mm F4.5](https://imaging.nikon.com/imaging/information/story/0015/) | — |
+| No. 15 | [New Zoom Nikkor 28–45mm F4.5](https://imaging.nikon.com/imaging/information/story/0015/) | [Zoom-Nikkor 28–45mm f/4.5](/lens/nikon-zoom-nikkor-28-45f45) |
 | No. 14 | [NIKKOR-N Auto 24mm F2.8](https://imaging.nikon.com/imaging/information/story/0014/) | [NIKKOR-N Auto 24mm F2.8](/lens/nikkor-24f28) |
 | No. 13 | [New Reflex-Nikkor 500mm F8](https://imaging.nikon.com/imaging/information/story/0013/) | [New Reflex-Nikkor 500mm F8](/lens/nikon-reflex-nikkor-500mm-f8-new) |
 | No. 12 | [NIKKOR-H Auto 2.8cm F3.5](https://imaging.nikon.com/imaging/information/story/0012/) | [NIKKOR-H Auto 2.8cm F3.5](/lens/nikon-nikkor-h-auto-28mm-f35) |
@@ -114,6 +114,8 @@ Nikon does not display a publication date on the current index or individual Eng
 | No. 3 | [W-Nikkor 3.5cm F1.8](https://imaging.nikon.com/imaging/information/story/0003/) | [W-Nikkor 3.5cm F1.8](/lens/nikon-w-nikkor-35mm-f18) |
 | No. 2 | [AI Nikkor 50mm F2](https://imaging.nikon.com/imaging/information/story/0002/) | — |
 | No. 1 | [NIKKOR-O 2.1cm F4](https://imaging.nikon.com/imaging/information/story/0001/) | [NIKKOR-O 2.1cm F4](/lens/nikon-nikkor-o-21mm-f4) |
+
+Tale 74 distinguishes the original 1989 S version from its 1993 D update, which added an absolute distance encoder; the catalog link points to that D version. Tale 22 illustrates both the COOLPIX 4300 lens and the COOLPIX SQ lens, so both are linked with their roles identified.
 
 ## Nikon Research Reports
 

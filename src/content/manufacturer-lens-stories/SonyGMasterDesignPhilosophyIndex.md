@@ -25,7 +25,7 @@ Installments are numbered 001 through 012 and are listed here newest first. Sony
 | 010 | FE 600mm F4 GM OSS | [Read at Sony](https://www.sony.jp/ichigan/a-universe/g-master/010/) | — |
 | 009 | FE 135mm F1.8 GM | [Read at Sony](https://www.sony.jp/ichigan/a-universe/g-master/009/) | [FE 135mm F1.8 GM](/lens/sony-fe-135-f18-gm) |
 | 008 | FE 24mm F1.4 GM | [Read at Sony](https://www.sony.jp/ichigan/a-universe/g-master/008/) | [FE 24mm F1.4 GM](/lens/sony-fe-24mm-f14-gm) |
-| 007 | FE 400mm F2.8 GM OSS | [Read at Sony](https://www.sony.jp/ichigan/a-universe/g-master/007/) | — |
+| 007 | FE 400mm F2.8 GM OSS | [Read at Sony](https://www.sony.jp/ichigan/a-universe/g-master/007/) | [FE 400mm F2.8 GM OSS](/lens/sony-fe-400mm-f28-gm-oss) |
 | 006 | FE 16–35mm F2.8 GM | [Read at Sony](https://www.sony.jp/ichigan/a-universe/g-master/006/) | — |
 | 005 | FE 100mm F2.8 STF GM OSS | [Read at Sony](https://www.sony.jp/ichigan/a-universe/g-master/005/) | — |
 | 004 | FE 100–400mm F4.5–5.6 GM OSS | [Read at Sony](https://www.sony.jp/ichigan/a-universe/g-master/004/) | — |
@@ -43,6 +43,6 @@ One G Master optical-design interview exists in English, outside the numbered Ja
 
 | Lens | Official article | Surface & Stop |
 | --- | --- | --- |
-| FE 50mm F1.2 GM | [What Goes Into Building The Best 50mm Lens](https://alphauniverse.com/stories/what-goes-into-building-the-best-50mm-lens-sony-designers-tell-the-inside-story-/) | — |
+| FE 50mm F1.2 GM | [What Goes Into Building The Best 50mm Lens](https://alphauniverse.com/stories/what-goes-into-building-the-best-50mm-lens-sony-designers-tell-the-inside-story-/) | [FE 50mm F1.2 GM](/lens/sony-fe-50mm-f12-gm) |
 
 Sony's regional sites also carry pages titled "Engineer Interviews | G Master Lenses," but they did not serve content to automated checks and are not linked here until their contents can be confirmed.

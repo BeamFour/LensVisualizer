@@ -25,6 +25,7 @@ import {
   findLocalPatent,
   extractSixDigitCodes,
   isCodeOnlyGlassAnnotation,
+  activeGlassAnnotation,
   isExplicitlyUnmatched,
   patentInventory,
   walkLensSurfaces,
@@ -155,7 +156,7 @@ function extractGlassCode(annotation: string): EmbeddedCode | null {
 }
 
 function namedOpportunityTokens(glassString: string): string[] {
-  const tokens = glassString.match(/[A-Za-z][A-Za-z0-9-]*\d[A-Za-z0-9]*/g) ?? [];
+  const tokens = activeGlassAnnotation(glassString).match(/[A-Za-z][A-Za-z0-9-]*\d[A-Za-z0-9]*/g) ?? [];
   return [
     ...new Set(
       tokens

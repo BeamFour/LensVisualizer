@@ -17,6 +17,7 @@ interface DiagramViewportProps extends Omit<
   ComponentProps<typeof DiagramSVG>,
   "onLocaInsetClick" | "onPetzvalBadgeClick"
 > {
+  minDiagramHeight?: number;
   chromaticRayFanSpreads?: ChromaticRayFanSpreadByAxis;
   showChromaticOverlay: boolean;
   showPetzvalOverlay: boolean;
@@ -100,6 +101,7 @@ export default function DiagramViewport({
   maxSvgHeight,
   useSideLayout,
   fillAvailableHeight,
+  minDiagramHeight,
   headerHeight,
   compact,
   flashVisible,
@@ -199,82 +201,85 @@ export default function DiagramViewport({
 
   const viewportStyle = fillAvailableHeight
     ? {
-        flex: "1 1 auto",
+        flex: minDiagramHeight ? `1 0 ${minDiagramHeight}px` : "1 1 auto",
         minWidth: 0,
-        minHeight: 0,
+        minHeight: minDiagramHeight ?? 0,
         position: "relative" as const,
-        overflow: "hidden",
+        overflow: minDiagramHeight ? "clip" : "hidden",
       }
     : useSideLayout
       ? { flex: 1, minWidth: 0, position: "relative" as const }
       : { position: "relative" as const };
 
+  const diagram = (
+    <DiagramSVG
+      L={L}
+      t={t}
+      dark={dark}
+      sx={sx}
+      sy={sy}
+      CX={CX}
+      IX={IX}
+      effectiveSC={effectiveSC}
+      movementTransform={movementTransform}
+      lensAxis={lensAxis}
+      zPos={zPos}
+      IMG_MM={IMG_MM}
+      shapes={shapes}
+      filterId={filterId}
+      stopZ={stopZ}
+      currentPhysStopSD={currentPhysStopSD}
+      rays={rays}
+      offAxisRays={offAxisRays}
+      chromaticRays={chromaticRays}
+      chromaticRayFanSpread={onAxisChromSpread}
+      dispersionQuality={dispersionQuality}
+      showOnAxis={showOnAxis}
+      showOffAxis={showOffAxis}
+      showChromatic={showChromatic}
+      showPupils={showPupils}
+      showCardinals={showCardinals}
+      showCardinalFocal={showCardinalFocal}
+      showCardinalPrincipal={showCardinalPrincipal}
+      showCardinalNodal={showCardinalNodal}
+      showCardinalDimensions={showCardinalDimensions}
+      showCardinalEfl={showCardinalEfl}
+      showCardinalBfd={showCardinalBfd}
+      showCardinalFfd={showCardinalFfd}
+      showCardinalHiatus={showCardinalHiatus}
+      showCardinalTotalTrack={showCardinalTotalTrack}
+      cardinalElements={cardinalElements}
+      foldedHitOrderLabels={foldedHitOrderLabels}
+      zoomT={zoomT}
+      act={act}
+      onHover={onHover}
+      onSelect={onSelect}
+      sel={sel}
+      maxSvgHeight={maxSvgHeight}
+      useSideLayout={useSideLayout}
+      fillAvailableHeight={fillAvailableHeight}
+      headerHeight={headerHeight}
+      compact={compact}
+      flashVisible={flashVisible}
+      flashKey={flashKey}
+      flashFading={flashFading}
+      onLocaInsetClick={onOpenChromaticOverlay}
+      onPetzvalBadgeClick={onOpenPetzvalOverlay}
+      viewBoxOverride={viewBoxOverride}
+      zoomPanActive={zoomPanActive}
+      isPanning={isPanning}
+      onSvgWheel={onSvgWheel}
+      onSvgPointerDown={onSvgPointerDown}
+      onSvgPointerMove={onSvgPointerMove}
+      onSvgPointerUp={onSvgPointerUp}
+      onSvgTouchStart={onSvgTouchStart}
+      onSvgTouchMove={onSvgTouchMove}
+      onSvgTouchEnd={onSvgTouchEnd}
+    />
+  );
   const stageContent = (
     <>
-      <DiagramSVG
-        L={L}
-        t={t}
-        dark={dark}
-        sx={sx}
-        sy={sy}
-        CX={CX}
-        IX={IX}
-        effectiveSC={effectiveSC}
-        movementTransform={movementTransform}
-        lensAxis={lensAxis}
-        zPos={zPos}
-        IMG_MM={IMG_MM}
-        shapes={shapes}
-        filterId={filterId}
-        stopZ={stopZ}
-        currentPhysStopSD={currentPhysStopSD}
-        rays={rays}
-        offAxisRays={offAxisRays}
-        chromaticRays={chromaticRays}
-        chromaticRayFanSpread={onAxisChromSpread}
-        dispersionQuality={dispersionQuality}
-        showOnAxis={showOnAxis}
-        showOffAxis={showOffAxis}
-        showChromatic={showChromatic}
-        showPupils={showPupils}
-        showCardinals={showCardinals}
-        showCardinalFocal={showCardinalFocal}
-        showCardinalPrincipal={showCardinalPrincipal}
-        showCardinalNodal={showCardinalNodal}
-        showCardinalDimensions={showCardinalDimensions}
-        showCardinalEfl={showCardinalEfl}
-        showCardinalBfd={showCardinalBfd}
-        showCardinalFfd={showCardinalFfd}
-        showCardinalHiatus={showCardinalHiatus}
-        showCardinalTotalTrack={showCardinalTotalTrack}
-        cardinalElements={cardinalElements}
-        foldedHitOrderLabels={foldedHitOrderLabels}
-        zoomT={zoomT}
-        act={act}
-        onHover={onHover}
-        onSelect={onSelect}
-        sel={sel}
-        maxSvgHeight={maxSvgHeight}
-        useSideLayout={useSideLayout}
-        fillAvailableHeight={fillAvailableHeight}
-        headerHeight={headerHeight}
-        compact={compact}
-        flashVisible={flashVisible}
-        flashKey={flashKey}
-        flashFading={flashFading}
-        onLocaInsetClick={onOpenChromaticOverlay}
-        onPetzvalBadgeClick={onOpenPetzvalOverlay}
-        viewBoxOverride={viewBoxOverride}
-        zoomPanActive={zoomPanActive}
-        isPanning={isPanning}
-        onSvgWheel={onSvgWheel}
-        onSvgPointerDown={onSvgPointerDown}
-        onSvgPointerMove={onSvgPointerMove}
-        onSvgPointerUp={onSvgPointerUp}
-        onSvgTouchStart={onSvgTouchStart}
-        onSvgTouchMove={onSvgTouchMove}
-        onSvgTouchEnd={onSvgTouchEnd}
-      />
+      {minDiagramHeight ? <div style={{ position: "absolute", inset: 0 }}>{diagram}</div> : diagram}
 
       {/* Overlays — hidden in zoom/pan mode */}
       {!zoomPanActive && showChromaticOverlay && showChromatic && overlayChromSpread ? (

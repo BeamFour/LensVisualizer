@@ -14,8 +14,8 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 - **8953 / 9646** non-air surfaces use trusted chromatic data (Sellmeier or measured line indices, 92.8%)
 - **0** mismatch surfaces in Sweep 1 across **0** lens files
 - **0** Sweep 1 surfaces have a matching untracked local patent PDF
-- **343** code-only missing-Sellmeier elements in Sweep 2: **23** active unreviewed, **187** self-recording explicit dispositions, **0** dispositions missing any review record
-- **1** unresolved named-token elements in Sweep 2B, producing **1** token occurrences across **1** distinct tokens
+- **345** code-only missing-Sellmeier elements in Sweep 2: **23** active unreviewed, **188** self-recording explicit dispositions, **0** dispositions missing any review record
+- **0** unresolved named-token elements in Sweep 2B, producing **0** token occurrences across **0** distinct tokens
 - **21** Tier A proprietary backfill rows in Sweep 3
 
 ## Sweep 1 - Relabel Mismatches
@@ -227,7 +227,6 @@ These unresolved catalog-style labels are often better first catalog targets tha
 
 | Token | Token occurrences | Lens files | localPatentStatus | Representative rows |
 |---|---:|---:|---|---|
-| H-ZF52A | 1 | 1 | patents/US20160266350A1.pdf | [LEICA SUMMILUX 28mm f/1.7 ASPH. (Leica Q, Q2, Q3)](../../src/lens-data/leica/Leica28mmf17.data.ts) Element 11 (1.68250 / 33.00; abbe) |
 
 ## Sweep 3 - Proprietary Line-Index Backfill
 

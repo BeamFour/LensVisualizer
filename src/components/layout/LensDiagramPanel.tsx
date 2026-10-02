@@ -18,7 +18,7 @@
  * wires sub-components.
  */
 
-import { useState, useEffect, useMemo, useRef, useCallback, type RefObject } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback, type RefObject, type ComponentProps } from "react";
 import useLensComputation from "../hooks/useLensComputation.js";
 import useViewBoxZoom from "../hooks/useViewBoxZoom.js";
 import useRayTracing from "../hooks/useRayTracing.js";
@@ -59,6 +59,8 @@ interface LensDiagramPanelProps {
   showSliders?: boolean;
   maxSvgHeight?: string;
   minHeaderHeight?: number;
+  minDiagramHeight?: number;
+  comparisonDetails?: ComponentProps<typeof DiagramHeader>["comparisonDetails"];
   onHeaderHeight?: (panelId: string, height: number) => void;
   flashOverlay?: boolean;
   sideLayoutEnabled?: boolean;
@@ -83,6 +85,8 @@ export default function LensDiagramPanel({
   showSliders = true,
   maxSvgHeight = "calc(100vh - 260px)",
   minHeaderHeight,
+  minDiagramHeight,
+  comparisonDetails,
   onHeaderHeight,
   flashOverlay = false,
   sideLayoutEnabled = false,
@@ -148,7 +152,7 @@ export default function LensDiagramPanel({
   /* ── Extracted hooks ── */
   const adapters = useDispatchAdapters();
   const overlays = useOverlayState(lensKey);
-  const { headerRef, headerHeight } = useHeaderHeight({ panelId, lensKey, onHeaderHeight });
+  const { headerRef, headerHeight } = useHeaderHeight({ panelId, lensKey, onHeaderHeight, enabled: !zoomPanActive });
   const { flashKey, flashVisible, flashFading } = useFlashOverlay(flashOverlay);
 
   /* ── Hover/selection state ── */
@@ -404,6 +408,7 @@ export default function LensDiagramPanel({
             maxSvgHeight,
             useSideLayout,
             fillAvailableHeight,
+            minDiagramHeight,
             zoomPanActive,
             showOnAxis,
             showOffAxis,
@@ -536,6 +541,7 @@ export default function LensDiagramPanel({
                 headerInfoExpanded={headerInfoExpanded}
                 onHeaderInfoExpandedChange={adapters.onHeaderInfoExpandedChange}
                 minHeaderHeight={minHeaderHeight}
+                comparisonDetails={comparisonDetails}
               />
             ) : null
           }

@@ -12,7 +12,7 @@ or per-lens patent backfills.
 - **9646** non-air surfaces examined
 - **9656** element glass declarations examined
 - **251** non-explicit-unmatched annotations did not resolve
-- **136** distinct unresolved glass-like tokens found
+- **135** distinct unresolved glass-like tokens found
 
 ## Tokens by Frequency
 
@@ -148,7 +148,6 @@ or per-lens patent backfills.
 | BAM5 | 1 | 1 | |
 | D-ZLAF85 | 1 | 1 | |
 | FPL51 | 1 | 1 | |
-| H-ZF52A | 1 | 1 | |
 | KF5 | 1 | 1 | |
 | KZF4 | 1 | 1 | |
 | LF7-CLASS | 1 | 1 | |
@@ -717,10 +716,6 @@ or per-lens patent backfills.
 ### FPL51 — 1 occurrence
 
 - [PANASONIC LEICA DG SUMMILUX 15mm f/1.7 ASPH](../../src/lens-data/panasonic/PanasonicLeicaDG15mmf17.data.ts) 1: `FPL51 class (499/801, OHARA family)`
-
-### H-ZF52A — 1 occurrence
-
-- [LEICA SUMMILUX 28mm f/1.7 ASPH. (Leica Q, Q2, Q3)](../../src/lens-data/leica/Leica28mmf17.data.ts) 20A: `683330 — dense flint (catalog unresolved; patent nd=1.68250, νd=33.0; prior H-ZF52A label rejected)`
 
 ### KF5 — 1 occurrence
 

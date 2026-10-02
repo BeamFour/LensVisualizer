@@ -51,15 +51,17 @@ function HeaderHeightProbe({
   panelId = "a",
   lensKey = "lens-a",
   onHeaderHeight,
+  enabled = true,
 }: {
   panelId?: string;
   lensKey?: string;
   onHeaderHeight?: (panelId: string, height: number) => void;
+  enabled?: boolean;
 }) {
-  const { headerRef, headerHeight } = useHeaderHeight({ panelId, lensKey, onHeaderHeight });
+  const { headerRef, headerHeight } = useHeaderHeight({ panelId, lensKey, onHeaderHeight, enabled });
   return (
     <>
-      <div ref={headerRef}>Header</div>
+      {enabled && <div ref={headerRef}>Header</div>}
       <output>{headerHeight}</output>
     </>
   );
@@ -106,6 +108,21 @@ describe("responsive layout hooks", () => {
 
     expect(screen.getByText("148")).toBeTruthy();
     expect(onHeaderHeight).toHaveBeenLastCalledWith("left", 148);
+    scrollHeight = 71.5;
+    act(() => resizeObserver.trigger());
+    expect(onHeaderHeight).toHaveBeenLastCalledWith("left", 72);
+  });
+
+  it("remeasures a header restored after zoom mode removes it", () => {
+    const resizeObserver = installResizeObserverMock();
+    const onHeaderHeight = vi.fn();
+    const { rerender } = render(<HeaderHeightProbe enabled onHeaderHeight={onHeaderHeight} />);
+    rerender(<HeaderHeightProbe enabled={false} onHeaderHeight={onHeaderHeight} />);
+    expect(resizeObserver.instances[0].disconnect).toHaveBeenCalled();
+    scrollHeight = 80;
+    rerender(<HeaderHeightProbe enabled onHeaderHeight={onHeaderHeight} />);
+    expect(onHeaderHeight).toHaveBeenLastCalledWith("a", 80);
+    expect(resizeObserver.instances[1].observe).toHaveBeenCalled();
   });
 
   it("cleans up header ResizeObserver subscriptions on unmount", () => {

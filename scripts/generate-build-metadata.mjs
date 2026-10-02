@@ -15,6 +15,8 @@
  * (prerender, sitemap, seo-audit) read this JSON instead of scanning the
  * filesystem independently.
  *
+ * Also emits client-metadata.json, a public display projection without build-only Git details.
+ *
  * Run before `vite build` so the generated file is available to the bundler.
  */
 
@@ -27,6 +29,7 @@ import {
   buildRouteFreshness,
   collectArticles,
   comparePublicationEntries,
+  projectClientMetadata,
   getGitFileFreshnessAsync,
 } from "./build-metadata-lib.mjs";
 import { collectLensDataAsync } from "./lens-data-lib.mjs";
@@ -40,6 +43,7 @@ const LENS_DATA_DIR = join(ROOT, "src", "lens-data");
 const CONTENT_DIR = join(ROOT, "src", "content");
 const OUT_DIR = join(ROOT, "src", "generated");
 const OUT_FILE = join(OUT_DIR, "build-metadata.json");
+const CLIENT_FILE = join(OUT_DIR, "client-metadata.json");
 const MAKER_PREFIXES_FILE = join(OUT_DIR, "maker-prefixes.json");
 const MAKER_DETAILS_FILE = join(ROOT, "src", "utils", "catalog", "makerDetails.ts");
 const ASSIGNEE_CORPORATE_HISTORY_FILE = join(ROOT, "src", "utils", "catalog", "assigneeCorporateHistory.ts");
@@ -195,6 +199,7 @@ async function main() {
     routeFreshness,
   };
   writeFileSync(OUT_FILE, JSON.stringify(metadata, null, 2) + "\n", "utf-8");
+  writeFileSync(CLIENT_FILE, JSON.stringify(projectClientMetadata(metadata)) + "\n", "utf-8");
 
   writeFileSync(LENS_SUMMARIES_FILE, JSON.stringify(lensSummaries) + "\n", "utf-8");
   console.log(`Lens summaries written to ${LENS_SUMMARIES_FILE} (${lensSummaries.length} lenses)`);

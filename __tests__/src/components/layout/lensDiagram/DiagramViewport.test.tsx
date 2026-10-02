@@ -190,6 +190,13 @@ describe("DiagramViewport", () => {
     );
   });
 
+  it("reserves comparison height without creating a focus-scrollable inner viewport", () => {
+    render(<DiagramViewport {...baseProps} fillAvailableHeight minDiagramHeight={280} analysisControls="shared" />);
+    const viewport = screen.getByTestId("diagram-svg").parentElement?.parentElement;
+    expect(viewport?.style.minHeight).toBe("280px");
+    expect(viewport?.style.overflow).toBe("clip");
+  });
+
   it("fills available height and forwards the fill-height flag to the SVG", () => {
     render(<DiagramViewport {...baseProps} fillAvailableHeight />);
 

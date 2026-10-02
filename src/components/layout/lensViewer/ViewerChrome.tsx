@@ -135,7 +135,7 @@ export default function ViewerChrome({
         onConfigurationChange={onConfigurationChange}
       />
 
-      {comparing && <ControlsBar {...controlsBarProps} compact={false} showScaleMode={true} />}
+      {comparing && <ControlsBar {...controlsBarProps} compact={false} showScaleMode={true} inlineGroups={isWide} />}
 
       {ENABLE_ANALYSIS_VIEW && !isWide && !comparing && (
         <ViewToggleBar

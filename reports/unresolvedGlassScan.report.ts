@@ -11,7 +11,7 @@
 import { describe, expect, it } from "vitest";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { glassTokens, resolveGlass } from "../src/optics/glassCatalog.js";
-import { isExplicitlyUnmatched, walkLensSurfaces } from "./glassScanLib.js";
+import { activeGlassAnnotation, isExplicitlyUnmatched, walkLensSurfaces } from "./glassScanLib.js";
 import type { LensData } from "../src/types/optics.js";
 
 const modules = import.meta.glob<{ default: LensData }>("../src/lens-data/**/*.data.ts", { eager: true });
@@ -29,7 +29,7 @@ function candidateTokens(glassString: string): string[] {
   // token that itself fails to resolve. No vendor-prefix whitelist: the old
   // list predated the Hikari-era expansion and silently hid unresolved J-/Q-/
   // M-/MC-/D-/PBH/TAC-style tokens from the catalog-expansion queue.
-  return glassTokens(glassString)
+  return glassTokens(activeGlassAnnotation(glassString))
     .map((token) => token.toUpperCase())
     .filter((token) => /\d/.test(token) && !resolveGlass(token));
 }

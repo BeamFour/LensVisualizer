@@ -1,4 +1,5 @@
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, readdirSync, statSync, rmSync, writeFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -16,6 +17,7 @@ import {
   mapLimit,
   parseFrontmatterContent,
   parseGitLogDates,
+  projectClientMetadata,
 } from "../../scripts/build-metadata-lib.mjs";
 
 const tempContentRoots: string[] = [];
@@ -40,6 +42,83 @@ afterEach(() => {
 });
 
 describe("build metadata helpers", () => {
+  it("projects only client display fields while preserving dates, ordering, and full source records", () => {
+    const freshness = {
+      publishedOn: "2026-01-01",
+      lastModified: "2026-02-02",
+      publishedAt: "2026-01-01T09:00:00Z",
+      publishedCommit: "first-commit",
+      lastModifiedAt: "2026-02-02T10:00:00Z",
+      lastModifiedCommit: "last-commit",
+    };
+    const metadata = {
+      lensFreshness: { lens: { ...freshness, publicationOrder: 3 } },
+      routeFreshness: { "/lens/lens": freshness },
+      articles: [
+        {
+          ...freshness,
+          slug: "second",
+          title: "Second",
+          summary: "Summary",
+          file: "second.md",
+          tag: "guide",
+          series: "optics",
+          seriesOrder: 2,
+          toc: true,
+        },
+        { ...freshness, slug: "first", title: "First", summary: "Intro", file: "first.md" },
+      ],
+      makerSlugs: ["example"],
+      authors: [{ name: "Author" }],
+      assignees: [{ name: "Maker", corporateFamily: [{ name: "Parent" }] }],
+      lensKeys: ["lens"],
+      routes: ["/lens/lens"],
+      mountIds: [],
+      formatIds: [],
+    };
+    const before = structuredClone(metadata);
+    const client = projectClientMetadata(metadata);
+    expect(Object.keys(client).sort()).toEqual([
+      "articles",
+      "assignees",
+      "authors",
+      "lensFreshness",
+      "makerSlugs",
+      "routeFreshness",
+    ]);
+    expect(client.lensFreshness.lens).toEqual({
+      publishedOn: freshness.publishedOn,
+      lastModified: freshness.lastModified,
+      publicationOrder: 3,
+    });
+    expect(client.routeFreshness["/lens/lens"]).toEqual({
+      publishedOn: freshness.publishedOn,
+      lastModified: freshness.lastModified,
+    });
+    expect(client.articles).toEqual(
+      metadata.articles.map(
+        ({ publishedAt: _a, publishedCommit: _b, lastModifiedAt: _c, lastModifiedCommit: _d, ...article }) => article,
+      ),
+    );
+    expect(client.authors).toEqual(metadata.authors);
+    expect(client.assignees).toEqual(metadata.assignees);
+    expect(metadata).toEqual(before);
+    expect(projectClientMetadata(metadata)).toEqual(client);
+  });
+
+  it("keeps full build metadata out of runtime imports", () => {
+    const sourceRoot = fileURLToPath(new URL("../../src/", import.meta.url));
+    const sourceFiles = (directory: string): string[] =>
+      readdirSync(directory).flatMap((name) => {
+        const path = join(directory, name);
+        return statSync(path).isDirectory() ? sourceFiles(path) : /\.[jt]sx?$/.test(name) ? [path] : [];
+      });
+    const files = sourceFiles(sourceRoot);
+    for (const file of files) {
+      expect(readFileSync(file, "utf8"), file).not.toMatch(/(?:from\s*|import\s*\()\s*["'][^"']*build-metadata\.json/);
+    }
+  });
+
   it("rejects shallow git history before freshness generation", () => {
     expect(() =>
       assertFullGitHistory({
