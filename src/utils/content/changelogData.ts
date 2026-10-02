@@ -21,7 +21,7 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-02",
     type: "fix",
-    summary: "Corrected comparison aperture readouts and limit markers when zooming",
+    summary: "Corrected aperture readouts, focus behavior, presets, and saved slider precision",
   },
   {
     date: "2026-10-02",

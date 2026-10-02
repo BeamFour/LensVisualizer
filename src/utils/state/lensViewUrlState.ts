@@ -205,11 +205,12 @@ export function buildLensViewQuery({
   const params = new URLSearchParams();
   if (usesV1ViewState) params.set("v", "1");
   if (zoom != null && zoom > 0) params.set("zoom", String(zoom));
-  if (focus != null && focus > 0) params.set("focus", focus.toFixed(3));
-  if (!comparing && aberration != null && Math.abs(aberration) > 1e-9) params.set("aberration", aberration.toFixed(3));
-  if (aperture != null && aperture > 0) params.set("aperture", aperture.toFixed(3));
-  if (shift != null && Math.abs(shift) > 1e-9) params.set("shift", shift.toFixed(2));
-  if (tilt != null && Math.abs(tilt) > 1e-9) params.set("tilt", tilt.toFixed(2));
+  // Preserve exact slider state: rounding normalized values changes restored distances and f-numbers.
+  if (focus != null && focus > 0) params.set("focus", String(focus));
+  if (!comparing && aberration != null && Math.abs(aberration) > 1e-9) params.set("aberration", String(aberration));
+  if (aperture != null && aperture > 0) params.set("aperture", String(aperture));
+  if (shift != null && Math.abs(shift) > 1e-9) params.set("shift", String(shift));
+  if (tilt != null && Math.abs(tilt) > 1e-9) params.set("tilt", String(tilt));
   if (!comparing && configurationKey) params.set("cfg", configurationKey);
 
   if (comparing) {
