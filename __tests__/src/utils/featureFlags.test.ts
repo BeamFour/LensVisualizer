@@ -3,6 +3,10 @@ import * as flags from "../../../src/utils/featureFlags.js";
 import * as appConfig from "../../../src/utils/appConfig.js";
 
 describe("featureFlags", () => {
+  it("exposes only the revised full universal map by default", () => {
+    expect(flags.ENABLE_UNIVERSAL_MAP_EXTRA_VIEWS).toBe(false);
+    expect(flags.ENABLE_REVISED_UNIVERSAL_MAP).toBe(true);
+  });
   it("exports only boolean values", () => {
     for (const [key, value] of Object.entries(flags)) {
       expect(typeof value, `${key} should be boolean`).toBe("boolean");
