@@ -41,6 +41,9 @@ When either lens cannot reach the request, the slider labels it "Requested" and 
 the optional effective-aperture row adds only the close-focus correction. The common-point marker and sticky flash
 follow the current zoom limits, with no common-point marker when the aperture ranges do not overlap.
 
+Focus ranges include only lenses with modeled focus travel. Unsupported panes receive infinity focus and display
+"Not modeled"; the shared control is disabled when neither lens supports focusing.
+
 ## Scale Modes
 
 Comparison mode can normalize the two panels so users can compare physical scale or framing. Scale ratios are computed

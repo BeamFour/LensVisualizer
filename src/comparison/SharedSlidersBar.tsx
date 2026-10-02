@@ -121,6 +121,7 @@ export default function SharedSlidersBar({
   const showTilt = showMovement && movementPair && isMovementAxisEnabled(movementPair.tiltRangeDeg);
   const movementAvailabilityA = getGroupMovementAvailability(LA);
   const movementAvailabilityB = getGroupMovementAvailability(LB);
+  const focusEnabled = movementAvailabilityA.focus || movementAvailabilityB.focus;
 
   /* Zoom readout helpers — dual-zoom uses the shared focal length from
    * computeZoomPair; single-zoom reads from the one zoom lens directly. */
@@ -338,10 +339,12 @@ export default function SharedSlidersBar({
         <SharedSliderSection
           theme={t}
           label="FOCUS"
-          valueLabel={focusDistStr}
+          valueLabel={focusEnabled ? focusDistStr : "Not modeled"}
           minLabel={"\u221e"}
-          maxLabel={`${minCloseFocus} m`}
-          sliderValue={sharedFocusT}
+          maxLabel={focusEnabled ? `${minCloseFocus} m` : "Not modeled"}
+          sliderValue={focusEnabled ? sharedFocusT : 0}
+          disabled={!focusEnabled}
+          disabledReason="No modeled focus travel data"
           onSliderChange={onSharedFocusChange}
           onPointerDown={onFocusPointerDown}
           onPointerUp={onSliderPointerUp}
@@ -352,14 +355,14 @@ export default function SharedSlidersBar({
           readouts={
             <>
               <span>
-                A: {formatDist(focusPair.focusA, LA, zoomPair?.zoomA)}
-                {focusPair.focusA > 0.003 && focusedEflDiffersA && (
+                A: {movementAvailabilityA.focus ? formatDist(focusPair.focusA, LA, zoomPair?.zoomA) : "Not modeled"}
+                {movementAvailabilityA.focus && focusPair.focusA > 0.003 && focusedEflDiffersA && (
                   <span style={{ opacity: 0.7 }}> ({dynamicEflA.toFixed(1)} mm)</span>
                 )}
               </span>
               <span>
-                B: {formatDist(focusPair.focusB, LB, zoomPair?.zoomB)}
-                {focusPair.focusB > 0.003 && focusedEflDiffersB && (
+                B: {movementAvailabilityB.focus ? formatDist(focusPair.focusB, LB, zoomPair?.zoomB) : "Not modeled"}
+                {movementAvailabilityB.focus && focusPair.focusB > 0.003 && focusedEflDiffersB && (
                   <span style={{ opacity: 0.7 }}> ({dynamicEflB.toFixed(1)} mm)</span>
                 )}
               </span>

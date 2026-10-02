@@ -7,6 +7,7 @@
  */
 
 import { closeFocusAtZoom } from "../optics/focusDistance.js";
+import { getGroupMovementAvailability } from "../optics/groupMovement.js";
 import type { RuntimeLens } from "../types/optics.js";
 import { FOCUS_INFINITY_THRESHOLD, fopenAtZoom } from "../optics/optics.js";
 import { fNumberAtStopdown } from "../optics/aperture.js";
@@ -73,15 +74,19 @@ export function computeFocusPair(
 ): FocusPairResult {
   const closA: number = closeFocusAtZoom(zoomA, LA);
   const closB: number = closeFocusAtZoom(zoomB, LB);
-  const minClose: number = Math.min(closA, closB);
-  const maxClose: number = Math.max(closA, closB);
+  const modeledA = getGroupMovementAvailability(LA).focus;
+  const modeledB = getGroupMovementAvailability(LB).focus;
+  // Product minimum-focus metadata alone does not establish modeled focus travel.
+  const endpoints = [...(modeledA ? [closA] : []), ...(modeledB ? [closB] : [])];
+  const minClose = endpoints.length ? Math.min(...endpoints) : 0;
+  const maxClose = endpoints.length ? Math.max(...endpoints) : 0;
 
   /* Common point: where the lens with larger closeFocusM (less capable) hits t=1 */
-  const commonPoint: number = minClose / maxClose;
+  const commonPoint: number = maxClose > 0 ? minClose / maxClose : 0;
 
   /* Per-lens focusT: physical dist = minClose / sharedT, so t_X = X.close * sharedT / minClose */
-  const focusA: number = Math.min((sharedT * closA) / minClose, 1.0);
-  const focusB: number = Math.min((sharedT * closB) / minClose, 1.0);
+  const focusA: number = modeledA ? Math.min((sharedT * closA) / minClose, 1.0) : 0;
+  const focusB: number = modeledB ? Math.min((sharedT * closB) / minClose, 1.0) : 0;
 
   return { focusA, focusB, commonPoint, minCloseFocus: minClose, maxCloseFocus: maxClose };
 }

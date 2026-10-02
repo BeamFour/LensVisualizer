@@ -63,6 +63,7 @@ flowchart LR
   n_src_comparison_src_comparison_comparisonSliders_ts --> n_external_src_optics_aperture_ts
   n_src_comparison_src_comparison_useComparisonMode_ts --> n_external_src_optics_buildLens_ts
   n_src_comparison_src_comparison_comparisonSliders_ts --> n_external_src_optics_focusDistance_ts
+  n_src_comparison_src_comparison_comparisonSliders_ts --> n_external_src_optics_groupMovement_ts
   n_src_comparison_src_comparison_SharedSlidersBar_tsx --> n_external_src_optics_groupMovement_ts
   n_src_comparison_src_comparison_comparisonSliders_ts --> n_external_src_optics_lensMovement_ts
   n_src_comparison_src_comparison_SharedSlidersBar_tsx --> n_external_src_optics_lensMovement_ts
@@ -73,7 +74,6 @@ flowchart LR
   n_src_comparison_src_comparison_comparisonReducer_ts --> n_external_src_types
   n_src_comparison_src_comparison_comparisonSliders_ts --> n_external_src_types
   n_src_comparison_src_comparison_comparisonURLSync_ts --> n_external_src_types
-  n_src_comparison_src_comparison_SharedAnalysisDock_tsx --> n_external_src_types
   n_src_comparison_truncated["additional relationships omitted"]
 ```
 
@@ -81,7 +81,7 @@ flowchart LR
 
 - Direct source files: 14
 - Direct subfolders: 0
-- Main outbound areas: same folder (27), src/types (14), package:react (8), src/utils/state (4), src/components/layout (3), src/optics/optics.ts (3), src/utils/style (3), src/optics/lensMovement.ts (2), +11 more
+- Main outbound areas: same folder (27), src/types (14), package:react (8), src/utils/state (4), src/components/layout (3), src/optics/optics.ts (3), src/utils/style (3), src/optics/groupMovement.ts (2), +11 more
 - External consumers: src/components/layout, src/pages/ComparePage.tsx, src/types, src/utils/catalog, src/utils/state
 
 ## Files
@@ -91,7 +91,7 @@ flowchart LR
 | `ComparisonContent.tsx` | React component module | same folder (7), src/types (2), package:react, src/components/errors, src/utils/state | src/components/layout | default, ComparisonContent |
 | `ComparisonLayout.tsx` | React component module | same folder (2), package:react, src/components/layout, src/types, src/utils/useMediaQuery.ts | same folder | default, ComparisonLayout |
 | `comparisonReducer.ts` | Comparison Reducer module with default export | src/types | same folder (3), src/utils/state | SET_SCALE_MODE, SET_SHARED_FOCUS_T, SET_SHARED_STOPDOWN_T, SET_SHARED_ZOOM_T, SET_SHARED_SHIFT_MM, SET_SHARED_TILT_DEG, ENTER_COMPARE, EXIT_COMPARE, +2 more |
-| `comparisonSliders.ts` | Comparison Sliders helper module | src/optics/aperture.ts, src/optics/focusDistance.ts, src/optics/lensMovement.ts, src/optics/optics.ts, src/types, +1 more | same folder (7), src/components/layout | FocusPairResult, AperturePairResult, ZoomPairResult, MovementPairResult, computeFocusPair, computeAperturePair, formatSharedFocusDist, sharedFNumber, +3 more |
+| `comparisonSliders.ts` | Comparison Sliders helper module | src/optics/aperture.ts, src/optics/focusDistance.ts, src/optics/groupMovement.ts, src/optics/lensMovement.ts, src/optics/optics.ts, +2 more | same folder (7), src/components/layout | FocusPairResult, AperturePairResult, ZoomPairResult, MovementPairResult, computeFocusPair, computeAperturePair, formatSharedFocusDist, sharedFNumber, +3 more |
 | `comparisonTypes.ts` | Comparison Types helper module | none | src/types | SharedSlidersSlice, ComparisonAction |
 | `comparisonURLSync.ts` | Comparison URLSync helper module | src/utils/state (2), src/types, src/utils/seo | src/pages/ComparePage.tsx, src/utils/catalog, src/utils/state | buildComparePath, comparePageTitle, comparePageDescription, compareCanonicalURL |
 | `SharedAnalysisDock.tsx` | React component module | src/components/layout (2), src/components/hooks, src/types, src/utils/state | same folder | default, SharedAnalysisDock |

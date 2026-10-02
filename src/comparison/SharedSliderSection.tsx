@@ -20,6 +20,8 @@ interface SharedSliderSectionProps {
   sliderMin?: number;
   sliderMax?: number;
   sliderStep?: number;
+  disabled?: boolean;
+  disabledReason?: string;
   onSliderChange: (value: number) => void;
   onPointerDown?: () => void;
   onPointerUp?: () => void;
@@ -88,6 +90,8 @@ export default function SharedSliderSection({
   sliderMin = 0,
   sliderMax = 1,
   sliderStep = 0.004,
+  disabled = false,
+  disabledReason,
   onSliderChange,
   onPointerDown,
   onPointerUp,
@@ -111,19 +115,26 @@ export default function SharedSliderSection({
         </span>
         {action && <span style={{ marginLeft: "auto", display: "flex", alignItems: "center" }}>{action}</span>}
       </div>
-      <div style={SLIDER_ROW}>
+      <div
+        style={{ ...SLIDER_ROW, opacity: disabled ? 0.42 : 1, filter: disabled ? "grayscale(1)" : undefined }}
+        title={disabled ? disabledReason : undefined}
+      >
         <span style={{ fontSize: 9, color: t.focusEndpoint }}>{minLabel}</span>
         <div style={SLIDER_WRAP}>
           {markerPositions.length > 0 && <CommonPointMarkers theme={t} positions={markerPositions} />}
           <input
             type="range"
+            aria-label={label}
+            disabled={disabled}
             min={sliderMin}
             max={sliderMax}
             step={sliderStep}
             value={sliderValue}
-            onPointerDown={onPointerDown}
-            onChange={(event) => onSliderChange(parseFloat(event.target.value))}
-            onPointerUp={onPointerUp}
+            onPointerDown={disabled ? undefined : onPointerDown}
+            onChange={(event) => {
+              if (!disabled) onSliderChange(parseFloat(event.target.value));
+            }}
+            onPointerUp={disabled ? undefined : onPointerUp}
             style={sliderInput(t, { sizing: "full" })}
           />
         </div>

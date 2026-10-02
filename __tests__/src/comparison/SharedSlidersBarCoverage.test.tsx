@@ -3,6 +3,7 @@
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import SharedSlidersBar from "../../../src/comparison/SharedSlidersBar.js";
+import { buildSimplePositiveElementLens, buildVariableStopGapLens } from "../optics/testLensFixtures.js";
 import themes from "../../../src/utils/theme/themes.js";
 import type { RuntimeLens } from "../../../src/types/optics.js";
 import { computeAperturePair } from "../../../src/comparison/comparisonSliders.js";
@@ -21,6 +22,7 @@ function lens(overrides: Partial<RuntimeLens> & Record<string, unknown> = {}): R
     maxFstop: 16,
     closeFocusM: 0.5,
     isZoom: false,
+    varByIdx: { 0: [1, 2] },
     fstopSeries: [2, 2.8, 4, 5.6, 8, 11, 16],
     ...overrides,
   } as unknown as RuntimeLens;
@@ -156,6 +158,20 @@ function renderSharedSliders({
 
 describe("SharedSlidersBar", () => {
   afterEach(() => cleanup());
+
+  it.each([true, false])("labels unsupported focus and disables only all-static comparisons (wide: %s)", (isWide) => {
+    const fixed = buildSimplePositiveElementLens();
+    const modeled = buildVariableStopGapLens([1, 2]);
+    renderSharedSliders({ LA: fixed, LB: fixed, isWide });
+    expect((screen.getByRole("slider", { name: "FOCUS" }) as HTMLInputElement).disabled).toBe(true);
+    expect(screen.getByText("A: Not modeled")).toBeTruthy();
+    expect(screen.getByText("B: Not modeled")).toBeTruthy();
+    cleanup();
+    renderSharedSliders({ LA: fixed, LB: modeled, isWide });
+    expect((screen.getByRole("slider", { name: "FOCUS" }) as HTMLInputElement).disabled).toBe(false);
+    expect(screen.getByText("A: Not modeled")).toBeTruthy();
+    expect(screen.queryByText("B: Not modeled")).toBeNull();
+  });
 
   it.each([true, false])("shows actual apertures independently of the effective toggle (wide layout: %s)", (isWide) => {
     const LA = lens({ FOPEN: 2, isZoom: true, zoomFOPENs: [2, 7.2], zoomPositions: [50, 100], zoomEFLs: [50, 100] });
