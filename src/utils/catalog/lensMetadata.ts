@@ -6,7 +6,7 @@
  */
 
 import type { LensData } from "../../types/optics.js";
-import buildMeta from "../../generated/build-metadata.json";
+import buildMeta from "../../generated/client-metadata.json";
 import makerPrefixes from "../../generated/maker-prefixes.json";
 import { canonicalPageUrl, SITE_URL } from "../seo/siteUrls.js";
 import { lensPatentReference } from "./lensPatentMetadata.js";

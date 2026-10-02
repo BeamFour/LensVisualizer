@@ -17,11 +17,11 @@
  *   3. The article will appear on the homepage and /articles page automatically
  */
 
-import buildMetaRaw from "../../generated/build-metadata.json";
+import buildMetaRaw from "../../generated/client-metadata.json";
 import { canonicalPagePath } from "../seo/siteUrls.js";
 import { stripFrontmatter } from "./stripFrontmatter.js";
 
-/** Shape of an entry in build-metadata.json → articles[]. Declared here because
+/** Shape of an entry in client-metadata.json → articles[]. Declared here because
  *  optional fields (series/seriesOrder/toc) may be absent from the JSON schema
  *  until at least one article declares them. */
 interface BuildMetaArticle {

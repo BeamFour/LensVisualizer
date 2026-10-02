@@ -26,6 +26,12 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-02",
     type: "improvement",
+    summary:
+      "Reduced browser downloads by trimming display metadata and separating viewer help from the article registry",
+  },
+  {
+    date: "2026-10-02",
+    type: "improvement",
     summary: "Filled 40 missing lens mounts and added historical and cinema mount families",
   },
   {

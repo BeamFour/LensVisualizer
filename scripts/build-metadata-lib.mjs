@@ -506,3 +506,39 @@ export function buildRouteFreshness({
 
   return routeFreshness;
 }
+
+/** Project public display metadata without shipping Git identity or build-only route inventories. */
+export function projectClientMetadata(metadata) {
+  const publicFreshness = ({ publishedOn, lastModified }) => ({ publishedOn, lastModified });
+  const articleFields = [
+    "slug",
+    "title",
+    "summary",
+    "tag",
+    "series",
+    "seriesOrder",
+    "toc",
+    "publishedOn",
+    "lastModified",
+    "file",
+  ];
+  return {
+    lensFreshness: Object.fromEntries(
+      Object.entries(metadata.lensFreshness).map(([key, value]) => [
+        key,
+        { ...publicFreshness(value), publicationOrder: value.publicationOrder },
+      ]),
+    ),
+    routeFreshness: Object.fromEntries(
+      Object.entries(metadata.routeFreshness).map(([route, value]) => [route, publicFreshness(value)]),
+    ),
+    articles: metadata.articles.map((article) =>
+      Object.fromEntries(
+        articleFields.filter((field) => article[field] !== undefined).map((field) => [field, article[field]]),
+      ),
+    ),
+    makerSlugs: metadata.makerSlugs,
+    authors: metadata.authors,
+    assignees: metadata.assignees,
+  };
+}

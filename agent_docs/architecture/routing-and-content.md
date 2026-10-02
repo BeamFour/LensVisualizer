@@ -41,7 +41,7 @@ no-focus HTML, so all fragment-dependent content is gated behind a `mounted` fla
 to keep the server render and first client render identical; the real focus appears one paint after hydration.
 Recentering pushes a new fragment, so browser Back retraces the exploration path without exposing separate query URLs to
 crawlers. Legacy `?focus=` links are read and replaced with the fragment form after hydration. The canonical URL is
-always `/relationships/`. Assignee slugs come from the build-generated `assignees` array in `build-metadata.json`
+always `/relationships/`. Assignee slugs come from the build-generated `assignees` array in `client-metadata.json`
 (alongside `authors`); assignees have no dedicated pages. Assignee records also carry sourced, dated `successorOf`,
 `acquiredBy`, `subsidiaryOf`, and `corporateFamily` arrays curated in
 `src/utils/catalog/assigneeCorporateHistory.ts`. Those fields are deliberately not consumed by the selected-party ego
@@ -91,6 +91,10 @@ The app uses React Router 8 with client-side routing plus static prerendering fo
 - `scripts/generate-build-metadata.mjs` expands the concrete prerender route list into
   `src/generated/build-metadata.json`, including homepage, search, lens, patent, author, maker, mount, format, article,
   and update routes.
+- The same generator emits `src/generated/client-metadata.json` for runtime imports: lens and route public dates,
+  lens publication ordering, article display fields, maker slugs, authors, and assignees. Its projection preserves
+  collection order and excludes Git hashes, precise timestamps, and build-only route inventories. Build tooling keeps
+  using the full metadata artifact; browser modules must import the client projection.
 - `scripts/prerender.mjs` reads that concrete route list, builds the SSR entry, validates it against
   `manifestPaths` exported from `entry-server.tsx`, and writes each route plus `404.html` into `dist/`.
 - `/compare/:slugA/:slugB` is routeable and SSR-capable, but it is intentionally excluded from the generated concrete
@@ -135,7 +139,8 @@ The shared renderer preserves:
 
 Article markdown files live in `src/content/**/*.md`. Their frontmatter flows through
 `scripts/generate-build-metadata.mjs`; raw markdown is loaded by `import.meta.glob` in
-`src/utils/content/homepageContent.ts` and joined to the generated metadata there.
+`src/utils/content/homepageContent.ts` and joined to the generated client metadata there. The viewer imports
+`stripFrontmatter` from its standalone utility so its help dialogs do not pull in the complete article registry.
 
 Lens description markdown files live beside lens data files as `*.analysis.md` and render in `DescriptionPanel.tsx`.
 

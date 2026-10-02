@@ -143,3 +143,36 @@ export function buildRouteFreshness(options: {
   assigneeCorporateHistoryFreshness?: FreshnessEntry | null;
   fallbackDate: string;
 }): Record<string, FreshnessEntry>;
+
+export function projectClientMetadata<A extends Record<string, unknown>, B, C>(metadata: {
+  lensFreshness: Record<string, FreshnessEntry & { publicationOrder?: number }>;
+  routeFreshness: Record<string, FreshnessEntry>;
+  articles: A[];
+  makerSlugs: string[];
+  authors: B[];
+  assignees: C[];
+}): {
+  lensFreshness: Record<string, Pick<FreshnessEntry, "publishedOn" | "lastModified"> & { publicationOrder?: number }>;
+  routeFreshness: Record<string, Pick<FreshnessEntry, "publishedOn" | "lastModified">>;
+  articles: Partial<
+    Pick<
+      A,
+      Extract<
+        keyof A,
+        | "slug"
+        | "title"
+        | "summary"
+        | "tag"
+        | "series"
+        | "seriesOrder"
+        | "toc"
+        | "publishedOn"
+        | "lastModified"
+        | "file"
+      >
+    >
+  >[];
+  makerSlugs: string[];
+  authors: B[];
+  assignees: C[];
+};
