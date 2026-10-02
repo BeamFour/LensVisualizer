@@ -52,6 +52,48 @@ function matchesWords(candidate: string, query: string): boolean {
   return words.length > 0 && words.every((word) => candidate.includes(word));
 }
 
+/** Preserve optical quantities before punctuation normalization loses their units and decimals. */
+export function normalizeLensSearchText(value: string): string {
+  return transliterateCatalogText(value)
+    .toLocaleLowerCase()
+    .replace(
+      /(?<![\p{L}\p{N}.])(\d+(?:\.\d+)?)\s*(?:[-–—]\s*(\d+(?:\.\d+)?)\s*)?mm\b/gu,
+      (_, start: string, end: string | undefined) =>
+        `${Number(start)}mm${end === undefined ? "" : ` ${Number(end)}mm`}`,
+    )
+    .replace(
+      /\bf\s*\/?\s*(\d+(?:\.\d+)?)(?:\s*[-–—]\s*(\d+(?:\.\d+)?))?/g,
+      (_, start: string, end: string | undefined) => `f${Number(start)}${end === undefined ? "" : ` f${Number(end)}`}`,
+    )
+    .replace(/[^\p{L}\p{N}.]+/gu, " ")
+    .replace(/(?<!\d)\.|\.(?!\d)/g, " ")
+    .replace(/\d+(?:\.\d+)?/g, (number) => String(Number(number)))
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
+function indexLensName(name: string) {
+  const normalizedName = normalizeLensSearchText(name);
+  const numbers: string[] = normalizedName.match(/\d+(?:\.\d+)?/g) ?? [];
+  return { normalizedName, tokens: normalizedName.split(" "), numbers };
+}
+
+function matchesIndexedLens(candidate: ReturnType<typeof indexLensName>, words: readonly string[]): boolean {
+  return (
+    words.length > 0 &&
+    words.every((word) => {
+      if (/^\d+(?:\.\d+)?$/.test(word)) return candidate.numbers.includes(word);
+      if (/\d/.test(word)) return candidate.tokens.includes(word);
+      return candidate.normalizedName.includes(word);
+    })
+  );
+}
+
+/** Numbers match whole values; named ranges contribute endpoints, never inferred interior values. */
+export function matchesLensSearch(candidate: string, query: string): boolean {
+  return matchesIndexedLens(indexLensName(candidate), normalizeLensSearchText(query).split(" ").filter(Boolean));
+}
+
 function matchScore(candidate: string, query: string): number {
   if (candidate === query) return 0;
   if (candidate.startsWith(query)) return 1;
@@ -65,7 +107,7 @@ const SEARCH_LENSES = SUMMARY_KEYS.map((key) => {
   return {
     key,
     data,
-    normalizedName: normalizeSearchText(data.name),
+    ...indexLensName(data.name),
     normalizedPatent,
     compactPatent: normalizedPatent?.replaceAll(" ", ""),
   };
@@ -78,9 +120,11 @@ export function searchCatalog(query: string): CatalogSearchResults {
   const normalizedQuery = normalizeSearchText(query);
   if (!normalizedQuery) return { lenses: [], patents: [], authors: [] };
   const compactQuery = normalizedQuery.replaceAll(" ", "");
+  const lensQuery = normalizeLensSearchText(query);
 
-  const lenses = SEARCH_LENSES.filter(({ normalizedName }) => matchesWords(normalizedName, normalizedQuery))
-    .map((entry) => ({ ...entry, score: matchScore(entry.normalizedName, normalizedQuery) }))
+  const lensWords = lensQuery.split(" ").filter(Boolean);
+  const lenses = SEARCH_LENSES.filter((entry) => matchesIndexedLens(entry, lensWords))
+    .map((entry) => ({ ...entry, score: matchScore(entry.normalizedName, lensQuery) }))
     .sort((a, b) => a.score - b.score || catalogCollator.compare(a.data.name, b.data.name))
     .map(({ key, data }) => ({ type: "lens" as const, key, data }));
 
@@ -111,8 +155,9 @@ export function exactSearchTarget(query: string): string | null {
   const normalizedQuery = normalizeSearchText(query);
   if (!normalizedQuery) return null;
   const compactQuery = normalizedQuery.replaceAll(" ", "");
+  const lensQuery = normalizeLensSearchText(query);
 
-  const lensMatches = SEARCH_LENSES.filter(({ normalizedName }) => normalizedName === normalizedQuery).map(({ key }) =>
+  const lensMatches = SEARCH_LENSES.filter(({ normalizedName }) => normalizedName === lensQuery).map(({ key }) =>
     canonicalPagePath(`/lens/${key}`),
   );
   const patentMatches = SEARCH_LENSES.filter(({ compactPatent }) => compactPatent === compactQuery).map(({ key }) =>
