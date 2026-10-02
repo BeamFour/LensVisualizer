@@ -30,7 +30,7 @@
 
 import { formatSharedFocusDist, sharedFNumber } from "./comparisonSliders.js";
 import type { FocusPairResult, AperturePairResult, ZoomPairResult, MovementPairResult } from "./comparisonSliders.js";
-import { formatDist, eflAtZoom } from "../optics/optics.js";
+import { formatDist, formatFNumber, eflAtZoom } from "../optics/optics.js";
 import { getGroupMovementAvailability } from "../optics/groupMovement.js";
 import { isMovementAxisEnabled } from "../optics/lensMovement.js";
 import { snapToZeroStop } from "../utils/style/sliderStops.js";
@@ -49,13 +49,13 @@ interface SharedSlidersBarProps {
   sharedZoomT: number;
   sharedShiftMm: number;
   sharedTiltDeg: number;
-  onSharedFocusChange: (value: number) => void;
-  onSharedStopdownChange: (value: number) => void;
+  onSharedFocusChange: (value: number, direct?: boolean) => void;
+  onSharedStopdownChange: (value: number, direct?: boolean) => void;
   onSharedZoomChange: (value: number) => void;
   onSharedShiftChange: (value: number) => void;
   onSharedTiltChange: (value: number) => void;
-  onFocusPointerDown: () => void;
-  onAperturePointerDown: () => void;
+  onFocusPointerDown: (value?: number) => void;
+  onAperturePointerDown: (value?: number) => void;
   onSliderPointerUp?: () => void;
   focusPair: FocusPairResult;
   aperturePair: AperturePairResult;
@@ -107,8 +107,9 @@ export default function SharedSlidersBar({
   isWide,
 }: SharedSlidersBarProps) {
   const { commonPoint: focusCP, minCloseFocus } = focusPair;
-  const { commonPoint: apertureCP, widerFOPEN, sharedMaxFstop } = aperturePair;
+  const { commonPoint: apertureCP, widerFOPEN, sharedMaxFstop, fNumberA, fNumberB } = aperturePair;
   const fNum = sharedFNumber(sharedStopdownT, widerFOPEN, sharedMaxFstop);
+  const apertureLimited = Math.abs(fNumberA - fNum) > 0.005 || Math.abs(fNumberB - fNum) > 0.005;
   const focusDistStr = formatSharedFocusDist(sharedFocusT, minCloseFocus);
   /* Only show the common-point marker when it falls in a visible range
    * (not at the extreme ends of the slider where it would be meaningless) */
@@ -120,6 +121,7 @@ export default function SharedSlidersBar({
   const showTilt = showMovement && movementPair && isMovementAxisEnabled(movementPair.tiltRangeDeg);
   const movementAvailabilityA = getGroupMovementAvailability(LA);
   const movementAvailabilityB = getGroupMovementAvailability(LB);
+  const focusEnabled = movementAvailabilityA.focus || movementAvailabilityB.focus;
 
   /* Zoom readout helpers — dual-zoom uses the shared focal length from
    * computeZoomPair; single-zoom reads from the one zoom lens directly. */
@@ -163,7 +165,7 @@ export default function SharedSlidersBar({
   ];
   const quickStopSelect = (value: number) => {
     const stopT = Math.log(value / widerFOPEN) / Math.log(sharedMaxFstop / widerFOPEN);
-    onSharedStopdownChange(Math.max(0, stopT));
+    onSharedStopdownChange(Math.max(0, Math.min(1, stopT)), true);
     onSliderPointerUp?.();
   };
   const handleSharedShiftChange = (value: number) => {
@@ -337,12 +339,15 @@ export default function SharedSlidersBar({
         <SharedSliderSection
           theme={t}
           label="FOCUS"
-          valueLabel={focusDistStr}
+          valueLabel={focusEnabled ? focusDistStr : "Not modeled"}
           minLabel={"\u221e"}
-          maxLabel={`${minCloseFocus} m`}
-          sliderValue={sharedFocusT}
+          maxLabel={focusEnabled ? `${minCloseFocus} m` : "Not modeled"}
+          sliderValue={focusEnabled ? sharedFocusT : 0}
+          disabled={!focusEnabled}
+          disabledReason="No modeled focus travel data"
           onSliderChange={onSharedFocusChange}
-          onPointerDown={onFocusPointerDown}
+          onDirectChange={(value) => onSharedFocusChange(value, true)}
+          onPointerDown={() => onFocusPointerDown(sharedFocusT)}
           onPointerUp={onSliderPointerUp}
           markerPositions={showFocusCP ? [focusCP] : []}
           action={
@@ -351,14 +356,14 @@ export default function SharedSlidersBar({
           readouts={
             <>
               <span>
-                A: {formatDist(focusPair.focusA, LA, zoomPair?.zoomA)}
-                {focusPair.focusA > 0.003 && focusedEflDiffersA && (
+                A: {movementAvailabilityA.focus ? formatDist(focusPair.focusA, LA, zoomPair?.zoomA) : "Not modeled"}
+                {movementAvailabilityA.focus && focusPair.focusA > 0.003 && focusedEflDiffersA && (
                   <span style={{ opacity: 0.7 }}> ({dynamicEflA.toFixed(1)} mm)</span>
                 )}
               </span>
               <span>
-                B: {formatDist(focusPair.focusB, LB, zoomPair?.zoomB)}
-                {focusPair.focusB > 0.003 && focusedEflDiffersB && (
+                B: {movementAvailabilityB.focus ? formatDist(focusPair.focusB, LB, zoomPair?.zoomB) : "Not modeled"}
+                {movementAvailabilityB.focus && focusPair.focusB > 0.003 && focusedEflDiffersB && (
                   <span style={{ opacity: 0.7 }}> ({dynamicEflB.toFixed(1)} mm)</span>
                 )}
               </span>
@@ -370,31 +375,40 @@ export default function SharedSlidersBar({
         <SharedSliderSection
           theme={t}
           label="APERTURE"
-          valueLabel={`f/${fNum < 10 ? fNum.toFixed(1) : Math.round(fNum)}`}
-          minLabel={`f/${widerFOPEN.toFixed(1)}`}
-          maxLabel={`f/${sharedMaxFstop}`}
+          valueLabel={`${apertureLimited ? "Requested " : ""}f/${formatFNumber(fNum)}`}
+          minLabel={`f/${formatFNumber(widerFOPEN)}`}
+          maxLabel={`f/${formatFNumber(sharedMaxFstop)}`}
           sliderValue={sharedStopdownT}
           onSliderChange={onSharedStopdownChange}
-          onPointerDown={onAperturePointerDown}
+          onDirectChange={(value) => onSharedStopdownChange(value, true)}
+          onPointerDown={() => onAperturePointerDown(sharedStopdownT)}
           onPointerUp={onSliderPointerUp}
           markerPositions={showApertureCP ? [apertureCP] : []}
           readouts={
-            <SharedFStopQuickSelect
-              fstopSeriesA={LA.fstopSeries}
-              fstopSeriesB={LB.fstopSeries}
-              widerFopen={widerFOPEN}
-              sharedMaxFstop={sharedMaxFstop}
-              currentFNumber={fNum}
-              onSelect={quickStopSelect}
-            />
+            <div>
+              {apertureLimited && (
+                <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+                  <span>A: f/{formatFNumber(fNumberA)}</span>
+                  <span>B: f/{formatFNumber(fNumberB)}</span>
+                </div>
+              )}
+              <SharedFStopQuickSelect
+                fstopSeriesA={LA.fstopSeries}
+                fstopSeriesB={LB.fstopSeries}
+                widerFopen={widerFOPEN}
+                sharedMaxFstop={sharedMaxFstop}
+                currentFNumber={fNum}
+                onSelect={quickStopSelect}
+              />
+            </div>
           }
           footer={
             <>
               {showEffectiveAperture &&
-                (Math.abs(effectiveFNumA - fNum) > 0.05 || Math.abs(effectiveFNumB - fNum) > 0.05) && (
+                (Math.abs(effectiveFNumA - fNumberA) > 0.05 || Math.abs(effectiveFNumB - fNumberB) > 0.05) && (
                   <div style={{ marginTop: 6, display: "flex", gap: 16, fontSize: 9, color: t.spacingVal }}>
-                    <span>A eff. f/{effectiveFNumA < 10 ? effectiveFNumA.toFixed(1) : Math.round(effectiveFNumA)}</span>
-                    <span>B eff. f/{effectiveFNumB < 10 ? effectiveFNumB.toFixed(1) : Math.round(effectiveFNumB)}</span>
+                    <span>A eff. f/{formatFNumber(effectiveFNumA)}</span>
+                    <span>B eff. f/{formatFNumber(effectiveFNumB)}</span>
                   </div>
                 )}
               <button

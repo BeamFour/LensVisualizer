@@ -8,6 +8,23 @@ import {
 import { MOVEMENT_SHIFT_ENVELOPE_MM, MOVEMENT_TILT_ENVELOPE_DEG } from "../../../../src/optics/lensMovement.js";
 
 describe("lensViewUrlState", () => {
+  it.each([false, true])("restores precise slider selections without quantization (comparing: %s)", (comparing) => {
+    const aperture = Math.log(8 / 4.6) / Math.log(54 / 4.6);
+    const sliders = { focus: 2 / 3, aperture, aberration: -1 / 3, shift: 1 / 3, tilt: -1 / 3 };
+    const restored = parseLensViewQuery(`?${buildLensViewQuery({ ...sliders, comparing })}`);
+    expect(restored.focus).toBe(sliders.focus);
+    expect(restored.aperture).toBe(aperture);
+    expect(4.6 * Math.pow(54 / 4.6, restored.aperture!)).toBeCloseTo(8, 12);
+    expect(restored.shift).toBe(sliders.shift);
+    expect(restored.tilt).toBe(sliders.tilt);
+    expect(restored.aberration).toBe(comparing ? null : sliders.aberration);
+  });
+
+  it("keeps historical rounded links valid and preserves values near the infinity threshold", () => {
+    expect(parseLensViewQuery("?focus=0.500&aperture=0.250")).toMatchObject({ focus: 0.5, aperture: 0.25 });
+    const focus = 0.003000000001;
+    expect(parseLensViewQuery(`?${buildLensViewQuery({ focus })}`).focus).toBe(focus);
+  });
   it("parses v1 single-lens view params", () => {
     const state = parseLensViewQuery(
       "?v=1&focus=0.25&aberration=0.75&aperture=0.5&zoom=70&el=12&gm=1&ad=1&tab=distortion&mv=zoom",
@@ -89,7 +106,7 @@ describe("lensViewUrlState", () => {
       analysisDrawerTab: "coma",
     });
 
-    expect(params.toString()).toBe("v=1&focus=0.250&aberration=0.750&el=4&gm=1&ad=1&tab=coma");
+    expect(params.toString()).toBe("v=1&focus=0.25&aberration=0.75&el=4&gm=1&ad=1&tab=coma");
   });
 
   it("round-trips the summary analysis tab", () => {
@@ -150,7 +167,7 @@ describe("lensViewUrlState", () => {
     expect(parsed.tilt).toBe(8.25);
 
     const params = buildLensViewQuery({ shift: -11.5, tilt: 8.25 });
-    expect(params.toString()).toBe("shift=-11.50&tilt=8.25");
+    expect(params.toString()).toBe("shift=-11.5&tilt=8.25");
   });
 
   it("round-trips signed centered aberration control positions", () => {

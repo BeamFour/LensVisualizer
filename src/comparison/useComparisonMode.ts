@@ -109,8 +109,14 @@ export default function useComparisonMode({
 
   const aperturePair = useMemo(() => {
     if (!isComparisonOk(comparisonLenses)) return null;
-    return computeAperturePair(sharedStopdownT, comparisonLenses.LA, comparisonLenses.LB);
-  }, [sharedStopdownT, comparisonLenses]);
+    return computeAperturePair(
+      sharedStopdownT,
+      comparisonLenses.LA,
+      comparisonLenses.LB,
+      zoomPair?.zoomA,
+      zoomPair?.zoomB,
+    );
+  }, [sharedStopdownT, comparisonLenses, zoomPair]);
 
   const movementPair = useMemo(() => {
     if (!isComparisonOk(comparisonLenses)) return null;

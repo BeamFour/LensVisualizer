@@ -6,7 +6,8 @@ import useComparisonMode, {
   isComparisonOk,
   type ComparisonLensesResult,
 } from "../../../src/comparison/useComparisonMode.js";
-import { CATALOG_KEYS } from "../../../src/utils/catalog/lensCatalog.js";
+import { CATALOG_KEYS, LENS_CATALOG } from "../../../src/utils/catalog/lensCatalog.js";
+import { build, buildSimplePositiveElementLens, buildVariableStopGapLens } from "../optics/testLensFixtures.js";
 
 /* Pick two valid catalog keys for testing */
 const keyA = CATALOG_KEYS[0];
@@ -28,6 +29,34 @@ function makeParams(overrides: Record<string, unknown> = {}) {
 }
 
 describe("useComparisonMode", () => {
+  it("updates aperture limits and the marker when only shared zoom changes", () => {
+    const base = buildVariableStopGapLens([
+      [1, 1],
+      [1.2, 1.2],
+      [1.4, 1.4],
+    ]);
+    const data = { ...base.data, key: "test-comparison-aperture-zoom", nominalFno: [2, 4, 8], maxFstop: 16 };
+    const prime = buildSimplePositiveElementLens("test-comparison-aperture-prime").data;
+    LENS_CATALOG[data.key] = build(data).data;
+    LENS_CATALOG[prime.key] = prime;
+    try {
+      const { result, rerender, unmount } = renderHook(
+        ({ zoom }) =>
+          useComparisonMode(
+            makeParams({ comparing: true, lensKeyA: data.key, lensKeyB: prime.key, sharedZoomT: zoom }),
+          ),
+        { initialProps: { zoom: 0 } },
+      );
+      expect(result.current.aperturePair?.fNumberA).toBe(2);
+      rerender({ zoom: 1 });
+      expect(result.current.aperturePair?.fNumberA).toBe(8);
+      expect(result.current.aperturePair?.commonPoint).toBeCloseTo(Math.log(8 / 2) / Math.log(16 / 2), 10);
+      unmount();
+    } finally {
+      delete LENS_CATALOG[data.key];
+      delete LENS_CATALOG[prime.key];
+    }
+  });
   it("returns null for all fields when not comparing", () => {
     const { result } = renderHook(() => useComparisonMode(makeParams({ comparing: false })));
     expect(result.current.comparisonLenses).toBeNull();

@@ -13,7 +13,7 @@
 import { forwardRef, memo } from "react";
 import InventorLinks from "../content/InventorLinks.js";
 import PatentNumberLink from "../content/PatentNumberLink.js";
-import { eflAtZoom, formatDist } from "../../optics/optics.js";
+import { eflAtZoom, formatDist, formatFNumber } from "../../optics/optics.js";
 import { fisheyeProjectionFocalLengthAtZoom, isFisheyeProjection } from "../../optics/projection.js";
 import { toggleGroup, toggleBtn, headerStrip } from "../../utils/style/styles.js";
 import CollapseButton from "./CollapseButton.js";
@@ -273,7 +273,7 @@ const DiagramHeader = memo(
               >
                 {L.isZoom && <span>{eflAtZoom(zoomT, L).toFixed(0)} mm</span>}
                 <span>{formatDist(focusT, L, zoomT)}</span>
-                <span>f/{fNumber < 10 ? fNumber.toFixed(1) : Math.round(fNumber)}</span>
+                <span>f/{formatFNumber(fNumber)}</span>
                 <span>{compactFocalReadout}</span>
               </div>
             )}

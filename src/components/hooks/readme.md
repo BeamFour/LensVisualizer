@@ -82,7 +82,7 @@ flowchart LR
 
 - Direct source files: 23
 - Direct subfolders: 0
-- Main outbound areas: package:react (21), src/types (21), same folder (15), src/optics/perspective (8), src/optics/optics.ts (7), src/utils/state (4), src/optics/raySampling.ts (3), src/optics/buildLens.ts (2), +11 more
+- Main outbound areas: package:react (21), src/types (21), same folder (15), src/optics/perspective (8), src/optics/optics.ts (7), src/utils/state (4), src/optics/raySampling.ts (3), src/optics/buildLens.ts (2), +12 more
 - External consumers: src/benchmarks, src/comparison, src/components/controls, src/components/display, src/components/layout, src/components/relationshipMap, src/components/search
 
 ## Files
@@ -100,7 +100,7 @@ flowchart LR
 | `useHeaderHeight.ts` | React hook module | package:react (2) | src/components/layout | default, useHeaderHeight |
 | `useInteractionSignal.ts` | React hook module | package:react | src/components/controls | InteractionSignal, default, useInteractionSignal |
 | `useLensAnalysisMarkdown.ts` | React hook module | package:react, src/utils/catalog, src/utils/featureFlags.ts | src/components/layout | default, useLensAnalysisMarkdown |
-| `useLensComputation.ts` | React hook module | src/optics/lensMovement.ts (2), src/optics/optics.ts (2), package:react, src/optics/apertureStop.ts, src/optics/buildLens.ts, +6 more | src/components/layout | default, useLensComputation |
+| `useLensComputation.ts` | React hook module | src/optics/lensMovement.ts (2), src/optics/optics.ts (2), package:react, src/optics/aperture.ts, src/optics/apertureStop.ts, +7 more | src/components/layout | default, useLensComputation |
 | `useModalDialog.ts` | React hook module | package:react | src/components/layout (2) | default, useModalDialog |
 | `useMtfComputation.ts` | React hook module | src/types (2), package:react, same folder | src/components/display | MtfComputation, useMtfComputation |
 | `useMtfPreferences.ts` | React hook module | package:react, src/utils/state | src/components/display | useMtfPreferences |

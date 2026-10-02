@@ -46,6 +46,7 @@ field being dropped when `v` is missing or ≠ 1.
 ## Rules
 
 - Params are omitted at default values so URLs stay minimal.
+- Serialize slider numbers with `String(value)` so links restore exact state; do not round normalized focus/aperture values.
 - Validate everything parsed from the URL (type guards, clamping) — URLs are user input.
 - Never rename existing param keys; shared links in the wild depend on them.
 - Comparison mode uses `a_`/`b_`-prefixed variants for per-panel fields (`selectedElementIdA/B` is the model); decide

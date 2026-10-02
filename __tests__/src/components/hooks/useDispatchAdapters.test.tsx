@@ -42,6 +42,7 @@ const DISPATCH_CASES: Array<{ adapter: AdapterName; args: unknown[]; expected: R
   /* ── Sliders ── */
   { adapter: "onFocusChange", args: [0.5], expected: { type: SET_FOCUS_T, value: 0.5 } },
   { adapter: "onZoomChange", args: [0.75], expected: { type: SET_ZOOM_T, value: 0.75 } },
+  { adapter: "onZoomChange", args: [0.75, 0.4], expected: { type: SET_ZOOM_T, value: 0.75, focusT: 0.4 } },
   { adapter: "onStopdownChange", args: [1.0], expected: { type: SET_STOPDOWN_T, value: 1.0 } },
   { adapter: "onShiftChange", args: [-5.5], expected: { type: SET_SHIFT_MM, value: -5.5 } },
   { adapter: "onTiltChange", args: [3.5], expected: { type: SET_TILT_DEG, value: 3.5 } },

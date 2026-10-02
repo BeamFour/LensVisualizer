@@ -657,3 +657,17 @@ describe("lensReducer — action constant exports", () => {
     }
   });
 });
+
+describe("zoom and focus updates", () => {
+  it("applies interactive zoom and adjusted focus together, but leaves URL focus intact", () => {
+    let state = makeState();
+    state = lensReducer(state, { type: SET_ZOOM_T, value: 1, focusT: 0.75 });
+    expect(state.sliders).toMatchObject({ zoomT: 1, focusT: 0.75 });
+    state = lensReducer(state, { type: SET_ZOOM_T, value: 0.25 });
+    expect(state.sliders.focusT).toBe(0.75);
+    state = lensReducer(state, { type: SET_SHARED_ZOOM_T, value: 1, focusT: 0.6 });
+    expect(state.sharedSliders).toMatchObject({ sharedZoomT: 1, sharedFocusT: 0.6 });
+    state = lensReducer(state, { type: SET_SHARED_ZOOM_T, value: 0.25 });
+    expect(state.sharedSliders.sharedFocusT).toBe(0.6);
+  });
+});

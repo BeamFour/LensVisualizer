@@ -283,7 +283,10 @@ export default function lensReducer(state: LensState, action: LensAction): LensS
     case SET_FOCUS_T:
       return { ...state, sliders: { ...state.sliders, focusT: action.value } };
     case SET_ZOOM_T:
-      return { ...state, sliders: { ...state.sliders, zoomT: action.value } };
+      return {
+        ...state,
+        sliders: { ...state.sliders, zoomT: action.value, focusT: action.focusT ?? state.sliders.focusT },
+      };
     case SET_ABERRATION_T:
       return { ...state, sliders: { ...state.sliders, aberrationT: action.value } };
     case SET_STOPDOWN_T:

@@ -10,6 +10,7 @@
 import { useMemo, useRef } from "react";
 import { LENS_CATALOG } from "../../utils/catalog/lensCatalog.js";
 import { wideOpenStopAtZoom } from "../../optics/apertureStop.js";
+import { fNumberAtStopdown } from "../../optics/aperture.js";
 import buildLens from "../../optics/buildLens.js";
 import { computeCardinalElementsAtState, type CardinalElements } from "../../optics/cardinalElements.js";
 import { computeElementShapes, createCoordinateTransforms } from "../../optics/diagramGeometry.js";
@@ -248,11 +249,7 @@ export default function useLensComputation({
   const stopZ = L ? zPos[L.stopIdx] : 0;
   /* Zoom-aware wide-open f-number (varies for variable-aperture zooms) */
   const currentFOPEN = L ? fopenAtZoom(zoomT, L) : 1;
-  /* Base formula uses L.FOPEN (widest across zoom range) so that a set
-   * f-number stays constant when zooming.  Clamp to currentFOPEN — the
-   * lens can't open wider than the zoom position allows. */
-  const rawFNumber = L ? L.FOPEN * Math.pow(L.maxFstop / L.FOPEN, stopdownT) : 1;
-  const fNumber = Math.max(rawFNumber, currentFOPEN);
+  const fNumber = L ? fNumberAtStopdown(stopdownT, zoomT, L) : 1;
   // Stop-down is relative to this zoom state: its wide-open marking retains the full iris.
   const wideOpenStopSD = L ? wideOpenStopAtZoom(zoomT, L) : 0;
   const currentPhysStopSD = L ? (wideOpenStopSD * currentFOPEN) / fNumber : 0;

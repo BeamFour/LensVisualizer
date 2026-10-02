@@ -35,6 +35,22 @@ Shared sliders represent a normalized comparison control surface. `comparisonSli
 lens' actual focus, aperture, zoom, and optional perspective-control movement ranges. This keeps the UI ergonomic while
 preserving each lens' real optical limits; lenses without `perspectiveControl` clamp shared shift/tilt to zero.
 
+The aperture request scale stays fixed across zoom so a selected f-number and saved URL keep their meaning.
+`fNumberAtStopdown` supplies the current-zoom aperture limit for both the diagrams and comparison readouts.
+When either lens cannot reach the request, the slider labels it "Requested" and shows both actual A/B apertures;
+the optional effective-aperture row adds only the close-focus correction. The common-point marker and sticky flash
+follow the current zoom limits, with no common-point marker when the aperture ranges do not overlap.
+
+Focus ranges include only lenses with modeled focus travel. Unsupported panes receive infinity focus and display
+"Not modeled"; the shared control is disabled when neither lens supports focusing.
+
+Sticky common-point detents apply only to pointer drags. Keyboard adjustments and aperture presets select their
+requested value directly and release an existing detent.
+
+Interactive zoom changes rescale normalized focus to preserve the current object distance, clamping at the new
+close-focus endpoint. Single-lens controls use the same distance conversion. Zoom actions carry the adjusted focus
+atomically; URL hydration omits this adjustment so saved focus and zoom restore together without reinterpretation.
+
 ## Scale Modes
 
 Comparison mode can normalize the two panels so users can compare physical scale or framing. Scale ratios are computed
