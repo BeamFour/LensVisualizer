@@ -18,8 +18,9 @@ import type { LensDataInput } from "../../types/optics.js";
 const LENS_DATA = {
   key: "voigtlander-tele-dynar-100mm-f63",
   maker: "Voigtländer",
-  name: "VOIGTLÄNDER TELE-DYNAR 100mm f/6.3",
+  name: "VOIGTLÄNDER TELE-DYNAR 100mm f/6.3 (patent-normalized)",
   subtitle: "DE 444150 C EXAMPLE 1 — HANS DESER; 100mm PATENT NORMALIZATION",
+  specs: ["5 ELEMENTS / 3 GROUPS", "100 mm f/6.3 PATENT NOMINAL", "STATIC INFINITY MODEL", "SPHERICAL / PLANAR"],
   focalLengthDesign: 100.20996958013951,
   apertureDesign: 6.3,
   patentNumber: "DE 444150 C",

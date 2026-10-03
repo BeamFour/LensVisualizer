@@ -25,7 +25,7 @@ import type { LensDataInput } from "../../types/optics.js";
  * NOTE ON SEMI-DIAMETERS: not published. Modeled from real meridional rays (full f/2.8 axial bundle, 0.6-field fan at
  *   ±0.75 stop fill, full-field 135-format chief ray) plus 8 % clearance. L7's rear clear aperture exceeds the r10
  *   junction radius, consistent with the figure's enlarged rear component.
- *   The r7 cemented rim is enlarged to 6.55 mm to follow the stepped rear edge of L4 in the drawing.
+ *   The r7 cemented rim is 4.6 mm; L4 ends below the larger 6.55 mm outer rim of L5 in the drawing.
  * NOTE ON FOCUS: CONSTRAINED_RECONSTRUCTION. Unit focus (whole optical unit on its own helicoid; third-party sources),
  *   solved paraxially to the manufacturer's 3 ft (0.9144 m) closest distance, measured object-to-image plane.
  *   The patent publishes only the infinity state.
@@ -151,7 +151,7 @@ const LENS_DATA = {
     { label: "5", R: 7.9625, d: 1.9404, nd: 1, elemId: 0, sd: 4.75 }, // L3 rear → air; l2 split at the inferred iris
     { label: "STO", R: 1e15, d: 0.2156, nd: 1, elemId: 0, sd: 4.3224 }, // aperture stop, 0.90 × l2 behind r5 (inferred from the patent figure); sd calibrated to f/2.8
     { label: "6", R: -1471.75, d: 0.833, nd: 1.4645, elemId: 4, sd: 4.7 }, // L4 front — patent prints r6 = −42.05; corrected to −4205 (see header)
-    { label: "7", R: 11.8685, d: 10.0485, nd: 1.6204, elemId: 5, sd: 6.55 }, // L4→L5 cemented junction
+    { label: "7", R: 11.8685, d: 10.0485, nd: 1.6204, elemId: 5, sd: 4.6 }, // L4→L5 cemented junction
     { label: "8", R: -16.0965, d: 1.113, nd: 1, elemId: 0, sd: 6.55 }, // L5 rear → air (l3)
     { label: "9", R: -11.55, d: 2.401, nd: 1.6204, elemId: 6, sd: 6.65 }, // L6 front
     { label: "10", R: -8.729, d: 1.715, nd: 1.4645, elemId: 7, sd: 7.1 }, // L6→L7 cemented junction

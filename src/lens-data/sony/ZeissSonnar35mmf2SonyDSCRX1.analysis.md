@@ -159,8 +159,9 @@ comparison with authoritative optical-glass catalogs; they are not supplier attr
 
 The close coordinates make these labels useful for classification and catalog cross-checking, but they do not establish
 which supplier Sony or Zeiss used. Catalog line indices retained in the dossier for especially close G6 and G8 candidates
-are replay evidence only and are deliberately not authored as element properties. Consequently this analysis makes no APO,
-anomalous-partial-dispersion, or catalog-Sellmeier performance claim from those candidate identities.
+are replay evidence only and are deliberately not authored as element properties. The runtime uses the compatible catalog curves as spectral proxies, with source nd and νd retained. This does not establish production glass identity, APO correction, or anomalous partial dispersion.
+
+The same coordinate guard supports spectral proxies for rear plates FL2 (BK7G18, Δn = +0.00075, Δν = −0.62) and FL3 (N-BK7, Δn = 0, Δν = −0.03). These are supplier-unconfirmed model choices; FL2 is not identified as radiation-resistant production glass. The [SCHOTT BK7G18 vendor coefficients](https://refractiveindex.info/?shelf=specs&book=SCHOTT-optical&page=BK7G18) agree with the existing catalog row. FL1 (1.549 / 64.2) has no compatible catalog curve and remains explicitly unresolved. The plate dimensions and physical gaps are unchanged.
 
 ## Focus Mechanism
 

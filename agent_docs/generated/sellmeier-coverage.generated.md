@@ -1063,12 +1063,12 @@ Fully strict and line-index-complete trusted lenses are listed above; this table
 | 266 | [NIKON UV-NIKKOR AUTO 55mm f/4](../../src/lens-data/nikon/NikonUvNikkor55mmf4.data.ts) | 0.0% | 0.0% | 0/3 | 0/3 | 3 | abbe: 3 |
 | 267 | [CARL ZEISS JENA TESSAR 144mm f/5.5](../../src/lens-data/carl-zeiss-jena/ZeissTessar144f55.data.ts) | 0.0% | 0.0% | 0/4 | 0/4 | 4 | abbe: 4 |
 | 268 | [FUJIFILM FUJINAR 210mm f/4.5](../../src/lens-data/fujifilm/FujifilmFujinar210mmf45.data.ts) | 0.0% | 0.0% | 0/4 | 0/4 | 4 | constant: 4 |
-| 269 | [VOIGTLÄNDER CINE-TELE-ANASTIGMAT 100mm f/4.5](../../src/lens-data/voigtlander/VoigtlanderCineTeleAnastigmat100mmf45.data.ts) | 0.0% | 0.0% | 0/4 | 0/4 | 4 | abbe: 4 |
+| 269 | [VOIGTLÄNDER CINE-TELE-ANASTIGMAT 100mm f/4.5 (patent model)](../../src/lens-data/voigtlander/VoigtlanderCineTeleAnastigmat100mmf45.data.ts) | 0.0% | 0.0% | 0/4 | 0/4 | 4 | abbe: 4 |
 | 270 | [SCHNEIDER-KREUZNACH TELE-XENAR 180mm f/4.5](../../src/lens-data/schneider-kreuznach/SchneiderTeleXenar180mmf45.data.ts) | 0.0% | 0.0% | 0/5 | 0/5 | 5 | abbe: 5 |
 | 271 | [VOIGTLÄNDER DYNAR 100mm f/6](../../src/lens-data/voigtlander/VoigtlanderDynarF6.data.ts) | 0.0% | 0.0% | 0/5 | 0/5 | 5 | constant: 5 |
 | 272 | [VOIGTLÄNDER HELIAR (Symmetric) f/4](../../src/lens-data/voigtlander/VoigtlanderHeliar.data.ts) | 0.0% | 0.0% | 0/5 | 0/5 | 5 | abbe: 5 |
 | 273 | [VOIGTLÄNDER HELIAR 100mm f/4.5 (Second Asymmetric Form)](../../src/lens-data/voigtlander/VoigtlanderHeliarF45SecondAsymmetric.data.ts) | 0.0% | 0.0% | 0/5 | 0/5 | 5 | constant: 5 |
-| 274 | [VOIGTLÄNDER TELE-DYNAR 100mm f/6.3](../../src/lens-data/voigtlander/VoigtlanderTeleDynar100mmf63.data.ts) | 0.0% | 0.0% | 0/5 | 0/5 | 5 | abbe: 5 |
+| 274 | [VOIGTLÄNDER TELE-DYNAR 100mm f/6.3 (patent-normalized)](../../src/lens-data/voigtlander/VoigtlanderTeleDynar100mmf63.data.ts) | 0.0% | 0.0% | 0/5 | 0/5 | 5 | abbe: 5 |
 | 275 | [APPLE iPhone 7 Wide 4.10mm f/1.8 (inferred patent model)](../../src/lens-data/apple/AppleiPhone7WideCameraLens.data.ts) | 0.0% | 0.0% | 0/6 | 0/6 | 6 | abbe: 6 |
 | 276 | [CARL ZEISS JENA PANCOLAR 50mm f/2](../../src/lens-data/carl-zeiss-jena/CarlZeissJenaPancolar50mmf2.data.ts) | 0.0% | 0.0% | 0/6 | 0/6 | 6 | abbe: 6 |
 | 277 | [MEYER OPTIK GÖRLITZ DOUBLE-PLASMAT 135mm f/4.5 (patent model)](../../src/lens-data/meyer-optik-goerlitz/MeyerOptikGorlitz135mmf45DoublePlasmat.data.ts) | 0.0% | 0.0% | 0/6 | 0/6 | 6 | abbe: 6 |
@@ -3002,14 +3002,14 @@ Incomplete visible lenses, still ordered by descending trusted chromatic complet
 | 5 | Element 3 | constant | `Unmatched (N=1.5293; Abbe number and spectral reference not published)` | Explicit unmatched/proprietary annotation |
 | 6 | Element 4 | constant | `Unmatched (N=1.6227; Abbe number and spectral reference not published)` | Explicit unmatched/proprietary annotation |
 
-### [VOIGTLÄNDER CINE-TELE-ANASTIGMAT 100mm f/4.5](../../src/lens-data/voigtlander/VoigtlanderCineTeleAnastigmat100mmf45.data.ts) - 0.0% trusted (0/4); 0.0% Sellmeier (0/4) - DE 444150 C
+### [VOIGTLÄNDER CINE-TELE-ANASTIGMAT 100mm f/4.5 (patent model)](../../src/lens-data/voigtlander/VoigtlanderCineTeleAnastigmat100mmf45.data.ts) - 0.0% trusted (0/4); 0.0% Sellmeier (0/4) - DE 444150 C
 
 | Surface | Element | Runtime quality | Glass annotation | Reason |
 |---|---|---|---|---|
-| 1 | Element 1 | abbe | `Unmatched (vintage sodium-D glass; supplier and modern d-line identity unconfirmed)` | Explicit unmatched/proprietary annotation |
-| 2 | Element 2 | abbe | `Unmatched (vintage sodium-D glass; supplier and modern d-line identity unconfirmed)` | Explicit unmatched/proprietary annotation |
-| 4 | Element 3 | abbe | `Unmatched (vintage sodium-D glass; supplier and modern d-line identity unconfirmed)` | Explicit unmatched/proprietary annotation |
-| 6 | Element 4 | abbe | `Unmatched (vintage sodium-D glass; supplier and modern d-line identity unconfirmed)` | Explicit unmatched/proprietary annotation |
+| 1 | Element 1 | abbe | `Unmatched (vintage crown; native sodium D coordinates)` | Explicit unmatched/proprietary annotation |
+| 2 | Element 2 | abbe | `Unmatched (vintage flint; native sodium D coordinates)` | Explicit unmatched/proprietary annotation |
+| 4 | Element 3 | abbe | `Unmatched (vintage light flint; native sodium D coordinates)` | Explicit unmatched/proprietary annotation |
+| 6 | Element 4 | abbe | `Unmatched (vintage flint; native sodium D coordinates)` | Explicit unmatched/proprietary annotation |
 
 ### [SCHNEIDER-KREUZNACH TELE-XENAR 180mm f/4.5](../../src/lens-data/schneider-kreuznach/SchneiderTeleXenar180mmf45.data.ts) - 0.0% trusted (0/5); 0.0% Sellmeier (0/5) - DE 471565 C
 
@@ -3051,7 +3051,7 @@ Incomplete visible lenses, still ordered by descending trusted chromatic complet
 | 6 | Element b2 | constant | `Unmatched (DE143889C b2; historical nD/nG′ pair only)` | Explicit unmatched/proprietary annotation |
 | 7 | Element a2 | constant | `Unmatched (DE143889C a2; historical nD/nG′ pair only)` | Explicit unmatched/proprietary annotation |
 
-### [VOIGTLÄNDER TELE-DYNAR 100mm f/6.3](../../src/lens-data/voigtlander/VoigtlanderTeleDynar100mmf63.data.ts) - 0.0% trusted (0/5); 0.0% Sellmeier (0/5) - DE 444150 C
+### [VOIGTLÄNDER TELE-DYNAR 100mm f/6.3 (patent-normalized)](../../src/lens-data/voigtlander/VoigtlanderTeleDynar100mmf63.data.ts) - 0.0% trusted (0/5); 0.0% Sellmeier (0/5) - DE 444150 C
 
 | Surface | Element | Runtime quality | Glass annotation | Reason |
 |---|---|---|---|---|

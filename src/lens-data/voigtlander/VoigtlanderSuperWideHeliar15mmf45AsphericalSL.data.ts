@@ -33,7 +33,7 @@ const LENS_DATA = {
   apertureDesign: 4.57,
   lensMounts: ["nikon-f"],
   imageFormat: "135-full-frame",
-  patentNumber: "JPH11326756A",
+  patentNumber: "JP H11-326756 A",
   patentAuthors: ["Yoshihisa Yomogida"],
   patentAssignees: ["Cosina Co., Ltd."],
   patentYear: 1999,

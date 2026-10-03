@@ -198,6 +198,7 @@ const LENS_DATA = {
   rearPlates: [
     {
       label: "FL1",
+      glass: "Unmatched (source plate; 1.549 / 64.2; supplier unconfirmed)",
       thicknessMm: 1.43,
       nd: 1.549,
       vd: 64.2,
@@ -206,6 +207,7 @@ const LENS_DATA = {
     },
     {
       label: "FL2",
+      glass: "BK7G18 class (Schott spectral proxy; supplier unconfirmed)",
       thicknessMm: 0.59,
       nd: 1.519,
       vd: 64.2,
@@ -214,6 +216,7 @@ const LENS_DATA = {
     },
     {
       label: "FL3",
+      glass: "N-BK7 class (Schott spectral proxy; supplier unconfirmed)",
       thicknessMm: 0.7,
       nd: 1.5168,
       vd: 64.2,

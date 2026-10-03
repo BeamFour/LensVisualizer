@@ -25,7 +25,7 @@ The example is correlated with the seven-element, four-group Biogon 1:2.8 f = 35
 
 The final radius is faint. It is read as printed, r11 = −133.9: its third digit matches the table's own 3s (open upper bowl, no ink at the left waist) rather than its 8s. The alternative reading −138.9 would raise the corrected focal length to 99.853 but has no support in the glyph itself and is not used.
 
-**Scaling and inferred quantities.** Every radius and thickness is scaled by s = 0.35 (nominal f = 100 → 35 mm), giving a computed focal length of 34.75 mm; indices, Abbe numbers and the all-spherical form are unchanged. The aperture stop is placed 0.90 of the way across the r5–r6 air space, measured from the patent figure. Its semi-diameter, 4.3224 mm, is calibrated to reproduce f/2.8 and is not independent evidence. Clear semi-diameters are inferred from real ray bundles and the optical figure, not published values. The r7 junction uses a 6.55 mm rim to follow the stepped rear edge of L4.
+**Scaling and inferred quantities.** Every radius and thickness is scaled by s = 0.35 (nominal f = 100 → 35 mm), giving a computed focal length of 34.75 mm; indices, Abbe numbers and the all-spherical form are unchanged. The aperture stop is placed 0.90 of the way across the r5–r6 air space, measured from the patent figure. Its semi-diameter, 4.3224 mm, is calibrated to reproduce f/2.8 and is not independent evidence. Clear semi-diameters are inferred from real ray bundles and the optical figure, not published values. The r7 cemented junction ends at 4.6 mm; the larger 6.55 mm rim belongs to L5 beyond the cemented contact. The stepped drawing does not support extending L4 to that outer height.
 
 ## Optical Architecture
 

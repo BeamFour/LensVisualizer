@@ -20,7 +20,7 @@ import type { LensDataInput } from "../../types/optics.js";
 const LENS_DATA = {
   key: "voigtlander-cine-tele-anastigmat-100mm-f45",
   maker: "Voigtländer",
-  name: "VOIGTLÄNDER CINE-TELE-ANASTIGMAT 100mm f/4.5",
+  name: "VOIGTLÄNDER CINE-TELE-ANASTIGMAT 100mm f/4.5 (patent model)",
   subtitle: "DE 444150 C, Example 2; selected commercial correlation unconfirmed",
   specs: ["4 ELEMENTS / 3 GROUPS", "100 mm f/4.5 PATENT NOMINAL", "FIXED INFINITY MODEL", "SPHERICAL / PLANAR"],
   focalLengthDesign: 100.06983213015889,
@@ -42,7 +42,7 @@ const LENS_DATA = {
       indexReferenceNote:
         "Native patent n_D (sodium D, approximately 589.3 nm); retained numerically in nd, approximate d-line tracing; source Abbe spectral pair not defined.",
       fl: 26.435932252825708,
-      glass: "Unmatched (vintage sodium-D glass; supplier and modern d-line identity unconfirmed)",
+      glass: "Unmatched (vintage crown; native sodium D coordinates)",
       cemented: "D1",
     },
     {
@@ -56,7 +56,7 @@ const LENS_DATA = {
       indexReferenceNote:
         "Native patent n_D (sodium D, approximately 589.3 nm); retained numerically in nd, approximate d-line tracing; source Abbe spectral pair not defined.",
       fl: -53.07954193748065,
-      glass: "Unmatched (vintage sodium-D glass; supplier and modern d-line identity unconfirmed)",
+      glass: "Unmatched (vintage flint; native sodium D coordinates)",
       cemented: "D1",
     },
     {
@@ -70,7 +70,7 @@ const LENS_DATA = {
       indexReferenceNote:
         "Native patent n_D (sodium D, approximately 589.3 nm); retained numerically in nd, approximate d-line tracing; source Abbe spectral pair not defined.",
       fl: -28.783074814557644,
-      glass: "Unmatched (vintage sodium-D glass; supplier and modern d-line identity unconfirmed)",
+      glass: "Unmatched (vintage light flint; native sodium D coordinates)",
     },
     {
       id: 4,
@@ -83,7 +83,7 @@ const LENS_DATA = {
       indexReferenceNote:
         "Native patent n_D (sodium D, approximately 589.3 nm); retained numerically in nd, approximate d-line tracing; source Abbe spectral pair not defined.",
       fl: 55.345174557209816,
-      glass: "Unmatched (vintage sodium-D glass; supplier and modern d-line identity unconfirmed)",
+      glass: "Unmatched (vintage flint; native sodium D coordinates)",
     },
   ],
   surfaces: [
