@@ -8,11 +8,11 @@ or per-lens patent backfills.
 
 ## Summary
 
-- **858** lenses scanned
-- **9646** non-air surfaces examined
-- **9656** element glass declarations examined
-- **251** non-explicit-unmatched annotations did not resolve
-- **135** distinct unresolved glass-like tokens found
+- **864** lenses scanned
+- **9686** non-air surfaces examined
+- **9696** element glass declarations examined
+- **250** non-explicit-unmatched annotations did not resolve
+- **134** distinct unresolved glass-like tokens found
 
 ## Tokens by Frequency
 
@@ -151,7 +151,6 @@ or per-lens patent backfills.
 | KF5 | 1 | 1 | |
 | KZF4 | 1 | 1 | |
 | LF7-CLASS | 1 | 1 | |
-| LLF7 | 1 | 1 | |
 | N3 | 1 | 1 | |
 
 ## Occurrences
@@ -728,10 +727,6 @@ or per-lens patent backfills.
 ### LF7-CLASS — 1 occurrence
 
 - [OLYMPUS OM ZUIKO AUTO-W 21mm f/2](../../src/lens-data/olympus/OlympusZuikoAuto21mmf2.data.ts) 12: `593348 — LF7-class light flint (no exact public catalog match)`
-
-### LLF7 — 1 occurrence
-
-- [CARL ZEISS PRO-TESSAR 35mm f/3.2](../../src/lens-data/carl-zeiss-oberkochen/CarlZeissProTessar35mmf32.data.ts) 12: `LLF7 (Schott)`
 
 ### N3 — 1 occurrence
 

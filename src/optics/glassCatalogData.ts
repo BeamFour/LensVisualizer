@@ -338,6 +338,7 @@ const GLASS_CATALOG_SOURCE_ORDER = [
   "J-BASF6",
   "J-SFH1",
   "J-SFH5",
+  "N-SSK8",
   "N-SSK5",
   "J-KZFH6",
   "J-LAF01",
@@ -515,12 +516,14 @@ const GLASS_CATALOG_SOURCE_ORDER = [
   "K-LaFK50",
   "K-BaSF5",
   "K-PSKn2",
+  "K-SSK4",
   "K-SSK1",
   "K-SSK9",
   "D-K59",
   "SK3",
   "H-ZBaF4",
   "BALK3",
+  "LLF7",
   "KF3",
   "LLF4",
   "BAK2",
@@ -655,6 +658,7 @@ const GLASS_CATALOG_ENTRIES_BY_NAME: ReadonlyMap<string, GlassEntry> = new Map(
  * resolver uses these explicit winners before adding non-duplicate code lookups.
  */
 export const DUPLICATE_CODE6_PRECEDENCE: ReadonlyMap<string, string> = new Map([
+  ["618498", "S-BSM28"],
   ["607567", "N-SK2"],
   ["618633", "S-PHM52Q"],
   ["717480", "LAF3"],

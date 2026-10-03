@@ -19,6 +19,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-10-03",
+    type: "lens",
+    summary: "Added post-war Biogon 35mm, S-Biogon 40mm and Sony RX1 Sonnar 35mm patent models",
+  },
+  {
+    date: "2026-10-03",
+    type: "lens",
+    summary: "Added Voigtländer Tele-Dynar, Cine-Tele-Anastigmat and Super Wide-Heliar SL models",
+  },
+  {
     date: "2026-10-02",
     type: "fix",
     summary: "Corrected aperture readouts, focus behavior, presets, and saved slider precision",

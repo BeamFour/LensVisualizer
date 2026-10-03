@@ -573,4 +573,23 @@ export const SUMITA_GLASS_ENTRIES: readonly GlassEntry[] = [
     source:
       "SUMITA Zemax all-glass catalog, download dated 2026-08-26 (header 2026-08-21), https://www.sumita-opt.co.jp/download_files/en/data/zemax.agf; accessed 2026-09-11. Vendor formula-1 polynomial for the unmolded K-PFK80 row; not K-PFK80(M). vd is coefficient-evaluated (81.3504); the source lists nominal vd=81.5. Coefficients are retained verbatim.",
   },
+  {
+    name: "K-SSK4",
+    vendor: "Sumita",
+    polynomial: [2.5720683, -0.010564186, 0.015625643, 0.00040593207, -1.3424134e-5, 6.4355621e-7],
+    nd: 1.61765,
+    vd: 55.1,
+    code6: "618551",
+    source: "SUMITA Zemax catalog 2017-02-02 via refractiveindex.info, K-SSK4 formula-3 polynomial (0.36–1.55 µm).",
+  },
+  {
+    name: "LLF7",
+    vendor: "Sumita",
+    polynomial: [2.351324, -0.008234544, 0.01618468, 0.0003389461, 0.000007331352, 0.0000008692234],
+    nd: 1.54869,
+    vd: 45.4,
+    code6: "549454",
+    source:
+      "SUMITA all-glass Zemax catalog (header 2026-08-21), https://www.sumita-opt.co.jp/download_files/en/data/zemax.agf; accessed 2026-10-03. Vendor formula-1 polynomial for discontinued LLF7.",
+  },
 ];

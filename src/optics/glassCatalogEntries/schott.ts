@@ -708,4 +708,14 @@ export const SCHOTT_GLASS_ENTRIES: readonly GlassEntry[] = [
     code6: "581409",
     source: "Schott Zemax catalog 2017-01-20b via refractiveindex.info; LF5 page.",
   },
+  {
+    name: "N-SSK8",
+    vendor: "Schott",
+    B: [1.44857867, 0.117965926, 1.06937528],
+    C: [0.00869310149, 0.0421566593, 111.300666],
+    nd: 1.61773,
+    vd: 49.83,
+    code6: "618498",
+    source: "SCHOTT Zemax catalog 2017-01-20b via refractiveindex.info, N-SSK8 Sellmeier constants (0.35–2.5 µm).",
+  },
 ];
