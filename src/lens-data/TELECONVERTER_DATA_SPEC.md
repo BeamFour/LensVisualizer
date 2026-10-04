@@ -112,9 +112,10 @@ host's stop, so a clipped beam would otherwise report an f-number the system can
 3. Every lens surface, element and asphere rule, by merging the converter behind a powerless reference host and
    running `validateLensData()` under the project default thresholds. Messages name composed labels (`TC1`, `TC2`).
 4. First-order self-consistency: the paraxial image of an object `masterImageDistanceMm` behind the first vertex must
-   land within 0.1 mm of the authored air-equivalent back focus, and the computed lateral magnification must be within
-   5% of `magnification`. A back-focus mismatch usually means a physical distance was used where an air-equivalent one
-   is required.
+   land on the authored air-equivalent back focus within 0.05 mm × `magnification`² (0.1 mm for a 1.4× converter,
+   0.2 mm for a 2×), and the computed lateral magnification must be within 5% of `magnification`. The tolerance covers
+   a master that is not at exact paraxial focus, which the converter magnifies; a back-focus mismatch usually means a
+   physical distance was used where an air-equivalent one is required.
 
 Corpus sweeps additionally compose every converter onto every compatible catalog host and build the result.
 

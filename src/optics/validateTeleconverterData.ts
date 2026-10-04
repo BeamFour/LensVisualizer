@@ -20,8 +20,14 @@ import validateLensData, { LENS_KEY_PATTERN, validateLensMounts, validateRearPla
 /* Validation operates on untrusted data — a permissive record keeps dynamic-key checks free of casts. */
 type UntrustedTeleconverterData = Record<string, any>;
 
-/** Allowed gap between the authored back focus and the paraxial image of the converter's virtual object. */
-const BACK_FOCUS_TOLERANCE_MM = 0.1;
+/**
+ * Allowed master-side defocus between the authored back focus and the paraxial image of the converter's virtual
+ * object. A published master is rarely at exact paraxial focus, and the converter magnifies that residual
+ * longitudinally by its magnification squared, so the image-side tolerance scales the same way: about 0.1 mm for a
+ * 1.4× converter and 0.2 mm for a 2×. A physical distance used where an air-equivalent one is required is off by
+ * several times that.
+ */
+const MASTER_FOCUS_TOLERANCE_MM = 0.05;
 
 /** Allowed relative difference between the computed lateral magnification and the nominal `magnification`. */
 const MAGNIFICATION_TOLERANCE = 0.05;
@@ -174,7 +180,8 @@ export default function validateTeleconverterData(data: UntrustedTeleconverterDa
   }
   const imageDistance = -exit.y / exit.u;
   const authoredBackFocus = last.d + rearPlateAirEquivalentMm(tc.rearPlates ?? []);
-  if (Math.abs(imageDistance - authoredBackFocus) > BACK_FOCUS_TOLERANCE_MM) {
+  const backFocusTolerance = MASTER_FOCUS_TOLERANCE_MM * tc.magnification ** 2;
+  if (Math.abs(imageDistance - authoredBackFocus) > backFocusTolerance) {
     errors.push(
       `Back focus mismatch: the paraxial image forms ${imageDistance.toFixed(3)} mm behind the last vertex, but the authored air-equivalent back focus is ${authoredBackFocus.toFixed(3)} mm`,
     );
