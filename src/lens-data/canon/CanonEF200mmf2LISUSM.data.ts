@@ -8,11 +8,12 @@ import type { LensDataInput } from "../../types/optics.js";
  * ║ Large-aperture positive-negative-positive inner-focus telephoto-   ║
  * ║ type design with optical image stabilization by L32 decentering.   ║
  * ║                                                                    ║
- * ║ Patent/product count: 17 elements / 12 groups including the        ║
- * ║ 2.00 mm drop-in filter plate F (surfaces 29–30, nd 1.51633,        ║
- * ║ νd 64.1). Surfaces hold the 16 powered elements; F and its 60.36   ║
- * ║ mm gap to the image are modeled in `rearPlates` (traced, not       ║
- * ║ drawn). Surface 28 keeps the patent's 3.27 mm gap to the filter.   ║
+ * ║ Patent/product count: 17 elements / 12 groups including the 2.00   ║
+ * ║ mm drop-in filter plate F (surfaces 29–30, nd 1.51633, νd 64.1).   ║
+ * ║ All 17 are drawn: the 16 powered elements, then F as a             ║
+ * ║ plane-parallel plate element with the patent's 3.27 mm gap ahead   ║
+ * ║ of it and 60.36 mm to the image. F's semi-diameter is a ray-trace  ║
+ * ║ estimate; the patent lists none.                                   ║
  * ║                                                                    ║
  * ║ Focus: L2 cemented doublet moves imageward. Paraxial close-focus   ║
  * ║ reconstruction for the official 1.9 m MFD gives +12.5604 mm        ║
@@ -30,7 +31,7 @@ const LENS_DATA = {
   name: "CANON EF 200mm f/2 L IS USM",
   subtitle: "JP 2008-145584 A Example 1 — Canon / Yokoyama",
   specs: [
-    "17 elements / 12 groups incl. filter; 16 powered elements rendered",
+    "17 elements / 12 groups incl. drop-in filter",
     "f = 194.991 mm design; 200 mm marketed",
     "F/2.05 design; f/2.0 marketed",
     "All-spherical, fluorite + 2 UD-class elements",
@@ -288,6 +289,16 @@ const LENS_DATA = {
       ng: 1.82569,
       role: "Final high-index positive meniscus for rear-group convergence and field correction.",
     },
+    {
+      id: 17,
+      name: "F",
+      label: "Drop-in filter F",
+      type: "Plane-Parallel Plate",
+      nd: 1.51633,
+      vd: 64.1,
+      glass: "S-BSL7",
+      role: "Plane-parallel filter plate of the patent prescription (JP 2008-145584 A, Numerical Example 1 (Table 1) surfaces 29–30), in the rear filter holder. The design is computed with it in place, so it is drawn and traced as part of the working system. Semi-diameter is a ray-trace estimate; the source lists none. Included in elementCount, which follows the maker's published count.",
+    },
   ],
 
   surfaces: [
@@ -319,19 +330,10 @@ const LENS_DATA = {
     { label: "26", R: -347.988, d: 0.2, nd: 1.0, elemId: 0, sd: 20 },
     { label: "27", R: 72.365, d: 3.73, nd: 1.804, elemId: 16, sd: 21 },
     { label: "28", R: 518.348, d: 3.27, nd: 1.0, elemId: 0, sd: 21 }, // patent gap to drop-in filter F
-  ],
-
-  /* ── Drop-in filter F (patent surfaces 29–30): traced, not drawn ── */
-  rearPlates: [
-    {
-      label: "F",
-      thicknessMm: 2.0,
-      nd: 1.51633,
-      vd: 64.1,
-      glass: "S-BSL7",
-      gapAfterMm: 60.36,
-      source: "JP 2008-145584 A, Numerical Example 1 (Table 1) surfaces 29–30",
-    },
+    // Drop-in filter F (JP 2008-145584 A, Numerical Example 1 (Table 1) surfaces 29–30), drawn as a plane-parallel plate.
+    // Its sd is a ray-trace estimate (the source lists none).
+    { label: "29", R: 1e15, d: 2.0, nd: 1.51633, elemId: 17, sd: 21.5 },
+    { label: "30", R: 1e15, d: 60.36, nd: 1.0, elemId: 0, sd: 21.5 }, // drop-in filter → image plane
   ],
 
   asph: {},

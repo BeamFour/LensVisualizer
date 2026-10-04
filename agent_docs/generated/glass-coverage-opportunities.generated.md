@@ -10,8 +10,8 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 ## Summary
 
 - **870** lenses scanned (**858** visible)
-- **9046 / 9760** non-air surfaces use strict catalog Sellmeier data (92.7%)
-- **9061 / 9760** non-air surfaces use trusted chromatic data (Sellmeier or measured line indices, 92.8%)
+- **9051 / 9767** non-air surfaces use strict catalog Sellmeier data (92.7%)
+- **9066 / 9767** non-air surfaces use trusted chromatic data (Sellmeier or measured line indices, 92.8%)
 - **0** mismatch surfaces in Sweep 1 across **0** lens files
 - **0** Sweep 1 surfaces have a matching untracked local patent PDF
 - **343** code-only missing-Sellmeier elements in Sweep 2: **23** active unreviewed, **189** self-recording explicit dispositions, **0** dispositions missing any review record
@@ -143,6 +143,8 @@ These rows contain resin, cement, plastic, liquid, or unclassified optical media
 | [CANON EF 28-200mm f/3.5-5.6 USM](../../src/lens-data/canon/CanonEF28200mmf3556USM.data.ts) | JP 2001-350095 A | [PDF](../../patents/JP2001350095A.pdf) | 94.1% (16/17) | 94.1% (16/17) | 1 | 6A [resin] (Hybrid replica layer: `Unmatched (thin replica/aspheric layer; nd=1.514210, vd=51.4)`) | abbe: 1 |
 | [FUJIFILM FUJINON GF 45-100mm f/4 R LM OIS WR](../../src/lens-data/fujifilm/FujifilmGF45100mmf4.data.ts) | US 2020/0379223 A1 | [PDF](../../patents/US20200379223A1.pdf) | 94.1% (16/17) | 94.1% (16/17) | 1 | 19A [resin] (L34 - resin OIS positive asphere: `Unmatched optical resin (W3bp = 1.228; OKP-class high-dispersion polymer)`) | abbe: 1 |
 | [HD PENTAX-DA 16-85mm f/3.5-5.6 ED DC WR](../../src/lens-data/pentax/HDPentaxDA1685mmF3556EDDCWR.data.ts) | JP 2016-114800 A | [PDF](../../patents/JP2016114800A.pdf) | 94.1% (16/17) | 94.1% (16/17) | 1 | 6A [resin] (L21 synthetic-resin aspheric layer: `Unmatched (synthetic resin; patent nd=1.52972, vd=42.7)`) | abbe: 1 |
+| [CANON EF 500mm f/4 L IS USM](../../src/lens-data/canon/CanonEF500mmf4LISUSM.data.ts) | US 6,115,188 A | [PDF](../../patents/US6115188.pdf) | 93.8% (15/16) | 93.8% (15/16) | 1 | 30 [other] (Drop-in filter FL: `no glass annotation`) | abbe: 1 |
+| [CANON EF 600mm f/4 L IS USM](../../src/lens-data/canon/CanonEF600mmf4LISUSM.data.ts) | US 6,115,188 A | [PDF](../../patents/US6115188.pdf) | 93.8% (15/16) | 93.8% (15/16) | 1 | 30 [other] (Drop-in filter FL: `no glass annotation`) | abbe: 1 |
 | [NIKON AF-S NIKKOR 24-70mm f/2.8 G ED](../../src/lens-data/nikon/NikonAFS2470mmf28G.data.ts) | US 7,508,592 B2 | [PDF](../../patents/US7508592.pdf) | 93.8% (15/16) | 93.8% (15/16) | 1 | 7A [resin] (Element 4 resin layer: `553381 — unmatched UV-cure replicated resin (patent nd=1.55389, νd=38.09; not catalog glass)`) | abbe: 1 |
 | [NIKON AF-S DX ZOOM-NIKKOR 18-70mm f/3.5-4.5G IF-ED](../../src/lens-data/nikon/NikonAFSDXZoomNikkor1870mmf3545GIFED.data.ts) | US 2005/0068636 A1 | [PDF](../../patents/US20050068636A1.pdf) | 93.8% (15/16) | 93.8% (15/16) | 1 | 6A [resin] (L21 Hybrid Resin Layer: `Unmatched (hybrid aspheric resin; patent nd=1.55389, vd=38.1)`) | abbe: 1 |
 | [NIKON AF-S VR ZOOM-NIKKOR 24-120mm f/3.5-5.6G IF-ED](../../src/lens-data/nikon/NikonAFSVRZoomNikkor24120mmf3556GIFED.data.ts) | US 2004/0218274 A1 | [PDF](../../patents/US20040218274A1.pdf) | 93.8% (15/16) | 93.8% (15/16) | 1 | 6A [resin] (L21 bonded aspheric layer: `Unmatched (thin bonded aspheric resin/composite layer; nd=1.553890, vd=38.09)`) | abbe: 1 |
