@@ -12,7 +12,7 @@ import UpdatesPage from "../../../../src/pages/UpdatesPage.js";
 import type { LensAction, LensState } from "../../../../src/types/state.js";
 import { CATALOG_KEYS, LENS_CATALOG } from "../../../../src/utils/catalog/lensCatalog.js";
 import { ALL_LENSES_BY_DATE } from "../../../../src/utils/catalog/lensSummaries.js";
-import { TELECONVERTER_CATALOG, TELECONVERTER_KEYS } from "../../../../src/utils/catalog/teleconverterCatalog.js";
+import { ALL_TELECONVERTER_KEYS, TELECONVERTER_CATALOG } from "../../../../src/utils/catalog/teleconverterCatalog.js";
 import { LensDispatchContext, LensStateContext, type LensCtxValue } from "../../../../src/utils/state/LensContext.js";
 import { createInitialState } from "../../../../src/utils/state/lensReducer.js";
 import { deriveMaker } from "../../../../src/utils/catalog/lensMetadata.js";
@@ -281,7 +281,7 @@ describe("page, markdown, and breadcrumb coverage", () => {
     expect(screen.getByRole("link", { name: "APS-C" }).getAttribute("href")).toBe("/formats/aps-c/");
 
     cleanup();
-    const teleconverterKey = TELECONVERTER_KEYS[0];
+    const teleconverterKey = ALL_TELECONVERTER_KEYS[0];
     renderBreadcrumb({
       lensKey,
       state,

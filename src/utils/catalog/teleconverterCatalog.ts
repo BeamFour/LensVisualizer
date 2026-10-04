@@ -5,6 +5,9 @@
  * module pairs converters with host lenses through the single fit predicate and builds the composed prescription
  * the viewer hands to `buildLens()`. Index-style pages must use the generated summaries instead so they do not ship
  * full prescriptions.
+ *
+ * Hidden converters (`visible: false`) are test models: they are never offered, but a `tc` key that names one still
+ * resolves, so a hand-typed URL mounts it.
  */
 
 import { attachTeleconverter, teleconverterCompatibility } from "../../optics/teleconverter.js";
@@ -35,35 +38,74 @@ for (const [path, mod] of Object.entries(_modules)) {
   }
 }
 
-/* Weakest converter first, then by display name, so toggle order is stable across lenses. */
-const TELECONVERTER_KEYS: string[] = Object.keys(TELECONVERTER_CATALOG).sort(
+/* Every converter including hidden test models. Weakest first, then by display name, so toggle order is stable
+ * across lenses. */
+const ALL_TELECONVERTER_KEYS: string[] = Object.keys(TELECONVERTER_CATALOG).sort(
   (a, b) =>
     TELECONVERTER_CATALOG[a].magnification - TELECONVERTER_CATALOG[b].magnification ||
     catalogCollator.compare(TELECONVERTER_CATALOG[a].name, TELECONVERTER_CATALOG[b].name),
 );
 
-const OPTIONS_BY_LENS = new Map<string, ReadonlyArray<TeleconverterOption>>();
+/* Published converters, in the same order. */
+const TELECONVERTER_KEYS: string[] = ALL_TELECONVERTER_KEYS.filter(
+  (key) => TELECONVERTER_CATALOG[key].visible !== false,
+);
+
+/* Fit is cached per lens; option arrays are cached per lens and mounted key so callers get a stable identity. */
+const FITTING_BY_LENS = new Map<string, ReadonlyArray<TeleconverterOption>>();
+const OPTIONS_BY_SYSTEM = new Map<string, ReadonlyArray<TeleconverterOption>>();
 
 /**
- * Converters that can be mounted on a catalog lens, weakest first.
+ * Every converter that fits a catalog lens, hidden test models included, weakest first.
  *
  * @param lensKey - catalog lens key (a configuration variant key is a lens key too)
- * @returns mountable converters; empty for unknown keys and lenses that take none
+ * @returns fitting converters; empty for unknown keys and lenses that take none
  */
-function teleconverterOptionsForLens(lensKey: string): ReadonlyArray<TeleconverterOption> {
-  const cached = OPTIONS_BY_LENS.get(lensKey);
+function fittingTeleconverters(lensKey: string): ReadonlyArray<TeleconverterOption> {
+  const cached = FITTING_BY_LENS.get(lensKey);
   if (cached) return cached;
   const host = LENS_CATALOG[lensKey];
-  const options: TeleconverterOption[] = [];
+  const fitting: TeleconverterOption[] = [];
   if (host) {
-    for (const key of TELECONVERTER_KEYS) {
+    for (const key of ALL_TELECONVERTER_KEYS) {
       const tc = TELECONVERTER_CATALOG[key];
       if (teleconverterCompatibility(host, tc).ok) {
-        options.push({ key, name: tc.name, label: `${tc.magnification}×`, magnification: tc.magnification });
+        fitting.push({ key, name: tc.name, label: `${tc.magnification}×`, magnification: tc.magnification });
       }
     }
   }
-  OPTIONS_BY_LENS.set(lensKey, options);
+  FITTING_BY_LENS.set(lensKey, fitting);
+  return fitting;
+}
+
+/**
+ * Converters the viewer offers for a catalog lens, weakest first.
+ *
+ * Hidden test models are left out unless one is the mounted converter, so a system opened from a hand-typed URL
+ * can still be switched back to the bare lens.
+ *
+ * @param lensKey - catalog lens key (a configuration variant key is a lens key too)
+ * @param mountedKey - converter currently mounted on the lens, if any
+ * @returns offered converters; empty for unknown keys and lenses that take none
+ */
+function teleconverterOptionsForLens(
+  lensKey: string,
+  mountedKey: string | null = null,
+): ReadonlyArray<TeleconverterOption> {
+  const fitting = fittingTeleconverters(lensKey);
+  const mountedHiddenKey =
+    mountedKey !== null &&
+    TELECONVERTER_CATALOG[mountedKey]?.visible === false &&
+    fitting.some((option) => option.key === mountedKey)
+      ? mountedKey
+      : null;
+  const cacheKey = lensSystemKey(lensKey, mountedHiddenKey);
+  const cached = OPTIONS_BY_SYSTEM.get(cacheKey);
+  if (cached) return cached;
+  const options = fitting.filter(
+    (option) => TELECONVERTER_CATALOG[option.key].visible !== false || option.key === mountedHiddenKey,
+  );
+  OPTIONS_BY_SYSTEM.set(cacheKey, options);
   return options;
 }
 
@@ -72,11 +114,11 @@ function teleconverterOptionsForLens(lensKey: string): ReadonlyArray<Teleconvert
  *
  * @param lensKey - catalog lens key the converter would mount on
  * @param requestedKey - converter key from the URL or prior state
- * @returns the key when that converter fits the lens, otherwise null
+ * @returns the key when that converter fits the lens (hidden test models included), otherwise null
  */
 function resolveTeleconverterKey(lensKey: string, requestedKey: string | null | undefined): string | null {
   if (!requestedKey) return null;
-  return teleconverterOptionsForLens(lensKey).some((option) => option.key === requestedKey) ? requestedKey : null;
+  return fittingTeleconverters(lensKey).some((option) => option.key === requestedKey) ? requestedKey : null;
 }
 
 /**
@@ -108,6 +150,7 @@ function lensSystemKey(lensKey: string, teleconverterKey: string | null | undefi
 
 export {
   TELECONVERTER_CATALOG,
+  ALL_TELECONVERTER_KEYS,
   TELECONVERTER_KEYS,
   teleconverterOptionsForLens,
   resolveTeleconverterKey,

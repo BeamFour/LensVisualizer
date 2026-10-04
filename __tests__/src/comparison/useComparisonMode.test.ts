@@ -7,7 +7,7 @@ import useComparisonMode, {
   type ComparisonLensesResult,
 } from "../../../src/comparison/useComparisonMode.js";
 import { CATALOG_KEYS, LENS_CATALOG } from "../../../src/utils/catalog/lensCatalog.js";
-import { TELECONVERTER_KEYS, teleconverterOptionsForLens } from "../../../src/utils/catalog/teleconverterCatalog.js";
+import { ALL_TELECONVERTER_KEYS, resolveTeleconverterKey } from "../../../src/utils/catalog/teleconverterCatalog.js";
 import { build, buildSimplePositiveElementLens, buildVariableStopGapLens } from "../optics/testLensFixtures.js";
 
 /* Pick two valid catalog keys for testing */
@@ -60,10 +60,8 @@ describe("useComparisonMode", () => {
   });
   it("builds each pane with its own teleconverter so a lens can be compared against itself", () => {
     /* The hook reads the real catalogs, so resolve a real converter–host pair instead of naming a lens. */
-    const teleconverterKey = TELECONVERTER_KEYS[0];
-    const hostKey = CATALOG_KEYS.find((key) =>
-      teleconverterOptionsForLens(key).some((option) => option.key === teleconverterKey),
-    )!;
+    const teleconverterKey = ALL_TELECONVERTER_KEYS[0];
+    const hostKey = CATALOG_KEYS.find((key) => resolveTeleconverterKey(key, teleconverterKey) !== null)!;
     const { result } = renderHook(() =>
       useComparisonMode(
         makeParams({ comparing: true, lensKeyA: hostKey, lensKeyB: hostKey, teleconverterKeyA: teleconverterKey }),

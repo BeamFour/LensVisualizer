@@ -18,6 +18,11 @@ export interface TeleconverterData {
   key: string;
   /** null explicitly records an unconfirmed manufacturer. */
   maker?: string | null;
+  /**
+   * false: a hidden test model. It gets no index entry, search result, prerendered page or sitemap URL and is not
+   * offered by the viewer's TC control; it still mounts through a hand-typed `tc` query.
+   */
+  visible?: boolean;
   name: string;
   subtitle?: string;
   specs?: string[];

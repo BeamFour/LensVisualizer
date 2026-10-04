@@ -186,7 +186,9 @@ Metadata generation is split across:
   freshness, generated author index, generated maker-prefix JSON, and README lens-count refresh. It also writes
   `src/generated/teleconverter-summaries.json`: each `*.teleconverter.ts` summary plus `compatibleLensKeys`, resolved
   by importing the import-free fit predicate (`src/optics/prescription/teleconverterCompatibility.ts`) under plain Node
-  so the page lists and the viewer cannot disagree.
+  so the page lists and the viewer cannot disagree. Hidden converters (`visible: false`) keep a summary but get no
+  route, and `/teleconverters` itself is emitted only when a published converter exists; `scripts/prerender.mjs`
+  lists the section in `OPTIONAL_SECTIONS` so its manifest patterns may go uncovered in that case.
 - `scripts/maker-prefixes.mjs` - single source of truth for maker prefixes, emitted to
   `src/generated/maker-prefixes.json`.
 

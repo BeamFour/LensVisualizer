@@ -7,7 +7,7 @@
  *   - lensKeys: sorted array of all visible lens catalog keys
  *   - makerSlugs: sorted array of unique maker URL slugs
  *   - mountIds / formatIds: sorted arrays of used taxonomy ids
- *   - teleconverterKeys: sorted array of all teleconverter catalog keys
+ *   - teleconverterKeys: sorted array of published teleconverter keys (hidden test models excluded)
  *   - authors: inventor names, stable slugs, and related lens/patent counts
  *   - assignees: names, stable slugs, lens/patent counts, and dated corporate history
  *   - routes: flat array of all concrete URL paths to pre-render
@@ -143,7 +143,8 @@ const TELECONVERTER_SUMMARY_FIELDS = [
  * Evaluate every teleconverter module and pair it with the visible lenses it can mount on.
  *
  * Fit depends on each host's back focus and rear plates, which lens summaries do not carry, so the host list is
- * resolved here with the runtime predicate and shipped as `compatibleLensKeys`.
+ * resolved here with the runtime predicate and shipped as `compatibleLensKeys`. Hidden test models keep a summary
+ * (`visible: false`) so their page resolves from a hand-typed URL; the caller leaves them out of routes.
  */
 async function collectTeleconverters(lensModules, fallbackDate) {
   const { teleconverterCompatibility } = await import(pathToFileURL(TELECONVERTER_COMPATIBILITY_FILE).href);
@@ -158,6 +159,7 @@ async function collectTeleconverters(lensModules, fallbackDate) {
     for (const field of TELECONVERTER_SUMMARY_FIELDS) {
       if (data[field] !== undefined) summary[field] = data[field];
     }
+    summary.visible = data.visible !== false;
     summary.compatibleLensKeys = visibleLenses
       .filter((lens) => teleconverterCompatibility(lens, data).ok)
       .map((lens) => lens.key);
@@ -186,7 +188,8 @@ function collectRoutes(lenses, articles, makerSlugs, mountIds, formatIds, author
     "/patents",
     "/mounts",
     "/formats",
-    "/teleconverters",
+    /* The section is published once it holds a converter that is not a hidden test model. */
+    ...(teleconverterKeys.length > 0 ? ["/teleconverters"] : []),
     "/articles",
     "/updates",
     "/relationships",
@@ -244,7 +247,8 @@ async function main() {
   const authors = buildAuthorMetadata(lensSummaries);
   const assignees = buildAssigneeMetadata(lensSummaries);
   const teleconverters = await collectTeleconverters(lensModules, fallbackDate);
-  const teleconverterKeys = teleconverters.map((teleconverter) => teleconverter.key).sort();
+  const publishedTeleconverters = teleconverters.filter((teleconverter) => teleconverter.summary.visible);
+  const teleconverterKeys = publishedTeleconverters.map((teleconverter) => teleconverter.key).sort();
   const routes = collectRoutes(lenses, articles, makerSlugs, mountIds, formatIds, authors, teleconverterKeys);
   const routeFreshness = buildRouteFreshness({
     lenses,
@@ -253,7 +257,7 @@ async function main() {
     mountIds,
     formatIds,
     authors,
-    teleconverters: teleconverters.map(({ key, freshness, summary }) => ({
+    teleconverters: publishedTeleconverters.map(({ key, freshness, summary }) => ({
       key,
       freshness,
       compatibleLensKeys: summary.compatibleLensKeys,
@@ -295,7 +299,8 @@ async function main() {
     "utf-8",
   );
   console.log(
-    `Teleconverter summaries written to ${TELECONVERTER_SUMMARIES_FILE} (${teleconverters.length} teleconverters)`,
+    `Teleconverter summaries written to ${TELECONVERTER_SUMMARIES_FILE} (${teleconverters.length} teleconverters, ` +
+      `${teleconverters.length - publishedTeleconverters.length} hidden)`,
   );
 
   // Keep the README public lens count in sync automatically

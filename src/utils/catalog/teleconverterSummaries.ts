@@ -8,6 +8,9 @@
  *
  * The interactive viewer keeps using `teleconverterCatalog.ts` (full prescriptions). A parity test asserts the
  * generated host lists match the runtime predicate.
+ *
+ * Hidden converters (`visible: false`) are test models. They keep a summary so their page still resolves from a
+ * hand-typed URL, but every list a visitor can reach holds published converters only.
  */
 
 import summariesJson from "../../generated/teleconverter-summaries.json";
@@ -19,6 +22,8 @@ export interface TeleconverterSummary {
   name: string;
   /** null explicitly records an unconfirmed manufacturer. */
   maker?: string | null;
+  /** false for a hidden test model; always written by the build script. */
+  visible: boolean;
   subtitle?: string;
   specs?: string[];
   magnification: number;
@@ -35,17 +40,22 @@ export interface TeleconverterSummary {
   compatibleLensKeys: string[];
 }
 
-/* The generated JSON is already ordered weakest converter first, then by display name. */
-const TELECONVERTER_SUMMARY_LIST = summariesJson as unknown as TeleconverterSummary[];
+/* Every converter including hidden test models. The generated JSON is already ordered weakest converter first,
+ * then by display name. */
+const ALL_TELECONVERTER_SUMMARY_LIST = summariesJson as unknown as TeleconverterSummary[];
 
+/* Keyed by converter key, hidden test models included, so a hand-typed page URL resolves. */
 const TELECONVERTER_SUMMARIES: Record<string, TeleconverterSummary> = Object.fromEntries(
-  TELECONVERTER_SUMMARY_LIST.map((summary) => [summary.key, summary]),
+  ALL_TELECONVERTER_SUMMARY_LIST.map((summary) => [summary.key, summary]),
 );
+
+/* Published converters: the index, search and lens-page lists. */
+const TELECONVERTER_SUMMARY_LIST = ALL_TELECONVERTER_SUMMARY_LIST.filter((summary) => summary.visible);
 
 const TELECONVERTER_SUMMARY_KEYS: string[] = TELECONVERTER_SUMMARY_LIST.map((summary) => summary.key);
 
 /**
- * Converters that can be mounted on a visible catalog lens.
+ * Published converters that can be mounted on a visible catalog lens.
  *
  * @param lensKey - catalog lens key
  * @returns matching summaries, weakest converter first
@@ -68,6 +78,7 @@ function teleconverterLensPath(lensKey: string, teleconverterKey: string): strin
 }
 
 export {
+  ALL_TELECONVERTER_SUMMARY_LIST,
   TELECONVERTER_SUMMARIES,
   TELECONVERTER_SUMMARY_KEYS,
   TELECONVERTER_SUMMARY_LIST,

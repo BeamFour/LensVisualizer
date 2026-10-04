@@ -7,11 +7,16 @@
  */
 
 import { cleanup, screen, within } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import CatalogSearchResults from "../../../../src/components/search/CatalogSearchResults.js";
 import { searchCatalog } from "../../../../src/utils/catalog/searchCatalog.js";
 import themes from "../../../../src/utils/theme/themes.js";
 import { renderWithRouter } from "../../../testUtils.js";
+
+/* One synthetic published converter joins the generated list; see teleconverterSummaryFixtures.ts. */
+vi.mock("../../../../src/generated/teleconverter-summaries.json", async (importOriginal) =>
+  (await import("../../utils/catalog/teleconverterSummaryFixtures.js")).withPublishedTeleconverter(importOriginal),
+);
 
 const theme = themes.dark;
 

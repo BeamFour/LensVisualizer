@@ -39,6 +39,7 @@ of every lens scan, so the import must stay type-only.
 | Field | Type | Description |
 |-------|------|-------------|
 | `maker`, `subtitle`, `specs`, `publishedAt` | | Same meaning as on a lens. |
+| `visible` | `boolean` | `false` marks a hidden test model. See Test Models below. |
 | `universal` | `boolean` | `true` when the converter fits any host sharing a mount. Otherwise the host must declare `acceptsTeleconverters`. |
 | `minHostFno` | `number` | Fastest host f-number whose axial beam the converter's clear apertures pass. Faster hosts are rejected. |
 | `incompatibleLensKeys` | `string[]` | Host lens keys excluded for reasons vertex geometry cannot express (rim contact, mechanical interference). |
@@ -115,6 +116,22 @@ host's stop, so a clipped beam would otherwise report an f-number the system can
    is required.
 
 Corpus sweeps additionally compose every converter onto every compatible catalog host and build the result.
+
+## Test Models
+
+`visible: false` hides a converter the way it hides a lens: the file stays in the catalog and in every corpus sweep,
+but nothing a visitor can reach names it.
+
+- No `/teleconverters/` listing, search result, prerendered page, sitemap URL or lens-page link.
+- The viewer's TC control does not offer it. It mounts only from a hand-typed query,
+  `/lens/<host>/?v=1&tc=<key>`, and while mounted it is listed so the control can switch it off.
+- Its `/teleconverters/<key>/` page still renders from a hand-typed URL, marked `noindex`.
+- While every converter is hidden, the `/teleconverters` section is not built and the homepage link is omitted.
+
+Test models live in `lens-data/reference/` and follow the reference-fixture naming: key `reference-…`, maker
+`Reference`, name `REFERENCE …`. `ReferenceXF14xTeleconverter.teleconverter.ts` is the engine's standing test
+converter (US 2017/0090163 A1 Example 1, with estimated semi-diameters, on host `fuji-xf-50140mm-f28`). A converter
+meant for publication gets its own file, key and name; it never reuses a test model's.
 
 ## Composed System
 

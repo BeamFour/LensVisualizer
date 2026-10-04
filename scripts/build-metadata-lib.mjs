@@ -462,10 +462,13 @@ export function buildRouteFreshness({
   routeFreshness["/patents"] = combineFreshnessEntries(allLensFreshness, fallbackDate);
   routeFreshness["/mounts"] = combineFreshnessEntries(allLensFreshness, fallbackDate);
   routeFreshness["/formats"] = combineFreshnessEntries(allLensFreshness, fallbackDate);
-  routeFreshness["/teleconverters"] = combineFreshnessEntries(
-    teleconverters.map((teleconverter) => teleconverter.freshness),
-    fallbackDate,
-  );
+  /* No published converter means no /teleconverters section, so no route to date. */
+  if (teleconverters.length > 0) {
+    routeFreshness["/teleconverters"] = combineFreshnessEntries(
+      teleconverters.map((teleconverter) => teleconverter.freshness),
+      fallbackDate,
+    );
+  }
   routeFreshness["/articles"] = combineFreshnessEntries(allArticleFreshness, fallbackDate);
   routeFreshness["/updates"] = combineFreshnessEntries(allLensFreshness, fallbackDate);
   routeFreshness["/relationships"] = combineFreshnessEntries(allLensFreshness, fallbackDate);

@@ -97,6 +97,9 @@ export default function validateTeleconverterData(data: UntrustedTeleconverterDa
     errors.push(`"magnification" must be a finite number > 1`);
   }
   validateLensMounts(data.lensMounts, errors);
+  if (data.visible !== undefined && typeof data.visible !== "boolean") {
+    errors.push(`"visible" must be a boolean (got ${typeof data.visible})`);
+  }
   if (data.universal !== undefined && typeof data.universal !== "boolean") {
     errors.push(`"universal" must be a boolean (got ${typeof data.universal})`);
   }

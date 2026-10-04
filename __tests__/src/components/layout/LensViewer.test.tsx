@@ -248,7 +248,11 @@ vi.mock("../../../../src/components/layout/lensViewer/ViewerOverlays.js", () => 
 
 import LensViewer from "../../../../src/components/layout/LensViewer.js";
 import { ALL_CATALOG_KEYS, CATALOG_KEYS, COMPARISON_CATALOG_KEYS } from "../../../../src/utils/catalog/lensCatalog.js";
-import { TELECONVERTER_KEYS, teleconverterOptionsForLens } from "../../../../src/utils/catalog/teleconverterCatalog.js";
+import {
+  ALL_TELECONVERTER_KEYS,
+  TELECONVERTER_CATALOG,
+  resolveTeleconverterKey,
+} from "../../../../src/utils/catalog/teleconverterCatalog.js";
 import { createInitialState } from "../../../../src/utils/state/lensReducer.js";
 
 function makeState(overrides: Partial<LensState> = {}): LensState {
@@ -315,25 +319,30 @@ describe("LensViewer", () => {
 
   it("offers and mounts teleconverters for an eligible lens and ignores one the lens cannot take", () => {
     /* The viewer reads the real catalogs, so resolve a real converter–host pair instead of naming a lens. */
-    const teleconverterKey = TELECONVERTER_KEYS[0];
-    const hostKey = CATALOG_KEYS.find((key) =>
-      teleconverterOptionsForLens(key).some((option) => option.key === teleconverterKey),
-    )!;
+    const teleconverterKey = ALL_TELECONVERTER_KEYS[0];
+    const hostKey = CATALOG_KEYS.find((key) => resolveTeleconverterKey(key, teleconverterKey) !== null)!;
     const hostLens = { ...makeState().lens, lensKeyA: hostKey, selectedConfigurationKey: hostKey };
     mocks.state = makeState({ lens: hostLens });
 
     const { rerender } = render(<LensViewer initialLensKey={hostKey} />);
     expect(screen.getByTestId("active-teleconverter").textContent).toBe("none");
-    fireEvent.click(screen.getByRole("button", { name: `mount ${teleconverterKey}` }));
-    expect(mocks.dispatch).toHaveBeenCalledWith({ type: "SET_TELECONVERTER", panel: "a", key: teleconverterKey });
-    mocks.dispatch.mockClear();
+    if (TELECONVERTER_CATALOG[teleconverterKey].visible === false) {
+      /* A hidden test model is never offered on the bare lens; only a URL mounts it. */
+      expect(screen.queryByRole("button", { name: `mount ${teleconverterKey}` })).toBeNull();
+    } else {
+      fireEvent.click(screen.getByRole("button", { name: `mount ${teleconverterKey}` }));
+      expect(mocks.dispatch).toHaveBeenCalledWith({ type: "SET_TELECONVERTER", panel: "a", key: teleconverterKey });
+      mocks.dispatch.mockClear();
+    }
     fireEvent.click(screen.getByRole("button", { name: "mount unknown" }));
     expect(mocks.dispatch).not.toHaveBeenCalled();
 
+    /* Once mounted, even a hidden converter is listed so the control can switch it off again. */
     mocks.state = makeState({ lens: { ...hostLens, teleconverterKeyA: teleconverterKey } });
     rerender(<LensViewer initialLensKey={hostKey} />);
     expect(screen.getByTestId("active-teleconverter").textContent).toBe(teleconverterKey);
     expect(screen.getByTestId("diagram-teleconverter").textContent).toBe(teleconverterKey);
+    expect(screen.getByRole("button", { name: `mount ${teleconverterKey}` })).toBeTruthy();
 
     /* A converter key left in state for a lens that cannot take it is not passed to the diagram. */
     mocks.state = makeState({

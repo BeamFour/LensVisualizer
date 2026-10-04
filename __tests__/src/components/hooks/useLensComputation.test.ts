@@ -7,7 +7,7 @@ import { prepareRuntimeState } from "../../../../src/optics/compat.js";
 import { traceEngineRay2 } from "../../../../src/optics/trace/rayAdapters.js";
 import buildLens from "../../../../src/optics/buildLens.js";
 import { CATALOG_KEYS, LENS_CATALOG } from "../../../../src/utils/catalog/lensCatalog.js";
-import { TELECONVERTER_KEYS, teleconverterOptionsForLens } from "../../../../src/utils/catalog/teleconverterCatalog.js";
+import { ALL_TELECONVERTER_KEYS, resolveTeleconverterKey } from "../../../../src/utils/catalog/teleconverterCatalog.js";
 
 /* This test uses a real lens key from the catalog. The LENS_CATALOG is populated
  * at import time via import.meta.glob so all *.data.ts lenses are available. */
@@ -81,10 +81,8 @@ describe("useLensComputation", () => {
 
   it("composes a mounted teleconverter into the built lens and ignores one that does not fit", () => {
     /* The hook reads the real catalogs, so resolve a real converter–host pair instead of naming a lens. */
-    const teleconverterKey = TELECONVERTER_KEYS[0];
-    const hostKey = CATALOG_KEYS.find((key) =>
-      teleconverterOptionsForLens(key).some((option) => option.key === teleconverterKey),
-    )!;
+    const teleconverterKey = ALL_TELECONVERTER_KEYS[0];
+    const hostKey = CATALOG_KEYS.find((key) => resolveTeleconverterKey(key, teleconverterKey) !== null)!;
     const compute = (lensKey: string, key: string | null) =>
       renderHook(() =>
         useLensComputation({

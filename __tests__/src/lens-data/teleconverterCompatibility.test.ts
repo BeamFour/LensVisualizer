@@ -9,8 +9,9 @@ import {
 } from "../../../src/optics/teleconverter.js";
 import { ALL_CATALOG_KEYS, LENS_CATALOG } from "../../../src/utils/catalog/lensCatalog.js";
 import {
+  ALL_TELECONVERTER_KEYS,
   TELECONVERTER_CATALOG,
-  TELECONVERTER_KEYS,
+  resolveTeleconverterKey,
   teleconverterOptionsForLens,
 } from "../../../src/utils/catalog/teleconverterCatalog.js";
 import type { RuntimeLens } from "../../../src/types/optics.js";
@@ -35,10 +36,10 @@ function zoomSamples(L: RuntimeLens): number[] {
  */
 describe("teleconverter catalog", () => {
   it("validates every teleconverter and applies the lens patent-metadata policy", () => {
-    expect(TELECONVERTER_KEYS.length).toBeGreaterThan(0);
+    expect(ALL_TELECONVERTER_KEYS.length).toBeGreaterThan(0);
     const offenders: string[] = [];
 
-    for (const key of TELECONVERTER_KEYS) {
+    for (const key of ALL_TELECONVERTER_KEYS) {
       const tc = TELECONVERTER_CATALOG[key];
       for (const error of validateTeleconverterData(tc)) offenders.push(`${key}: ${error}`);
       if (LENS_CATALOG[key]) offenders.push(`${key}: key is already used by a lens`);
@@ -57,7 +58,7 @@ describe("teleconverter catalog", () => {
     const offenders: string[] = [];
     let pairs = 0;
 
-    for (const tcKey of TELECONVERTER_KEYS) {
+    for (const tcKey of ALL_TELECONVERTER_KEYS) {
       const tc = TELECONVERTER_CATALOG[tcKey];
       for (const lensKey of ALL_CATALOG_KEYS) {
         const hostData = LENS_CATALOG[lensKey];
@@ -156,16 +157,33 @@ describe("teleconverter catalog", () => {
     expect(offenders).toEqual([]);
   });
 
-  it("offers a converter in the viewer for exactly the hosts the fit predicate allows", () => {
+  it("offers published converters for exactly the hosts the fit predicate allows and hidden ones only once mounted", () => {
     const offenders: string[] = [];
+    const offeredKeys = (lensKey: string, mountedKey?: string) =>
+      teleconverterOptionsForLens(lensKey, mountedKey).map((option) => option.key);
 
     for (const lensKey of ALL_CATALOG_KEYS) {
-      const expected = TELECONVERTER_KEYS.filter(
+      const fitting = ALL_TELECONVERTER_KEYS.filter(
         (tcKey) => teleconverterCompatibility(LENS_CATALOG[lensKey], TELECONVERTER_CATALOG[tcKey]).ok,
       );
-      const offered = teleconverterOptionsForLens(lensKey).map((option) => option.key);
-      if (offered.join() !== expected.join())
-        offenders.push(`${lensKey}: offered [${offered}], expected [${expected}]`);
+      const published = fitting.filter((tcKey) => TELECONVERTER_CATALOG[tcKey].visible !== false);
+      const offered = offeredKeys(lensKey);
+      if (offered.join() !== published.join())
+        offenders.push(`${lensKey}: offered [${offered}], expected [${published}]`);
+
+      /* A `tc` key resolves for every fit, hidden test models included, and for nothing else. */
+      for (const tcKey of ALL_TELECONVERTER_KEYS) {
+        const resolves = resolveTeleconverterKey(lensKey, tcKey) === tcKey;
+        if (resolves !== fitting.includes(tcKey)) offenders.push(`${lensKey}: ${tcKey} resolves=${resolves}`);
+      }
+
+      /* A mounted hidden converter joins the list in catalog order so the control can switch it off. */
+      for (const hiddenKey of fitting.filter((tcKey) => !published.includes(tcKey))) {
+        const expected = fitting.filter((tcKey) => published.includes(tcKey) || tcKey === hiddenKey);
+        const withMounted = offeredKeys(lensKey, hiddenKey);
+        if (withMounted.join() !== expected.join())
+          offenders.push(`${lensKey} + ${hiddenKey}: offered [${withMounted}], expected [${expected}]`);
+      }
     }
 
     expect(offenders).toEqual([]);

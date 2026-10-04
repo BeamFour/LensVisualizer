@@ -514,6 +514,17 @@ describe("build metadata helpers", () => {
       publishedOn: "2026-03-19",
       lastModified: "2026-03-25",
     });
+
+    /* Without a published converter the section has no route, so nothing is dated for it. */
+    const withoutTeleconverters = buildRouteFreshness({
+      lenses: [],
+      articles: [],
+      makerSlugs: [],
+      makerDetailsFreshness: { publishedOn: "2026-03-17", lastModified: "2026-03-26" },
+      assigneeCorporateHistoryFreshness: { publishedOn: "2026-03-20", lastModified: "2026-03-28" },
+      fallbackDate: "2026-03-27",
+    });
+    expect(Object.hasOwn(withoutTeleconverters, "/teleconverters")).toBe(false);
   });
 
   it("parses quoted frontmatter values and ignores indented keys", () => {

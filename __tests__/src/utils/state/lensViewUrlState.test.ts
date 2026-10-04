@@ -63,7 +63,7 @@ describe("lensViewUrlState", () => {
   });
 
   it("round-trips a v1 teleconverter key and applies the same bounds as cfg", () => {
-    const teleconverterKey = "fuji-xf-14x-tc-wr";
+    const teleconverterKey = "reference-xf-14x-teleconverter";
     const params = buildLensViewQuery({ teleconverterKey });
 
     expect(params.toString()).toBe(`v=1&tc=${teleconverterKey}`);

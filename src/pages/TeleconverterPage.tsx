@@ -2,7 +2,8 @@
  * Individual teleconverter page — /teleconverters/:teleconverterKey
  *
  * A teleconverter cannot be traced or drawn alone, so this page has no diagram: it describes the converter and lists
- * the lenses it can mount on. Each lens link opens the viewer with the converter attached.
+ * the lenses it can mount on. Each lens link opens the viewer with the converter attached. A hidden test model has
+ * no prerendered page; it renders here only from a hand-typed URL and is marked noindex.
  */
 
 import { Navigate, Link, useParams } from "react-router";
@@ -47,6 +48,7 @@ export default function TeleconverterPage() {
           title={`${teleconverter.name} — Teleconverter Optical Design | ${SITE_NAME}`}
           description={seoDescription}
           canonicalURL={canonicalURL}
+          robots={teleconverter.visible ? undefined : "noindex,nofollow"}
           jsonLd={[
             collectionPageJsonLd({ name: teleconverter.name, description: seoDescription, url: canonicalURL, route }),
             breadcrumbJsonLd([
@@ -72,6 +74,12 @@ export default function TeleconverterPage() {
               </span>
             ))}
           </p>
+
+          {!teleconverter.visible && (
+            <p style={{ fontSize: "0.8rem", color: t.muted, marginBottom: "0.75rem" }}>
+              Hidden test model: not part of the published catalog.
+            </p>
+          )}
 
           {teleconverter.patentNumber && (
             <p style={{ fontSize: "0.8rem", color: t.subtitle, marginBottom: "0.75rem" }}>

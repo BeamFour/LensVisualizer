@@ -14,6 +14,12 @@ Teleconverter files are auto-discovered like lens files. Adding one `*.teleconve
 
 No imports, catalog edits, route edits, or per-converter tests are needed.
 
+A converter with `visible: false` is a hidden test model and gets none of the above: it mounts only from a
+hand-typed `?v=1&tc=<key>` query. The `/teleconverters` section itself is built only once a published converter
+exists. The standing test model is `src/lens-data/reference/ReferenceXF14xTeleconverter.teleconverter.ts`; do not
+publish it or reuse its key — a production converter gets its own file
+(`src/lens-data/TELECONVERTER_DATA_SPEC.md` § Test Models).
+
 ## Steps
 
 1. Copy `src/lens-data/TEMPLATE.teleconverter.ts.template` to `src/lens-data/<maker>/<Name>.teleconverter.ts`. Author

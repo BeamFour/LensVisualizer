@@ -514,9 +514,16 @@ function auditInternalLinks(
     ok(`/formats page has ${foundLinks}/${formatIds.length} format links`);
   }
 
-  /* /teleconverters → all teleconverter pages */
+  /* /teleconverters → all teleconverter pages. The section is not built while every converter is a hidden test
+   * model, so an absent page is only an error when a published converter exists. */
   const teleconvertersPage = join(DIST_DIR, "teleconverters", "index.html");
-  if (!existsSync(teleconvertersPage)) {
+  if (teleconverterKeys.length === 0) {
+    if (existsSync(teleconvertersPage)) {
+      error("/teleconverters/index.html was built without a published teleconverter");
+    } else {
+      ok("/teleconverters section not built (no published teleconverter)");
+    }
+  } else if (!existsSync(teleconvertersPage)) {
     error("Missing /teleconverters/index.html");
   } else {
     const html = readFileSync(teleconvertersPage, "utf-8");

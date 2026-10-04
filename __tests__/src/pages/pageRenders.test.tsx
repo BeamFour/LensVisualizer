@@ -13,7 +13,10 @@ import NotFoundPage from "../../../src/pages/NotFoundPage.js";
 import TeleconverterPage from "../../../src/pages/TeleconverterPage.js";
 import TeleconvertersIndexPage from "../../../src/pages/TeleconvertersIndexPage.js";
 import { LENS_SUMMARIES } from "../../../src/utils/catalog/lensSummaries.js";
-import { TELECONVERTER_SUMMARY_LIST } from "../../../src/utils/catalog/teleconverterSummaries.js";
+import {
+  ALL_TELECONVERTER_SUMMARY_LIST,
+  TELECONVERTER_SUMMARY_LIST,
+} from "../../../src/utils/catalog/teleconverterSummaries.js";
 import { ARTICLE_CONTENT, ARTICLES, HOMEPAGE_ARTICLES } from "../../../src/utils/content/homepageContent.js";
 import { CATALOG_KEYS, COMPARISON_CATALOG_KEYS, LENS_CATALOG } from "../../../src/utils/catalog/lensCatalog.js";
 import { lensDisplaySubtitle } from "../../../src/utils/catalog/lensPatentMetadata.js";
@@ -25,6 +28,11 @@ vi.mock("../../../src/components/SEOHead.js", () => ({
     return null;
   },
 }));
+
+/* One synthetic published converter joins the generated list; see teleconverterSummaryFixtures.ts. */
+vi.mock("../../../src/generated/teleconverter-summaries.json", async (importOriginal) =>
+  (await import("../utils/catalog/teleconverterSummaryFixtures.js")).withPublishedTeleconverter(importOriginal),
+);
 
 vi.mock("../../../src/components/ClientOnly.js", () => ({
   default: function ClientOnly({ fallback = null }: { fallback?: ReactNode }) {
@@ -282,7 +290,7 @@ describe("static page renders", () => {
     });
   });
 
-  it("lists teleconverters and links each to its own page", () => {
+  it("lists published teleconverters, links each to its own page and leaves hidden test models out", () => {
     renderRoutes(
       "/teleconverters/",
       <Routes>
@@ -291,10 +299,11 @@ describe("static page renders", () => {
     );
 
     expect(screen.getByRole("heading", { level: 1, name: "Teleconverters" })).toBeTruthy();
-    for (const teleconverter of TELECONVERTER_SUMMARY_LIST) {
-      expect(screen.getByRole("link", { name: teleconverter.name }).getAttribute("href")).toBe(
-        `/teleconverters/${teleconverter.key}/`,
-      );
+    expect(TELECONVERTER_SUMMARY_LIST.length).toBeGreaterThan(0);
+    for (const teleconverter of ALL_TELECONVERTER_SUMMARY_LIST) {
+      const link = screen.queryByRole("link", { name: teleconverter.name });
+      if (teleconverter.visible) expect(link?.getAttribute("href")).toBe(`/teleconverters/${teleconverter.key}/`);
+      else expect(link, teleconverter.key).toBeNull();
     }
   });
 
@@ -313,6 +322,21 @@ describe("static page renders", () => {
     expect(hostLink.getAttribute("href")).toBe(`/lens/${hostKey}/?v=1&tc=${teleconverter.key}`);
     /* The page has no diagram: a converter is only ever drawn mounted on a lens. */
     expect(document.querySelector("svg")).toBeNull();
+    expect(screen.queryByText(/Hidden test model/)).toBeNull();
+    cleanup();
+
+    /* A hidden test model has no listing, but its page still resolves from a hand-typed URL and says what it is. */
+    for (const hidden of ALL_TELECONVERTER_SUMMARY_LIST.filter((summary) => !summary.visible)) {
+      renderRoutes(
+        `/teleconverters/${hidden.key}/`,
+        <Routes>
+          <Route path="/teleconverters/:teleconverterKey" element={<TeleconverterPage />} />
+        </Routes>,
+      );
+      expect(screen.getByRole("heading", { level: 1, name: hidden.name })).toBeTruthy();
+      expect(screen.getByText(/Hidden test model/)).toBeTruthy();
+      cleanup();
+    }
   });
 
   it("redirects unknown teleconverter keys to the index and links converters from a host lens page", async () => {
@@ -336,6 +360,9 @@ describe("static page renders", () => {
     expect(screen.getByRole("link", { name: teleconverter.name }).getAttribute("href")).toBe(
       `/teleconverters/${teleconverter.key}/`,
     );
+    for (const hidden of ALL_TELECONVERTER_SUMMARY_LIST.filter((summary) => !summary.visible)) {
+      expect(screen.queryByRole("link", { name: hidden.name }), hidden.key).toBeNull();
+    }
   });
 
   it("renders the 404 page links", () => {

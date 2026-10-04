@@ -153,11 +153,15 @@ export default function LensVisualization({ initialLensKey, initialLensKeyB }: L
   );
 
   /* Detachable teleconverters mount on the prescription actually shown: the configured diagram lens in the
-     single view (in comparison mode pane A's key already is the variant), and each pane's own lens when comparing. */
-  const teleconverterOptions = useMemo(() => teleconverterOptionsForLens(diagramLensKey), [diagramLensKey]);
+     single view (in comparison mode pane A's key already is the variant), and each pane's own lens when comparing.
+     The mounted key is passed so a hidden test model opened from a URL stays listed and can be switched off. */
+  const teleconverterOptions = useMemo(
+    () => teleconverterOptionsForLens(diagramLensKey, teleconverterKeyA),
+    [diagramLensKey, teleconverterKeyA],
+  );
   const teleconverterOptionsB = useMemo(
-    () => (comparing ? teleconverterOptionsForLens(lensKeyB) : []),
-    [comparing, lensKeyB],
+    () => (comparing ? teleconverterOptionsForLens(lensKeyB, teleconverterKeyB) : []),
+    [comparing, lensKeyB, teleconverterKeyB],
   );
   const activeTeleconverterKey = teleconverterOptions.some((option) => option.key === teleconverterKeyA)
     ? teleconverterKeyA

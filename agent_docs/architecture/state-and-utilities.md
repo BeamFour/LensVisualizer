@@ -59,6 +59,8 @@ shareable view state:
   validated like `cfg`: bounded key syntax in the parser, then `resolveTeleconverterKey()` against the lens it mounts
   on at init and popstate, so a converter the lens cannot take is dropped. A composed lens + converter is not a
   catalog key, which is why it cannot live in the compare path the way a configuration variant does.
+  `resolveTeleconverterKey()` accepts hidden test models (`visible: false`), so the URL is how they are mounted;
+  `teleconverterOptionsForLens()` offers published converters plus the mounted one.
 - Entering or leaving compare mode navigates to a different route, which mounts a fresh viewer initialized from the
   URL. Identity that must survive the transition travels in that navigation's query; `toggleCompare` builds it with
   `buildLensViewQuery()`.

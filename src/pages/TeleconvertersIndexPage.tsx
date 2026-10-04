@@ -1,8 +1,9 @@
 /**
  * Teleconverters index page — /teleconverters
  *
- * Lists every detachable rear teleconverter in the catalog. A converter has no diagram of its own; each entry links
- * to its page, where a host lens is chosen to mount it on.
+ * Lists every published detachable rear teleconverter in the catalog. A converter has no diagram of its own; each
+ * entry links to its page, where a host lens is chosen to mount it on. Hidden test models are not listed; while the
+ * catalog holds nothing else the page is not built and only renders, unindexed, from a hand-typed URL.
  */
 
 import { Link } from "react-router";
@@ -27,6 +28,7 @@ export default function TeleconvertersIndexPage() {
           title={`Teleconverters — ${SITE_NAME}`}
           description={SEO_DESCRIPTION}
           canonicalURL={`${SITE_URL}/teleconverters`}
+          robots={TELECONVERTER_SUMMARY_LIST.length === 0 ? "noindex,nofollow" : undefined}
           jsonLd={[
             collectionPageJsonLd({
               name: "Teleconverters",
@@ -53,6 +55,10 @@ export default function TeleconvertersIndexPage() {
             A rear teleconverter sits between a lens and the camera and lengthens the focal length. It has no aperture
             stop of its own, so it is shown mounted on a host lens: open a converter to pick the lens.
           </p>
+
+          {TELECONVERTER_SUMMARY_LIST.length === 0 && (
+            <p style={{ fontSize: "0.85rem", color: t.muted }}>No teleconverter has been published yet.</p>
+          )}
 
           {TELECONVERTER_SUMMARY_LIST.map((teleconverter) => {
             const hostCount = teleconverter.compatibleLensKeys.length;

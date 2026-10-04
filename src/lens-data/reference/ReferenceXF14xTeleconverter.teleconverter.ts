@@ -2,24 +2,33 @@ import type { TeleconverterDataInput } from "../../types/teleconverter.js";
 
 /**
  * ╔══════════════════════════════════════════════════════════════════════╗
- * ║     TELECONVERTER DATA — FUJIFILM FUJINON XF1.4X TC WR               ║
+ * ║     TELECONVERTER DATA — REFERENCE 1.4× TEST MODEL                   ║
  * ╠══════════════════════════════════════════════════════════════════════╣
+ * ║  HIDDEN TEST MODEL (`visible: false`). It exists so the converter    ║
+ * ║    engine, viewer, compare mode and corpus sweeps have a real        ║
+ * ║    prescription to run against. It is NOT the catalog entry for the  ║
+ * ║    FUJINON XF1.4X TC WR: that converter gets its own audited file    ║
+ * ║    with its own key and name. This file has no index entry, search   ║
+ * ║    result, prerendered page or sitemap URL, and the viewer does not  ║
+ * ║    offer it; it mounts only from a hand-typed query:                 ║
+ * ║    /lens/fuji-xf-50140mm-f28/?v=1&tc=reference-xf-14x-teleconverter  ║
+ * ║                                                                      ║
  * ║  Data source: US 2017/0090163 A1, EXAMPLE 1, rear converter RCL —    ║
  * ║    the bold-framed rows 41–50 of Table 3 (Fujifilm Corporation /     ║
  * ║    Tetsuya Ori; priority JP 2015-186957, 24 September 2015;          ║
  * ║    published 30 March 2017). Cross-sections: FIG. 1 (converter       ║
  * ║    alone) and FIG. 2 (attached to the master lens, wide end).        ║
- * ║                                                                     ║
- * ║  Identification: 7 elements / 3 groups and a 15.07 mm image-plane    ║
- * ║  shift match the production XF1.4X TC WR (7 / 3, 15 mm long).        ║
- * ║                                                                     ║
+ * ║                                                                      ║
+ * ║  Origin: 7 elements / 3 groups and a 15.07 mm image-plane shift,     ║
+ * ║  the layout of the production XF1.4X TC WR (7 / 3, 15 mm long).      ║
+ * ║                                                                      ║
  * ║  Design: three cemented groups, positive–negative–positive.          ║
  * ║    RG1 (RL11+RL12, doublet)          — positive                      ║
  * ║    RG2 (RL21+RL22+RL23, triplet)     — negative                      ║
  * ║    RG3 (RL31+RL32, doublet)          — positive                      ║
  * ║  All-spherical. Glass names are Ohara catalog equivalents; every     ║
  * ║  patent nd/νd pair matches its catalog entry exactly.                ║
- * ║                                                                     ║
+ * ║                                                                      ║
  * ║  MASTER LENS: the patent's master lens ML (Tables 1–2), in the       ║
  * ║    catalog as `fuji-xf-50140mm-f28`.                                 ║
  * ║  GEOMETRY: master back focus in air                                  ║
@@ -28,10 +37,10 @@ import type { TeleconverterDataInput } from "../../types/teleconverter.js";
  * ║    gives masterImageDistanceMm = 26.9071. The last gap (13.1685) is  ║
  * ║    the physical distance to optical member PP; with PP the combined  ║
  * ║    back focus in air is 16.1475 mm (Table 4 prints 16.15).           ║
- * ║                                                                     ║
+ * ║                                                                      ║
  * ║  Patent combined system (Table 4, W / M / T): f = 72.10 / 117.14 /   ║
  * ║    190.30 mm, FNo. 4.04 / 4.05 / 4.04, 2ω = 23.6° / 14.6° / 9.0°.    ║
- * ║                                                                     ║
+ * ║                                                                      ║
  * ║  NOTE ON SEMI-DIAMETERS: the patent lists no effective diameters.    ║
  * ║    Values are ray-trace estimates on the master lens: the paraxial   ║
  * ║    f/2.88 marginal height plus the chief-ray height for the APS-C    ║
@@ -40,7 +49,7 @@ import type { TeleconverterDataInput } from "../../types/teleconverter.js";
  * ║    is fixed). NOT figure-audited: FIG. 1 was not available at a      ║
  * ║    measurable resolution. Faster masters are excluded through        ║
  * ║    `minHostFno`.                                                     ║
- * ║                                                                     ║
+ * ║                                                                      ║
  * ║  NOTE ON FOCUS: a virtual object at masterImageDistanceMm images     ║
  * ║    16.116 mm behind the last vertex, 0.03 mm short of the printed    ║
  * ║    16.1475 mm, and the master's own paraxial focus is 0.03–0.05 mm   ║
@@ -51,11 +60,12 @@ import type { TeleconverterDataInput } from "../../types/teleconverter.js";
 
 const TELECONVERTER_DATA = {
   /* ── Identity ── */
-  key: "fuji-xf-14x-tc-wr",
-  maker: "Fujifilm",
-  name: "FUJIFILM FUJINON TELECONVERTER XF1.4X TC WR",
-  subtitle: "US 2017/0090163 A1 — Rear Converter RCL, Example 1 (T. Ori / Fujifilm)",
-  specs: ["7 ELEMENTS / 3 GROUPS", "1.4× REAR CONVERTER", "0 ASPHERICAL SURFACES"],
+  key: "reference-xf-14x-teleconverter",
+  maker: "Reference",
+  visible: false,
+  name: "REFERENCE 1.4× Teleconverter (Test Model)",
+  subtitle: "Hidden test model — US 2017/0090163 A1 Example 1 rear converter, estimated semi-diameters",
+  specs: ["TEST MODEL", "7 ELEMENTS / 3 GROUPS", "1.4× REAR CONVERTER"],
 
   /* ── Fit ── */
   magnification: 1.4,

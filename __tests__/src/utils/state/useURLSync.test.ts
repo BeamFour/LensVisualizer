@@ -4,7 +4,7 @@ import { renderHook, act } from "@testing-library/react";
 import useURLSync from "../../../../src/utils/state/useURLSync.js";
 import { createInitialState } from "../../../../src/utils/state/lensReducer.js";
 import { CATALOG_KEYS, LENS_CATALOG } from "../../../../src/utils/catalog/lensCatalog.js";
-import { TELECONVERTER_KEYS, teleconverterOptionsForLens } from "../../../../src/utils/catalog/teleconverterCatalog.js";
+import { ALL_TELECONVERTER_KEYS, resolveTeleconverterKey } from "../../../../src/utils/catalog/teleconverterCatalog.js";
 import { clearBrowserState, installMatchMediaMock, mockReplaceState } from "../../../testUtils.js";
 import { focalLengthToZoomT } from "../../../../src/utils/state/zoomConversion.js";
 import type { Dispatch } from "react";
@@ -20,11 +20,10 @@ const zoomLensKey = CATALOG_KEYS.find(
 const zoomLensPositions = LENS_CATALOG[zoomLensKey].zoomPositions!;
 const canonicalConfigurationKey = "nikon-af-s-nikkor-180-400mm-f4e-tc14-fl-ed-vr";
 const alternateConfigurationKey = `${canonicalConfigurationKey}-tc-in`;
-/* Catalog-aware converter validation needs a real pair; resolve it from the catalogs rather than naming a lens. */
-const teleconverterKey = TELECONVERTER_KEYS[0];
-const teleconverterHostKey = CATALOG_KEYS.find((key) =>
-  teleconverterOptionsForLens(key).some((option) => option.key === teleconverterKey),
-)!;
+/* Catalog-aware converter validation needs a real pair; resolve it from the catalogs rather than naming a lens.
+   Hidden test models count: a URL mounts them like any other converter. */
+const teleconverterKey = ALL_TELECONVERTER_KEYS[0];
+const teleconverterHostKey = CATALOG_KEYS.find((key) => resolveTeleconverterKey(key, teleconverterKey) !== null)!;
 
 /* ── Setup / teardown ── */
 

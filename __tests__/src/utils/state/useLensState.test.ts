@@ -8,7 +8,7 @@ import { renderHook, act } from "@testing-library/react";
 import useLensState from "../../../../src/utils/state/useLensState.js";
 import { PREFS_KEY } from "../../../../src/utils/state/preferences.js";
 import { CATALOG_KEYS, COMPARISON_CATALOG_KEYS } from "../../../../src/utils/catalog/lensCatalog.js";
-import { TELECONVERTER_KEYS, teleconverterOptionsForLens } from "../../../../src/utils/catalog/teleconverterCatalog.js";
+import { ALL_TELECONVERTER_KEYS, resolveTeleconverterKey } from "../../../../src/utils/catalog/teleconverterCatalog.js";
 import { clearBrowserState, installMatchMediaMock } from "../../../testUtils.js";
 
 /* ── Mock window.matchMedia (not implemented in jsdom) ── */
@@ -85,12 +85,11 @@ describe("useLensState — URL params override defaults", () => {
     expect(result.current[0].lens.selectedConfigurationKey).toBe(canonicalConfigurationKey);
   });
 
-  /* Catalog-aware converter validation needs a real pair; resolve it from the catalogs rather than naming a lens. */
-  const teleconverterKey = TELECONVERTER_KEYS[0];
-  const teleconverterHostKey = CATALOG_KEYS.find((key) =>
-    teleconverterOptionsForLens(key).some((option) => option.key === teleconverterKey),
-  )!;
-  const bareLensKey = CATALOG_KEYS.find((key) => teleconverterOptionsForLens(key).length === 0)!;
+  /* Catalog-aware converter validation needs a real pair; resolve it from the catalogs rather than naming a lens.
+     Hidden test models count: a URL mounts them like any other converter. */
+  const teleconverterKey = ALL_TELECONVERTER_KEYS[0];
+  const teleconverterHostKey = CATALOG_KEYS.find((key) => resolveTeleconverterKey(key, teleconverterKey) !== null)!;
+  const bareLensKey = CATALOG_KEYS.find((key) => resolveTeleconverterKey(key, teleconverterKey) === null)!;
 
   it("mounts a compatible teleconverter from the URL and drops one the lens cannot take", () => {
     window.history.replaceState({}, "", `/lens/${teleconverterHostKey}/?v=1&tc=${teleconverterKey}`);
