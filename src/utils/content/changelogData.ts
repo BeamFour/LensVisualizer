@@ -20,6 +20,11 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-04",
+    type: "improvement",
+    summary: "Drew the rear drop-in filters of 17 Canon and Nikon super-telephotos as lens elements",
+  },
+  {
+    date: "2026-10-04",
     type: "lens",
     summary: "Added six Minolta MD Zoom patent models, from the 24-35mm f/3.5 to the 75-150mm f/4",
   },
