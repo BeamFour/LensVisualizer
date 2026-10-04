@@ -11,6 +11,7 @@ import {
   normalizeSearchText,
   searchCatalog,
 } from "../../../../src/utils/catalog/searchCatalog.js";
+import { TELECONVERTER_SUMMARY_LIST } from "../../../../src/utils/catalog/teleconverterSummaries.js";
 
 describe("catalog search", () => {
   it("normalizes punctuation and diacritics", () => {
@@ -24,6 +25,18 @@ describe("catalog search", () => {
     expect(searchCatalog("us2819651").patents.some((match) => match.key === "agfa-color-telinear-90mm-f4")).toBe(true);
     expect(searchCatalog("carl baur").authors.some((match) => match.author.name === "Carl Baur")).toBe(true);
     expect(searchCatalog("weiss").authors.some((match) => match.author.name.includes("Weiß"))).toBe(true);
+  });
+
+  it("finds teleconverters by name and opens an exact match on its own page", () => {
+    const teleconverter = TELECONVERTER_SUMMARY_LIST[0];
+    const matches = searchCatalog(teleconverter.name).teleconverters;
+
+    expect(matches[0]).toMatchObject({ type: "teleconverter", key: teleconverter.key });
+    expect(searchCatalog("teleconverter").teleconverters.some((match) => match.key === teleconverter.key)).toBe(true);
+    /* A teleconverter is not a lens and must never be offered as one. */
+    expect(searchCatalog(teleconverter.name).lenses.some((match) => match.key === teleconverter.key)).toBe(false);
+    expect(exactSearchTarget(teleconverter.name)).toBe(`/teleconverters/${teleconverter.key}/`);
+    expect(searchCatalog("").teleconverters).toEqual([]);
   });
 
   it("resolves exact unambiguous entries directly", () => {

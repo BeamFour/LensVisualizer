@@ -418,7 +418,15 @@ function auditLensPages(lensKeys) {
   );
 }
 
-function auditInternalLinks(lensKeys, articleSlugs, makerSlugs, mountIds = [], formatIds = [], authors = []) {
+function auditInternalLinks(
+  lensKeys,
+  articleSlugs,
+  makerSlugs,
+  mountIds = [],
+  formatIds = [],
+  authors = [],
+  teleconverterKeys = [],
+) {
   console.log("\n[Internal links]");
 
   /* /lenses → all lens pages */
@@ -506,6 +514,23 @@ function auditInternalLinks(lensKeys, articleSlugs, makerSlugs, mountIds = [], f
     ok(`/formats page has ${foundLinks}/${formatIds.length} format links`);
   }
 
+  /* /teleconverters → all teleconverter pages */
+  const teleconvertersPage = join(DIST_DIR, "teleconverters", "index.html");
+  if (!existsSync(teleconvertersPage)) {
+    error("Missing /teleconverters/index.html");
+  } else {
+    const html = readFileSync(teleconvertersPage, "utf-8");
+    let foundLinks = 0;
+    for (const key of teleconverterKeys) {
+      if (html.includes(`href="/teleconverters/${key}/"`)) {
+        foundLinks++;
+      } else {
+        error(`/teleconverters page missing link to /teleconverters/${key}`);
+      }
+    }
+    ok(`/teleconverters page has ${foundLinks}/${teleconverterKeys.length} teleconverter links`);
+  }
+
   /* /authors → all author pages */
   const authorsPage = join(DIST_DIR, "authors", "index.html");
   if (!existsSync(authorsPage)) {
@@ -562,7 +587,7 @@ if (!existsSync(META_PATH)) {
 }
 
 const buildMeta = JSON.parse(readFileSync(META_PATH, "utf-8"));
-const { routes, lensKeys, makerSlugs, mountIds = [], formatIds = [], authors = [] } = buildMeta;
+const { routes, lensKeys, makerSlugs, mountIds = [], formatIds = [], authors = [], teleconverterKeys = [] } = buildMeta;
 const articleSlugs = buildMeta.articles.map((a) => a.slug);
 
 console.log(
@@ -576,7 +601,7 @@ auditFeedDiscovery();
 auditAllPrerenderedPages(routes);
 auditCanonicalInternalLinks(routes);
 auditLensPages(lensKeys);
-auditInternalLinks(lensKeys, articleSlugs, makerSlugs, mountIds, formatIds, authors);
+auditInternalLinks(lensKeys, articleSlugs, makerSlugs, mountIds, formatIds, authors, teleconverterKeys);
 audit404();
 
 console.log("\n============================");

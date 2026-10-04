@@ -12,6 +12,7 @@ import UpdatesPage from "../../../../src/pages/UpdatesPage.js";
 import type { LensAction, LensState } from "../../../../src/types/state.js";
 import { CATALOG_KEYS, LENS_CATALOG } from "../../../../src/utils/catalog/lensCatalog.js";
 import { ALL_LENSES_BY_DATE } from "../../../../src/utils/catalog/lensSummaries.js";
+import { TELECONVERTER_CATALOG, TELECONVERTER_KEYS } from "../../../../src/utils/catalog/teleconverterCatalog.js";
 import { LensDispatchContext, LensStateContext, type LensCtxValue } from "../../../../src/utils/state/LensContext.js";
 import { createInitialState } from "../../../../src/utils/state/lensReducer.js";
 import { deriveMaker } from "../../../../src/utils/catalog/lensMetadata.js";
@@ -278,6 +279,35 @@ describe("page, markdown, and breadcrumb coverage", () => {
 
     expect(screen.getByRole("link", { name: "Formats" }).getAttribute("href")).toBe("/formats/");
     expect(screen.getByRole("link", { name: "APS-C" }).getAttribute("href")).toBe("/formats/aps-c/");
+
+    cleanup();
+    const teleconverterKey = TELECONVERTER_KEYS[0];
+    renderBreadcrumb({
+      lensKey,
+      state,
+      initialEntry: {
+        pathname: `/lens/${lensKey}/`,
+        state: { lensBreadcrumb: { type: "teleconverter", id: teleconverterKey } },
+      },
+    });
+
+    expect(screen.getByRole("link", { name: "Teleconverters" }).getAttribute("href")).toBe("/teleconverters/");
+    expect(screen.getByRole("link", { name: TELECONVERTER_CATALOG[teleconverterKey].name }).getAttribute("href")).toBe(
+      `/teleconverters/${teleconverterKey}/`,
+    );
+
+    /* An unknown converter id falls back to the default maker trail instead of rendering a dead link. */
+    cleanup();
+    renderBreadcrumb({
+      lensKey,
+      state,
+      initialEntry: {
+        pathname: `/lens/${lensKey}/`,
+        state: { lensBreadcrumb: { type: "teleconverter", id: "not-a-real-converter" } },
+      },
+    });
+    expect(screen.queryByRole("link", { name: "Teleconverters" })).toBeNull();
+    expect(screen.getByRole("link", { name: "Makers" }).getAttribute("href")).toBe("/makers/");
 
     cleanup();
     renderBreadcrumb({ lensKey, state, initialEntry: `/lens/${lensKey}?from=mount&id=not-real` });

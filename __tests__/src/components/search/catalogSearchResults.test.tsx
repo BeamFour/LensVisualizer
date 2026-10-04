@@ -27,12 +27,16 @@ afterEach(cleanup);
 describe("CatalogSearchResults", () => {
   it("prompts for input when the query is empty", () => {
     renderWithRouter(<CatalogSearchResults query="" theme={theme} />);
-    expect(screen.getByText(/Enter a lens name, a published patent number, or an inventor name/)).toBeTruthy();
+    expect(
+      screen.getByText(/Enter a lens or teleconverter name, a published patent number, or an inventor name/),
+    ).toBeTruthy();
   });
 
   it("treats a whitespace-only query as empty", () => {
     renderWithRouter(<CatalogSearchResults query="   " theme={theme} />);
-    expect(screen.getByText(/Enter a lens name, a published patent number, or an inventor name/)).toBeTruthy();
+    expect(
+      screen.getByText(/Enter a lens or teleconverter name, a published patent number, or an inventor name/),
+    ).toBeTruthy();
   });
 
   it("reports an empty result set politely", () => {
@@ -43,6 +47,16 @@ describe("CatalogSearchResults", () => {
     const message = screen.getByText(/No results for/);
     expect(message.getAttribute("aria-live")).toBe("polite");
     expect(message.textContent).toContain(query);
+  });
+
+  it("renders teleconverter matches as links to their own pages, not lens pages", () => {
+    const first = searchCatalog("teleconverter").teleconverters[0];
+
+    renderWithRouter(<CatalogSearchResults query="teleconverter" theme={theme} />);
+    const section = screen.getByRole("heading", { name: /Teleconverters/ }).parentElement!;
+
+    expect(within(section).getByText(first.data.name)).toBeTruthy();
+    expect(within(section).getAllByRole("link")[0].getAttribute("href")).toBe(`/teleconverters/${first.key}/`);
   });
 
   it("renders lens matches as links to their lens pages", () => {

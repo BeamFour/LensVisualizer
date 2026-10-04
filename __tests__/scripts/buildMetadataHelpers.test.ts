@@ -449,6 +449,13 @@ describe("build metadata helpers", () => {
       mountIds: ["canon-rf", "nikon-z"],
       formatIds: ["135-full-frame"],
       authors: [{ name: "Author A", slug: "author-a", lensKeys: ["lens-a"], patentCount: 1 }],
+      teleconverters: [
+        {
+          key: "converter-a",
+          freshness: { publishedOn: "2026-03-22", lastModified: "2026-03-23" },
+          compatibleLensKeys: ["lens-a"],
+        },
+      ],
       makerDetailsFreshness: { publishedOn: "2026-03-17", lastModified: "2026-03-26" },
       assigneeCorporateHistoryFreshness: { publishedOn: "2026-03-20", lastModified: "2026-03-28" },
       fallbackDate: "2026-03-27",
@@ -495,6 +502,15 @@ describe("build metadata helpers", () => {
       lastModified: "2026-03-27",
     });
     expect(routeFreshness["/authors/author-a"]).toEqual({
+      publishedOn: "2026-03-19",
+      lastModified: "2026-03-25",
+    });
+    expect(routeFreshness["/teleconverters"]).toEqual({
+      publishedOn: "2026-03-22",
+      lastModified: "2026-03-23",
+    });
+    /* A converter page lists its hosts, so it is as fresh as the newest of the converter and those lenses. */
+    expect(routeFreshness["/teleconverters/converter-a"]).toEqual({
       publishedOn: "2026-03-19",
       lastModified: "2026-03-25",
     });

@@ -32,8 +32,8 @@ flowchart LR
   n_external_src_components_hooks["src/components/hooks"]
   n_external_src_utils_state["src/utils/state"]
   n_external_src_types["src/types"]
-  n_external_src_pages_lensIndex["src/pages/lensIndex"]
   n_external_src_utils_catalog["src/utils/catalog"]
+  n_external_src_pages_lensIndex["src/pages/lensIndex"]
   n_external_src_utils_theme["src/utils/theme"]
   n_external_pkg_react["pkg:react"]
   n_external_src_components_controls["src/components/controls"]
@@ -44,8 +44,8 @@ flowchart LR
   n_src_components_layout_src_components_layout_LensDiagramPanel_tsx --> |8| n_external_src_components_hooks
   n_src_components_layout_src_components_layout_LensViewer_tsx --> |5| n_external_src_utils_state
   n_src_components_layout_src_components_layout_DiagramControlPanel_tsx --> |4| n_external_src_types
+  n_src_components_layout_src_components_layout_BreadcrumbBar_tsx --> |4| n_external_src_utils_catalog
   n_src_components_layout_src_components_layout_BreadcrumbBar_tsx --> |3| n_external_src_pages_lensIndex
-  n_src_components_layout_src_components_layout_BreadcrumbBar_tsx --> |3| n_external_src_utils_catalog
   n_src_components_layout_src_components_layout_ThemeToggleGroup_tsx --> |3| n_external_src_utils_theme
   n_src_components_layout_src_components_layout_LensDiagramPanel_tsx --> |3| n_src_components_layout_src_components_layout_lensDiagram
   n_src_components_layout_src_components_layout_LensViewer_tsx --> |3| n_src_components_layout_src_components_layout_lensViewer
@@ -84,8 +84,8 @@ flowchart LR
 
 - Direct source files: 17
 - Direct subfolders: 2
-- Main outbound areas: src/types (23), src/components/hooks (13), package:react (11), same folder (11), src/utils/state (10), src/utils/style (10), src/utils/theme (9), src/utils/catalog (8), +21 more
-- External consumers: src/comparison, src/components/controls, src/components/layout, src/components/relationshipMap, src/pages/ArticlePage.tsx, src/pages/ArticlesPage.tsx, src/pages/AuthorPage.tsx, src/pages/AuthorsIndexPage.tsx, +16 more
+- Main outbound areas: src/types (23), src/components/hooks (13), package:react (11), same folder (11), src/utils/state (10), src/utils/style (10), src/utils/catalog (9), src/utils/theme (9), +21 more
+- External consumers: src/comparison, src/components/controls, src/components/layout, src/components/relationshipMap, src/pages/ArticlePage.tsx, src/pages/ArticlesPage.tsx, src/pages/AuthorPage.tsx, src/pages/AuthorsIndexPage.tsx, +18 more
 
 ## Subfolders
 
@@ -99,7 +99,7 @@ flowchart LR
 | File | Role | Imports from | Imported by | Exports |
 | --- | --- | --- | --- | --- |
 | `AnalysisDrawer.tsx` | React component module | src/types (2), package:react, src/utils/style, src/utils/usePrefersReducedMotion.ts | same folder (3) | AnalysisTab, default, AnalysisDrawer |
-| `BreadcrumbBar.tsx` | React component module | src/pages/lensIndex (3), src/utils/catalog (3), src/utils/state (2), package:react-router, same folder, +4 more | same folder | default, BreadcrumbBar |
+| `BreadcrumbBar.tsx` | React component module | src/utils/catalog (4), src/pages/lensIndex (3), src/utils/state (2), package:react-router, same folder, +4 more | same folder | default, BreadcrumbBar |
 | `ControlsBar.tsx` | React component module | src/types (2), package:react, src/components/controls, src/utils/featureFlags.ts, src/utils/state, +1 more | same folder | default, ControlsBar |
 | `DescriptionPanel.tsx` | React component module | package:react, src/components/markdown, src/types | same folder (2) | default, DescriptionPanel |
 | `DiagramControlPanel.tsx` | React component module | src/types (4), src/components/display (2), src/components/controls | same folder | default, DiagramControlPanel |
@@ -111,7 +111,7 @@ flowchart LR
 | `PanelOverlay.tsx` | React component module | package:react, src/components/hooks, src/types, src/utils/style, src/utils/usePrefersReducedMotion.ts | same folder | default, PanelOverlay |
 | `PrimerToggleButton.tsx` | React component module | src/types | same folder | default, PrimerToggleButton |
 | `SingleLensContent.tsx` | React component module | same folder (2), src/types (2), src/utils/featureFlags.ts | same folder | default, SingleLensContent |
-| `StaticPageShell.tsx` | React component module | package:react, package:react-router, same folder, src/types, src/utils/seo, +2 more | src/pages/ArticlePage.tsx, src/pages/ArticlesPage.tsx, src/pages/AuthorPage.tsx, src/pages/AuthorsIndexPage.tsx, src/pages/FormatPage.tsx, +11 more | default, StaticPageShell |
+| `StaticPageShell.tsx` | React component module | package:react, package:react-router, same folder, src/types, src/utils/seo, +2 more | src/pages/ArticlePage.tsx, src/pages/ArticlesPage.tsx, src/pages/AuthorPage.tsx, src/pages/AuthorsIndexPage.tsx, src/pages/FormatPage.tsx, +13 more | default, StaticPageShell |
 | `ThemeToggleGroup.tsx` | React component module | src/utils/theme (3), src/types, src/utils/style | same folder (2) | default, ThemeToggleGroup |
 | `TopBar.tsx` | React component module | src/components/controls (2), src/utils/catalog (2), src/components/display, src/types, src/utils/style | same folder | default, TopBar |
 | `ViewToggleBar.tsx` | React component module | src/types, src/utils/style | same folder | default, ViewToggleBar |
