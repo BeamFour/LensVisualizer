@@ -57,6 +57,9 @@ function renderChrome(dispatch = vi.fn()) {
         configurationOptions={[]}
         activeConfigurationKey="nokton-50f1"
         onConfigurationChange={vi.fn()}
+        teleconverterOptions={[]}
+        activeTeleconverterKey={null}
+        onTeleconverterChange={vi.fn()}
         controlsBarProps={{
           theme: themes.dark,
           showOnAxis: true,

@@ -42,9 +42,12 @@ import type { RuntimeLens } from "../../types/optics.js";
 import { foldedHitOrderLabelsForDisplay } from "../../optics/foldedPathDisplay.js";
 import { isHeavyLensForRayWork } from "../../optics/raySampling.js";
 import { normalizePanelId, selectedElementKeyForPanel } from "../../types/state.js";
+import { lensSystemKey } from "../../utils/catalog/teleconverterCatalog.js";
 
 interface LensDiagramPanelProps {
   lensKey: string;
+  /** Converter mounted on this panel's lens; ignored when a prebuilt `runtimeLens` is supplied. */
+  teleconverterKey?: string | null;
   runtimeLens?: RuntimeLens;
   focusT?: number;
   zoomT?: number;
@@ -71,6 +74,7 @@ interface LensDiagramPanelProps {
 
 export default function LensDiagramPanel({
   lensKey,
+  teleconverterKey = null,
   runtimeLens,
   focusT: focusTProp,
   zoomT: zoomTProp,
@@ -151,8 +155,16 @@ export default function LensDiagramPanel({
 
   /* ── Extracted hooks ── */
   const adapters = useDispatchAdapters();
-  const overlays = useOverlayState(lensKey);
-  const { headerRef, headerHeight } = useHeaderHeight({ panelId, lensKey, onHeaderHeight, enabled: !zoomPanActive });
+  /* Every lens-keyed reset below (overlays, header height, hover, error boundary) must also fire when a converter
+     is mounted or removed, so they key on the lens-plus-converter system rather than the lens alone. */
+  const systemKey = lensSystemKey(lensKey, teleconverterKey);
+  const overlays = useOverlayState(systemKey);
+  const { headerRef, headerHeight } = useHeaderHeight({
+    panelId,
+    lensKey: systemKey,
+    onHeaderHeight,
+    enabled: !zoomPanActive,
+  });
   const { flashKey, flashVisible, flashFading } = useFlashOverlay(flashOverlay);
 
   /* ── Hover/selection state ── */
@@ -164,13 +176,13 @@ export default function LensDiagramPanel({
 
   useEffect(() => {
     setHov(null);
-  }, [lensKey]);
+  }, [systemKey]);
 
   /* ── Side-panel overflow detection ── */
   const useSideLayout = useSideLayoutDetection({
     enabled: sideLayoutEnabled,
     containerRef: panelContainerRef,
-    deps: [lensKey, showSliders, showControls, showChromatic],
+    deps: [systemKey, showSliders, showControls, showChromatic],
   });
 
   /* ── Lens computation (build, layout, transforms, shapes, aperture) ── */
@@ -206,6 +218,7 @@ export default function LensDiagramPanel({
     filterId,
   } = useLensComputation({
     lensKey,
+    teleconverterKey,
     runtimeLens,
     focusT,
     zoomT,
@@ -327,28 +340,28 @@ export default function LensDiagramPanel({
     chromG,
     chromB,
     chromV,
-    lensKey,
+    lensKey: systemKey,
   });
   return (
-    <PanelErrorBoundary lensKey={lensKey}>
+    <PanelErrorBoundary lensKey={systemKey}>
       {buildError ? (
         <LensDiagramErrorState
           error={buildError}
-          lensKey={lensKey}
+          lensKey={systemKey}
           component="LensDiagramPanel (buildLens)"
           title="Failed to build lens"
         />
       ) : shapeError ? (
         <LensDiagramErrorState
           error={shapeError}
-          lensKey={lensKey}
+          lensKey={systemKey}
           component="LensDiagramPanel (element shapes)"
           title="Failed to compute lens element shapes"
         />
       ) : rayError ? (
         <LensDiagramErrorState
           error={rayError}
-          lensKey={lensKey}
+          lensKey={systemKey}
           component="LensDiagramPanel (ray tracing)"
           title="Ray tracing failed"
         />

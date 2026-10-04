@@ -25,6 +25,7 @@ import {
   COMPARISON_CATALOG_KEYS,
   opticalConfigurationOptionsForKey,
 } from "../../utils/catalog/lensCatalog.js";
+import { resolveTeleconverterKey, teleconverterOptionsForLens } from "../../utils/catalog/teleconverterCatalog.js";
 import useLensAnalysisMarkdown from "../hooks/useLensAnalysisMarkdown.js";
 import usePreferences from "../../utils/state/usePreferences.js";
 import useURLSync from "../../utils/state/useURLSync.js";
@@ -52,6 +53,7 @@ import {
   SET_MOBILE_VIEW,
   SET_DESKTOP_VIEW,
   SET_OPTICAL_CONFIGURATION,
+  SET_TELECONVERTER,
 } from "../../utils/state/lensReducer.js";
 import useComparisonOrchestration from "../../comparison/useComparisonOrchestration.js";
 import useOverlays from "../hooks/useOverlays.js";
@@ -101,7 +103,7 @@ export default function LensVisualization({ initialLensKey, initialLensKeyB }: L
 
   /* ── Destructure state slices for convenient access ── */
   const { lens, display, rays, sharedSliders, panels, overlays } = state;
-  const { lensKeyA, lensKeyB, selectedConfigurationKey, comparing, scaleMode } = lens;
+  const { lensKeyA, lensKeyB, selectedConfigurationKey, teleconverterKeyA, comparing, scaleMode } = lens;
   const { dark, highContrast, mobileView, desktopView } = display;
   const {
     showOnAxis,
@@ -139,9 +141,30 @@ export default function LensVisualization({ initialLensKey, initialLensKeyB }: L
   const switchOpticalConfiguration = useCallback(
     (key: string) => {
       if (!configurationOptions.some((option) => option.key === key)) return;
-      dispatch({ type: SET_OPTICAL_CONFIGURATION, key });
+      /* Keep the mounted converter only if it also fits the prescription being switched to. */
+      dispatch({
+        type: SET_OPTICAL_CONFIGURATION,
+        key,
+        teleconverterKey: resolveTeleconverterKey(key, teleconverterKeyA),
+      });
     },
-    [configurationOptions, dispatch],
+    [configurationOptions, dispatch, teleconverterKeyA],
+  );
+
+  /* Detachable teleconverters mount on the prescription actually shown, so options follow the configuration. */
+  const teleconverterOptions = useMemo(
+    () => (comparing ? [] : teleconverterOptionsForLens(diagramLensKey)),
+    [comparing, diagramLensKey],
+  );
+  const activeTeleconverterKey = teleconverterOptions.some((option) => option.key === teleconverterKeyA)
+    ? teleconverterKeyA
+    : null;
+  const switchTeleconverter = useCallback(
+    (key: string | null) => {
+      if (key !== null && !teleconverterOptions.some((option) => option.key === key)) return;
+      dispatch({ type: SET_TELECONVERTER, panel: "a", key });
+    },
+    [dispatch, teleconverterOptions],
   );
 
   /* ── Comparison mode orchestration ── */
@@ -333,6 +356,9 @@ export default function LensVisualization({ initialLensKey, initialLensKeyB }: L
                 configurationOptions={configurationOptions}
                 activeConfigurationKey={diagramLensKey}
                 onConfigurationChange={switchOpticalConfiguration}
+                teleconverterOptions={teleconverterOptions}
+                activeTeleconverterKey={activeTeleconverterKey}
+                onTeleconverterChange={switchTeleconverter}
                 controlsBarProps={controlsBarProps}
                 mobileView={mobileView}
                 onMobileViewChange={(val) => dispatch({ type: SET_MOBILE_VIEW, mobileView: val })}
@@ -351,6 +377,7 @@ export default function LensVisualization({ initialLensKey, initialLensKeyB }: L
                 lensKeyA={lensKeyA}
                 lensKeyB={lensKeyB}
                 diagramLensKey={diagramLensKey}
+                teleconverterKey={activeTeleconverterKey}
                 comparisonLenses={comparisonLenses}
                 focusPair={focusPair}
                 aperturePair={aperturePair}

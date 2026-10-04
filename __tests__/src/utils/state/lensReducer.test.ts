@@ -12,6 +12,8 @@ import lensReducer, {
   SET_LENS_A,
   SET_LENS_B,
   SET_OPTICAL_CONFIGURATION,
+  SET_TELECONVERTER,
+  SWAP_LENSES,
   SET_SCALE_MODE,
   SET_DARK,
   SET_HIGH_CONTRAST,
@@ -310,6 +312,57 @@ describe("lensReducer", () => {
       expect(next.lens.selectedConfigurationKey).toBe("nikon_58_tc_in");
       expect(next.panels.selectedElementId).toBeNull();
     });
+
+    it("keeps only the teleconverter the dispatcher resolved for the new prescription", () => {
+      state.lens = { ...state.lens, teleconverterKeyA: "tc_14" };
+      const kept = lensReducer(state, {
+        type: SET_OPTICAL_CONFIGURATION,
+        key: "nikon_58_tc_in",
+        teleconverterKey: "tc_14",
+      });
+      const dropped = lensReducer(state, { type: SET_OPTICAL_CONFIGURATION, key: "nikon_58_tc_in" });
+
+      expect(kept.lens.teleconverterKeyA).toBe("tc_14");
+      expect(dropped.lens.teleconverterKeyA).toBeNull();
+    });
+  });
+
+  describe("SET_TELECONVERTER", () => {
+    it("mounts and removes a converter without resetting sliders, clearing the stale element selection", () => {
+      state.sliders = { ...state.sliders, focusT: 0.4, zoomT: 0.6, stopdownT: 0.2 };
+      state.panels = { ...state.panels, selectedElementId: 3, analysisDrawerOpen: true };
+      const mounted = lensReducer(state, { type: SET_TELECONVERTER, panel: "a", key: "tc_14" });
+
+      expect(mounted.lens.teleconverterKeyA).toBe("tc_14");
+      expect(mounted.lens.teleconverterKeyB).toBeNull();
+      expect(mounted.sliders).toBe(state.sliders);
+      expect(mounted.panels.selectedElementId).toBeNull();
+      expect(mounted.panels.analysisDrawerOpen).toBe(true);
+      expect(
+        lensReducer(mounted, { type: SET_TELECONVERTER, panel: "a", key: null }).lens.teleconverterKeyA,
+      ).toBeNull();
+    });
+
+    it("targets comparison pane B independently", () => {
+      state.panels = { ...state.panels, selectedElementIdA: 2, selectedElementIdB: 5 };
+      const next = lensReducer(state, { type: SET_TELECONVERTER, panel: "b", key: "tc_20" });
+
+      expect(next.lens.teleconverterKeyB).toBe("tc_20");
+      expect(next.lens.teleconverterKeyA).toBeNull();
+      expect(next.panels.selectedElementIdB).toBeNull();
+      expect(next.panels.selectedElementIdA).toBe(2);
+    });
+
+    it("is dropped when that pane's lens changes and travels with the lens on swap", () => {
+      state.lens = { ...state.lens, comparing: true, teleconverterKeyA: "tc_14", teleconverterKeyB: "tc_20" };
+
+      expect(lensReducer(state, { type: SET_LENS_A, key: "zeiss_35" }).lens.teleconverterKeyA).toBeNull();
+      expect(lensReducer(state, { type: SET_LENS_A, key: "zeiss_35" }).lens.teleconverterKeyB).toBe("tc_20");
+      expect(lensReducer(state, { type: SET_LENS_B, key: "zeiss_35" }).lens.teleconverterKeyB).toBeNull();
+      const swapped = lensReducer(state, { type: SWAP_LENSES });
+      expect(swapped.lens.teleconverterKeyA).toBe("tc_20");
+      expect(swapped.lens.teleconverterKeyB).toBe("tc_14");
+    });
   });
 
   /* ── Single-field setters (scale mode, display, sliders, shared sliders) ── */
@@ -461,6 +514,15 @@ describe("lensReducer", () => {
         },
       });
       expect(next.lens.selectedConfigurationKey).toBe("nikon_58_tc_in");
+      /* A URL state without the key leaves the mounted converter alone; an explicit null unmounts it. */
+      const mounted = lensReducer(next, { type: APPLY_URL_VIEW_STATE, state: { teleconverterKey: "tc_14" } });
+      expect(mounted.lens.teleconverterKeyA).toBe("tc_14");
+      expect(lensReducer(mounted, { type: APPLY_URL_VIEW_STATE, state: { focus: 0.1 } }).lens.teleconverterKeyA).toBe(
+        "tc_14",
+      );
+      expect(
+        lensReducer(mounted, { type: APPLY_URL_VIEW_STATE, state: { teleconverterKey: null } }).lens.teleconverterKeyA,
+      ).toBeNull();
       expect(next.sliders.focusT).toBe(0.4);
       expect(next.sliders.aberrationT).toBe(0.7);
       expect(next.sliders.stopdownT).toBe(0.2);

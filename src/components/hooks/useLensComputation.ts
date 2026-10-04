@@ -8,7 +8,7 @@
  */
 
 import { useMemo, useRef } from "react";
-import { LENS_CATALOG } from "../../utils/catalog/lensCatalog.js";
+import { resolveLensSystemData } from "../../utils/catalog/teleconverterCatalog.js";
 import { wideOpenStopAtZoom } from "../../optics/apertureStop.js";
 import { fNumberAtStopdown } from "../../optics/aperture.js";
 import buildLens from "../../optics/buildLens.js";
@@ -37,6 +37,8 @@ import type { FieldGeometryState } from "../../optics/optics.js";
 
 interface UseLensComputationParams {
   lensKey: string;
+  /** Converter composed onto the catalog lens before building; ignored when `runtimeLens` is supplied. */
+  teleconverterKey?: string | null;
   runtimeLens?: RuntimeLens;
   focusT: number;
   zoomT: number;
@@ -88,6 +90,7 @@ interface UseLensComputationResult {
 
 export default function useLensComputation({
   lensKey,
+  teleconverterKey = null,
   runtimeLens,
   focusT,
   zoomT,
@@ -103,11 +106,11 @@ export default function useLensComputation({
   const buildResult = useMemo((): { L: RuntimeLens; error?: undefined } | { L?: undefined; error: unknown } => {
     if (runtimeLens) return { L: runtimeLens };
     try {
-      return { L: buildLens(LENS_CATALOG[lensKey]) };
+      return { L: buildLens(resolveLensSystemData(lensKey, teleconverterKey)) };
     } catch (e) {
       return { error: e };
     }
-  }, [lensKey, runtimeLens]);
+  }, [lensKey, teleconverterKey, runtimeLens]);
 
   const L = buildResult.L;
   const buildError = buildResult.error;

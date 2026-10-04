@@ -4,6 +4,7 @@ import { renderHook, act } from "@testing-library/react";
 import useURLSync from "../../../../src/utils/state/useURLSync.js";
 import { createInitialState } from "../../../../src/utils/state/lensReducer.js";
 import { CATALOG_KEYS, LENS_CATALOG } from "../../../../src/utils/catalog/lensCatalog.js";
+import { TELECONVERTER_KEYS, teleconverterOptionsForLens } from "../../../../src/utils/catalog/teleconverterCatalog.js";
 import { clearBrowserState, installMatchMediaMock, mockReplaceState } from "../../../testUtils.js";
 import { focalLengthToZoomT } from "../../../../src/utils/state/zoomConversion.js";
 import type { Dispatch } from "react";
@@ -19,6 +20,11 @@ const zoomLensKey = CATALOG_KEYS.find(
 const zoomLensPositions = LENS_CATALOG[zoomLensKey].zoomPositions!;
 const canonicalConfigurationKey = "nikon-af-s-nikkor-180-400mm-f4e-tc14-fl-ed-vr";
 const alternateConfigurationKey = `${canonicalConfigurationKey}-tc-in`;
+/* Catalog-aware converter validation needs a real pair; resolve it from the catalogs rather than naming a lens. */
+const teleconverterKey = TELECONVERTER_KEYS[0];
+const teleconverterHostKey = CATALOG_KEYS.find((key) =>
+  teleconverterOptionsForLens(key).some((option) => option.key === teleconverterKey),
+)!;
 
 /* ── Setup / teardown ── */
 
@@ -222,6 +228,34 @@ describe("useURLSync — updateURLWithSliders (debounced)", () => {
     expect(replaceStateSpy.mock.calls.at(-1)?.[2]).toBe(`/lens/${canonicalConfigurationKey}/`);
   });
 
+  it("writes the mounted teleconverter and removes the param when it is unmounted", () => {
+    const dispatch = vi.fn() as unknown as Dispatch<LensAction>;
+    const base = makeState();
+    const mountedState: LensState = {
+      ...base,
+      lens: {
+        ...base.lens,
+        lensKeyA: teleconverterHostKey,
+        selectedConfigurationKey: teleconverterHostKey,
+        teleconverterKeyA: teleconverterKey,
+      },
+    };
+    window.history.replaceState({}, "", `/lens/${teleconverterHostKey}/`);
+    replaceStateSpy.mockClear();
+
+    const { rerender } = renderHook(({ state }) => useURLSync(state, dispatch, null, true, false), {
+      initialProps: { state: mountedState },
+    });
+    act(() => vi.advanceTimersByTime(100));
+    expect(replaceStateSpy.mock.calls.at(-1)?.[2]).toBe(`/lens/${teleconverterHostKey}/?v=1&tc=${teleconverterKey}`);
+
+    window.history.replaceState({}, "", `/lens/${teleconverterHostKey}/?v=1&tc=${teleconverterKey}`);
+    replaceStateSpy.mockClear();
+    rerender({ state: { ...mountedState, lens: { ...mountedState.lens, teleconverterKeyA: null } } });
+    act(() => vi.advanceTimersByTime(100));
+    expect(replaceStateSpy.mock.calls.at(-1)?.[2]).toBe(`/lens/${teleconverterHostKey}/`);
+  });
+
   it("uses shared overlay params and per-pane element params on compare pages", () => {
     const dispatch = vi.fn() as unknown as Dispatch<LensAction>;
     const [lensKeyA, lensKeyB] = CATALOG_KEYS;
@@ -296,6 +330,33 @@ describe("useURLSync — updateURLWithSliders (debounced)", () => {
       type: "APPLY_URL_VIEW_STATE",
       state: expect.objectContaining({ configurationKey: canonicalConfigurationKey }),
     });
+  });
+
+  it("hydrates teleconverter history, unmounting on a URL without tc and rejecting an unfit converter", () => {
+    const dispatch = vi.fn() as unknown as Dispatch<LensAction>;
+    const base = makeState();
+    const state: LensState = {
+      ...base,
+      lens: { ...base.lens, lensKeyA: teleconverterHostKey, selectedConfigurationKey: teleconverterHostKey },
+    };
+    renderHook(() => useURLSync(state, dispatch, null, true, false));
+
+    window.history.replaceState({}, "", `?v=1&tc=${teleconverterKey}`);
+    act(() => window.dispatchEvent(new PopStateEvent("popstate")));
+    expect(dispatch).toHaveBeenCalledWith({
+      type: "APPLY_URL_VIEW_STATE",
+      state: expect.objectContaining({ teleconverterKey }),
+    });
+
+    for (const search of ["", "?v=1&tc=not-a-real-converter"]) {
+      vi.mocked(dispatch).mockClear();
+      window.history.replaceState({}, "", search || window.location.pathname);
+      act(() => window.dispatchEvent(new PopStateEvent("popstate")));
+      expect(dispatch).toHaveBeenCalledWith({
+        type: "APPLY_URL_VIEW_STATE",
+        state: expect.objectContaining({ teleconverterKey: null }),
+      });
+    }
   });
 
   it("strips configuration params from compare-mode history navigation", () => {

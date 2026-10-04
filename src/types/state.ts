@@ -57,6 +57,10 @@ export interface LensSlice {
   lensKeyA: string;
   lensKeyB: string;
   selectedConfigurationKey: string;
+  /** Teleconverter mounted on the single-lens view and comparison pane A; null = bare lens. */
+  teleconverterKeyA: string | null;
+  /** Teleconverter mounted on comparison pane B; null = bare lens. */
+  teleconverterKeyB: string | null;
   comparing: boolean;
   scaleMode: "independent" | "normalized";
 }
@@ -187,7 +191,9 @@ export interface LensState {
 export type LensAction =
   | { type: "SET_LENS_A"; key: string }
   | { type: "SET_LENS_B"; key: string }
-  | { type: "SET_OPTICAL_CONFIGURATION"; key: string }
+  /* The reducer has no catalog, so the dispatcher passes the converter that still fits the new prescription. */
+  | { type: "SET_OPTICAL_CONFIGURATION"; key: string; teleconverterKey?: string | null }
+  | { type: "SET_TELECONVERTER"; panel: "a" | "b"; key: string | null }
   | { type: "SET_DARK"; dark: boolean | null }
   | { type: "SET_HIGH_CONTRAST"; highContrast: boolean }
   | { type: "SET_MOBILE_VIEW"; mobileView: MobileView }
@@ -259,6 +265,8 @@ export interface URLState {
   lensKeyB?: string;
   comparing?: boolean;
   configurationKey?: string;
+  /** Single-lens `tc` query value; null clears a mounted converter on popstate. */
+  teleconverterKey?: string | null;
   focus?: number;
   aberration?: number;
   aperture?: number;

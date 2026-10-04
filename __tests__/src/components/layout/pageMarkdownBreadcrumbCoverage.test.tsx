@@ -169,6 +169,8 @@ describe("page, markdown, and breadcrumb coverage", () => {
         lensKeyA,
         lensKeyB,
         selectedConfigurationKey: lensKeyA,
+        teleconverterKeyA: null,
+        teleconverterKeyB: null,
         comparing: true,
         scaleMode: "independent",
       },

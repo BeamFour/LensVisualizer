@@ -6,7 +6,8 @@ import useLensComputation from "../../../../src/components/hooks/useLensComputat
 import { prepareRuntimeState } from "../../../../src/optics/compat.js";
 import { traceEngineRay2 } from "../../../../src/optics/trace/rayAdapters.js";
 import buildLens from "../../../../src/optics/buildLens.js";
-import { LENS_CATALOG } from "../../../../src/utils/catalog/lensCatalog.js";
+import { CATALOG_KEYS, LENS_CATALOG } from "../../../../src/utils/catalog/lensCatalog.js";
+import { TELECONVERTER_KEYS, teleconverterOptionsForLens } from "../../../../src/utils/catalog/teleconverterCatalog.js";
 
 /* This test uses a real lens key from the catalog. The LENS_CATALOG is populated
  * at import time via import.meta.glob so all *.data.ts lenses are available. */
@@ -76,6 +77,38 @@ describe("useLensComputation", () => {
 
     expect(result.current.L).toBe(runtimeLens);
     expect(result.current.buildError).toBeUndefined();
+  });
+
+  it("composes a mounted teleconverter into the built lens and ignores one that does not fit", () => {
+    /* The hook reads the real catalogs, so resolve a real converter–host pair instead of naming a lens. */
+    const teleconverterKey = TELECONVERTER_KEYS[0];
+    const hostKey = CATALOG_KEYS.find((key) =>
+      teleconverterOptionsForLens(key).some((option) => option.key === teleconverterKey),
+    )!;
+    const compute = (lensKey: string, key: string | null) =>
+      renderHook(() =>
+        useLensComputation({
+          lensKey,
+          teleconverterKey: key,
+          focusT: 0,
+          zoomT: 0,
+          stopdownT: 0,
+          scaleRatio: null,
+          panelId: "test",
+        }),
+      ).result.current;
+
+    const bare = compute(hostKey, null);
+    const mounted = compute(hostKey, teleconverterKey);
+    expect(mounted.buildError).toBeUndefined();
+    expect(mounted.L!.data.attachedTeleconverter?.key).toBe(teleconverterKey);
+    expect(mounted.L!.N).toBeGreaterThan(bare.L!.N);
+    expect(mounted.L!.stopPhysSD).toBeCloseTo(bare.L!.stopPhysSD, 9);
+    expect(mounted.dynamicEFL).toBeGreaterThan(bare.dynamicEFL);
+
+    const unfit = compute(baseLensKey, teleconverterKey);
+    expect(unfit.buildError).toBeUndefined();
+    expect(unfit.L!.data.attachedTeleconverter).toBeUndefined();
   });
 
   it("returns element shapes", () => {

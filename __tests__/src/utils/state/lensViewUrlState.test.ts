@@ -62,6 +62,24 @@ describe("lensViewUrlState", () => {
     );
   });
 
+  it("round-trips a v1 teleconverter key and applies the same bounds as cfg", () => {
+    const teleconverterKey = "fuji-xf-14x-tc-wr";
+    const params = buildLensViewQuery({ teleconverterKey });
+
+    expect(params.toString()).toBe(`v=1&tc=${teleconverterKey}`);
+    expect(parseLensViewQuery(`?${params.toString()}`).teleconverterKey).toBe(teleconverterKey);
+    expect(lensViewQueryToUrlState(parseLensViewQuery(`?${params.toString()}`)).teleconverterKey).toBe(
+      teleconverterKey,
+    );
+    /* A null key (bare lens) serializes nothing, so the default URL stays clean. */
+    expect(buildLensViewQuery({ teleconverterKey: null }).toString()).toBe("");
+
+    expect(parseLensViewQuery("?v=1&tc=../other").teleconverterKey).toBeUndefined();
+    expect(parseLensViewQuery(`?v=1&tc=${"a".repeat(129)}`).teleconverterKey).toBeUndefined();
+    expect(parseLensViewQuery("?tc=valid-looking-key").teleconverterKey).toBeUndefined();
+    expect(buildLensViewQuery({ comparing: true, teleconverterKey }).toString()).toBe("");
+  });
+
   it("rejects malformed, oversized, unversioned, and comparison configuration params", () => {
     expect(parseLensViewQuery("?v=1&cfg=../other-lens").configurationKey).toBeUndefined();
     expect(parseLensViewQuery(`?v=1&cfg=${"a".repeat(129)}`).configurationKey).toBeUndefined();
@@ -243,6 +261,7 @@ describe("lensViewUrlState", () => {
       shift: -4.5,
       tilt: 3.25,
       configurationKey: "example-configuration",
+      teleconverterKey: "example-teleconverter",
       selectedElementId: 4,
       selectedElementIdA: 2,
       selectedElementIdB: 9,

@@ -23,7 +23,7 @@ flowchart LR
     n_src_optics_src_optics_prescription["prescription/"]
     n_src_optics_src_optics_state["state/"]
     n_src_optics_src_optics_trace["trace/"]
-    n_src_optics_TypeScript_modules["TypeScript modules (40)"]
+    n_src_optics_TypeScript_modules["TypeScript modules (41)"]
   end
   n_external_src_types["src/types"]
   n_external_src_lens_data_defaults_ts["src/lens-data/defaults.ts"]
@@ -33,9 +33,9 @@ flowchart LR
   n_src_optics_TypeScript_modules --> |22| n_src_optics_src_optics_internal
   n_src_optics_TypeScript_modules --> |18| n_src_optics_src_optics_analysis
   n_src_optics_TypeScript_modules --> |8| n_src_optics_src_optics_glassCatalogEntries
+  n_src_optics_TypeScript_modules --> |8| n_src_optics_src_optics_prescription
   n_src_optics_TypeScript_modules --> |7| n_src_optics_src_optics_chromatic
   n_src_optics_TypeScript_modules --> |6| n_src_optics_src_optics_aberration
-  n_src_optics_TypeScript_modules --> |6| n_src_optics_src_optics_prescription
   n_src_optics_TypeScript_modules --> |4| n_src_optics_src_optics_diagram
   n_src_optics_TypeScript_modules --> |4| n_src_optics_src_optics_field
   n_src_optics_TypeScript_modules --> |3| n_src_optics_src_optics_first_order
@@ -50,10 +50,10 @@ flowchart LR
 
 ## Directory Overview
 
-- Direct source files: 40
+- Direct source files: 41
 - Direct subfolders: 14
-- Main outbound areas: src/types (29), src/optics/internal (22), src/optics/analysis (18), src/optics/compat.ts (12), src/optics/glassCatalogEntries (8), src/optics/optics.ts (8), src/optics/chromatic (7), src/optics/aberration (6), +29 more
-- External consumers: src/benchmarks, src/comparison, src/components/controls, src/components/diagram, src/components/display, src/components/hooks, src/components/layout, src/optics/aberration, +12 more
+- Main outbound areas: src/types (29), src/optics/internal (22), src/optics/analysis (18), src/optics/compat.ts (12), src/optics/glassCatalogEntries (8), src/optics/optics.ts (8), src/optics/prescription (8), src/optics/chromatic (7), +30 more
+- External consumers: src/benchmarks, src/comparison, src/components/controls, src/components/diagram, src/components/display, src/components/hooks, src/components/layout, src/optics/aberration, +13 more
 
 ## Subfolders
 
@@ -114,7 +114,8 @@ flowchart LR
 | `runtimeLens.ts` | Runtime Lens module with default export | src/optics/internal (5), src/optics/dispersion.ts, src/optics/field, src/optics/math, src/optics/prescription, +3 more | src/optics/buildLens.ts, src/optics/compat.ts, src/optics/prescription | default, buildLens, paraxialTrace, realTraceToStop |
 | `spectralLines.ts` | Spectral Lines helper module | none | src/optics/analysis (2), src/optics/chromatic (2), src/optics/constants.ts, src/optics/glassCatalog.ts, src/optics/math | LINE_NM |
 | `stopObstruction.ts` | Stop Obstruction helper module | src/types | src/optics/optics.ts, src/optics/raySampling.ts | stopInnerBlockedSemiDiameter |
+| `teleconverter.ts` | Teleconverter helper module | src/optics/prescription (2), src/optics/validateTeleconverterData.ts | src/components/diagram, src/utils/catalog | attachTeleconverter, TeleconverterAttachError, teleconverterGroupLabel, teleconverterSurfaceLabel, MIN_TELECONVERTER_GAP_MM, TELECONVERTER_LABEL_PREFIX, teleconverterCompatibility, teleconverterGeometry, +1 more |
 | `types.ts` | Shared TypeScript types | src/optics/dispersion.ts, src/optics/glassCatalog.ts, src/types | src/optics/analysis (20), src/optics/perspective (20), src/components/display (14), src/optics/trace (12), src/optics/math (6), +10 more | Vec3, Ray3, Plane3, SurfaceProfile, CompiledSurfaceInteraction, CompiledRadialPhaseTerm, CompiledDiffractivePhase, CompiledSurface, +16 more |
 | `validateLensData.ts` | Validate Lens Data module with default export | src/optics/internal (5), src/optics/prescription (2), src/types (2), src/utils/catalog | src/optics/runtimeLens.ts, src/optics/validateTeleconverterData.ts, src/utils/state | validateRearPlates, validateLensMounts, LENS_KEY_PATTERN, default, validateLensData |
-| `validateTeleconverterData.ts` | Validate Teleconverter Data module with default export | src/optics/prescription (2), src/types (2), src/lens-data/defaults.ts, src/optics/internal, src/optics/validateLensData.ts | none | default, validateTeleconverterData |
+| `validateTeleconverterData.ts` | Validate Teleconverter Data module with default export | src/optics/prescription (2), src/types (2), src/lens-data/defaults.ts, src/optics/internal, src/optics/validateLensData.ts | src/optics/teleconverter.ts | default, validateTeleconverterData |
 | `vignetteAnalysis.ts` | Vignette Analysis helper module | src/optics/optics.ts (2), src/optics/analysis, src/optics/projection.ts, src/optics/raySampling.ts, src/types | src/components/display, src/optics/analysis | VignettingSample, computeVignettingCurve |

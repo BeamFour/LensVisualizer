@@ -54,6 +54,8 @@ export default function comparisonReducer(state: LensState, action: LensAction):
       const lens = {
         ...state.lens,
         lensKeyA: state.lens.selectedConfigurationKey,
+        teleconverterKeyA: null,
+        teleconverterKeyB: null,
         comparing: true as const,
       };
       /* Pick next lens if A===B */

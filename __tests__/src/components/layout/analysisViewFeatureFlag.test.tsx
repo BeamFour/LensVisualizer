@@ -106,6 +106,9 @@ describe("ENABLE_ANALYSIS_VIEW disabled behavior", () => {
         configurationOptions={[]}
         activeConfigurationKey="lens-a"
         onConfigurationChange={vi.fn()}
+        teleconverterOptions={[]}
+        activeTeleconverterKey={null}
+        onTeleconverterChange={vi.fn()}
         controlsBarProps={{
           theme: themes.dark,
           showOnAxis: true,
