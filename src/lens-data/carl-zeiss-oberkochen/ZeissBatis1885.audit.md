@@ -48,7 +48,7 @@ Infinity, the intermediate |β|=0.025 keyframe, and the |β|=0.125 endpoint are 
   gapAfter 1.000 mm. Paraxial check against the previous data: EFL identical and defocus unchanged at all three focus
   states (the old 17.348206751055 mm fold was exact). Physical track grows by 0.852 mm, to 1.190 × EFL.
 
-## 2026-10-04 — Iris calibration, finite-focus aperture and retained geometry
+## 2026-10-03 — Iris calibration, finite-focus aperture and retained geometry
 
 ### Source limits and calibration
 

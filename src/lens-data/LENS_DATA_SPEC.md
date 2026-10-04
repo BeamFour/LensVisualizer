@@ -123,7 +123,6 @@ Keep it normalized even when the product's official styling varies by source:
 
 | Field | Type | Default | Description |
 |-------|------|---------|-------------|
-| `inferredApertures` | `{ marginFrac: number; requiredSemiDiameters: Record<string, number> }` | — | Explicit per-lens inferred radial reserve contract; see Semi-diameters under authoring guidance below |
 | `maker` | `string \| null` | | Manufacturer name (e.g. `"Nikon"`, `"Voigtländer"`). Used for maker pages and SEO metadata. If omitted, derived from the lens `name` via prefix matching. Use `null` when the manufacturer is explicitly unconfirmed; this uses the Unattributed catalog category and omits the SEO manufacturer claim. |
 | `publishedAt` | `string` | Git-derived | Optional explicit UTC ISO timestamp (`YYYY-MM-DDTHH:mm:ssZ`) for a newly published replacement model. Overrides inherited file publication history in recent lenses, feeds, and SEO; last-modified remains Git-derived but cannot precede publication. Omit for normal additions and routine corrections. |
 | `visible` | `boolean` | `true` | Controls whether the lens appears in the UI catalog. Set to `false` to hide a lens from the dropdown without removing its data file. |
@@ -147,6 +146,7 @@ Keep it normalized even when the product's official styling varies by source:
 | `projection` | `object` | `{ kind: "rectilinear" }` | Optional projection metadata. Use for non-rectilinear lenses, or for rare rectilinear designs whose published coverage should override the paraxial field estimate. |
 | `opticalPath` | `object` | | Optional generalized path metadata for mirror, folded, annular, or non-right-side image-plane systems. Omit for ordinary front-to-rear refractive lenses. |
 | `rearPlates` | `object[]` | | Source-listed cover glass / filter plates behind the last lens surface, ordered lens → image. Traced by every analysis, never drawn. See [Rear Plates](#rear-plates-rearplates). |
+| `inferredApertures` | `{ marginFrac: number; surfaces: string[] }` | — | Declares which authored `sd` values are inferred rather than source-published and the radial reserve they must keep; see Semi-diameters under authoring guidance below |
 | `focusDescription` | `string` | | Human-readable focus mechanism description |
 | `asph` | `object` | | Aspherical coefficients (see below) |
 | `var` | `object` | | Variable air gaps for focus (see below) |
@@ -1280,12 +1280,15 @@ doublets: [
     and non-negative `gapAfterMm`, and is not combined with `opticalPath`, non-refracting surfaces, or
     `perspectiveControl`; authored surfaces may not use the reserved `RP<n>a` / `RP<n>b` labels or the engine-only
     `synthetic` field
-21. Perspective-control ranges, projection metadata, aberration-control gaps, explicit element spans, rim slope, edge thickness, and the remaining numeric bounds described above
+21. `inferredApertures`, when present, has a finite `marginFrac` > 0 and ≤ 1 and a non-empty `surfaces` list of
+    distinct, existing, non-stop surface labels (shape only; the margin is traced by a corpus sweep)
+22. Perspective-control ranges, projection metadata, aberration-control gaps, explicit element spans, rim slope, edge thickness, and the remaining numeric bounds described above
 
 On failure, `buildLens()` throws with all errors listed.
 
 Corpus tests add policies that are intentionally separate from `validateLensData()`: structured patent metadata and
-author-name normalization, catalog integrity, the analysis-file structural floor, and production element-render diagnostics. In
+author-name normalization, catalog integrity, the analysis-file structural floor, the declared `inferredApertures`
+margin, and production element-render diagnostics. In
 particular, production lenses fail the render-diagnostics test when slope, conic, or cross-gap limits would require more
 than 0.25 mm of hidden material trim.
 
@@ -1310,17 +1313,16 @@ When transcribing from an optical patent:
 
    **Explicit tight-design authoring contract.** `gapSagFrac` already supports per-lens overrides; no new clearance setting is needed. Keep the default `0.90` unless source geometry and independently checked positive physical clearance justify an override (for example `0.92` or `0.95`). Validation distinguishes a positive-clearance reserve-policy failure from physical intersection/contact; intersection/contact remains a hard failure even at `1`. Do not change source spacing or published clear apertures to hide a reserve failure.
 
-   Optional `inferredApertures` makes a per-lens radial margin explicit and enforceable for a selected set of inferred apertures:
+   Optional `inferredApertures` declares which authored semi-diameters are inferred rather than source-published, and the radial reserve they must keep:
 
    ```ts
    inferredApertures: {
-     marginFrac: 0.01,
-     requiredSemiDiameters: { "2": 10.0, "3": 10.0 },
+     marginFrac: 0.08,
+     surfaces: ["1", "2", "3", "4"],
    },
-   // Author surfaces 2 and 3 with sd >= 10.1 mm.
    ```
 
-   `marginFrac` must be finite, > 0 and ≤ 1. Every map entry must reference an existing non-stop surface and provide a positive finite ray-envelope semi-diameter in mm. The validator requires its authored `sd` to include at least that fractional radial reserve (within 1e-9 mm rounding tolerance). It never calculates, enlarges, or trims `sd`. Omission preserves all existing behavior and the ordinary 8–12% authoring guidance. Only list inferred apertures: keep source-published clear diameters/2 in `surfaces[].sd` and out of this map. Identify the source and tested zoom/focus/field/pupil envelope in the analysis; a declared envelope is an authoring claim, not proof of ray coverage. A smaller margin needs documented source/geometry justification and explicit review. Clearance, source fidelity, required-ray clipping (including cemented interfaces), and field coverage remain independent checks; neither this contract nor `gapSagFrac` waives them.
+   The validator checks only the shape (validation rule 21). The corpus sweep `__tests__/src/lens-data/inferredApertures.test.ts` traces the wide-open on-axis marginal ray at infinity focus for every authored zoom position and fails when a listed `sd` is below `footprint × (1 + marginFrac)`; the failure message prints the footprint. Nothing calculates, enlarges, or trims `sd`. Omission preserves all existing behavior and the ordinary 8–12% authoring guidance. List every inferred surface, not only those that pass comfortably, and keep source-published clear diameters/2 in `surfaces[].sd` and out of this list. The traced envelope is on-axis and infinity-focus only: it is not proof of field or finite-focus coverage. A margin below 0.08 needs documented source/geometry justification in the audit sidecar. Clearance, source fidelity, and field coverage remain independent checks; neither this contract nor `gapSagFrac` waives them.
 
 3. **Aspherical coefficients** — Copy from the asph table. Watch for scientific notation format differences between patents
 4. **Variable gaps** — Look for "variable spacing" tables showing values at different object distances

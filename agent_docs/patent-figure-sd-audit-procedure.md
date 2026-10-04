@@ -183,7 +183,8 @@ short of it — losing a millimetre here is correct, not a compromise.
 |---|---|---|
 | negative edge thickness | the two surfaces of the element cross at that height | the drawn outline is a flange; the glass really is smaller — back off |
 | rim slope exceeds threshold | the surface is near-vertical at that height | back off, or check you are not past a conic/aspheric limit |
-| combined surface sag exceeds allowed gap intrusion | neighbouring elements would overlap in the render | back off, **but first check the gap actually narrows outward** — a flat surface facing a convex-to-image one opens up, and that check reports a negative intrusion |
+| `gapSagFrac` reserve-policy failure | neighbouring elements stay clear but use more of the air gap than `gapSagFrac` allows | back off, **but first check the gap actually narrows outward** — a flat surface facing a convex-to-image one opens up, and that check reports a negative intrusion |
+| physical surface intersection or contact | neighbouring elements touch or cross at that height | back off; no `gapSagFrac` value permits it |
 | SD ratio | front and rear differ by more than 3× | you scaled one surface and not the other |
 
 ## Step 7 — Apply the edit

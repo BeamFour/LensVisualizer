@@ -91,7 +91,8 @@ Existing tests cover:
   (`exactTraceCatalog.test.ts`), catalog and summary invariants under `__tests__/src/utils/catalog/`, and the
   data-contract sweeps under `__tests__/src/lens-data/`: structured patent metadata (`patentMetadata.test.ts`), the
   analysis-file metadata/section floor (`analysisFiles.test.ts`), exact focus-keyframe reproduction
-  (`focusKeyframes.test.ts`), and shared-prescription parity across switchable configuration groups
+  (`focusKeyframes.test.ts`), the traced wide-open marginal-ray margin on declared `inferredApertures`
+  (`inferredApertures.test.ts`), and shared-prescription parity across switchable configuration groups
   (`opticalConfigurationParity.test.ts`, which requires a contract entry for every `opticalConfiguration` group).
 - Golden-value trace regressions (`exactTraceGoldenValues.test.ts`): pinned EFL, image-plane, marginal/skew ray, fisheye
   chief-ray, and folded-fixture values for reference designs, plus Schott datasheet anchors for N-BK7/SF6 in

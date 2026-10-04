@@ -737,6 +737,7 @@ export default function validateLensData(data: UntrustedLensData): string[] {
     }
   }
   if (data.inferredApertures !== undefined) {
+    /* Shape only: the margin itself is traced by the inferred-apertures corpus sweep, not validated here. */
     const policy = data.inferredApertures;
     if (!policy || typeof policy !== "object" || Array.isArray(policy)) {
       errors.push('"inferredApertures" must be an object');
@@ -745,30 +746,20 @@ export default function validateLensData(data: UntrustedLensData): string[] {
       if (typeof margin !== "number" || !Number.isFinite(margin) || margin <= 0 || margin > 1) {
         errors.push('"inferredApertures.marginFrac" must be finite, > 0 and <= 1');
       }
-      const required = policy.requiredSemiDiameters;
-      if (!required || typeof required !== "object" || Array.isArray(required) || !Object.keys(required).length) {
-        errors.push('"inferredApertures.requiredSemiDiameters" must be a non-empty surface-label map');
+      const labels = policy.surfaces;
+      if (!Array.isArray(labels) || !labels.length) {
+        errors.push('"inferredApertures.surfaces" must be a non-empty array of surface labels');
       } else {
-        for (const [label, radius] of Object.entries(required)) {
-          const surface = Array.isArray(data.surfaces)
-            ? data.surfaces.find((s: UntrustedLensData) => s.label === label)
-            : undefined;
-          if (!surface || label === "STO") {
+        const seen = new Set<unknown>();
+        for (const label of labels) {
+          const exists =
+            Array.isArray(data.surfaces) && data.surfaces.some((s: UntrustedLensData) => s && s.label === label);
+          if (typeof label !== "string" || !exists || label === "STO") {
             errors.push(`Inferred aperture "${label}" must reference an existing non-stop surface`);
+          } else if (seen.has(label)) {
+            errors.push(`Inferred aperture "${label}" is listed more than once`);
           }
-          if (typeof radius !== "number" || !Number.isFinite(radius) || radius <= 0) {
-            errors.push(`Inferred aperture "${label}" requires a positive finite ray-envelope semi-diameter`);
-          } else if (
-            surface &&
-            Number.isFinite(margin) &&
-            margin > 0 &&
-            margin <= 1 &&
-            surface.sd < radius * (1 + margin) - 1e-9
-          ) {
-            errors.push(
-              `Inferred aperture "${label}": sd=${surface.sd} mm is below the required ${(radius * (1 + margin)).toFixed(6)} mm including marginFrac=${margin}`,
-            );
-          }
+          seen.add(label);
         }
       }
     }

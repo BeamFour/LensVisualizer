@@ -139,6 +139,8 @@ const LENS_DATA = {
    *    radial band, conic height for K > 0, and > 0.25 mm of hidden render trim fails the production sweep.
    *    Guidance the validator does not enforce:
    *    - Cemented junctions share one clear aperture: keep the SDs on both sides nearly identical.
+   *    - Inferred SDs can be held to a traced wide-open marginal-ray margin with the optional top-level
+   *      inferredApertures: { marginFrac: 0.08, surfaces: ["1", "2", ...] } (§ Data Sourcing Checklist item 2).
    *    - SDs should shrink smoothly toward the STO and grow smoothly after it; abrupt jumps are data errors.
    *    - After sizing SDs from on-axis marginal rays, confirm off-axis bundles (offAxisFieldFrac × half-field) clip
    *      at element edges or air gaps, never inside cemented groups; thick elements amplify off-axis divergence

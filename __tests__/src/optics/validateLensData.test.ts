@@ -93,71 +93,52 @@ describe("validateLensData", () => {
     }
   });
 
-  it("allows a justified 1% inferred margin while larger margins truly intersect", () => {
-    const requiredSd = 5.99;
-    const data = {
-      ...tightGap(0.95, requiredSd * 1.01),
-      inferredApertures: { marginFrac: 0.01, requiredSemiDiameters: { "2": requiredSd, "3": requiredSd } },
-    };
-    expect(validateLensData(data)).toEqual([]);
-    expect(validateLensData({ ...data, gapSagFrac: 0.92 }).some((e) => e.includes("reserve-policy failure"))).toBe(
-      true,
-    );
-    for (const marginFrac of [0.08, 0.12]) {
-      expect(
-        validateLensData({
-          ...tightGap(0.95, requiredSd * (1 + marginFrac)),
-          inferredApertures: { marginFrac, requiredSemiDiameters: { "2": requiredSd, "3": requiredSd } },
-        }).some((e) => e.includes("physical surface intersection")),
-      ).toBe(true);
-    }
-  });
-
   it("rejects physical intersections even at the largest allowed fraction", () => {
     const errors = validateLensData(tightGap(1, 7));
     expect(errors.some((e) => e.includes("physical surface intersection"))).toBe(true);
     expect(errors.some((e) => e.includes("reserve-policy failure"))).toBe(false);
   });
 
-  it("enforces an opt-in inferred margin without changing authored or published apertures", () => {
-    const data = makeValid();
+  it("accepts an opt-in inferred-aperture declaration without changing authored apertures", () => {
+    // Shape only: the declared margin is traced by __tests__/src/lens-data/inferredApertures.test.ts.
+    const data = makeValid({ inferredApertures: { marginFrac: 0.08, surfaces: ["1"] } });
     const original = structuredClone(data);
     expect(validateLensData(data)).toEqual([]);
-    expect(
-      validateLensData({ ...data, inferredApertures: { marginFrac: 0.01, requiredSemiDiameters: { "1": 9.9 } } }),
-    ).toEqual([]);
-    expect(
-      validateLensData({ ...data, inferredApertures: { marginFrac: 0.08, requiredSemiDiameters: { "1": 9.9 } } }).some(
-        (e) => e.includes("including marginFrac"),
-      ),
-    ).toBe(true);
     expect(data).toEqual(original);
   });
 
-  it("rejects invalid inferred margin contracts", () => {
-    for (const marginFrac of [0, -0.01, 1.01, NaN, Infinity, "0.01", null]) {
+  it("rejects malformed inferred-aperture declarations", () => {
+    for (const inferredApertures of [null, [], "1"]) {
+      expect(validateLensData(makeValid({ inferredApertures })).some((e) => e.includes("inferredApertures"))).toBe(
+        true,
+      );
+    }
+    for (const marginFrac of [0, -0.01, 1.01, NaN, Infinity, "0.01", null, undefined]) {
       expect(
-        validateLensData(makeValid({ inferredApertures: { marginFrac, requiredSemiDiameters: { "1": 9 } } })).some(
-          (e) => e.includes("marginFrac"),
+        validateLensData(makeValid({ inferredApertures: { marginFrac, surfaces: ["1"] } })).some((e) =>
+          e.includes("marginFrac"),
         ),
       ).toBe(true);
     }
-    for (const requiredSemiDiameters of [
-      {},
-      [],
-      null,
-      { missing: 1 },
-      { STO: 1 },
-      { "1": 0 },
-      { "1": -1 },
-      { "1": Infinity },
-      { "1": NaN },
-      { "1": "9" },
-    ]) {
+    for (const surfaces of [[], {}, null, "1"]) {
       expect(
-        validateLensData(makeValid({ inferredApertures: { marginFrac: 0.01, requiredSemiDiameters } })).length,
-      ).toBeGreaterThan(0);
+        validateLensData(makeValid({ inferredApertures: { marginFrac: 0.01, surfaces } })).some((e) =>
+          e.includes("inferredApertures.surfaces"),
+        ),
+      ).toBe(true);
     }
+    for (const surfaces of [["missing"], ["STO"], [1]]) {
+      expect(
+        validateLensData(makeValid({ inferredApertures: { marginFrac: 0.01, surfaces } })).some((e) =>
+          e.includes("existing non-stop surface"),
+        ),
+      ).toBe(true);
+    }
+    expect(
+      validateLensData(makeValid({ inferredApertures: { marginFrac: 0.01, surfaces: ["1", "1"] } })).some((e) =>
+        e.includes("listed more than once"),
+      ),
+    ).toBe(true);
   });
 
   it("requires finite-conjugate source evidence, distance conventions and authored stations", () => {
