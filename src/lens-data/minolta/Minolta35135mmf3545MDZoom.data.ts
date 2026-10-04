@@ -340,7 +340,7 @@ const LENS_DATA = {
 
   nominalFno: [3.610666, 4.55663],
   fstopSeries: [3.5, 4, 4.5, 5.6, 8, 11, 16, 22],
-  maxFstop: 22, // production minimum aperture; the patent publishes none
+  maxFstop: 22, // production minimum aperture per the MINOLTA Manual Lens List (A min 22); the patent publishes none
 
   yScFill: 0.36,
 } satisfies LensDataInput;
