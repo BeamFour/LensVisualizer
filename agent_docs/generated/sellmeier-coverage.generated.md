@@ -19,9 +19,9 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 - **568** visible lenses fully covered by strict Sellmeier data
 - **6** lenses fully covered only after measured line-index data
 - **6** visible lenses fully covered only after measured line-index data
-- **9063 / 9777** non-air surfaces use strict catalog Sellmeier data
+- **9067 / 9781** non-air surfaces use strict catalog Sellmeier data
 - **92.7%** strict Sellmeier surface coverage overall
-- **9078 / 9777** non-air surfaces use trusted chromatic data
+- **9082 / 9781** non-air surfaces use trusted chromatic data
 - **92.9%** trusted chromatic coverage overall
 - **150 / 195** native e-line surfaces use name-verified catalog Sellmeier data
 
@@ -250,6 +250,7 @@ Six-digit codes are not considered because their encoded coordinates are nd/νd.
 | [CANON EF 200mm f/2 L IS USM](../../src/lens-data/canon/CanonEF200mmf2LISUSM.data.ts) | 17/17 | 17 | 17/17 |
 | [CANON EF 400mm f/2.8 L IS III USM](../../src/lens-data/canon/CanonEF400mmf28LISIIIUSM.data.ts) | 17/17 | 17 | 17/17 |
 | [CANON EF 400mm f/2.8 L IS USM](../../src/lens-data/canon/CanonEF400mmf28LISUSM.data.ts) | 17/17 | 17 | 17/17 |
+| [CANON EF 600mm f/4 L IS III USM](../../src/lens-data/canon/CanonEF600mmf4LISIIIUSM.data.ts) | 17/17 | 17 | 17/17 |
 | [CANON EF 70-300mm f/4-5.6 IS II USM](../../src/lens-data/canon/CanonEF70300mmf456ISIIUSM.data.ts) | 17/17 | 17 | 17/17 |
 | [CANON EF 70-300mm f/4.5-5.6 DO IS USM](../../src/lens-data/canon/CanonEF70300mmf4556DOISUSM.data.ts) | 17/17 | 17 | 17/17 |
 | [CANON EF-S 17-85mm f/4-5.6 IS USM](../../src/lens-data/canon/CanonEFS1785mmf456ISUSM.data.ts) | 17/17 | 17 | 17/17 |
@@ -276,9 +277,10 @@ Six-digit codes are not considered because their encoded coordinates are nd/νd.
 | [CANON EF 11-24mm f/4 L USM](../../src/lens-data/canon/CanonEF1124mmf4L.data.ts) | 16/16 | 16 | 16/16 |
 | [CANON EF 28-135mm f/3.5-5.6 IS USM](../../src/lens-data/canon/CanonEF28135mmf3556IS.data.ts) | 16/16 | 16 | 16/16 |
 | [CANON EF 300mm f/2.8 L IS USM](../../src/lens-data/canon/CanonEF300mmf28LISUSM.data.ts) | 16/16 | 16 | 16/16 |
+| [CANON EF 400mm f/2.8 L IS II USM](../../src/lens-data/canon/CanonEF400mmf28LISIIUSM.data.ts) | 16/16 | 16 | 16/16 |
 | [CANON EF 400mm f/4 DO IS USM](../../src/lens-data/canon/CanonEF400mmf4DOISUSM.data.ts) | 16/16 | 16 | 16/16 |
 | [CANON EF 500mm f/4 L IS USM](../../src/lens-data/canon/CanonEF500mmf4LISUSM.data.ts) | 16/16 | 16 | 16/16 |
-| [CANON EF 600mm f/4 L IS III USM](../../src/lens-data/canon/CanonEF600mmf4LISIIIUSM.data.ts) | 16/16 | 16 | 16/16 |
+| [CANON EF 600mm f/4 L IS II USM](../../src/lens-data/canon/CanonEF600mmf4LISIIUSM.data.ts) | 16/16 | 16 | 16/16 |
 | [CANON EF 600mm f/4 L IS USM](../../src/lens-data/canon/CanonEF600mmf4LISUSM.data.ts) | 16/16 | 16 | 16/16 |
 | [CANON EF 70-200mm f/4L USM](../../src/lens-data/canon/CanonEF70200mmf4LUSM.data.ts) | 16/16 | 16 | 16/16 |
 | [CANON EF-S 18-135mm f/3.5-5.6 IS STM](../../src/lens-data/canon/CanonEFS18135mmf3556ISSTM.data.ts) | 16/16 | 16 | 16/16 |
@@ -316,8 +318,6 @@ Six-digit codes are not considered because their encoded coordinates are nd/νd.
 | [CANON EF 100mm f/2.8 L Macro IS USM](../../src/lens-data/canon/CanonEF100mmf28LIS.data.ts) | 15/15 | 15 | 15/15 |
 | [CANON EF 20-35mm f/2.8 L](../../src/lens-data/canon/CanonEF2035mmf28L.data.ts) | 15/15 | 15 | 15/15 |
 | [CANON EF 28-105mm f/3.5-4.5 II USM](../../src/lens-data/canon/CanonEF28105mmf3545II.data.ts) | 15/15 | 15 | 15/15 |
-| [CANON EF 400mm f/2.8 L IS II USM](../../src/lens-data/canon/CanonEF400mmf28LISIIUSM.data.ts) | 15/15 | 15 | 15/15 |
-| [CANON EF 600mm f/4 L IS II USM](../../src/lens-data/canon/CanonEF600mmf4LISIIUSM.data.ts) | 15/15 | 15 | 15/15 |
 | [CANON EF 70-300mm f/4-5.6 IS USM](../../src/lens-data/canon/CanonEF70300mmf456ISUSM.data.ts) | 15/15 | 15 | 15/15 |
 | [CANON EF-S 55-250mm f/4-5.6 IS STM](../../src/lens-data/canon/CanonEFS55250mmf456ISSTM.data.ts) | 15/15 | 15 | 15/15 |
 | [CANON RF 24mm f/1.4 L VCM](../../src/lens-data/canon/CanonRF24mmF14LVCM.data.ts) | 15/15 | 15 | 15/15 |
@@ -564,6 +564,7 @@ Six-digit codes are not considered because their encoded coordinates are nd/νd.
 | [LEICA SUMMICRON 35mm f/2 I](../../src/lens-data/leica/LeicaSummicron35mmf2I.data.ts) | 8/8 | 8 | 8/8 |
 | [MAMIYA AF APO 300mm f/4.5 IF](../../src/lens-data/mamiya/MamiyaAFAPO300mmf45IF.data.ts) | 8/8 | 8 | 8/8 |
 | [MAMIYA-SEKOR C 55mm f/2.8 N](../../src/lens-data/mamiya/MamiyaSekorC55mmf28N.data.ts) | 8/8 | 8 | 8/8 |
+| [MINOLTA AF Reflex 500mm f/8](../../src/lens-data/minolta/MinoltaAFReflex500mmf8.data.ts) | 8/8 | 8 | 8/8 |
 | [NIKON AF FISHEYE-NIKKOR 16mm f/2.8D](../../src/lens-data/nikon/NikonAFFisheyeNikkor16mmf28D.data.ts) | 8/8 | 8 | 8/8 |
 | [NIKON AF MICRO-NIKKOR 60mm f/2.8 D](../../src/lens-data/nikon/NikonAFMicroNikkor60mmf28D.data.ts) | 8/8 | 8 | 8/8 |
 | [NIKON AF ZOOM-NIKKOR 28-80mm f/3.5-5.6 D](../../src/lens-data/nikon/NikonAFZoomNikkor2880mmf3556.data.ts) | 8/8 | 8 | 8/8 |
@@ -615,7 +616,6 @@ Six-digit codes are not considered because their encoded coordinates are nd/νd.
 | [MAMIYA N 210mm f/8 L](../../src/lens-data/mamiya/Mamiya7210mmf8NL.data.ts) | 7/7 | 7 | 7/7 |
 | [MAMIYA SEKOR AF 55mm f/2.8](../../src/lens-data/mamiya/MamiyaSekorAF55mmf28.data.ts) | 7/7 | 7 | 7/7 |
 | [MINOLTA AF 35mm f/2](../../src/lens-data/minolta/MinoltaAF35mmf2.data.ts) | 7/7 | 7 | 7/7 |
-| [MINOLTA AF Reflex 500mm f/8](../../src/lens-data/minolta/MinoltaAFReflex500mmf8.data.ts) | 7/7 | 7 | 7/7 |
 | [MINOLTA MC W.ROKKOR-SG 28mm f/3.5](../../src/lens-data/minolta/Minolta28mmf35MCWRokkorv2.data.ts) | 7/7 | 7 | 7/7 |
 | [MINOLTA MD 28mm f/2.8 (7 elements / 7 groups)](../../src/lens-data/minolta/Minolta28mmf28MD.data.ts) | 7/7 | 7 | 7/7 |
 | [NIKON AF DC-NIKKOR 135mm f/2D](../../src/lens-data/nikon/NikonAFDCNikkor135mmf2.data.ts) | 7/7 | 7 | 7/7 |

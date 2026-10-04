@@ -16,9 +16,11 @@ import type { LensDataInput } from "../../types/optics.js";
  * ║ The stop is treated as fixed; this is inferred from Fig. 1 and     ║
  * ║ Nikon's cross-section, not explicitly dimensioned by the patent.   ║
  * ║                                                                    ║
- * ║ Filter normalization: patent surfaces 14-15 form a 1.20 mm plate  ║
- * ║ at nd = 1.51680. The plate is omitted and its 0.7911392405 mm air ║
- * ║ equivalent is folded into the rear image spacing.                  ║
+ * ║ Filter: patent surfaces 14-15 form a 1.20 mm plate at nd = 1.51680 ║
+ * ║ behind the last element. The patent calls it a filter that may be  ║
+ * ║ placed anywhere in the system or left out without affecting the    ║
+ * ║ basic performance, so it is not modeled. The rear image spacing is ║
+ * ║ the filter-absent back focus: 0.88 mm + 1.20/1.51680 mm + Bf.      ║
  * ║                                                                    ║
  * ║ Stop model: Nikon's official cross-section maps the stop to        ║
  * ║ 6.47 mm after surface 7 within the 10.9883 mm infinity gap. The   ║
@@ -220,7 +222,7 @@ const LENS_DATA = {
     { label: "10", R: -20.609, d: 0.1, nd: 1, elemId: 0, sd: 10 },
     { label: "11", R: 46.733, d: 5.5, nd: 1.5186, elemId: 7, sd: 11.1 },
     { label: "12", R: -19.219, d: 1.3, nd: 1.7847, elemId: 8, sd: 11.5 },
-    // Patent filter omitted; d includes 0.88 mm + 1.20/1.51680 mm + Bf.
+    // Optional patent filter left out; d is the filter-absent back focus, 0.88 mm + 1.20/1.51680 mm + Bf.
     { label: "13", R: -40.706, d: 40.2685392405, nd: 1, elemId: 0, sd: 12.2 },
   ],
 

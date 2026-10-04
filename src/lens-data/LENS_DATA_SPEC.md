@@ -32,12 +32,14 @@ Per-lens patent audit logs use `*.audit.md` alongside the data file. They are no
 - Annular clear apertures or central obstructions when they are optically meaningful
 - **Required drop-in / slip-in filters** — a plane plate the source prescription lists at the lens's own filter
   holder, whether ahead of the last lens surface or behind it, when the lens is computed with a filter in place
-  (super-telephoto holders shipped with an NC or clear filter). It belongs to the lens: a teleconverter mounts behind
-  it. Author it at the source position as two flat surfaces and a drawn `Plane-Parallel Plate` element with the
-  source's physical gaps; never fold t/n into a neighbouring air gap. When the source gives no clear aperture, size
-  the semi-diameter by ray trace — the largest height on the plate of any ray that reaches the image format or the
-  diagram's off-axis field, at every focus and zoom end, plus 5%, rounded up to 0.5 mm — and log the estimate in the
-  `*.audit.md` sidecar. Count it in `elementCount` only when the maker's published count includes it.
+  (super-telephoto holders shipped with an NC or clear filter, a mirror lens's plug-in filter). It belongs to the
+  lens: a teleconverter mounts behind it. Author it at the source position as two flat surfaces and a drawn
+  `Plane-Parallel Plate` element with the source's physical gaps; never fold t/n into a neighbouring air gap. When the
+  source gives no clear aperture, or only a ray-envelope "effective diameter" that would limit bundles the rest of
+  the model passes, size the semi-diameter by ray trace — the largest height on the plate of any ray that reaches the
+  image format or the diagram's off-axis field, at every focus and zoom end, plus 5%, rounded up to 0.5 mm — and log
+  the estimate in the `*.audit.md` sidecar. Count it in `elementCount` only when the maker's published count includes
+  it.
 
 **Model through `rearPlates`, not as surfaces or elements:**
 - **Camera-side plates** the source prescription lists behind the last lens surface: sensor cover glass and IR-cut /
@@ -47,7 +49,10 @@ Per-lens patent audit logs use `*.audit.md` alongside the data file. They are no
 
 **Do NOT include:**
 - **Optional front or mid-lens filters** — accessory UV, ND, polarizing or protection plates mounted ahead of or
-  inside the lens, and any plate the source does not list (required drop-in filters are included; see above)
+  inside the lens, and any plate the source does not list (required drop-in filters are included; see above). A
+  listed filter that the source itself calls optional, removable or free to sit elsewhere is also left out, as
+  several fisheye patents do: keep its air-equivalent spacing (gap before + t/n + gap after) where it stood, so the
+  published first-order values hold, and quote the source's wording in the file header and the `*.audit.md` sidecar
 - **Dummy / flare-cutter planes** — source-table bookkeeping surfaces that do not change medium and are not active
   blockers in the modeled path
 - **Mechanical components** — focus motors, aperture blades (mechanical detail), barrel, mounts

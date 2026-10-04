@@ -46,3 +46,19 @@ Patent: US 2011/0090576 A1, Third Numerical Embodiment / Figure 5
   L11–L15 with moving L16. Movement analysis therefore averaged the two and displayed only half the real shift.
 - Split the display spans into fixed LF, imageward-moving `L16 FOCUS (−)`, and fixed LR. L16 now reports its full
   +20.112105825 mm imageward translation. This prime lens has no zoom travel.
+
+## 2026-10-04 — Drop-in filter drawn as an element
+
+- Patent check (US 2011/0090576 A1, Third Numerical Embodiment): rows 28–29 tabulate glass block G as two flat
+  surfaces, 2.00 mm thick, nd 1.51633, νd 64.1, θgF 0.5352, X −0.0007, effective diameter 31.00 mm, 12.00 mm behind
+  row 27. The description calls G "a glass block, such as an optical filter or a faceplate" and defines back focus
+  with it absent.
+- The file had omitted G and carried the 121.13 mm plate-absent back focus on surface 27. G is now drawn: surfaces
+  28–29 and element 16 (`Plane-Parallel Plate`). Surface 27 keeps the patent's 12.00 mm, and
+  121.13 − 12.00 − 2.00/1.51633 = 107.811026 mm of air follows the plate. The authored track is 475.591 mm against the
+  patent's Lt = 475.58 mm.
+- Semi-diameter: half the patent's effective diameter (15.5 mm) would narrow the half-field from 4.19° to 4.05°. The
+  plate instead takes 18.0 mm, a ray-trace estimate: the largest height on the plate of any ray that reaches the 135
+  format or the diagram's off-axis field at infinity, mid and close focus (16.83 mm), plus 5%, rounded up to 0.5 mm.
+  Not figure-audited.
+- Before/after check: EFL, stop radius, paraxial focus, analysis half-field and the vignetting curve are unchanged.

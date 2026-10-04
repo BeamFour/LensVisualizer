@@ -14,10 +14,11 @@ import type { LensDataInput } from "../../types/optics.js";
  * ║    ×16.0 to f ≈ 16 mm production focal length.                     ║
  * ║                                                                    ║
  * ║  NOTE ON FILTER EXCLUSION:                                         ║
- * ║    The patent includes a built-in plane-parallel filter plate       ║
- * ║    (r10, r11) between L4 and L5. Per project convention the filter ║
- * ║    is excluded; its optical-path contribution is folded into an     ║
- * ║    air-equivalent reduced gap on surface "9":                       ║
+ * ║    The patent lists a plane-parallel filter (r10, r11) between L4  ║
+ * ║    and L5, prints no index or Abbe number for it, and says it may  ║
+ * ║    be placed at any other position. It is not modeled. Its optical ║
+ * ║    path is kept as an air-equivalent reduced gap on surface "9",   ║
+ * ║    with an assumed index of 1.51633:                               ║
  * ║      d_reduced = d9 + d10/n_filter + d11                           ║
  * ║                = 0.0792 + 0.0742/1.51633 + 0.0829                  ║
  * ║                = 0.211034 (norm.) → 3.377 mm.                      ║

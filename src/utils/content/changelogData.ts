@@ -36,7 +36,7 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-04",
     type: "improvement",
-    summary: "Drew the rear drop-in filters of 17 Canon and Nikon super-telephotos as lens elements",
+    summary: "Drew the rear filters of 21 Canon, Nikon and Minolta telephoto lenses as lens elements",
   },
   {
     date: "2026-10-04",
