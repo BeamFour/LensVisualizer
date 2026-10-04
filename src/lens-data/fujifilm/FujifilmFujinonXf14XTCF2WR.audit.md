@@ -43,3 +43,10 @@
   to the host's own PP plate. The host file is transcribed from a different publication, US 2019/0265504 A1, whose
   Example 1 has the same lens elements but a back focus of 31.1415 mm in air. Focal length 194.015 → 271.616 mm
   against the printed 271.54, f/2.884 against 2.88, and the host's stop radius unchanged.
+
+## 2026-10-04 — Exclusions for newly enabled X-mount hosts
+
+- `acceptsTeleconverters` is a yes/no flag, so each X-mount lens that declares it has to be excluded here: the XF 80mm
+  f/2.8 Macro, XF 70-300mm f/4-5.6 and XF 100-400mm f/4.5-5.6 join the XF 50-140mm f/2.8 in `incompatibleLensKeys`.
+  Fujifilm's charts give those lenses the XF1.4X TC WR and XF2X TC WR; this converter is supplied with the XF 200mm
+  f/2 and has no chart of its own. Add any further X-mount host to the list when it is enabled.

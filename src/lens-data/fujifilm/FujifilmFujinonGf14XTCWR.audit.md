@@ -41,3 +41,12 @@
   US 2019/0094496 A1 Example 1. Its 27 surfaces match this patent's master rows to the printed precision, but its
   back focus in air is 70.9527 mm, so the junction gap is 16.4990 mm against the patent's 16.4997. Focal length
   242.544 → 339.583 mm against the printed 339.58, f/5.768 against 5.77, and the host's stop radius unchanged.
+
+## 2026-10-04 — Additional hosts
+
+- Fujifilm's compatibility chart for this converter (fujifilm-x.com support pages, read 2026-10-04) lists the GF
+  100-200mm f/5.6 and GF 500mm f/5.6 alongside the GF 250mm f/4; both now declare `acceptsTeleconverters`.
+- GF 100-200mm: junction gap 6.17 mm, 142.4 / 213.6 / 284.6 mm at f/7.84. GF 500mm: junction 11.87 mm, 679.7 mm
+  f/7.98.
+- On both hosts the stop radius is unchanged, the corner chief ray clears, and more of the axial bundle reaches the
+  format corner than on the bare lens. The converter's rims are the package's values, unchanged.

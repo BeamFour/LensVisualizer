@@ -72,3 +72,17 @@
   the share of the on-axis bundle reaching the format corner at 140 mm rises from 34% to 76%.
 - Not done: the figure is a patent drawing, not a dimensioned part, so the rims remain estimates good to about ±0.3
   mm.
+
+## 2026-10-04 — Additional hosts
+
+- Fujifilm's compatibility chart for this converter (fujifilm-x.com support pages, read 2026-10-04) lists the XF 80mm
+  f/2.8 Macro, XF 70-300mm f/4-5.6 and XF 100-400mm f/4.5-5.6 alongside the XF 50-140mm f/2.8; those three now declare
+  `acceptsTeleconverters`. The chart also lists the XF 400mm f/4.5, XF 500mm f/5.6 and XF 150-600mm f/5.6-8, which are
+  not in the catalog.
+- XF 80mm Macro: junction gap 3.39 mm, 157.8 mm f/5.77. XF 70-300mm: junction 2.34 mm, 144.3 / 255.9 / 583.1 mm at
+  f/8.25 / 9.81 / 11.56. XF 100-400mm: junction 4.80 mm, 205.9 / 356.6 / 775.8 mm at f/9.24 / 9.58 / 11.59.
+- On every host the stop radius is unchanged, the corner chief ray clears at each zoom station, and more of the axial
+  bundle reaches the format corner than on the bare lens. On the Macro the close-focus axial cone stays limited by the
+  lens's own stop through the whole focus range.
+- These hosts were tested only after the rims were re-sized from the patent figure; with the delivered rims the two
+  zooms reached 94% of the corner at the long end.

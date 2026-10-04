@@ -89,7 +89,14 @@ const TELECONVERTER_DATA = {
   magnification: 1.4,
   lensMounts: ["fujifilm-x"],
   minHostFno: 2, // semi-diameters are sized for the f/2.06 master beam
-  incompatibleLensKeys: ["fuji-xf-50140mm-f28"], // supplied with the XF 200mm f/2; Fujifilm lists the XF1.4X TC WR for the zoom
+  // Supplied with the XF 200mm f/2 only. The other X-mount lenses that take converters are listed by Fujifilm for
+  // the XF1.4X TC WR and XF2X TC WR instead; each one that declares converter support is excluded here.
+  incompatibleLensKeys: [
+    "fuji-xf-50140mm-f28",
+    "fujifilm-xf80-f28-macro",
+    "fujifilm-fujinon-xf-70-300mm-f4-56-r-lm-ois-wr",
+    "fujifilm-fujinon-xf-100-400mm-f45-56-r-lm-ois-wr",
+  ],
 
   /* ── Patent metadata ── */
   patentNumber: "US 11,079,573 B2",

@@ -21,7 +21,7 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-04",
     type: "feature",
-    summary: "Added teleconverters: mount the Fujifilm XF1.4X, XF2X or GF1.4X on its host lens",
+    summary: "Added teleconverters: mount the Fujifilm XF1.4X, XF2X or GF1.4X on compatible lenses",
   },
   {
     date: "2026-10-04",
