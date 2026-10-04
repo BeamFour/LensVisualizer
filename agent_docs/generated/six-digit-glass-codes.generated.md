@@ -10,8 +10,8 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 ## Summary
 
 - **870** lenses scanned
-- **1921** total code-only elements found
-- **1921** elements in this report
+- **1914** total code-only elements found
+- **1914** elements in this report
 - **309** distinct lens files affected
 
 ## Codes by Frequency
@@ -48,7 +48,7 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 717295 | 14 | 10 | patents/JP2018049102A.pdf<br>patents/US20160327774A1.pdf<br>patents/US3584935.pdf<br>patents/JPA 1989039542-000000.pdf | 1/14 rows have review records |
 | 001291 | 13 | 12 | patents/JP2016148731A.pdf<br>patents/US20190113711A1.pdf<br>patents/US20200166730A1.pdf<br>patents/US20160282590A1.pdf | 2/13 rows have review records |
 | 923209 | 13 | 12 | patents/JP2023033114A.pdf<br>patents/DE112013006887B4.pdf<br>patents/JP2020118738A.pdf<br>patents/WO2020230915A1.pdf | 1/13 rows have review records |
-| 517642 | 12 | 8 | patents/US7158320.pdf<br>patents/JPA 1999231209-000000.pdf<br>patents/JP_2003241093_A.pdf<br>patents/US4223981.pdf | 1/12 rows have review records |
+| 517642 | 12 | 8 | patents/US7158320.pdf<br>patents/JPA 1999231209-000000.pdf<br>patents/US_5249079_A.pdf<br>patents/JP_2003241093_A.pdf | 1/12 rows have review records |
 | 648338 | 12 | 12 | patents/US20110090576A1.pdf<br>patents/US2968221.pdf<br>patents/US20200166730A1.pdf<br>patents/US3635546.pdf | 1/12 rows have review records |
 | 437951 | 11 | 7 | patents/WO2025013477A1.pdf<br>patents/JP2020118738A.pdf<br>patents/US20210132345A1.pdf<br>patents/JP2020086133A.pdf | No review-record hit |
 | 720502 | 11 | 8 | patents/JP2018049102A.pdf<br>patents/US6115188.pdf<br>patents/US20110090576A1.pdf<br>patents/US20060023317A1.pdf | 1/11 rows have review records |
@@ -79,9 +79,9 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 946180 | 7 | 7 | patents/JP2016148731A.pdf<br>patents/WO2025013477A1.pdf<br>patents/US20160282590A1.pdf<br>patents/US20140139720A1.pdf | 2/7 rows have review records |
 | 954323 | 7 | 6 | patents/US20220171174A1.pdf<br>patents/US20170242219A1.pdf<br>patents/US20220011542A1.pdf<br>patents/JP2023001878A.pdf | No review-record hit |
 | 001255 | 6 | 6 | patents/US20220171174A1.pdf<br>patents/US20210033835A1.pdf<br>patents/US20200073096A1.pdf<br>patents/JP2023033114A.pdf | No review-record hit |
-| 517522 | 6 | 6 | patents/JP2016090725A.pdf<br>patents/JP2014209144A.pdf<br>patents/US9538088.pdf<br>patents/US10545321.pdf | 2/6 rows have review records |
+| 517522 | 6 | 6 | patents/JP2016090725A.pdf<br>patents/US_5249079_A.pdf<br>patents/JP2014209144A.pdf<br>patents/US9538088.pdf | 2/6 rows have review records |
 | 517524 | 6 | 6 | patents/JP2016148731A.pdf<br>patents/US6115188.pdf<br>patents/US20140098253A1.pdf<br>patents/US20190113711A1.pdf | No review-record hit |
-| 541472 | 6 | 6 | patents/US4826301.pdf<br>patents/US20130308041A1.pdf<br>patents/US20210033835A1.pdf<br>patents/JP2012181525A.pdf | No review-record hit |
+| 541472 | 6 | 6 | patents/US4826301.pdf<br>patents/US20130308041A1.pdf<br>patents/US20210033835A1.pdf<br>patents/US_5249079_A.pdf | No review-record hit |
 | 567428 | 6 | 6 | patents/US20180164556A1.pdf<br>patents/US7804652.pdf<br>patents/WO2024166548A1.pdf<br>patents/CN211826699U.pdf | No review-record hit |
 | 689311 | 6 | 6 | patents/US20060023317A1.pdf<br>patents/US2968221.pdf<br>patents/JPA 1989039542-000000.pdf<br>patents/US5734508.pdf | 1/6 rows have review records |
 | 720347 | 6 | 6 | patents/US20130308041A1.pdf<br>patents/US20220171174A1.pdf<br>patents/US20200073096A1.pdf<br>patents/WO2023153076A1.pdf | No review-record hit |
@@ -93,7 +93,7 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 808228 | 6 | 6 | patents/US20110090576A1.pdf<br>patents/US20190113711A1.pdf<br>patents/US6621643.pdf<br>patents/JP2011221421A.pdf | No review-record hit |
 | 816466 | 6 | 5 | patents/US20170242219A1.pdf<br>patents/JP2011221421A.pdf<br>patents/US20040218274A1.pdf<br>patents/US20170068075A1.pdf | 1/6 rows have review records |
 | 593353 | 5 | 5 | patents/US20150146044A1.pdf<br>patents/JPA 1997211319-000000.pdf<br>patents/US20190113711A1.pdf<br>patents/US20170242219A1.pdf | No review-record hit |
-| 603380 | 5 | 5 | patents/US20130308041A1.pdf<br>patents/US20240151940A1.pdf<br>patents/JP2017116646A.pdf<br>patents/JPA 2020122918-000000.pdf | 1/5 rows have review records |
+| 603380 | 5 | 5 | patents/US20130308041A1.pdf<br>patents/US_5249079_A.pdf<br>patents/US20240151940A1.pdf<br>patents/JP2017116646A.pdf | 1/5 rows have review records |
 | 652585 | 5 | 5 | patents/US20130308041A1.pdf<br>patents/JPA 1989189622-000000.pdf<br>patents/US20200166730A1.pdf<br>patents/JP_2003241093_A.pdf | No review-record hit |
 | 673321 | 5 | 5 | patents/US20210263286A1.pdf<br>patents/JPA 1982108817-000000.pdf<br>patents/JPA 1981119109-000000.pdf<br>patents/US7106520.pdf | No review-record hit |
 | 678555 | 5 | 4 | patents/JP_2003177313_A.pdf<br>patents/US3442573.pdf<br>patents/CN_121091494_A.pdf<br>patents/JPA 1975110330-000000.pdf | No review-record hit |
@@ -138,7 +138,6 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 593354 | 3 | 2 | patents/JP2022140076A.pdf | No review-record hit |
 | 613443 | 3 | 3 | patents/US20130308041A1.pdf<br>patents/US20210033835A1.pdf<br>patents/WO_2025220324_A1.pdf | No review-record hit |
 | 622531 | 3 | 3 | patents/US4158482.pdf<br>patents/US3482900.pdf<br>patents/JPB 1969024068-000000.pdf | No review-record hit |
-| 622532 | 3 | 2 | patents/GB_135853_A.pdf<br>patents/JPA 1994082698-000000.pdf | 2/3 rows have review records |
 | 626357 | 3 | 3 | patents/US20140098253A1.pdf<br>patents/JP_H0219814_A.pdf<br>patents/CN211955966U.pdf | 1/3 rows have review records |
 | 639555 | 3 | 3 | patents/JP2021086024A.pdf<br>patents/DE_1282311_B.pdf<br>patents/DE_927540_C.pdf | No review-record hit |
 | 654397 | 3 | 2 | patents/US20150146044A1.pdf<br>patents/US20110090576A1.pdf | No review-record hit |
@@ -182,7 +181,7 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 581409 | 2 | 2 | patents/JPWO2020158622A1.pdf<br>patents/US20240151940A1.pdf | No review-record hit |
 | 589613 | 2 | 2 | patents/JP2020086133A.pdf<br>patents/US8422143.pdf | No review-record hit |
 | 592670 | 2 | 2 | patents/US20150092100A1.pdf<br>patents/JP2017116646A.pdf | No review-record hit |
-| 600644 | 2 | 1 | Missing from untracked local patents/ references (US4147410, 4147410) | All rows explicitly disposed |
+| 600644 | 2 | 1 | patents/US_4147410_A.pdf | All rows explicitly disposed |
 | 606437 | 2 | 2 | patents/WO2024062958A1.pdf<br>patents/US20210132345A1.pdf | No review-record hit |
 | 617540 | 2 | 1 | patents/JPA 1999030748-000000.pdf | No review-record hit |
 | 620586 | 2 | 1 | patents/US4303314.pdf | All rows have review records |
@@ -284,7 +283,6 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 573575 | 1 | 1 | patents/JP_S5357028_A.pdf | No review-record hit |
 | 573578 | 1 | 1 | patents/JP_2005092056_A.pdf | No review-record hit |
 | 575391 | 1 | 1 | patents/JPB 1963011590-000000.pdf | No review-record hit |
-| 575414 | 1 | 1 | patents/US2279384.pdf | All rows explicitly disposed |
 | 576388 | 1 | 1 | patents/WO2024154461A1.pdf | No review-record hit |
 | 578671 | 1 | 1 | patents/JPA 2021076740-000000.pdf | All rows explicitly disposed |
 | 580539 | 1 | 1 | patents/US3482900.pdf | No review-record hit |
@@ -309,6 +307,7 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 617308 | 1 | 1 | patents/US5528428.pdf | All rows have review records |
 | 617443 | 1 | 1 | patents/JP2023039817A.pdf | All rows have review records |
 | 620364 | 1 | 1 | No patent number parsed from lens metadata | All rows explicitly disposed |
+| 622532 | 1 | 1 | patents/JPA 1994082698-000000.pdf | No review-record hit |
 | 622639 | 1 | 1 | patents/WO2021199923A1.pdf | All rows explicitly disposed |
 | 624584 | 1 | 1 | patents/JP2025052870A.pdf | All rows have review records |
 | 625533 | 1 | 1 | patents/US2721499.pdf | All rows have review records |
@@ -323,7 +322,6 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 640353 | 1 | 1 | patents/US4277149.pdf | All rows have review records |
 | 640433 | 1 | 1 | patents/US2516724.pdf | All rows explicitly disposed |
 | 641589 | 1 | 1 | patents/US7307794.pdf | All rows explicitly disposed |
-| 642581 | 1 | 1 | patents/US2721499.pdf | All rows have review records |
 | 643478 | 1 | 1 | patents/JPB 1969024068-000000.pdf | No review-record hit |
 | 646287 | 1 | 1 | patents/WO2024154461A1.pdf | No review-record hit |
 | 648337 | 1 | 1 | No patent number parsed from lens metadata | All rows explicitly disposed |
@@ -350,8 +348,7 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 676440 | 1 | 1 | patents/US7542219.pdf | All rows explicitly disposed |
 | 678314 | 1 | 1 | patents/US20100208366A1.pdf | All rows explicitly disposed |
 | 678322 | 1 | 1 | patents/WO2021200206A1.pdf | All rows explicitly disposed |
-| 678490 | 1 | 1 | Missing from untracked local patents/ references (US4192577, 4192577) | All rows explicitly disposed |
-| 678508 | 1 | 1 | patents/GB_978797_A.pdf | All rows explicitly disposed |
+| 678490 | 1 | 1 | patents/US_4192577_A.pdf | All rows explicitly disposed |
 | 680312 | 1 | 1 | patents/JP2015041012A.pdf | All rows have review records |
 | 681472 | 1 | 1 | patents/DE_1157000_B.pdf | No review-record hit |
 | 682366 | 1 | 1 | Missing from untracked local patents/ references (US4518229, 4518229) | All rows have review records |
@@ -410,7 +407,7 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 755501 | 1 | 1 | patents/US4277149.pdf | All rows have review records |
 | 755524 | 1 | 1 | patents/US3584935.pdf | No review-record hit |
 | 756288 | 1 | 1 | patents/US7307794.pdf | No review-record hit |
-| 757297 | 1 | 1 | Missing from untracked local patents/ references (US4147410, 4147410) | All rows explicitly disposed |
+| 757297 | 1 | 1 | patents/US_4147410_A.pdf | All rows explicitly disposed |
 | 760492 | 1 | 1 | patents/JP2015041012A.pdf | All rows explicitly disposed |
 | 762266 | 1 | 1 | patents/US20070229969A1.pdf | No review-record hit |
 | 762271 | 1 | 1 | patents/JPA 1979055423-000000.pdf | No review-record hit |
@@ -420,7 +417,6 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 770493 | 1 | 1 | Missing from untracked local patents/ references (WO2021246545A1, WO2021246545, 2021246545) | All rows explicitly disposed |
 | 772361 | 1 | 1 | patents/US20100208366A1.pdf | All rows explicitly disposed |
 | 772493 | 1 | 1 | patents/US20230341664A1.pdf | All rows have review records |
-| 773498 | 1 | 1 | patents/US4871239.pdf | All rows have review records |
 | 773501 | 1 | 1 | patents/US4258985.pdf | All rows have review records |
 | 773530 | 1 | 1 | patents/CN110161666A.pdf | All rows have review records |
 | 774472 | 1 | 1 | patents/JP2015166834A.pdf | All rows explicitly disposed |
@@ -438,7 +434,6 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 797455 | 1 | 1 | patents/US4452513.pdf | All rows have review records |
 | 798453 | 1 | 1 | patents/US9651761.pdf | All rows explicitly disposed |
 | 800255 | 1 | 1 | patents/JP2015041012A.pdf | All rows have review records |
-| 802444 | 1 | 1 | patents/JP_S5357028_A.pdf | All rows have review records |
 | 803405 | 1 | 1 | patents/US20170351051A1.pdf | All rows have review records |
 | 803456 | 1 | 1 | patents/US20140354857A1.pdf | All rows have review records |
 | 805410 | 1 | 1 | patents/US4871239.pdf | All rows have review records |
@@ -1166,7 +1161,6 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 |---|---|---|---|---|---|---|---|
 | L5 (Element 5) | 8 | `570575 — BaK-type barium crown (no exact catalog match)` | 1.56993 / 57.50 | No catalog entry | abbe | patents/US2721499.pdf | Audit-log hit |
 | L6 (Element 6) | 9 | `625533 — SSK-type dense crown (no exact catalog match)` | 1.62500 / 53.30 | No catalog entry | abbe | patents/US2721499.pdf | Reviewed sidecar hit |
-| L8 (Element 8) | 12 | `LaK/SK crown (642/581)` | 1.64200 / 58.10 | No catalog entry | abbe | patents/US2721499.pdf | Reviewed sidecar hit |
 
 ### [CARL ZEISS CONTAREX PLANAR 55mm f/1.4](../../src/lens-data/carl-zeiss-oberkochen/CarlZeissContarexPlanar55mmf14.data.ts) - DE 1,170,157 B
 
@@ -1204,7 +1198,6 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
 |---|---|---|---|---|---|---|---|
 | L6 (Element 6) | 10 | `Unmatched (728380; nearest current dense-barium-flint family outside Δn=0.003)` | 1.72800 / 38.00 | No catalog entry | abbe | patents/GB_978797_A.pdf | Explicit disposition in data |
-| L10 (Element 10) | 15 | `Unmatched (678508; no coordinate-compatible current catalog glass located)` | 1.67800 / 50.80 | No catalog entry | abbe | patents/GB_978797_A.pdf | Explicit disposition in data |
 
 ### [CARL ZEISS JENA FLEKTOGON 50mm f/4](../../src/lens-data/carl-zeiss-jena/ZeissFlektogon50mmf4.data.ts) - DE 1 157 000
 
@@ -1583,7 +1576,6 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 |---|---|---|---|---|---|---|---|
 | L1 (Element 1) | 1 | `Unmatched (vintage barium crown class, 611/572)` | 1.61100 / 57.20 | No catalog entry | abbe | patents/US2279384.pdf | Explicit disposition in data |
 | L3 (Element 3) | 4 | `Unmatched (vintage dense flint class, 605/382)` | 1.60500 / 38.20 | No catalog entry | abbe | patents/US2279384.pdf | Explicit disposition in data |
-| L4 (Element 4) | 6 | `Unmatched (vintage light flint class, 575/414)` | 1.57500 / 41.40 | No catalog entry | abbe | patents/US2279384.pdf | Explicit disposition in data |
 | L5 (Element 5) | 7 | `Unmatched (vintage high-index lanthanum flint class, 744/458)` | 1.74400 / 45.80 | No catalog entry | abbe | patents/US2279384.pdf | Explicit disposition in data |
 
 ### [KONICA HEXANON 38mm f/2.8 (Konica C35)](../../src/lens-data/konica/KonicaHexanon38mmf28.data.ts) - US 3,615,126
@@ -1817,8 +1809,6 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 |---|---|---|---|---|---|---|---|
 | L3′ (Element 1) | 1 | `Unmatched (621569 — historical D-line crown-class coordinate; supplier unresolved)` | 1.62070 / 56.90 | No catalog entry | abbe | patents/GB_135853_A.pdf | Explicit disposition in data |
 | L2′ (Element 2) | 2 | `Unmatched (540473 — historical D-line low-index flint / LLF-FEL-class coordinate; supplier unresolved)` | 1.53980 / 47.30 | No catalog entry | abbe | patents/GB_135853_A.pdf | Explicit disposition in data |
-| L1′ (Element 3) | 4 | `Unmatched (622532 — historical D-line SSK/BSM-class coordinate; supplier unresolved)` | 1.62230 / 53.20 | No catalog entry | abbe | patents/GB_135853_A.pdf | Explicit disposition in data |
-| L1 (Element 4) | 6 | `Unmatched (622532 — historical D-line SSK/BSM-class coordinate; supplier unresolved)` | 1.62230 / 53.20 | No catalog entry | abbe | patents/GB_135853_A.pdf | Explicit disposition in data |
 | L2 (Element 5) | 8 | `Unmatched (540473 — historical D-line low-index flint / LLF-FEL-class coordinate; supplier unresolved)` | 1.53980 / 47.30 | No catalog entry | abbe | patents/GB_135853_A.pdf | Explicit disposition in data |
 | L3 (Element 6) | 9 | `Unmatched (621569 — historical D-line crown-class coordinate; supplier unresolved)` | 1.62070 / 56.90 | No catalog entry | abbe | patents/GB_135853_A.pdf | Explicit disposition in data |
 
@@ -1901,7 +1891,6 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 | Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
 |---|---|---|---|---|---|---|---|
-| L4 (Element 4) | 6 | `773498 - dense lanthanum-flint boundary class (unresolved)` | 1.77250 / 49.77 | No catalog entry | abbe | patents/US4871239.pdf | Reviewed sidecar hit |
 | L10 (Element 10) | 17 | `807316 - high-index dense flint class (unresolved)` | 1.80741 / 31.59 | No catalog entry | abbe | patents/US4871239.pdf | Reviewed sidecar hit |
 | L12 (Element 12) | 21A | `518523 - thin hybrid aspheric layer (unresolved)` | 1.51790 / 52.31 | No catalog entry | abbe | patents/US4871239.pdf | Reviewed sidecar hit |
 | L13 (Element 13) | 22 | `805410 - dense lanthanum-flint / LASF-class glass (unresolved)` | 1.80500 / 40.97 | No catalog entry | abbe | patents/US4871239.pdf | Reviewed sidecar hit |
@@ -2035,32 +2024,32 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 | Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
 |---|---|---|---|---|---|---|---|
-| L1 (Element 1) | 1 | `Unmatched (600644 phosphate-crown class; nearest current catalog coordinates sit at Δnd +0.003, outside the runtime window)` | 1.60000 / 64.40 | No catalog entry | abbe | Missing from untracked local patents/ references (US4147410, 4147410) | Explicit disposition in data |
-| L11 (Element 11) | 19 | `Unmatched (757297 lanthanum dense-flint class; no current catalog glass within Δnd 0.003 / Δνd 2)` | 1.75690 / 29.70 | No catalog entry | abbe | Missing from untracked local patents/ references (US4147410, 4147410) | Explicit disposition in data |
-| L13 (Element 13) | 23 | `Unmatched (600644 phosphate-crown class; nearest current catalog coordinates sit at Δnd +0.003, outside the runtime window)` | 1.60000 / 64.40 | No catalog entry | abbe | Missing from untracked local patents/ references (US4147410, 4147410) | Explicit disposition in data |
+| L1 (Element 1) | 1 | `Unmatched (600644 phosphate-crown class; nearest current catalog coordinates sit at Δnd +0.003, outside the runtime window)` | 1.60000 / 64.40 | No catalog entry | abbe | patents/US_4147410_A.pdf | Explicit disposition in data |
+| L11 (Element 11) | 19 | `Unmatched (757297 lanthanum dense-flint class; no current catalog glass within Δnd 0.003 / Δνd 2)` | 1.75690 / 29.70 | No catalog entry | abbe | patents/US_4147410_A.pdf | Explicit disposition in data |
+| L13 (Element 13) | 23 | `Unmatched (600644 phosphate-crown class; nearest current catalog coordinates sit at Δnd +0.003, outside the runtime window)` | 1.60000 / 64.40 | No catalog entry | abbe | patents/US_4147410_A.pdf | Explicit disposition in data |
 
 ### [MINOLTA MD ZOOM 35-135mm f/3.5-4.5](../../src/lens-data/minolta/Minolta35135mmf3545MDZoom.data.ts) - US 5,249,079 A
 
 | Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
 |---|---|---|---|---|---|---|---|
-| N1 (Element N1) | 1 | `805254 — dense flint class` | 1.80518 / 25.43 | N-SF6 (trusted Sellmeier) | sellmeier | Missing from untracked local patents/ references (US5249079A, US5249079, 5249079) | No review-record hit |
-| N2 (Element N2) | 2 | `517642 — borosilicate crown class` | 1.51680 / 64.20 | H-K9L (trusted Sellmeier) | sellmeier | Missing from untracked local patents/ references (US5249079A, US5249079, 5249079) | No review-record hit |
-| N6 (Element N6) | 10 | `847238 — dense flint class` | 1.84666 / 23.80 | J-SF03 (trusted Sellmeier) | sellmeier | Missing from untracked local patents/ references (US5249079A, US5249079, 5249079) | No review-record hit |
-| N7 (Element N7) | 12 | `618634 — dense phosphate crown class` | 1.61800 / 63.39 | S-PHM52 (trusted Sellmeier) | sellmeier | Missing from untracked local patents/ references (US5249079A, US5249079, 5249079) | No review-record hit |
-| N8 (Element N8 / deflecting G8) | 15 | `517642 — borosilicate crown class` | 1.51680 / 64.20 | H-K9L (trusted Sellmeier) | sellmeier | Missing from untracked local patents/ references (US5249079A, US5249079, 5249079) | No review-record hit |
-| N9 (Element N9) | 17 | `541472 — light flint class` | 1.54072 / 47.20 | S-TIL2 (trusted Sellmeier) | sellmeier | Missing from untracked local patents/ references (US5249079A, US5249079, 5249079) | No review-record hit |
-| N10 (Element N10) | 18 | `755275 — dense flint class` | 1.75520 / 27.51 | E-FD4 (trusted Sellmeier) | sellmeier | Missing from untracked local patents/ references (US5249079A, US5249079, 5249079) | No review-record hit |
-| N11 (Element N11) | 20 | `603380 — flint class` | 1.60342 / 38.00 | J-F5 (trusted Sellmeier) | sellmeier | Missing from untracked local patents/ references (US5249079A, US5249079, 5249079) | No review-record hit |
-| N13 (Element N13) | 24 | `517642 — borosilicate crown class` | 1.51680 / 64.20 | H-K9L (trusted Sellmeier) | sellmeier | Missing from untracked local patents/ references (US5249079A, US5249079, 5249079) | No review-record hit |
-| N14 (Element N14) | 26 | `517522 — crown-flint class` | 1.51742 / 52.20 | J-KF6 (trusted Sellmeier) | sellmeier | Missing from untracked local patents/ references (US5249079A, US5249079, 5249079) | No review-record hit |
+| N1 (Element N1) | 1 | `805254 — dense flint class` | 1.80518 / 25.43 | N-SF6 (trusted Sellmeier) | sellmeier | patents/US_5249079_A.pdf | No review-record hit |
+| N2 (Element N2) | 2 | `517642 — borosilicate crown class` | 1.51680 / 64.20 | H-K9L (trusted Sellmeier) | sellmeier | patents/US_5249079_A.pdf | No review-record hit |
+| N6 (Element N6) | 10 | `847238 — dense flint class` | 1.84666 / 23.80 | J-SF03 (trusted Sellmeier) | sellmeier | patents/US_5249079_A.pdf | No review-record hit |
+| N7 (Element N7) | 12 | `618634 — dense phosphate crown class` | 1.61800 / 63.39 | S-PHM52 (trusted Sellmeier) | sellmeier | patents/US_5249079_A.pdf | No review-record hit |
+| N8 (Element N8 / deflecting G8) | 15 | `517642 — borosilicate crown class` | 1.51680 / 64.20 | H-K9L (trusted Sellmeier) | sellmeier | patents/US_5249079_A.pdf | No review-record hit |
+| N9 (Element N9) | 17 | `541472 — light flint class` | 1.54072 / 47.20 | S-TIL2 (trusted Sellmeier) | sellmeier | patents/US_5249079_A.pdf | No review-record hit |
+| N10 (Element N10) | 18 | `755275 — dense flint class` | 1.75520 / 27.51 | E-FD4 (trusted Sellmeier) | sellmeier | patents/US_5249079_A.pdf | No review-record hit |
+| N11 (Element N11) | 20 | `603380 — flint class` | 1.60342 / 38.00 | J-F5 (trusted Sellmeier) | sellmeier | patents/US_5249079_A.pdf | No review-record hit |
+| N13 (Element N13) | 24 | `517642 — borosilicate crown class` | 1.51680 / 64.20 | H-K9L (trusted Sellmeier) | sellmeier | patents/US_5249079_A.pdf | No review-record hit |
+| N14 (Element N14) | 26 | `517522 — crown-flint class` | 1.51742 / 52.20 | J-KF6 (trusted Sellmeier) | sellmeier | patents/US_5249079_A.pdf | No review-record hit |
 
 ### [MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) - US 4,192,577
 
 | Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
 |---|---|---|---|---|---|---|---|
-| G1 (Element G1) | 1 | `805254 — dense-flint coordinate class (supplier/melt unresolved)` | 1.80520 / 25.40 | SF6 (trusted Sellmeier) | sellmeier | Missing from untracked local patents/ references (US4192577, 4192577) | No review-record hit |
-| G3 (Element G3) | 4 | `Unmatched (678490 lanthanum flint; no public catalog glass at this coordinate)` | 1.67830 / 49.00 | No catalog entry | abbe | Missing from untracked local patents/ references (US4192577, 4192577) | Explicit disposition in data |
-| G6 (Element G6) | 10 | `805254 — dense-flint coordinate class (supplier/melt unresolved)` | 1.80520 / 25.40 | SF6 (trusted Sellmeier) | sellmeier | Missing from untracked local patents/ references (US4192577, 4192577) | No review-record hit |
+| G1 (Element G1) | 1 | `805254 — dense-flint coordinate class (supplier/melt unresolved)` | 1.80520 / 25.40 | SF6 (trusted Sellmeier) | sellmeier | patents/US_4192577_A.pdf | No review-record hit |
+| G3 (Element G3) | 4 | `Unmatched (678490 lanthanum flint; no public catalog glass at this coordinate)` | 1.67830 / 49.00 | No catalog entry | abbe | patents/US_4192577_A.pdf | Explicit disposition in data |
+| G6 (Element G6) | 10 | `805254 — dense-flint coordinate class (supplier/melt unresolved)` | 1.80520 / 25.40 | SF6 (trusted Sellmeier) | sellmeier | patents/US_4192577_A.pdf | No review-record hit |
 
 ### [MINOLTA MD ZOOM 75-150mm f/4](../../src/lens-data/minolta/Minolta75150mmf40MDZoom.data.ts) - JP S56-150717 A
 
@@ -2602,7 +2591,6 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
 |---|---|---|---|---|---|---|---|
 | L1 (Element 1) | 1 | `573575 — barium crown coordinate class (vendor unresolved)` | 1.57250 / 57.50 | BAK1 (trusted Sellmeier) | sellmeier | patents/JP_S5357028_A.pdf | No review-record hit |
-| L2A (Element 2) | 3 | `802444 — high-index crown/lanthanum coordinate class (vendor unresolved)` | 1.80218 / 44.40 | No catalog entry | abbe | patents/JP_S5357028_A.pdf | Audit-log hit |
 | L2B (Element 3) | 4 | `672388 — dense-flint/lanthanum coordinate class (vendor unresolved)` | 1.67163 / 38.80 | No catalog entry | abbe | patents/JP_S5357028_A.pdf | Audit-log hit |
 | L2C (Element 4) | 5 | `520701 — low-index high-Abbe crown coordinate class (vendor unresolved)` | 1.52000 / 70.10 | No catalog entry | abbe | patents/JP_S5357028_A.pdf | Audit-log hit |
 | L3B (Element 6) | 8 | `717295 — dense flint coordinate class (vendor unresolved)` | 1.71736 / 29.50 | SF1 (trusted Sellmeier) | sellmeier | patents/JP_S5357028_A.pdf | No review-record hit |

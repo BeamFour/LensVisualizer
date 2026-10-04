@@ -11,8 +11,8 @@ or per-lens patent backfills.
 - **870** lenses scanned
 - **9760** non-air surfaces examined
 - **9770** element glass declarations examined
-- **250** non-explicit-unmatched annotations did not resolve
-- **134** distinct unresolved glass-like tokens found
+- **242** non-explicit-unmatched annotations did not resolve
+- **129** distinct unresolved glass-like tokens found
 
 ## Tokens by Frequency
 
@@ -68,7 +68,6 @@ or per-lens patent backfills.
 | 596670 | 1 | 1 | |
 | 602352 | 1 | 1 | |
 | 603564 | 1 | 1 | |
-| 607492 | 1 | 1 | |
 | 612313 | 1 | 1 | |
 | 617308 | 1 | 1 | |
 | 617443 | 1 | 1 | |
@@ -77,7 +76,6 @@ or per-lens patent backfills.
 | 630346 | 1 | 1 | |
 | 634299 | 1 | 1 | |
 | 640353 | 1 | 1 | |
-| 642581 | 1 | 1 | |
 | 646287 | 1 | 1 | |
 | 656277 | 1 | 1 | |
 | 658397 | 1 | 1 | |
@@ -112,7 +110,6 @@ or per-lens patent backfills.
 | 767462 | 1 | 1 | |
 | 769497 | 1 | 1 | |
 | 772493 | 1 | 1 | |
-| 773498 | 1 | 1 | |
 | 773501 | 1 | 1 | |
 | 773530 | 1 | 1 | |
 | 774494 | 1 | 1 | |
@@ -124,7 +121,6 @@ or per-lens patent backfills.
 | 792450 | 1 | 1 | |
 | 797455 | 1 | 1 | |
 | 800255 | 1 | 1 | |
-| 802444 | 1 | 1 | |
 | 803405 | 1 | 1 | |
 | 803456 | 1 | 1 | |
 | 805410 | 1 | 1 | |
@@ -145,7 +141,6 @@ or per-lens patent backfills.
 | 930240 | 1 | 1 | |
 | 933209 | 1 | 1 | |
 | 958300 | 1 | 1 | |
-| BAM5 | 1 | 1 | |
 | D-ZLAF85 | 1 | 1 | |
 | FPL51 | 1 | 1 | |
 | KF5 | 1 | 1 | |
@@ -396,10 +391,6 @@ or per-lens patent backfills.
 
 - [NIKON NIKKOR Z 100-400mm f/4.5-5.6 VR S](../../src/lens-data/nikon/NikonNikkorZ100400f4556.data.ts) 34: `603564 — inferred vd and unresolved identity; patent gives nd only`
 
-### 607492 — 1 occurrence
-
-- [AGFA COLOR-TELINEAR 90mm f/4](../../src/lens-data/agfa/AgfaColorTelinear90mmf4.data.ts) 7: `BAM5 class (barium middle glass, 607/492)`
-
 ### 612313 — 1 occurrence
 
 - [NIKON AF-P DX NIKKOR 70-300mm f/4.5-6.3 G ED VR](../../src/lens-data/nikon/NikonAFPDX70300mmf4563G.data.ts) 3: `612313 — anomalous-dispersion flint class (patent nd=1.61155, νd=31.26, θgF=0.618; no exact public catalog match)`
@@ -431,10 +422,6 @@ or per-lens patent backfills.
 ### 640353 — 1 occurrence
 
 - [MINOLTA MD ROKKOR 45mm f/2](../../src/lens-data/minolta/MinoltaRokkor45mmf2MD.data.ts) 7: `640353 - medium flint (catalog unresolved)`
-
-### 642581 — 1 occurrence
-
-- [CARL ZEISS BIOGON 21mm f/4.5](../../src/lens-data/carl-zeiss-oberkochen/ZeissBiogon21mmf45.data.ts) 12: `LaK/SK crown (642/581)`
 
 ### 646287 — 1 occurrence
 
@@ -572,10 +559,6 @@ or per-lens patent backfills.
 
 - [FUJIFILM FUJINON GF 55mm f/1.7 R WR](../../src/lens-data/fujifilm/FujifilmGF55mmf17.data.ts) 11A: `772493 — molded lanthanum-crown class (no exact public catalog match)`
 
-### 773498 — 1 occurrence
-
-- [MINOLTA AF 35-105mm f/3.5-4.5 New (v2)](../../src/lens-data/minolta/MinoltaAF35105mmf3545v2.data.ts) 6: `773498 - dense lanthanum-flint boundary class (unresolved)`
-
 ### 773501 — 1 occurrence
 
 - [MINOLTA AF 28mm f/2](../../src/lens-data/minolta/MinoltaAF28mmf2.data.ts) 13: `773501 - lanthanum flint (catalog unresolved)`
@@ -619,10 +602,6 @@ or per-lens patent backfills.
 ### 800255 — 1 occurrence
 
 - [SONY SONNAR T* FE 35mm f/2.8 ZA](../../src/lens-data/sony/SonyFE35mmf28ZA.data.ts) 1: `800255 - dense flint (patent nd=1.80000, vd=25.46; no exact public catalog match)`
-
-### 802444 — 1 occurrence
-
-- [NIKON NIKKOR-SW 75mm f/4.5](../../src/lens-data/nikon/NikonNikkorSW75mmf45.data.ts) 3: `802444 — high-index crown/lanthanum coordinate class (vendor unresolved)`
 
 ### 803405 — 1 occurrence
 
@@ -703,10 +682,6 @@ or per-lens patent backfills.
 ### 958300 — 1 occurrence
 
 - [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) 21: `958300 — catalog unresolved (supplier unconfirmed)`
-
-### BAM5 — 1 occurrence
-
-- [AGFA COLOR-TELINEAR 90mm f/4](../../src/lens-data/agfa/AgfaColorTelinear90mmf4.data.ts) 7: `BAM5 class (barium middle glass, 607/492)`
 
 ### D-ZLAF85 — 1 occurrence
 
