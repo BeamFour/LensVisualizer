@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { mtfFiniteConjugate, mtfFiniteObjectPoint } from "../../../../src/optics/analysis/mtfConjugates.js";
 import { paraxialTrace } from "../../../../src/optics/buildLens.js";
+import { prepareRuntimeState } from "../../../../src/optics/compat.js";
 import {
   attachTeleconverter,
   TeleconverterAttachError,
@@ -304,6 +306,29 @@ describe("attachTeleconverter", () => {
     /* The first quick-stop must coincide with wide-open, and the last must survive the `<= maxFstop` filter. */
     expect(Math.abs(composedData.fstopSeries[0] - composed.FOPEN)).toBeLessThanOrEqual(0.001);
     expect(composedData.maxFstop).toBeGreaterThanOrEqual(composedData.fstopSeries[composedData.fstopSeries.length - 1]);
+  });
+
+  it("keeps a finite conjugate on the same object point, whichever end its distance is measured from", () => {
+    /* MTF places the source at the conjugate's distance from its reference; the converter moves only the image plane. */
+    const objectZ = (data: LensData): number => {
+      const state = prepareRuntimeState(build(data), 1, 0);
+      return mtfFiniteObjectPoint(state, mtfFiniteConjugate(state)!, 0)![2] - state.surfaces[0].z;
+    };
+
+    for (const plates of [undefined, [REAR_PLATE_FIXTURE]]) {
+      for (const distanceReference of ["image-plane", "first-surface"] as const) {
+        const conjugate = { focusT: 1, zoomT: 0, objectDistanceMm: 1000, distanceReference, source: "Synthetic" };
+        const hostData = teleconverterHostData({
+          lastGapFocusOffsets: [0, 5],
+          plates,
+          overrides: { finiteConjugates: [conjugate] },
+        });
+        const composedData = attachTeleconverter(hostData, tc);
+
+        expect(validateLensData(composedData)).toEqual([]);
+        expect(objectZ(composedData)).toBeCloseTo(objectZ(hostData), 9);
+      }
+    }
   });
 
   it("narrows a declared rectilinear coverage by the focal ratio", () => {

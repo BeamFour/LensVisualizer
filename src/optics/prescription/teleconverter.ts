@@ -341,8 +341,9 @@ export function attachTeleconverter(host: LensData, tc: TeleconverterData): Lens
     return Array.isArray(value) ? [scaled(value[0], wide), scaled(value[1], tele)] : scaled(value, wide);
   };
 
-  /* The converter moves the image plane back, so image-referenced close-focus distances grow by the same amount. */
-  const extensionM = fit.geometry.extensionMm / 1000;
+  /* The converter moves the image plane back, so image-referenced object distances grow by the same amount. */
+  const extensionMm = fit.geometry.extensionMm;
+  const extensionM = extensionMm / 1000;
   const formatDiagonal = isImageFormatId(host.imageFormat)
     ? IMAGE_FORMAT_BY_ID[host.imageFormat].diagonalMm
     : undefined;
@@ -372,6 +373,16 @@ export function attachTeleconverter(host: LensData, tc: TeleconverterData): Lens
     maxFstop: Math.ceil(host.maxFstop * firstRatio * 10 - 1e-9) / 10,
     closeFocusM: host.closeFocusM + extensionM,
     ...(host.zoomCloseFocusM ? { zoomCloseFocusM: host.zoomCloseFocusM.map((distance) => distance + extensionM) } : {}),
+    /* A finite conjugate keeps its physical object; one measured from the first surface is already unchanged. */
+    ...(host.finiteConjugates
+      ? {
+          finiteConjugates: host.finiteConjugates.map((conjugate) =>
+            conjugate.distanceReference === "image-plane"
+              ? { ...conjugate, objectDistanceMm: conjugate.objectDistanceMm + extensionMm }
+              : conjugate,
+          ),
+        }
+      : {}),
     /* imageCircleMm is the analysis field radius. A converter enlarges the circle, but the format still crops it. */
     ...(host.imageCircleMm !== undefined && formatDiagonal !== undefined
       ? { imageCircleMm: Math.max(host.imageCircleMm, Math.min(host.imageCircleMm * magnification, formatDiagonal)) }

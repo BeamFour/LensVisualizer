@@ -266,6 +266,9 @@ is the host's. Built-in converters stay on `opticalConfiguration`.
 - **Metadata `buildLens()` and the controls trust is rescaled** by the same ratio: `focalLengthDesign` (the build
   throws when it disagrees with the Gaussian EFL), `zoomPositions`, `fstopSeries`, `maxFstop`. `imageCircleMm` is the
   analysis field radius, so it grows only up to the format diagonal.
+- **Image-referenced object distances grow by the converter's extension**, because only the image plane moves:
+  `closeFocusM`, `zoomCloseFocusM`, and every `finiteConjugates` entry measured from the image plane. Entries measured
+  from the first surface are unchanged.
 - **Identity:** converter surface labels take the reserved `TC` prefix, element ids continue after the host's, and the
   composed data carries an `attachedTeleconverter` descriptor. `validateLensData()` accepts the prefix only with the
   descriptor and requires the prefixed surfaces to be exactly the trailing block; `LensDataInput` omits the descriptor
