@@ -20,6 +20,11 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-04",
+    type: "feature",
+    summary: "Added teleconverters: mount the Fujifilm XF1.4X, XF2X or GF1.4X on its host lens",
+  },
+  {
+    date: "2026-10-04",
     type: "improvement",
     summary: "Drew the rear drop-in filters of 17 Canon and Nikon super-telephotos as lens elements",
   },

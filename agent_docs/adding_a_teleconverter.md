@@ -33,6 +33,23 @@ publish it or reuse its key — a production converter gets its own file
 5. Size the semi-diameters for the fastest intended host and set `minHostFno` if faster hosts would be clipped.
 6. Run the gate below. Fix what the sweeps report before reaching for `incompatibleLensKeys`.
 
+## Adapting a Master-Plus-Converter Package
+
+A converter authored as one lens (the patent's master lens plus the converter, in the lens format) becomes a
+teleconverter file by keeping the converter and letting the catalog host supply the rest:
+
+1. Keep the converter's surfaces and elements only, relabelled from 1, with the patent's own lens and group
+   designations. Drop the master elements, the stop, zoom and focus tables, `nominalFno`, `projection` and the other
+   lens-only fields.
+2. `masterImageDistanceMm` = the master table's back focus in air − the gap from the master's last surface to the
+   converter. Keep the converter's last gap and the plane member behind it (`rearPlates`) as printed.
+3. Set `acceptsTeleconverters: true` on the catalog lens that is the patent's master, and on other hosts only after the
+   sweeps and a corner-coverage check pass for them. Rims inferred on the master system can fall short on another host.
+4. Record the maker's compatibility in the fit fields: `minHostFno` for a beam the rims do not pass, and
+   `incompatibleLensKeys` for a converter the maker supplies for one lens only.
+5. Write an `*.audit.md` sidecar beside the file: source, what was extracted and dropped, geometry, rim provenance,
+   discrepancies carried, fit decisions.
+
 ## Verification
 
 ```bash
