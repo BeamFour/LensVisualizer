@@ -142,7 +142,8 @@ a warning until the reader has seen them. A gap is listed only when it changes t
 - `scale`: the prescription and marketed focal lengths differ by more than 10 % (`mtfPrescriptionScale`).
 
 A lens with a converter is assessed as one system; no separate gap is raised for the pairing. A reference-line chart
-the reader chose has no glass gap.
+the reader chose has no glass gap. A paused proposal to narrow the `estimated-dispersion` blur and refit the
+estimate is in `agent_docs/dispersion-estimate-exploration.md`.
 
 The MTF tab lazily creates a worker from serializable lens data. Worker initialization removes engine-generated
 synthetic surfaces/elements from `RuntimeLens.data` and rebuilds them once from `rearPlates`, preserving physical
