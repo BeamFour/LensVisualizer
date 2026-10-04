@@ -296,6 +296,7 @@ const LENS_DATA = {
       type: "Plane-Parallel Plate",
       nd: 1.51633,
       vd: 64.4,
+      glass: "S-BSL7 (OHARA index match; patent prints νd 64.4 against the catalog 64.14; supplier unconfirmed)",
       role: "Plane-parallel filter plate of the patent prescription (US 6,115,188 A, Numerical Example 22, R30–R31), in the rear filter holder. The design is computed with it in place, so it is drawn and traced as part of the working system. Semi-diameter is a ray-trace estimate; the source lists none. Not counted in elementCount.",
     },
   ],

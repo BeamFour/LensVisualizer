@@ -36,3 +36,6 @@ Validation: focused buildLens/MTF check; full corpus gates at the ten-lens check
   mid-field and corner bundles are unchanged, and `npm run audit:field-coverage` still reports 100% of the corner. The
   plate now clips the chief ray at 3.77° (the half-field was 3.85°, set by another rim); the format corner is 2.52°,
   so coverage is unaffected, and the diagram's off-axis field narrows from 2.31° to 2.26°.
+- Glass: the filter is labelled `S-BSL7 (OHARA coordinate match; supplier unconfirmed)`. Example 24 prints nd 1.516330 /
+  νd 64.1, Ohara S-BSL7's coordinates, and the files for Examples 1 and 25 of the same patent already carry that label
+  for the same filter. The plate previously had no glass label and traced on the Abbe-number estimate.

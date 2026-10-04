@@ -66,3 +66,7 @@ Validation: focused runtime/paraxial check; full corpus gates at the ten-lens ch
 - Before/after check: EFL, entrance pupil, stop radius, image plane, half-field, analysis half-field and the traced
   axial, mid-field, corner and diagram bundles are unchanged. `npm run audit:field-coverage` still reports 100% of the
   corner.
+- Glass: the filter is labelled S-BSL7 by its index. Example 22 prints νd 64.4 where Examples 1, 24 and 25 of the same
+  patent print 64.1 for the same filter, and no catalog glass sits at 1.51633 / 64.4. The printed value is kept and
+  Ohara S-BSL7 (νd 64.14) supplies the dispersion curve; the supplier is not confirmed. The plate previously had no
+  glass label and traced on the Abbe-number estimate.
