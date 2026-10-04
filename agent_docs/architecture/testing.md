@@ -130,8 +130,10 @@ Existing tests cover:
   `generate:glass-reports`, `generate:mirror-reports`, `generate:mount-svgs`, or `npm run generate:reports -- <name>`.
   An invariant a report depends on belongs in the suite as its own test, not as an `expect` inside the generator.
 - **Tooling tests** for manual-only dev tools (the benchmark harness and the audit-script npm entries) are listed in
-  `TOOLING_TESTS` in `vite.config.js` and run with `npm run test:tooling`; CI runs both commands. Add a file there only
-  when it guards a tool that neither the build nor the app uses.
+  `TOOLING_TESTS` in `vite.config.js` and run with `npm run test:tooling`. CI runs both suites in one job and calls
+  Vitest directly for this one (`npx vitest run --config vitest.tooling.config.js`), so the metadata `npm run test`
+  just generated is not generated again. Add a file there only when it guards a tool that neither the build nor the
+  app uses.
 
 ## Refactor Test Expectations
 
