@@ -9,12 +9,12 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 ## Summary
 
-- **864** lenses scanned (**852** visible)
-- **8970 / 9686** non-air surfaces use strict catalog Sellmeier data (92.6%)
-- **8985 / 9686** non-air surfaces use trusted chromatic data (Sellmeier or measured line indices, 92.8%)
+- **870** lenses scanned (**858** visible)
+- **9029 / 9760** non-air surfaces use strict catalog Sellmeier data (92.5%)
+- **9044 / 9760** non-air surfaces use trusted chromatic data (Sellmeier or measured line indices, 92.7%)
 - **0** mismatch surfaces in Sweep 1 across **0** lens files
 - **0** Sweep 1 surfaces have a matching untracked local patent PDF
-- **345** code-only missing-Sellmeier elements in Sweep 2: **23** active unreviewed, **188** self-recording explicit dispositions, **0** dispositions missing any review record
+- **359** code-only missing-Sellmeier elements in Sweep 2: **30** active unreviewed, **195** self-recording explicit dispositions, **0** dispositions missing any review record
 - **0** unresolved named-token elements in Sweep 2B, producing **0** token occurrences across **0** distinct tokens
 - **21** Tier A proprietary backfill rows in Sweep 3
 
@@ -44,6 +44,7 @@ These lenses are missing trusted chromatic data only on glass elements. One or t
 | [NIKON TV-NIKKOR 11.5-69mm f/1.2 (Nikon S-100)](../../src/lens-data/nikon/NikonTVNikkor11569mmf12NikonS100.data.ts) | US 4,437,733 | [PDF](../../patents/US_4437733_A.pdf) | 93.3% (14/15) | 93.3% (14/15) | 1 | 18 [glass] (L8: `Unmatched (740449; current authoritative catalogs)`) | abbe: 1 |
 | [CANON EF-M 32mm f/1.4 STM](../../src/lens-data/canon/CanonEFM32mmf14STM.data.ts) | JP 2018-180366 A | [PDF](../../patents/JP2018180366A.pdf) | 92.9% (13/14) | 92.9% (13/14) | 1 | 13 [glass] (LR negative member: `Unmatched (675/348 partial-dispersion flint; patent nd=1.67542, vd=34.8, θgF=0.5825)`) | abbe: 1 |
 | [FUJIFILM FUJINON GF 55mm f/1.7 R WR](../../src/lens-data/fujifilm/FujifilmGF55mmf17.data.ts) | US 2023/0341664 A1 | [PDF](../../patents/US20230341664A1.pdf) | 92.9% (13/14) | 92.9% (13/14) | 1 | 11A [glass] (L24: `772493 — molded lanthanum-crown class (no exact public catalog match)`) | abbe: 1 |
+| [MINOLTA MD ZOOM 35-135mm f/3.5-4.5](../../src/lens-data/minolta/Minolta35135mmf3545MDZoom.data.ts) | US 5,249,079 A | Missing from untracked local patents/ references (US5249079A, US5249079, 5249079) | 92.9% (13/14) | 92.9% (13/14) | 1 | 22 [glass] (Element N12: `807316 — high-index flint class`) | abbe: 1 |
 | [NIKON AF-P DX NIKKOR 70-300mm f/4.5-6.3 G ED VR](../../src/lens-data/nikon/NikonAFPDX70300mmf4563G.data.ts) | US 2021/0026133 A1 | [PDF](../../patents/US20210026133A1.pdf) | 92.9% (13/14) | 92.9% (13/14) | 1 | 3 [glass] (L12: `612313 — anomalous-dispersion flint class (patent nd=1.61155, νd=31.26, θgF=0.618; no exact public catalog match)`) | abbe: 1 |
 | [NIKON AF-S DX ZOOM-NIKKOR 17-55mm f/2.8G IF-ED](../../src/lens-data/nikon/NikonAFSDXZoomNikkor1755mmf28GIFED.data.ts) | US 2005/0013015 A1 | [PDF](../../patents/US20050013015A1.pdf) | 92.9% (13/14) | 92.9% (13/14) | 1 | 11A [glass] (Element 7: `Unmatched (740493; nd=1.739929, vd=49.25)`) | abbe: 1 |
 | [NIKON AF-S NIKKOR 105mm f/1.4E ED](../../src/lens-data/nikon/NikonNikkor105f14E.data.ts) | WO 2019/116563 A1 | [PDF](../../patents/JPWO2019116563A1.pdf) | 92.9% (13/14) | 92.9% (13/14) | 1 | 8 [glass] (Element 5: `Unmatched APD medium (patent optical constants; supplier unspecified)`) | abbe: 1 |
@@ -55,6 +56,7 @@ These lenses are missing trusted chromatic data only on glass elements. One or t
 | [CANON EF-M 18-55mm f/3.5-5.6 IS STM](../../src/lens-data/canon/CanonEFM1855mmf3556ISSTM.data.ts) | US 2013/0335830 A1 | [PDF](../../patents/US20130335830A1.pdf) | 92.3% (12/13) | 92.3% (12/13) | 1 | 22 [glass] (Element 12: `Unmatched (nd=1.52996, nu_d=55.8; code 530558)`) | abbe: 1 |
 | [CANON RF 24-105mm f/4-7.1 IS STM](../../src/lens-data/canon/CanonRF24105mmf471ISSTM.data.ts) | US 2021/0003831 A1 | [PDF](../../patents/US20210003831A1.pdf) | 92.3% (12/13) | 92.3% (12/13) | 1 | 22A [glass] (Element 12 / B5: `Unmatched (1.53110/55.9; no exact public catalog match)`) | abbe: 1 |
 | [FUJIFILM FUJINON XF 16mm f/1.4 R WR](../../src/lens-data/fujifilm/FujifilmFujinonXf16mmf14RWR.data.ts) | US 2016/0282590 A1 | [PDF](../../patents/US20160282590A1.pdf) | 92.3% (12/13) | 92.3% (12/13) | 1 | 17A [glass] (Element 9: `Unmatched (nd=1.80348, nu_d=40.45; no defensible current public-catalog identity)`) | abbe: 1 |
+| [MINOLTA MD ZOOM 28-85mm f/3.5-4.5](../../src/lens-data/minolta/Minolta2885mmf3545MDZoom.data.ts) | JP H01-193709 A | [PDF](../../patents/JPA 1989193709-000000.pdf) | 92.3% (12/13) | 92.3% (12/13) | 1 | 3 [glass] (Element 2: `Unmatched (807316 high-index flint; nearest current NBFD15 / H-ZLaF56B differ by Δνd ≈ +1.7)`) | abbe: 1 |
 | [NIKON AI ZOOM-NIKKOR 80-200mm f/4](../../src/lens-data/nikon/NikonAINikkor80200mmf4.data.ts) | US 4,452,513 | [PDF](../../patents/US4452513.pdf) | 92.3% (12/13) | 92.3% (12/13) | 1 | 19 [glass] (G4 rear negative: `797455 — dense lanthanum glass class (catalog unresolved)`) | abbe: 1 |
 | [SONY FE 24mm f/1.4 GM](../../src/lens-data/sony/SonyFE24mmf14GM.data.ts) | WO 2019/073744 A1 | [PDF](../../patents/JPWO2019073744A1.pdf) | 92.3% (12/13) | 92.3% (12/13) | 1 | 1A [glass] (L11 front XA element: `Unmatched (MC-TAF115-class; Hoya source nominal/polynomial conflict; patent nd=1.77002, νd=49.4)`) | abbe: 1 |
 | [NIKON NIKKOR Z 100-400mm f/4.5-5.6 VR S](../../src/lens-data/nikon/NikonNikkorZ100400f4556.data.ts) | JP 2022-092388 A | [PDF](../../patents/JP2022092388A.pdf) | 92.0% (23/25) | 92.0% (23/25) | 2 | 34 [glass] (Element 19: `603564 — inferred vd and unresolved identity; patent gives nd only`)<br>45 [glass] (Element 25: `738493 — inferred vd and unresolved identity; patent gives nd only`) | abbe: 2 |
@@ -74,6 +76,7 @@ These lenses are missing trusted chromatic data only on glass elements. One or t
 | [TAMRON 70-180mm f/2.8 Di III VXD](../../src/lens-data/tamron/TamronA05670180mmf28.data.ts) | JP 2021-43375 A | [PDF](../../patents/JP2021043375A.pdf) | 90.5% (19/21) | 90.5% (19/21) | 2 | 13A [glass] (Element 8 bonded aspheric layer: `Unmatched (bonded aspheric optical layer; physical material not identified by patent)`)<br>30A [glass] (Element 17 bonded aspheric layer: `Unmatched (bonded aspheric optical layer; physical material not identified by patent)`) | abbe: 2 |
 | [Fujinon XC 15-45mm f/3.5-5.6 OIS PZ](../../src/lens-data/fujifilm/FujifilmFujinonXC1545mmf3556OISPZ.data.ts) | JP 2021-15312 A | [PDF](../../patents/JP2021015312A.pdf) | 90.0% (9/10) | 90.0% (9/10) | 1 | 3A [glass] (Element L1b: `Unmatched (nd=1.53409, vd=55.89; 534559 coordinate class)`) | abbe: 1 |
 | [FUJIFILM FUJINON XF 23mm f/2 R WR](../../src/lens-data/fujifilm/FujifilmXF23mmf2RWR.data.ts) | US 2017/0351051 A1 | [PDF](../../patents/US20170351051A1.pdf) | 90.0% (9/10) | 90.0% (9/10) | 1 | 13A [glass] (L21 — moving focus asphere: `803405 - high-index lanthanum flint (likely PGM aspheric melt; no exact public catalog match)`) | abbe: 1 |
+| [MINOLTA MD ZOOM 24-35mm f/3.5](../../src/lens-data/minolta/Minolta2435mmf35MDZoom.data.ts) | JP S56-158314 A | [PDF](../../patents/JPA 1981158314-000000.pdf) | 90.0% (9/10) | 90.0% (9/10) | 1 | 19 [glass] (Element 10: `526521 — crown/light-flint boundary (catalog unresolved)`) | abbe: 1 |
 | [MINOLTA AF 20mm f/2.8](../../src/lens-data/minolta/MinoltaAF20mmf28.data.ts) | JP 1987-249119 A | [PDF](../../patents/JPA 1987249119-000000.pdf) | 90.0% (9/10) | 90.0% (9/10) | 1 | 7 [glass] (Element 4: `683315 — flint class (catalog unresolved)`) | abbe: 1 |
 | [MINOLTA AF APO TELE 300mm f/2.8](../../src/lens-data/minolta/MinoltaAF300mmf28.data.ts) | US 4,518,229 | Missing from untracked local patents/ references (US4518229, 4518229) | 90.0% (9/10) | 90.0% (9/10) | 1 | 5 [glass] (Element 3: `682366 - dense flint class (catalog unresolved)`) | abbe: 1 |
 | [NIKON R-UW AF FISHEYE-NIKKOR 13mm f/2.8](../../src/lens-data/nikon/NikonRUWAFNikkor13mmf28.data.ts) | US 5,579,169 | [PDF](../../patents/US5579169.pdf) | 90.0% (9/10) | 90.0% (9/10) | 1 | 7 [glass] (G41 positive doublet element: `Unmatched dense flint (595355)`) | abbe: 1 |
@@ -202,6 +205,7 @@ Add catalog entries only when public coefficient-backed vendor data is available
 | 683315 | 2 | 2 | patents/JPB 1963011590-000000.pdf<br>patents/JPA 1987249119-000000.pdf | [Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) Element 2 (1.68287 / 31.50)<br>[MINOLTA AF 20mm f/2.8](../../src/lens-data/minolta/MinoltaAF20mmf28.data.ts) Element 4 (1.68300 / 31.52) |
 | 680557 | 2 | 1 | patents/JPB 1963011590-000000.pdf | [Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) Element 1 (1.67975 / 55.70)<br>[Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) Element 3 (1.67975 / 55.70) |
 | 682419 | 2 | 1 | patents/DE_1157000_B.pdf | [CARL ZEISS JENA FLEKTOGON 50mm f/4](../../src/lens-data/carl-zeiss-jena/ZeissFlektogon50mmf4.data.ts) Element 3 (1.68169 / 41.90)<br>[CARL ZEISS JENA FLEKTOGON 50mm f/4](../../src/lens-data/carl-zeiss-jena/ZeissFlektogon50mmf4.data.ts) Element 4 (1.68169 / 41.90) |
+| 526521 | 1 | 1 | patents/JPA 1981158314-000000.pdf | [MINOLTA MD ZOOM 24-35mm f/3.5](../../src/lens-data/minolta/Minolta2435mmf35MDZoom.data.ts) Element 10 (1.52584 / 52.06) |
 | 575391 | 1 | 1 | patents/JPB 1963011590-000000.pdf | [Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) Element 5 (1.57526 / 39.10) |
 | 576388 | 1 | 1 | patents/WO2024154461A1.pdf | [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) Element L77 (1.57567 / 38.80) |
 | 634299 | 1 | 1 | patents/WO2024154461A1.pdf | [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) Element L75 (1.63362 / 29.90) |
@@ -219,6 +223,10 @@ Add catalog entries only when public coefficient-backed vendor data is available
 | 839196 | 1 | 1 | patents/WO2024154461A1.pdf | [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) Element L32 (1.83909 / 19.60) |
 | 868323 | 1 | 1 | patents/WO2024154461A1.pdf | [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) Element L33 (1.86758 / 32.30) |
 | 958300 | 1 | 1 | patents/WO2024154461A1.pdf | [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) Element L51 (1.95787 / 30.00) |
+| 807316 | 2 | 2 | Missing from untracked local patents/ references (US5249079A, US5249079, 5249079)<br>Missing from untracked local patents/ references (US4192577, 4192577) | [MINOLTA MD ZOOM 35-135mm f/3.5-4.5](../../src/lens-data/minolta/Minolta35135mmf3545MDZoom.data.ts) Element N12 (1.80741 / 31.59)<br>[MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) Element G10 (1.80740 / 31.60) |
+| 621613 | 2 | 1 | Missing from untracked local patents/ references (US4192577, 4192577) | [MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) Element G8 (1.62140 / 61.30)<br>[MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) Element G11 (1.62140 / 61.30) |
+| 658585 | 1 | 1 | Missing from untracked local patents/ references (US4192577, 4192577) | [MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) Element G5 (1.65830 / 58.50) |
+| 678490 | 1 | 1 | Missing from untracked local patents/ references (US4192577, 4192577) | [MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) Element G3 (1.67830 / 49.00) |
 
 ## Sweep 2B - Named Tokens Missing Catalog Resolution
 

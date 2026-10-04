@@ -1396,6 +1396,16 @@ export const HOYA_GLASS_ENTRIES: readonly GlassEntry[] = [
       "HOYA Zemax OpticStudio DATA 2026-07-07 (HOYA20260707_include_obsolete.agf), vendor-published obsolete catalog row.",
   },
   {
+    name: "BAF10",
+    vendor: "Hoya",
+    polynomial: [2.7324621, -0.01249046, 0.018562334, 0.00099990536, -0.000068388552, 0.0000049257931],
+    nd: 1.67003,
+    vd: 47.19,
+    code6: "670472",
+    source:
+      "Hoya Zemax catalog 2017-04-01 via refractiveindex.info; BAF10 page (formula 3 polynomial), discontinued glass.",
+  },
+  {
     name: "LAFL4",
     vendor: "Hoya",
     polynomial: [2.8554713, -0.0096096763, 0.029421326, -0.001076041, 0.00023612368, -0.000010372733],
