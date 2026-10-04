@@ -94,11 +94,12 @@ Existing tests cover:
   (`focusKeyframes.test.ts`), and shared-prescription parity across switchable configuration groups
   (`opticalConfigurationParity.test.ts`, which requires a contract entry for every `opticalConfiguration` group).
 - Teleconverters, which never enter `LENS_CATALOG` (`teleconverterCompatibility.test.ts`): every converter validates;
-  every converter–host pair the fit predicate allows composes, builds, passes the axial beam and keeps the host's
-  stop; and a synthetic universal converter is composed onto every catalog lens to hold the stop-preservation
-  invariant across zoom tables, embedded stops, rear plates and drop-in filters. Tests that need a
-  real pair take it from `ALL_TELECONVERTER_KEYS` and `resolveTeleconverterKey()` so they hold while the only
-  converter is a hidden test model; page and search tests add one synthetic published summary to the generated JSON.
+  every converter–host pair the fit predicate allows composes, builds, passes the axial beam, keeps the host's stop
+  and, at every zoom station, reaches as much of the format corner as the bare lens; and a synthetic universal
+  converter is composed onto every catalog lens to hold the stop-preservation invariant across zoom tables, embedded
+  stops, rear plates and drop-in filters. Tests that need a real pair take it from `ALL_TELECONVERTER_KEYS` and
+  `resolveTeleconverterKey()` so they hold while the only converter is a hidden test model; page and search tests add
+  one synthetic published summary to the generated JSON.
 - Golden-value trace regressions (`exactTraceGoldenValues.test.ts`): pinned EFL, image-plane, marginal/skew ray, fisheye
   chief-ray, and folded-fixture values for reference designs, plus Schott datasheet anchors for N-BK7/SF6 in
   `dispersion.test.ts`. These complement the finite/unclipped catalog smoke test — if a pin moves, absolute trace or

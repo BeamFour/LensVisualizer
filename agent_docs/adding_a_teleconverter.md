@@ -71,6 +71,7 @@ compatible catalog lens. Then check in the viewer, on the source's own master le
 | `Magnification mismatch` | A radius, thickness or index was mistranscribed, or `masterImageDistanceMm` belongs to a different example. |
 | Converter is not offered on a lens | `teleconverterCompatibility()` names the failing rule: mount, missing `acceptsTeleconverters`, clearance, or an excluded host type. |
 | Sweep reports a clipped axial beam | The host is faster than the converter's rims pass; raise the semi-diameters if the source supports it, or set `minHostFno`. |
+| Sweep reports the chief ray reaching less of the format corner than on the bare lens | The converter's rims stop the corner chief ray; a package's rims are often a lower bound. Re-size them from the source figure (`agent_docs/patent-figure-sd-audit-procedure.md`). |
 | Sweep reports a build error at the junction | Rim contact between the host's last surface and the converter's first; exclude that host with `incompatibleLensKeys`. |
 
 ## How It Works

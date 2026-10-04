@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { wideOpenStopAtZoom } from "../../../src/optics/apertureStop.js";
 import buildLens from "../../../src/optics/buildLens.js";
+import { prepareRuntimeState } from "../../../src/optics/compat.js";
 import { computeElementRenderDiagnostics } from "../../../src/optics/diagramGeometry.js";
+import { resolveMtfGeometry } from "../../../src/optics/mtf.js";
 import { doLayout, epAtZoom, traceRay, traceSkewRay } from "../../../src/optics/optics.js";
 import {
   attachTeleconverter,
@@ -23,8 +26,27 @@ const MATERIAL_TRIM_TOLERANCE_MM = 0.25;
 /** Fraction of the entrance-pupil radius the converter must pass on axis without clipping. */
 const AXIAL_BEAM_FRACTION = 0.8;
 
-function zoomSamples(L: RuntimeLens): number[] {
-  return L.isZoom ? [0, 1] : [0];
+/** Slack on the share of the format corner a chief ray reaches, for the field-edge bisection. */
+const CORNER_COVERAGE_TOLERANCE = 1e-3;
+
+/** Every authored zoom station as a slider position. */
+function zoomStations(L: RuntimeLens): number[] {
+  const count = (L.isZoom && L.zoomPositions?.length) || 1;
+  return Array.from({ length: count }, (_, station) => (count === 1 ? 0 : station / (count - 1)));
+}
+
+/**
+ * Share of the format corner the real chief ray reaches through every clear aperture, wide open at infinity: the
+ * field axis the MTF tab charts, so a shortfall here is the tab's "short of the format corner" warning.
+ */
+function cornerCoverage(L: RuntimeLens, zoomT: number): number {
+  const geometry = resolveMtfGeometry(prepareRuntimeState(L, 0, zoomT), {
+    method: "geometric",
+    spectrum: "reference",
+    pupilSemiDiameterMm: epAtZoom(zoomT, L),
+    stopSemiDiameterMm: wideOpenStopAtZoom(zoomT, L),
+  });
+  return geometry ? geometry.modeledEdgeHeightMm / geometry.referenceHeightMm : 0;
 }
 
 /**
@@ -32,7 +54,8 @@ function zoomSamples(L: RuntimeLens): number[] {
  * enters `LENS_CATALOG`, so none of those sweeps see it. Every converter is validated on its own, and every
  * converter–host pair the fit predicate allows must actually compose into a lens that builds and traces — the
  * predicate checks vertex clearance only, so this sweep is what catches rim contact or a clipped axial beam and
- * tells the author to set `incompatibleLensKeys` or `minHostFno`.
+ * tells the author to set `incompatibleLensKeys` or `minHostFno`. It also catches converter rims too small for the
+ * format corner, which are re-sized from the patent figure instead.
  */
 describe("teleconverter catalog", () => {
   it("validates every teleconverter and applies the lens patent-metadata policy", () => {
@@ -54,7 +77,7 @@ describe("teleconverter catalog", () => {
     expect(offenders).toEqual([]);
   });
 
-  it("composes every compatible converter–host pair into a lens that builds, traces and keeps the host's stop", () => {
+  it("composes every compatible converter–host pair into a lens that builds, traces, keeps the host's stop and loses no field", () => {
     const offenders: string[] = [];
     let pairs = 0;
 
@@ -87,7 +110,7 @@ describe("teleconverter catalog", () => {
           }
         });
 
-        for (const zoomT of zoomSamples(L)) {
+        for (const zoomT of zoomStations(L)) {
           const layout = doLayout(0, zoomT, L);
           const beamHeight = AXIAL_BEAM_FRACTION * epAtZoom(zoomT, L);
           const traces = [
@@ -97,6 +120,17 @@ describe("teleconverter catalog", () => {
           ];
           if (traces.some((trace) => trace.clipped || !Number.isFinite(trace.y))) {
             offenders.push(`${pair}: axial beam is clipped or non-finite at zoomT=${zoomT}`);
+          }
+
+          /* A rear converter images the format corner from a narrower field of the host, so the host cannot stop a
+             corner chief ray it passed on its own: a lower share with the converter mounted is the converter's rims. */
+          const bare = cornerCoverage(host, zoomT);
+          const mounted = cornerCoverage(L, zoomT);
+          if (mounted < bare - CORNER_COVERAGE_TOLERANCE) {
+            offenders.push(
+              `${pair}: chief ray reaches ${(mounted * 100).toFixed(1)}% of the format corner at zoomT=${zoomT}, ` +
+                `${(bare * 100).toFixed(1)}% on the bare lens`,
+            );
           }
         }
 
