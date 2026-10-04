@@ -36,6 +36,7 @@ Tags: `[policy]` how we work · `[recipe]` steps for one change type · `[archit
 ## Recipes
 
 - [recipe] [`adding_a_lens.md`](adding_a_lens.md) — lens data workflow and validation troubleshooting; field rules live in `src/lens-data/LENS_DATA_SPEC.md`
+- [recipe] [`adding_a_teleconverter.md`](adding_a_teleconverter.md) — detachable teleconverter workflow; field rules live in `src/lens-data/TELECONVERTER_DATA_SPEC.md`
 - [recipe] [`lens-data-integration-handoff.md`](lens-data-integration-handoff.md) — copy-ready AI handoff for constructing data/analysis pairs
 - [recipe] [`lens-patent-audit.md`](lens-patent-audit.md) — four-phase patent audit and the per-lens `*.audit.md` log format
 - [recipe] [`patent-figure-sd-audit-procedure.md`](patent-figure-sd-audit-procedure.md) — semi-diameter vs patent-figure runbook

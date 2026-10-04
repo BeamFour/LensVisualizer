@@ -40,6 +40,11 @@ Key responsibilities:
 - Builds or receives a `RuntimeLens` through the stable `src/optics/buildLens.ts` entry point. In comparison mode,
   `ComparisonContent` / `ComparisonLayout` pass prebuilt runtime lenses to avoid rebuilding the same lens inside each
   panel.
+- Takes an optional `teleconverterKey`. `useLensComputation` builds `resolveLensSystemData(lensKey, teleconverterKey)`
+  (`src/utils/catalog/teleconverterCatalog.ts`), and every lens-keyed reset in the panel — overlay state, header
+  height, hover, the error boundary — keys on `lensSystemKey()` so mounting or removing a converter resets them too.
+  `LensViewer` offers converters through `TeleconverterControl` in `TopBar`, from `teleconverterOptionsForLens()`
+  for the prescription actually shown; a converter the lens cannot take is never passed down.
 - Wires computation hooks for layout, density-controlled rays, chromatic spread, overlays, and slider feedback.
 - Builds one `PerspectiveTraceContext` for supported perspective-control lenses from the camera-anchored layout,
   clamped movement, fixed sensor, and authored tilt pivot. The same context drives the diagram rays and analysis drawer

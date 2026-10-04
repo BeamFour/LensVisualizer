@@ -26,6 +26,11 @@ Non-obvious constraints and failure modes: one trap per bullet, with the full ru
   0.90); production tests fail if `computeElementRenderDiagnostics()` would hide more than 0.25 mm of a surface.
 - `nominalFno` may be an array only on zoom lenses, with one entry per `zoomPositions` element; an array on a prime fails
   validation.
+- `buildLens()` derives the physical stop from `nominalFno` and whole-system EFL, so appending surfaces behind the stop
+  resizes the iris unless `nominalFno` is rescaled by the same focal ratio. `attachTeleconverter()` does this per zoom
+  station, measuring on the plate-expanded prescription; see `agent_docs/architecture/optics-engine.md`.
+- Entering or leaving compare mode changes route and mounts a fresh viewer initialized from the URL, before the debounced
+  URL writer runs. State that must survive goes in the navigation's own query (`agent_docs/adding_url_state.md`).
 - Some zoom patents publish only infinity-focus spacing tables; copying them unchanged into the close-focus slot leaves
   the focus slider visually static. Infer close-focus pairs only for the true focusing gaps, preserve the mechanism
   constraint (a single rigid translator keeps the adjacent-gap sum constant), and document the approximation in the

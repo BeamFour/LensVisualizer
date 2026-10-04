@@ -219,6 +219,46 @@ What is hidden, and where:
 Folded paths and perspective-control lenses reject `rearPlates`; a camera-fixed plate would otherwise tilt with the
 lens. Lenses whose notes still fold a plate as t/n remain valid; see `src/lens-data/LENS_DATA_SPEC.md`.
 
+### Teleconverter Composition
+
+A detachable rear teleconverter is a `TeleconverterData` entity (`src/types/teleconverter.ts`), not a lens.
+`attachTeleconverter(host, tc)` in `src/optics/prescription/teleconverter.ts` returns an ordinary `LensData` — host
+surfaces, the junction gap, then the converter's surfaces — and that goes through the unchanged `buildLens()`. Nothing
+downstream is converter-aware: the exact tracer, prepared states and every analysis see one sequential lens whose stop
+is the host's. Built-in converters stay on `opticalConfiguration`.
+
+- **Fit and spacing** live in `src/optics/prescription/teleconverterCompatibility.ts`, which has no runtime imports so
+  the build script can load it under plain Node. `teleconverterCompatibility()` returns the composed spacing or the
+  first failing rule; field semantics are in `src/lens-data/TELECONVERTER_DATA_SPEC.md`.
+- **Spacing is air-equivalent.** The converter is placed by its virtual object (`masterImageDistanceMm` behind its
+  first vertex), so the junction gap is the host's air back focus minus that distance and replaces the host's last gap
+  in its scalar `d`, its `var` table and its `aberrationControl.var` entry. The converter's own plates only convert
+  its authored last gap.
+- **Host plates split around the converter.** A plate whose rear face is at least `masterImageDistanceMm` from the
+  image is lens-side (a drop-in filter) and stays ahead; the rest are camera-side and stay behind. With plates ahead
+  the host's last gap is untouched and the last plate ahead trails into the converter. `expandRearPlates()` reads the
+  descriptor's `platesAhead` and emits those plates before the converter's first surface, so expansion stays the only
+  place plates become surfaces and the MTF worker's strip-and-rebuild reproduces the same stack.
+- **The stop is preserved through `nominalFno`.** `buildLens()` derives the physical stop from `nominalFno` and
+  whole-system EFL, so the composer rescales `nominalFno` at each zoom station by the exact paraxial ratio
+  EFL(composed) / EFL(host). The entrance pupil is then unchanged and the real trace to the stop, which only touches
+  surfaces ahead of it, lands on the same radius. A scalar f-number becomes a per-station array on zoom hosts. The
+  ratio is measured the way `buildLens()` measures EFL: on the plate-expanded prescription, with the first station
+  taken from the surfaces as authored rather than the resolved `var` table.
+- **Metadata `buildLens()` and the controls trust is rescaled** by the same ratio: `focalLengthDesign` (the build
+  throws when it disagrees with the Gaussian EFL), `zoomPositions`, `fstopSeries`, `maxFstop`. `imageCircleMm` is the
+  analysis field radius, so it grows only up to the format diagonal.
+- **Identity:** converter surface labels take the reserved `TC` prefix, element ids continue after the host's, and the
+  composed data carries an `attachedTeleconverter` descriptor. `validateLensData()` accepts the prefix only with the
+  descriptor and requires the prefixed surfaces to be exactly the trailing block; `LensDataInput` omits the descriptor
+  so catalog files cannot author it. A converter group annotation is added only when the host authors `groups`,
+  because authored groups replace the group-movement overlay's element-span fallback.
+- **Validation:** `validateTeleconverterData()` merges the converter behind a powerless reference host and reuses
+  `validateLensData()` under default thresholds, then checks the converter's own paraxial conjugate and magnification.
+
+Not composable: folded or mirror hosts, fisheye projections, and perspective-control hosts (the movement model poses
+the whole prescription while a converter is camera-fixed).
+
 ## optics.ts
 
 `src/optics/optics.ts` is the stable barrel for commonly consumed pure optics helpers. Continue importing from this

@@ -93,6 +93,10 @@ Existing tests cover:
   analysis-file metadata/section floor (`analysisFiles.test.ts`), exact focus-keyframe reproduction
   (`focusKeyframes.test.ts`), and shared-prescription parity across switchable configuration groups
   (`opticalConfigurationParity.test.ts`, which requires a contract entry for every `opticalConfiguration` group).
+- Teleconverters, which never enter `LENS_CATALOG` (`teleconverterCompatibility.test.ts`): every converter validates;
+  every converter–host pair the fit predicate allows composes, builds, passes the axial beam and keeps the host's
+  stop; and a synthetic universal converter is composed onto every catalog lens to hold the stop-preservation
+  invariant across zoom tables, embedded stops and rear plates on either side of the converter.
 - Golden-value trace regressions (`exactTraceGoldenValues.test.ts`): pinned EFL, image-plane, marginal/skew ray, fisheye
   chief-ray, and folded-fixture values for reference designs, plus Schott datasheet anchors for N-BK7/SF6 in
   `dispersion.test.ts`. These complement the finite/unclipped catalog smoke test — if a pin moves, absolute trace or
