@@ -36,6 +36,8 @@ export interface SurfaceIntersectionOptions {
   bracketSamples?: number;
   refractiveIndex?: number;
   directionNormalized?: boolean;
+  /** Authored asphere radius; exterior hits remain diagnostic when the ray misses the cap. */
+  clearRadius?: number;
 }
 
 /** Successful ray/surface intersection with geometry at the hit point. */
@@ -91,6 +93,44 @@ export function intersectSurfaceProfile(
   ray: Ray3,
   profile: SurfaceProfile,
   vertexZ: number,
+  options: SurfaceIntersectionOptions = {},
+): SurfaceIntersectionResult {
+  const hit = intersectProfile(ray, profile, vertexZ, options);
+  if (!hit.ok) return hit;
+  const radius = options.clearRadius;
+  if (profile.kind !== "aspheric" || !(radius !== undefined && Number.isFinite(radius) && radius > 0)) return hit;
+
+  // Only the authored cap contains optical material. Retain the exterior hit if no cap hit exists,
+  // so ordinary aperture misses still report their first clip instead of becoming transmitted rays.
+  const direction = options.directionNormalized ? ray.direction : normalize(ray.direction);
+  if (!direction) return hit;
+  const speed2 = direction[0] ** 2 + direction[1] ** 2;
+  const dotXY = ray.origin[0] * direction[0] + ray.origin[1] * direction[1];
+  const offset = ray.origin[0] ** 2 + ray.origin[1] ** 2 - radius ** 2;
+  let minT = options.minT ?? 0;
+  let maxT = options.maxT ?? Infinity;
+  if (speed2 === 0) {
+    if (offset > 0) return hit;
+  } else {
+    const discriminant = dotXY ** 2 - speed2 * offset;
+    if (discriminant < 0) return hit;
+    const root = Math.sqrt(discriminant);
+    minT = Math.max(minT, (-dotXY - root) / speed2);
+    maxT = Math.min(maxT, (-dotXY + root) / speed2);
+  }
+  if (!isValidBounds(minT, maxT) || !Number.isFinite(maxT)) return hit;
+  const capHit = intersectProfile(ray, profile, vertexZ, { ...options, minT, maxT }, true);
+  // A numerical failure inside the cap is unresolved, not proof that only the exterior root exists.
+  if (!capHit.ok && capHit.failureReason === "noBracket") return hit;
+  // Keep established numerics when the ordered cap search confirms the same root.
+  if (capHit.ok && hit.ok && Math.abs(capHit.t - hit.t) <= INTERSECTION_TOLERANCE * 10) return hit;
+  return capHit;
+}
+
+function intersectProfile(
+  ray: Ray3,
+  profile: SurfaceProfile,
+  vertexZ: number,
   {
     minT = 0,
     maxT = Infinity,
@@ -100,6 +140,7 @@ export function intersectSurfaceProfile(
     refractiveIndex,
     directionNormalized = false,
   }: SurfaceIntersectionOptions = {},
+  ordered = false,
 ): SurfaceIntersectionResult {
   const direction = directionNormalized ? ray.direction : normalize(ray.direction);
   if (!direction) return failure("invalidDirection", null, 0);
@@ -116,7 +157,7 @@ export function intersectSurfaceProfile(
   const domainRadius = profile.finiteRadiusLimit();
   const evalAt = (t: number): SurfaceEvaluation =>
     evaluateProfile(ray.origin, direction, profile, vertexZ, t, domainRadius);
-  const bracket = findBracket(evalAt, minT, maxT, tolerance, bracketSamples);
+  const bracket = findBracket(evalAt, minT, maxT, tolerance, bracketSamples, ordered);
   if (bracket.kind === "success")
     return makeSuccess(bracket.value, profile, vertexZ, tolerance, refractiveIndex, bracket.iterations);
   if (bracket.kind === "failure") return failure(bracket.failureReason, bracket.residual, bracket.iterations);
@@ -233,6 +274,7 @@ function findBracket(
   maxT: number,
   tolerance: number,
   bracketSamples: number,
+  ordered: boolean,
 ): BracketResult {
   const loEval = evalAt(minT);
   const loValid = isFiniteValueEvaluation(loEval);
@@ -240,8 +282,9 @@ function findBracket(
 
   const hiEval = evalAt(maxT);
   const hiValid = isFiniteValueEvaluation(hiEval);
-  if (hiValid && Math.abs(hiEval.value) <= tolerance) return { kind: "success", value: hiEval, iterations: 0 };
-  if (loValid && hiValid && !sameSign(loEval.value, hiEval.value))
+  if (!ordered && hiValid && Math.abs(hiEval.value) <= tolerance)
+    return { kind: "success", value: hiEval, iterations: 0 };
+  if (!ordered && loValid && hiValid && !sameSign(loEval.value, hiEval.value))
     return { kind: "bracket", lo: minT, hi: maxT, fLo: loEval.value };
 
   /* Scan for the first sign change between surface points. Points outside the surface's domain are skipped, but

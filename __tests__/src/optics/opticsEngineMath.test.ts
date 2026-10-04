@@ -3,6 +3,7 @@ import { conicPolySag, sag, sagSlopeRaw } from "../../../src/optics/optics.js";
 import type { AsphericCoefficients } from "../../../src/types/optics.js";
 import type { Vec3 } from "../../../src/optics/types.js";
 import { createSurfaceProfile, createTiltedPlaneProfile } from "../../../src/optics/math/surfaceProfile.js";
+import { intersectSagSurface } from "../../../src/optics/internal/surfaceIntersection.js";
 import { intersectSurfaceProfile } from "../../../src/optics/math/intersection.js";
 import {
   cross,
@@ -396,5 +397,85 @@ describe("Optics engine surface intersections", () => {
     expect(hit.radius).toBeGreaterThan(3.9);
     expect(hit.radius).toBeLessThan(4);
     expectClose(hit.point[2], profile.sag(hit.radius), 1e-9);
+  });
+});
+
+// Small shared-engine regression: a sixth-order continuation has an exterior root before the authored cap.
+// This must remain independent of a catalog prescription and exercise both intersection entry points.
+describe("authored asphere cap selection", () => {
+  const asphere: AsphericCoefficients = { K: 0, A4: 0.04, A6: -0.004, A8: 0, A10: 0, A12: 0, A14: 0 };
+  const profile = createSurfaceProfile({ R: 1e15 }, asphere);
+  const ray = { origin: [0, 7.5, -5] as Vec3, direction: normalize([0, -1, 1])! };
+
+  it("replaces an exterior polynomial root with the first cap hit", () => {
+    const exterior = intersectSurfaceProfile(ray, profile, 0, { maxT: 15 });
+    const physical = intersectSurfaceProfile(ray, profile, 0, { maxT: 15, clearRadius: 2.5 });
+    const legacy = intersectSagSurface(
+      { origin: [...ray.origin], direction: [...ray.direction] },
+      0,
+      0,
+      { S: [{ R: 1e15, sd: 2.5 }], asphByIdx: { 0: asphere } },
+      { maxT: 15 },
+    );
+    expect(exterior.ok && exterior.radius).toBeCloseTo(3.417823094641, 8);
+    for (const hit of [physical, legacy]) {
+      expect(hit.ok).toBe(true);
+      if (!hit.ok) continue;
+      expect(hit.radius).toBeCloseTo(2.076820214007, 8);
+      expect(hit.point[2]).toBeCloseTo(0.423179785993, 8);
+    }
+  });
+
+  it("preserves exterior first-clip geometry when the ray misses the cap", () => {
+    const original = intersectSurfaceProfile(ray, profile, 0, { maxT: 15 });
+    expect(intersectSurfaceProfile(ray, profile, 0, { maxT: 15, clearRadius: 2 })).toEqual(original);
+    const axialMiss = { origin: [0, 3.5, -5] as Vec3, direction: [0, 0, 1] as Vec3 };
+    expect(intersectSurfaceProfile(axialMiss, profile, 0, { maxT: 15, clearRadius: 2.5 })).toEqual(
+      intersectSurfaceProfile(axialMiss, profile, 0, { maxT: 15 }),
+    );
+  });
+
+  it.each([-1, 1])("uses ray-distance order for convex/concave and forward/backward paths (%s)", (sign) => {
+    const coefficients = { ...asphere, A4: sign * asphere.A4, A6: sign * asphere.A6 };
+    const p = createSurfaceProfile({ R: 1e15 }, coefficients);
+    const r = { origin: [0, 7.5, -5 * sign] as Vec3, direction: normalize([0, -1, sign])! };
+    const hit = intersectSurfaceProfile(r, p, 0, { maxT: 15, clearRadius: 2.5 });
+    expect(hit.ok).toBe(true);
+    if (hit.ok) {
+      expect(hit.radius).toBeCloseTo(2.076820214007, 8);
+      expect(hit.point[2]).toBeCloseTo(sign * 0.423179785993, 8);
+    }
+  });
+
+  it("does not reinterpret spherical, flat, or tilted-plane aperture misses", () => {
+    for (const p of [
+      createSurfaceProfile({ R: 50 }),
+      createSurfaceProfile({ R: 1e15 }),
+      createTiltedPlaneProfile({ y: 1, z: 1 }),
+    ]) {
+      expect(intersectSurfaceProfile(ray, p, 0, { maxT: 15, clearRadius: 1 })).toEqual(
+        intersectSurfaceProfile(ray, p, 0, { maxT: 15 }),
+      );
+    }
+  });
+
+  it("selects the first physical root even when the final endpoint is also a root", () => {
+    // sag = r³(r - 1)(r - 2)(r - 3): the ray meets r=3 outside the cap, then r=2, r=1, and r=0.
+    const p = createSurfaceProfile({ R: 1e15 }, { K: 0, A3: -6, A4: 11, A5: -6, A6: 1, A8: 0, A10: 0, A12: 0, A14: 0 });
+    const r = { origin: [0, 4, 0] as Vec3, direction: [0, -1, 0] as Vec3 };
+    const hit = intersectSurfaceProfile(r, p, 0, { maxT: 4, clearRadius: 2.5 });
+    expect(hit.ok).toBe(true);
+    if (hit.ok) expect(hit.radius).toBeCloseTo(2, 8);
+  });
+
+  it("keeps invalid input and failed cap convergence explicit", () => {
+    expect(intersectSurfaceProfile(ray, profile, 0, { minT: -1, maxT: 15, clearRadius: 2.5 })).toMatchObject({
+      ok: false,
+      failureReason: "invalidBounds",
+    });
+    expect(intersectSurfaceProfile(ray, profile, 0, { maxT: 15, clearRadius: 2.5, maxIterations: 0 })).toMatchObject({
+      ok: false,
+      failureReason: "noConvergedIntersection",
+    });
   });
 });
