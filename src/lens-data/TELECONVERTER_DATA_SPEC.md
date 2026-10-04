@@ -75,10 +75,11 @@ plate and a host that folds it into its back focus resolve to the same system:
 - Final gap = converter back focus (air) − the host plates behind the converter (air). The converter's own
   `rearPlates` only convert its authored last gap and are never emitted.
 
-A host's `rearPlates` can hold two kinds of plate, and the converter goes between them. A plate whose rear face is at
-least `masterImageDistanceMm` (air-equivalent) from the image is a lens-side plate — a drop-in filter tens of
-millimetres ahead of the sensor — and stays ahead of the converter; the host's last gap is then left alone and the
-junction gap follows that plate. Every other plate is camera-side cover glass and stays behind the converter.
+A host's required drop-in filter is a drawn element ([LENS_DATA_SPEC.md](LENS_DATA_SPEC.md) § Scope), so it is simply
+the host's last surface and the converter follows it. `rearPlates` holds camera-side plates, which stay behind the
+converter. The engine still splits them by position in case a file lists a plate far ahead of the sensor: a plate
+whose rear face is at least `masterImageDistanceMm` (air-equivalent) from the image stays ahead of the converter, the
+host's last gap is then left alone and the junction gap follows that plate.
 
 ## Compatibility
 

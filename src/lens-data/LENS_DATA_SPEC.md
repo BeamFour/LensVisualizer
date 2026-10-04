@@ -30,14 +30,20 @@ Per-lens patent audit logs use `*.audit.md` alongside the data file. They are no
 - Variable air gaps for focus and zoom
 - Mirror or blocking surfaces that participate in a folded path
 - Annular clear apertures or central obstructions when they are optically meaningful
-- **Required in-lens drop-in / slip-in filters** — a plane plate the source prescription lists ahead of the last lens
-  surface, when the manufacturer says a filter must stay inserted (super-telephoto filter holders shipped with an NC
-  or clear filter). Author it at the source position as two flat surfaces and a drawn `Plane-Parallel Plate` element
-  with the source's physical gaps; never fold t/n into a neighbouring air gap. Keep it out of `elementCount`.
+- **Required drop-in / slip-in filters** — a plane plate the source prescription lists at the lens's own filter
+  holder, whether ahead of the last lens surface or behind it, when the lens is computed with a filter in place
+  (super-telephoto holders shipped with an NC or clear filter). It belongs to the lens: a teleconverter mounts behind
+  it. Author it at the source position as two flat surfaces and a drawn `Plane-Parallel Plate` element with the
+  source's physical gaps; never fold t/n into a neighbouring air gap. When the source gives no clear aperture, size
+  the semi-diameter by ray trace — the largest height on the plate of any ray that reaches the image format or the
+  diagram's off-axis field, at every focus and zoom end, plus 5%, rounded up to 0.5 mm — and log the estimate in the
+  `*.audit.md` sidecar. Count it in `elementCount` only when the maker's published count includes it.
 
 **Model through `rearPlates`, not as surfaces or elements:**
-- **Sensor glass / cover glass and rear filter plates** that the source prescription lists behind the last lens
-  surface (cover glass, IR-cut / low-pass stacks, rear drop-in filters). See [Rear Plates](#rear-plates-rearplates).
+- **Camera-side plates** the source prescription lists behind the last lens surface: sensor cover glass and IR-cut /
+  low-pass stacks, which sit a few millimetres ahead of the image and stay with the camera when the lens or a
+  teleconverter changes. See [Rear Plates](#rear-plates-rearplates). A drop-in filter in the lens's own holder is not
+  one of these, even when it is the last glass in the prescription.
 
 **Do NOT include:**
 - **Optional front or mid-lens filters** — accessory UV, ND, polarizing or protection plates mounted ahead of or
@@ -267,8 +273,8 @@ patentAssignees: ["Canon Inc."],
 
 ## Rear Plates (`rearPlates`)
 
-Use `rearPlates` when the source prescription lists plane-parallel plates between the last lens surface and the image
-plane: sensor cover glass, IR-cut or low-pass stacks, or a rear filter. Copy the source values as printed:
+Use `rearPlates` when the source prescription lists camera-side plane-parallel plates between the last lens surface and
+the image plane: sensor cover glass and IR-cut or low-pass stacks. Copy the source values as printed:
 
 ```ts
 surfaces: [
@@ -314,7 +320,8 @@ Rules:
   migrating.
 - BFD in the Summary tab and cardinal overlay is measured from the last lens vertex, so it includes the plates.
 - Not supported with `opticalPath` / non-refracting surfaces or with `perspectiveControl`. Keep the air-equivalent fold
-  for those lenses. A plate ahead of the last lens surface cannot use `rearPlates`; see What to Include.
+  for those lenses. A plate ahead of the last lens surface cannot use `rearPlates`, and a drop-in filter in the lens's
+  own holder is a drawn element wherever it sits; see What to Include.
 - Do not invent a camera stack: use `rearPlates` only for plates the source lists.
 
 ## Element Bulk Absorption

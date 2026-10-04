@@ -235,7 +235,8 @@ is the host's. Built-in converters stay on `opticalConfiguration`.
   in its scalar `d`, its `var` table and its `aberrationControl.var` entry. The converter's own plates only convert
   its authored last gap.
 - **Host plates split around the converter.** A plate whose rear face is at least `masterImageDistanceMm` from the
-  image is lens-side (a drop-in filter) and stays ahead; the rest are camera-side and stay behind. With plates ahead
+  image is lens-side and stays ahead; the rest are camera-side and stay behind. Drop-in filters are authored as drawn
+  elements, so the split only matters for a file that lists some other plate far ahead of the sensor. With plates ahead
   the host's last gap is untouched and the last plate ahead trails into the converter. `expandRearPlates()` reads the
   descriptor's `platesAhead` and emits those plates before the converter's first surface, so expansion stays the only
   place plates become surfaces and the MTF worker's strip-and-rebuild reproduces the same stack.

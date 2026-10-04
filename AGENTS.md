@@ -91,8 +91,9 @@ Read the smallest relevant doc before changing an area. `agent_docs/README.md` i
 - Folded-system complex analysis stays guarded until the specific path is mirror-safe: the drawer guards coma,
   distortion, vignetting, and pupils, and field curvature/astigmatism stays section-guarded inside the Aberrations tab.
   Details in `agent_docs/architecture/optics-engine.md`.
-- Source-listed rear cover glass / filter plates go in `LensData.rearPlates` with the source's physical gaps; never fold
-  t/n into the last gap by hand. `buildLens()` traces them everywhere and hides them from drawing via `synthetic`.
+- Source-listed camera-side cover glass / filter plates go in `LensData.rearPlates` with the source's physical gaps;
+  never fold t/n into the last gap by hand. `buildLens()` traces them everywhere and hides them from drawing via
+  `synthetic`. A required drop-in filter in the lens's own holder is a drawn `Plane-Parallel Plate` element instead.
 - Detachable teleconverters are `*.teleconverter.ts` entities composed onto a host by `attachTeleconverter()` before
   `buildLens()`; never author a host + converter copy, and keep `buildLens()` and analyses converter-unaware. Built-in
   converters stay on `opticalConfiguration`.

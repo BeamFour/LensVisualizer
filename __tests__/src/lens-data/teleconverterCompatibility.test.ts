@@ -121,13 +121,13 @@ describe("teleconverter catalog", () => {
 
   it("keeps every host's stop when a synthetic universal converter is composed onto it", () => {
     /* The real catalog pairs above are few. The composer's central promise — the host's iris does not change —
-       depends on how each host is authored (zoom tables, rear plates ahead of or behind the converter, embedded
-       stops, authored gaps that differ slightly from their focus tables), so it is checked against every lens with a
-       synthetic converter made universal for that lens's mounts. A pair that fails to build is a fit problem the
-       real sweep reports for real converters, not an engine failure, and is only counted here. */
+       depends on how each host is authored (zoom tables, rear plates, drop-in filters, embedded stops, authored gaps
+       that differ slightly from their focus tables), so it is checked against every lens with a synthetic converter
+       made universal for that lens's mounts. A pair that fails to build is a fit problem the real sweep reports for
+       real converters, not an engine failure, and is only counted here. Plates ahead of the converter are covered by
+       the synthetic fixtures in teleconverter.test.ts: the catalog authors drop-in filters as drawn elements. */
     const offenders: string[] = [];
     let built = 0;
-    let withPlateAhead = 0;
 
     for (const lensKey of ALL_CATALOG_KEYS) {
       const hostData = LENS_CATALOG[lensKey];
@@ -142,7 +142,6 @@ describe("teleconverter catalog", () => {
         continue;
       }
       built++;
-      if (L.data.attachedTeleconverter?.platesAhead) withPlateAhead++;
       const host = buildLens(hostData);
       const drift = Math.max(
         Math.abs(L.stopPhysSD - host.stopPhysSD),
@@ -153,7 +152,6 @@ describe("teleconverter catalog", () => {
     }
 
     expect(built).toBeGreaterThan(100);
-    expect(withPlateAhead).toBeGreaterThan(0);
     expect(offenders).toEqual([]);
   });
 
