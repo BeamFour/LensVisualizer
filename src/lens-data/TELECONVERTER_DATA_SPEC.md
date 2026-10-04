@@ -71,8 +71,13 @@ plate and a host that folds it into its back focus resolve to the same system:
 
 - Junction gap = host back focus (air) − `masterImageDistanceMm`. It replaces the host's last gap in every focus,
   zoom and aberration-control state.
-- Final gap = converter back focus (air) − the host's plate stack (air). The host's `rearPlates` stay behind the
-  converter; the converter's own `rearPlates` only convert its authored last gap and are never emitted.
+- Final gap = converter back focus (air) − the host plates behind the converter (air). The converter's own
+  `rearPlates` only convert its authored last gap and are never emitted.
+
+A host's `rearPlates` can hold two kinds of plate, and the converter goes between them. A plate whose rear face is at
+least `masterImageDistanceMm` (air-equivalent) from the image is a lens-side plate — a drop-in filter tens of
+millimetres ahead of the sensor — and stays ahead of the converter; the host's last gap is then left alone and the
+junction gap follows that plate. Every other plate is camera-side cover glass and stays behind the converter.
 
 ## Compatibility
 
@@ -82,9 +87,9 @@ by the viewer and by the build-time host lists. A converter mounts on a host whe
 1. The two share a mount id.
 2. The converter is `universal`, or the host sets `acceptsTeleconverters: true`.
 3. The host is not in `incompatibleLensKeys` and is not faster than `minHostFno`.
-4. The junction gap and the final gap are at least 0.1 mm in every authored host state.
+4. The junction gap and the final gap are at least 0.1 mm in every authored host state. A host plate the converter's
+   body would have to occupy fails this rule.
 5. The host is an ordinary sequential rectilinear lens: not folded or mirror, not fisheye, not perspective-control.
-6. The host has no rear plate ahead of the converter (a drop-in filter tens of millimetres in front of the image).
 
 A zoom host that clears the converter only over part of its range is excluded entirely.
 
@@ -119,5 +124,7 @@ Authors do not write composed data, but the conventions matter when reading the 
   surfaces may not use that prefix.
 - The host's stop is the system stop. `nominalFno` is rescaled per zoom station by the exact focal ratio so the
   physical iris is unchanged.
+- Lens-side host plates are expanded between the host's last surface and the converter; the descriptor's `platesAhead`
+  records how many.
 - The composed data carries an `attachedTeleconverter` descriptor. It is written only by the composer and is not an
   authorable lens field.

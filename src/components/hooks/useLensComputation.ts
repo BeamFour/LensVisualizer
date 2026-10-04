@@ -265,8 +265,9 @@ export default function useLensComputation({
   const varReadouts: VarReadout[] = L
     ? L.varLabels.map(([idx, label]) => {
         const val = thick(idx, focusT, zoomT, L, aberrationT).toFixed(2);
-        /* With modeled rear plates the last lens gap ends at the plate stack, not the sensor. */
-        const toPlate = idx === L.lastLensSurfaceIdx && idx < L.N - 1;
+        /* With modeled rear plates a lens gap can end at a plate rather than the sensor. That is the last lens
+           gap for an ordinary lens, and the host's last gap when a lens-side plate sits ahead of a teleconverter. */
+        const toPlate = L.S[idx + 1]?.synthetic !== undefined;
         return { label: toPlate ? `${label} (to plate)` : label, val };
       })
     : [];

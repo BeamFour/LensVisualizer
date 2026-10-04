@@ -427,6 +427,12 @@ function validateAttachedTeleconverter(data: UntrustedLensData, errors: string[]
   if (!Number.isInteger(info.firstElementId) || info.firstElementId <= 0) {
     errors.push(`"attachedTeleconverter.firstElementId" must be a positive integer`);
   }
+  if (info.platesAhead !== undefined) {
+    const plateCount = Array.isArray(data.rearPlates) ? data.rearPlates.length : 0;
+    if (!Number.isInteger(info.platesAhead) || info.platesAhead < 1 || info.platesAhead > plateCount) {
+      errors.push(`"attachedTeleconverter.platesAhead" must count leading "rearPlates" (1..${plateCount})`);
+    }
+  }
   if (data.acceptsTeleconverters !== undefined) {
     errors.push(`A composed teleconverter system cannot declare "acceptsTeleconverters" (converters do not stack)`);
   }
@@ -1541,7 +1547,30 @@ export default function validateLensData(data: UntrustedLensData): string[] {
    *  from the two boundary surfaces that face each other does not exceed the
    *  configured fraction of the gap thickness.
    */
-  _checkCrossGapOverlap(S, asphByIdx, null, errors, "", data.gapSagFrac);
+  /* A lens-side plate ahead of an attached teleconverter is expanded between the host's last surface and the
+   * converter, so the authored gap there ends at the plate. The junction is checked against the full vertex
+   * separation instead: authored gap + the plates ahead and their trailing gaps. */
+  const platesAhead = Number.isInteger(data.attachedTeleconverter?.platesAhead)
+    ? (data.attachedTeleconverter.platesAhead as number)
+    : 0;
+  const junctionIdx = platesAhead > 0 ? labelToIdx[data.attachedTeleconverter.firstSurfaceLabel] - 1 : -1;
+  const junctionPlateSpanMm =
+    junctionIdx >= 0 && Array.isArray(data.rearPlates)
+      ? data.rearPlates
+          .slice(0, platesAhead)
+          .reduce(
+            (sum: number, plate: UntrustedLensData) => sum + (plate?.thicknessMm ?? 0) + (plate?.gapAfterMm ?? 0),
+            0,
+          )
+      : 0;
+  const withJunctionSpan = (gapOverrides: Record<number, number>): Record<number, number> => {
+    if (junctionIdx >= 0 && typeof S[junctionIdx]?.d === "number") {
+      gapOverrides[junctionIdx] = (gapOverrides[junctionIdx] ?? S[junctionIdx].d) + junctionPlateSpanMm;
+    }
+    return gapOverrides;
+  };
+
+  _checkCrossGapOverlap(S, asphByIdx, junctionIdx >= 0 ? withJunctionSpan({}) : null, errors, "", data.gapSagFrac);
 
   /* For zoom lenses, also check at each zoom position's variable thickness.
    * Air gaps can change dramatically across zoom positions. */
@@ -1561,7 +1590,7 @@ export default function validateLensData(data: UntrustedLensData): string[] {
       _checkCrossGapOverlap(
         S,
         asphByIdx,
-        gapOverrides,
+        withJunctionSpan(gapOverrides),
         errors,
         ` at zoom position ${zi} (${data.zoomPositions[zi]} mm)`,
         data.gapSagFrac,

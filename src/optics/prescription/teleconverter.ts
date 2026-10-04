@@ -20,6 +20,7 @@ import { IMAGE_FORMAT_BY_ID, isImageFormatId } from "../../utils/catalog/lensTax
 import { projectionFieldAngleForImageHeight2, projectionImageHeightForAngle2 } from "../field/projection.js";
 import { buildLabelIndex, buildStateSurfaces, buildVarIndex, zoomIndexToT } from "../internal/lensState.js";
 import { traceSurfacesParaxial } from "../internal/traceSurfaces.js";
+import { expandRearPlates } from "./rearPlates.js";
 import { TELECONVERTER_LABEL_PREFIX, teleconverterCompatibility } from "./teleconverterCompatibility.js";
 
 /** Readout label for the host's last gap once it ends at the converter instead of the image plane. */
@@ -74,10 +75,13 @@ function round(value: number, decimals: number): number {
  * Shared by `attachTeleconverter()` and teleconverter validation, which merges behind a powerless reference host
  * whose focal ratio is undefined.
  *
- * - The host's last gap (scalar, focus/zoom table and aberration-control entry) becomes the junction gap.
+ * - The host's last gap (scalar, focus/zoom table and aberration-control entry) becomes the junction gap. When a
+ *   lens-side plate sits ahead of the converter the last gap is left alone — it still ends at that plate — and
+ *   the junction becomes that plate's trailing gap instead.
  * - Converter labels get the reserved prefix and element ids continue after the host's, so every label- and
  *   id-keyed map (`asph`, `var`, annotations, element selection) stays unambiguous.
- * - Host `rearPlates` are kept: `buildLens()` expands them behind the converter's last surface.
+ * - Host `rearPlates` are kept: `expandRearPlates()` emits the `platesAhead` leading ones in front of the
+ *   converter and the rest behind its last surface.
  *
  * @param host - host lens data
  * @param tc - teleconverter data
@@ -93,6 +97,15 @@ export function mergeTeleconverterPrescription(
   const junctionLabel = hostLast.label;
   const idOffset = Math.max(0, ...host.elements.map((element) => element.id));
   const lastTcIndex = tc.surfaces.length - 1;
+  const { platesAhead } = geometry;
+  /* With a plate ahead, the label the host gives its last gap ("BF", "to plate") is still accurate. */
+  const junctionIsLastGap = platesAhead === 0;
+  const rearPlates =
+    platesAhead > 0 && host.rearPlates
+      ? host.rearPlates.map((plate, index) =>
+          index === platesAhead - 1 ? { ...plate, gapAfterMm: geometry.plateJunctionGapMm! } : plate,
+        )
+      : host.rearPlates;
 
   const surfaces: SurfaceData[] = [
     ...host.surfaces.slice(0, -1),
@@ -162,6 +175,7 @@ export function mergeTeleconverterPrescription(
       firstSurfaceLabel: teleconverterSurfaceLabel(tc.surfaces[0].label),
       lastSurfaceLabel: teleconverterSurfaceLabel(tc.surfaces[lastTcIndex].label),
       firstElementId: idOffset + Math.min(...tc.elements.map((element) => element.id)),
+      ...(platesAhead > 0 ? { platesAhead } : {}),
       ...(tc.patentNumber !== undefined ? { patentNumber: tc.patentNumber } : {}),
       ...(tc.patentAuthors !== undefined ? { patentAuthors: tc.patentAuthors } : {}),
     },
@@ -180,7 +194,8 @@ export function mergeTeleconverterPrescription(
           },
         }
       : {}),
-    ...(host.varLabels
+    ...(rearPlates ? { rearPlates } : {}),
+    ...(host.varLabels && junctionIsLastGap
       ? {
           varLabels: host.varLabels.map(([label, text]): [string, string] =>
             label === junctionLabel ? [label, JUNCTION_GAP_LABEL] : [label, text],
@@ -201,23 +216,33 @@ export function mergeTeleconverterPrescription(
  * Gaussian focal length at infinity focus for each zoom station (one entry for a prime).
  *
  * Mirrors the EFL `buildLens()` derives: a unit-height marginal ray traced through the station's surfaces, EFL = −1/u.
+ * Rear plates are expanded first, exactly as `buildLens()` does: a plate ahead of the converter sets how far the
+ * converter sits behind the host, so tracing the authored surfaces alone would misplace it.
+ *
+ * The first entry uses the surfaces as authored rather than the resolved `var` table, because that is the trace
+ * `buildLens()` sizes the physical stop from. Validation lets an authored `d` differ from its `var` infinity value
+ * by up to 1e-6 mm, and resolving the table here would move the stop by that much.
  */
-function infinityFocalLengths(data: LensData): number[] {
+function infinityFocalLengths(authored: LensData): number[] {
+  const data = expandRearPlates(authored);
   const isZoom = Array.isArray(data.zoomPositions) && data.zoomPositions.length >= 2;
   const stationCount = isZoom ? data.zoomPositions!.length : 1;
   const varByIdx = buildVarIndex(data.var, buildLabelIndex(data.surfaces));
   const focalLengths: number[] = [];
   for (let station = 0; station < stationCount; station++) {
-    const surfaces = buildStateSurfaces(
-      data.surfaces,
-      varByIdx,
-      isZoom,
-      0,
-      zoomIndexToT(station, stationCount),
-      {},
-      0,
-      data.focusPositions,
-    );
+    const surfaces =
+      station === 0
+        ? data.surfaces
+        : buildStateSurfaces(
+            data.surfaces,
+            varByIdx,
+            isZoom,
+            0,
+            zoomIndexToT(station, stationCount),
+            {},
+            0,
+            data.focusPositions,
+          );
     focalLengths.push(-1 / traceSurfacesParaxial(surfaces, 1, 0, { skipLastTransfer: true }).u);
   }
   return focalLengths;

@@ -5,6 +5,10 @@
  * `expandRearPlates()` appends two flat refracting surfaces and one synthetic element per plate so the exact
  * tracer, dispersion lookup and every analysis see the plate. The synthetic marker keeps the plate out of
  * drawn element spans, element lists and diagram scale (see `buildElementSpans` and `buildLens`).
+ *
+ * A composed host + teleconverter system is the one case where plates are not all trailing: a lens-side drop-in
+ * filter stays ahead of the converter, so its surfaces are emitted between the host's last surface and the
+ * converter's first.
  */
 
 import type { ElementData, LensData, SurfaceData } from "../../types/optics.js";
@@ -56,6 +60,10 @@ export { rearPlateAirEquivalentMm } from "./teleconverterCompatibility.js";
  * plate thicknesses and trailing gaps are fixed camera-side distances. Lenses without plates are returned unchanged
  * (same object), so the zero-plate path is identity.
  *
+ * With an attached teleconverter, the descriptor's `platesAhead` leading plates go in front of the converter's first
+ * surface; the composer has already set the last of them to trail into the converter. Expansion stays the only
+ * place plates become surfaces, so a rebuild from stripped runtime data (the MTF worker) reproduces the same stack.
+ *
  * @param data - validated lens data after defaults merging
  * @returns lens data whose `surfaces` and `elements` include the synthetic plates
  */
@@ -66,10 +74,19 @@ export function expandRearPlates(data: LensData): LensData {
   const generatedSd =
     GENERATED_SD_FACTOR * Math.max(...data.surfaces.map((surface) => surface.sd), imageSemiDiagonalMm(data));
   let nextElementId = Math.max(0, ...data.elements.map((element) => element.id)) + 1;
-  const surfaces: SurfaceData[] = [...data.surfaces];
+  const teleconverter = data.attachedTeleconverter;
+  const platesAhead = teleconverter?.platesAhead ?? 0;
+  const converterStart =
+    platesAhead > 0
+      ? data.surfaces.findIndex((surface) => surface.label === teleconverter!.firstSurfaceLabel)
+      : data.surfaces.length;
+  /* Plates ahead of a converter are collected here and spliced in before it; the rest append as usual. */
+  const aheadSurfaces: SurfaceData[] = [];
+  const trailingSurfaces: SurfaceData[] = [];
   const elements: ElementData[] = [...data.elements];
 
   plates.forEach((plate, plateIndex) => {
+    const surfaces = plateIndex < platesAhead ? aheadSurfaces : trailingSurfaces;
     const elemId = nextElementId++;
     const [frontLabel, rearLabel] = rearPlateSurfaceLabels(plateIndex);
     const sd = plate.sd ?? generatedSd;
@@ -96,7 +113,16 @@ export function expandRearPlates(data: LensData): LensData {
     );
   });
 
-  return { ...data, surfaces, elements };
+  return {
+    ...data,
+    surfaces: [
+      ...data.surfaces.slice(0, converterStart),
+      ...aheadSurfaces,
+      ...data.surfaces.slice(converterStart),
+      ...trailingSurfaces,
+    ],
+    elements,
+  };
 }
 
 /**

@@ -44,8 +44,11 @@ it("rebuilds serializable prescriptions in the worker and matches the pure engin
     rearPlates: [REAR_PLATE_FIXTURE, { ...REAR_PLATE_FIXTURE, gapAfterMm: 20 }],
   });
   // A composed host + converter prescription must rebuild too: its reserved labels are only valid
-  // alongside the descriptor, and its host plate has to re-expand behind the converter.
-  const hostData = teleconverterHostData({ plates: [REAR_PLATE_FIXTURE] });
+  // alongside the descriptor, and its host plates have to re-expand on the right side of the converter —
+  // the drop-in filter ahead of it, the cover glass behind.
+  const hostData = teleconverterHostData({
+    plates: [{ ...REAR_PLATE_FIXTURE, label: "F", gapAfterMm: 38 }, REAR_PLATE_FIXTURE],
+  });
   const converterData = teleconverterFixture();
   const converted = build(
     attachTeleconverter(

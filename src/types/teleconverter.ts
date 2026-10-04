@@ -67,6 +67,11 @@ export interface AttachedTeleconverterInfo {
   lastSurfaceLabel: string;
   /** Smallest composed element id belonging to the converter. */
   firstElementId: number;
+  /**
+   * Number of leading host `rearPlates` that sit ahead of the converter (a lens-side drop-in filter).
+   * `expandRearPlates()` emits those between the host's last surface and the converter; the rest stay behind it.
+   */
+  platesAhead?: number;
   patentNumber?: string;
   patentAuthors?: string[];
 }
@@ -81,13 +86,19 @@ export type TeleconverterIncompatibility =
   | "projection"
   | "perspective-control"
   | "host-too-fast"
-  | "lens-side-plate"
   | "clearance";
 
 /** Axial spacing of a composed host + converter system, in mm. */
 export interface TeleconverterGeometry {
-  /** Added to every authored value of the host's last gap to turn it into the host-to-converter junction gap. */
+  /** Leading host rear plates that sit ahead of the converter; 0 when every plate is camera-side. */
+  platesAhead: number;
+  /**
+   * Added to every authored value of the host's last gap to turn it into the host-to-converter junction gap.
+   * 0 when a lens-side plate is ahead: the host's last gap still ends at that plate.
+   */
   lastGapShiftMm: number;
+  /** Gap from the last lens-side plate's rear face to the converter; null when no plate is ahead. */
+  plateJunctionGapMm: number | null;
   /** Smallest junction gap across every authored host focus, zoom and aberration-control state. */
   minJunctionGapMm: number;
   /** Composed final gap: converter last vertex to the host's first rear plate, or to the image plane. */

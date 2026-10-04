@@ -14,6 +14,7 @@ import {
   teleconverterOptionsForLens,
 } from "../../../src/utils/catalog/teleconverterCatalog.js";
 import type { RuntimeLens } from "../../../src/types/optics.js";
+import { teleconverterFixture } from "../optics/testLensFixtures.js";
 
 /** Largest hidden render trim tolerated on a converter element, matching the production-lens diagnostics sweep. */
 const MATERIAL_TRIM_TOLERANCE_MM = 0.25;
@@ -114,6 +115,44 @@ describe("teleconverter catalog", () => {
 
     /* Zero pairs would mean the sweep stopped seeing the catalog rather than that everything passed. */
     expect(pairs).toBeGreaterThan(0);
+    expect(offenders).toEqual([]);
+  });
+
+  it("keeps every host's stop when a synthetic universal converter is composed onto it", () => {
+    /* The real catalog pairs above are few. The composer's central promise — the host's iris does not change —
+       depends on how each host is authored (zoom tables, rear plates ahead of or behind the converter, embedded
+       stops, authored gaps that differ slightly from their focus tables), so it is checked against every lens with a
+       synthetic converter made universal for that lens's mounts. A pair that fails to build is a fit problem the
+       real sweep reports for real converters, not an engine failure, and is only counted here. */
+    const offenders: string[] = [];
+    let built = 0;
+    let withPlateAhead = 0;
+
+    for (const lensKey of ALL_CATALOG_KEYS) {
+      const hostData = LENS_CATALOG[lensKey];
+      if (!hostData.lensMounts) continue;
+      const tc = teleconverterFixture({ universal: true, lensMounts: hostData.lensMounts });
+      if (!teleconverterCompatibility(hostData, tc).ok) continue;
+
+      let L: RuntimeLens;
+      try {
+        L = buildLens(attachTeleconverter(hostData, tc));
+      } catch {
+        continue;
+      }
+      built++;
+      if (L.data.attachedTeleconverter?.platesAhead) withPlateAhead++;
+      const host = buildLens(hostData);
+      const drift = Math.max(
+        Math.abs(L.stopPhysSD - host.stopPhysSD),
+        ...(host.zoomStopSDs ?? []).map((sd, station) => Math.abs((L.zoomStopSDs?.[station] ?? NaN) - sd)),
+        ...(host.zoomEPs ?? []).map((epSD, station) => Math.abs((L.zoomEPs?.[station] ?? NaN) - epSD)),
+      );
+      if (!(drift <= 1e-9)) offenders.push(`${lensKey}: stop or pupil moved by ${drift.toExponential(2)} mm`);
+    }
+
+    expect(built).toBeGreaterThan(100);
+    expect(withPlateAhead).toBeGreaterThan(0);
     expect(offenders).toEqual([]);
   });
 

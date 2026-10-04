@@ -11,6 +11,7 @@ import {
   teleconverterCompatibility,
   teleconverterGeometry,
 } from "../../../../src/optics/prescription/teleconverterCompatibility.js";
+import validateLensData from "../../../../src/optics/validateLensData.js";
 import validateTeleconverterData from "../../../../src/optics/validateTeleconverterData.js";
 import type { LensData, RuntimeLens } from "../../../../src/types/optics.js";
 import type { TeleconverterIncompatibility } from "../../../../src/types/teleconverter.js";
@@ -68,9 +69,14 @@ describe("teleconverterCompatibility", () => {
         {},
       ],
       ["host-too-fast", teleconverterHostData(), { minHostFno: 2.8 }],
-      /* A drop-in filter 40 mm ahead of the image sits in front of a converter whose object distance is 30 mm. */
-      ["lens-side-plate", teleconverterHostData({ plates: [{ ...REAR_PLATE_FIXTURE, gapAfterMm: 40 }] }), {}],
       ["clearance", teleconverterHostData(), { masterImageDistanceMm: 60 }],
+      /* A plate behind the converter's first vertex but too deep to fit behind its last one: the converter's body
+         would have to occupy it. */
+      [
+        "clearance",
+        teleconverterHostData({ plates: [{ ...REAR_PLATE_FIXTURE, thicknessMm: 30, gapAfterMm: 29 }] }),
+        {},
+      ],
     ];
 
     for (const [reason, host, tcOverrides] of cases) {
@@ -96,6 +102,74 @@ describe("teleconverterCompatibility", () => {
     expect(geometry.minJunctionGapMm).toBeCloseTo(0.05, 9);
     expect(geometry.minJunctionGapMm).toBeLessThan(MIN_TELECONVERTER_GAP_MM);
     expect(teleconverterCompatibility(host, tc)).toEqual({ ok: false, reason: "clearance" });
+  });
+});
+
+describe("host rear plates around a teleconverter", () => {
+  const tc = teleconverterFixture();
+  /* 40 mm ahead of the image is in front of a converter whose object distance is 30 mm: a lens-side drop-in filter. */
+  const dropIn = { ...REAR_PLATE_FIXTURE, label: "F", gapAfterMm: 40 };
+
+  it("keeps a lens-side plate ahead of the converter and leaves the host's last gap alone", () => {
+    const hostData = teleconverterHostData({ plates: [dropIn], lastGapFocusOffsets: [0, 3] });
+    const geometry = teleconverterGeometry(hostData, tc);
+    const composedData = attachTeleconverter(hostData, tc);
+    const composed = build(composedData);
+
+    expect(geometry).toMatchObject({ platesAhead: 1, lastGapShiftMm: 0 });
+    expect(geometry.plateJunctionGapMm).toBeCloseTo(10, 9);
+    expect(geometry.minJunctionGapMm).toBeCloseTo(10, 9);
+    expect(composedData.surfaces[2].d).toBe(lastGapOf(hostData));
+    expect(composedData.var!["2"]).toEqual(hostData.var!["2"]);
+    expect(composedData.varLabels).toEqual([["2", "BF"]]);
+    expect(composedData.attachedTeleconverter?.platesAhead).toBe(1);
+    expect(composed.S.map((surface) => surface.label)).toEqual(["STO", "1", "2", "RP1a", "RP1b", "TC1", "TC2"]);
+    expect(composed.S[4].d).toBeCloseTo(10, 9);
+    expect(composed.lastLensSurfaceIdx).toBe(6);
+  });
+
+  it("gives the same first-order system whether the plate is modeled or folded into the back focus", () => {
+    const bare = build(attachTeleconverter(teleconverterHostData(), tc));
+    const plated = build(attachTeleconverter(teleconverterHostData({ plates: [dropIn] }), tc));
+    const hostAlone = build(teleconverterHostData({ plates: [dropIn] }));
+
+    expect(Math.abs(paraxialDefocus(plated))).toBeLessThan(1e-9);
+    expect(plated.EFL).toBeCloseTo(bare.EFL, 9);
+    expect(plated.stopPhysSD).toBeCloseTo(hostAlone.stopPhysSD, 9);
+    expect(plated.EP.epSD).toBeCloseTo(hostAlone.EP.epSD, 9);
+  });
+
+  it("splits a mixed stack: the drop-in filter ahead, the sensor cover glass behind", () => {
+    const hostData = teleconverterHostData({ plates: [{ ...dropIn, gapAfterMm: 38 }, REAR_PLATE_FIXTURE] });
+    const coverAirEq = rearPlateAirEquivalentMm([REAR_PLATE_FIXTURE]);
+    const composed = build(attachTeleconverter(hostData, tc));
+
+    expect(composed.S.map((surface) => surface.label)).toEqual([
+      "STO",
+      "1",
+      "2",
+      "RP1a",
+      "RP1b",
+      "TC1",
+      "TC2",
+      "RP2a",
+      "RP2b",
+    ]);
+    /* Junction: the drop-in's rear face is 38 mm + the cover stack (air) from the image; the object is 30 mm. */
+    expect(composed.S[4].d).toBeCloseTo(38 + coverAirEq - TELECONVERTER_FIXTURE_OBJECT_DISTANCE_MM, 9);
+    expect(composed.S[6].d).toBeCloseTo(lastGapOf(tc as unknown as LensData) - coverAirEq, 9);
+    expect(Math.abs(paraxialDefocus(composed))).toBeLessThan(1e-9);
+  });
+
+  it("rejects a descriptor whose plates-ahead count does not match the plate list", () => {
+    const composedData = attachTeleconverter(teleconverterHostData({ plates: [dropIn] }), tc);
+    const errors = validateLensData({
+      ...composedData,
+      attachedTeleconverter: { ...composedData.attachedTeleconverter!, platesAhead: 2 },
+    });
+
+    expect(errors.some((error) => error.includes('"attachedTeleconverter.platesAhead"'))).toBe(true);
+    expect(validateLensData(composedData)).toEqual([]);
   });
 });
 

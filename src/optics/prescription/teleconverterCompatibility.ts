@@ -79,36 +79,66 @@ function hostLastGapThicknesses(host: TeleconverterHost): number[] {
 }
 
 /**
- * Whether any host rear plate sits ahead of the converter's first vertex (a lens-side drop-in filter).
+ * Split a host's rear plates into those ahead of the converter and those behind it.
  *
- * A plate is positioned by the air-equivalent distance from its rear face to the image. Camera-side cover glass is
- * within a few millimetres of the image; a drop-in filter is tens of millimetres ahead and belongs to the lens.
+ * `rearPlates` holds two kinds of plate. Camera-side cover glass sits within a few millimetres of the image and stays
+ * behind the converter. A lens-side drop-in filter sits tens of millimetres ahead, belongs to the lens, and stays in
+ * front of the converter. A plate is ahead when its rear face is at least `masterImageDistanceMm` (air-equivalent)
+ * from the image, i.e. at or in front of the converter's first vertex; because that distance only shrinks toward the
+ * image, the plates ahead are always a leading run.
+ *
+ * @param plates - host rear plates, ordered lens → image
+ * @param masterImageDistanceMm - converter's virtual object distance
+ * @returns the count ahead, the air-equivalent distance from the last one's rear face to the image, and the
+ *   air-equivalent length of the plates behind
  */
-function hasLensSidePlate(plates: readonly RearPlateData[], masterImageDistanceMm: number): boolean {
+function splitRearPlates(
+  plates: readonly RearPlateData[],
+  masterImageDistanceMm: number,
+): { ahead: number; lastAheadRearFaceToImage: number; behindAirEq: number } {
+  /* Walk image → lens accumulating each rear face's distance to the image. */
   let rearFaceToImage = 0;
   for (let i = plates.length - 1; i >= 0; i--) {
+    const behindAirEq = rearFaceToImage;
     rearFaceToImage += plates[i].gapAfterMm;
-    if (rearFaceToImage >= masterImageDistanceMm) return true;
+    if (rearFaceToImage >= masterImageDistanceMm) {
+      return { ahead: i + 1, lastAheadRearFaceToImage: rearFaceToImage, behindAirEq };
+    }
     rearFaceToImage += plates[i].thicknessMm / plates[i].nd;
   }
-  return false;
+  return { ahead: 0, lastAheadRearFaceToImage: 0, behindAirEq: rearFaceToImage };
 }
 
 /**
  * Axial spacing of a host + converter system.
  *
- * junction gap = host back focus (air) − `masterImageDistanceMm`
- * final gap    = converter back focus (air) − host plate stack (air)
+ * With every host plate behind the converter:
+ *   junction gap = host back focus (air) − `masterImageDistanceMm`
+ * With lens-side plates ahead, the host's last gap still ends at the first plate and the junction follows the last
+ * plate ahead:
+ *   junction gap = that plate's rear face to the image (air) − `masterImageDistanceMm`
+ * Either way:
+ *   final gap    = converter back focus (air) − host plates behind the converter (air)
  *
  * @param host - host lens data
  * @param tc - teleconverter data
- * @returns junction shift, smallest junction gap, final gap and image-plane extension in mm
+ * @returns plate split, junction spacing, final gap and image-plane extension in mm
  */
 export function teleconverterGeometry(host: TeleconverterHost, tc: TeleconverterData): TeleconverterGeometry {
-  const hostPlatesAirEq = rearPlateAirEquivalentMm(host.rearPlates ?? []);
-  const lastGapShiftMm = hostPlatesAirEq - tc.masterImageDistanceMm;
+  const hostPlates = host.rearPlates ?? [];
+  const split = splitRearPlates(hostPlates, tc.masterImageDistanceMm);
   const lastGaps = hostLastGapThicknesses(host);
-  const minJunctionGapMm = lastGaps.length > 0 ? Math.min(...lastGaps) + lastGapShiftMm : -Infinity;
+
+  let lastGapShiftMm = 0;
+  let plateJunctionGapMm: number | null = null;
+  let minJunctionGapMm: number;
+  if (split.ahead > 0) {
+    plateJunctionGapMm = split.lastAheadRearFaceToImage - tc.masterImageDistanceMm;
+    minJunctionGapMm = plateJunctionGapMm;
+  } else {
+    lastGapShiftMm = rearPlateAirEquivalentMm(hostPlates) - tc.masterImageDistanceMm;
+    minJunctionGapMm = lastGaps.length > 0 ? Math.min(...lastGaps) + lastGapShiftMm : -Infinity;
+  }
 
   const tcLast = tc.surfaces[tc.surfaces.length - 1];
   const tcAirBackFocus = (tcLast?.d ?? 0) + rearPlateAirEquivalentMm(tc.rearPlates ?? []);
@@ -116,9 +146,11 @@ export function teleconverterGeometry(host: TeleconverterHost, tc: Teleconverter
   for (let i = 0; i < tc.surfaces.length - 1; i++) tcVertexLength += tc.surfaces[i].d;
 
   return {
+    platesAhead: split.ahead,
     lastGapShiftMm,
+    plateJunctionGapMm,
     minJunctionGapMm,
-    finalGapMm: tcAirBackFocus - hostPlatesAirEq,
+    finalGapMm: tcAirBackFocus - split.behindAirEq,
     extensionMm: tcVertexLength + tcAirBackFocus - tc.masterImageDistanceMm,
   };
 }
@@ -128,8 +160,8 @@ export function teleconverterGeometry(host: TeleconverterHost, tc: Teleconverter
  *
  * Fit needs a shared mount and either a universal converter or a host that declares acceptance. The remaining rules
  * reject systems the engine cannot compose faithfully: folded paths, fisheye projections, perspective-control
- * movement (the converter is camera-fixed while the movement model poses the whole prescription), lens-side rear
- * plates, and any state where the glass would touch.
+ * movement (the converter is camera-fixed while the movement model poses the whole prescription), and any state
+ * where the glass would touch — including a host plate the converter's body would have to occupy.
  *
  * @param host - host lens data (defaulted or raw)
  * @param tc - teleconverter data
@@ -155,10 +187,6 @@ export function teleconverterCompatibility(host: TeleconverterHost, tc: Teleconv
     const fastest = Array.isArray(host.nominalFno) ? Math.min(...host.nominalFno) : host.nominalFno;
     /* A tiny tolerance keeps a host at exactly the limit from failing on float noise. */
     if (typeof fastest === "number" && fastest < tc.minHostFno - 1e-9) return { ok: false, reason: "host-too-fast" };
-  }
-
-  if (hasLensSidePlate(host.rearPlates ?? [], tc.masterImageDistanceMm)) {
-    return { ok: false, reason: "lens-side-plate" };
   }
 
   const geometry = teleconverterGeometry(host, tc);
