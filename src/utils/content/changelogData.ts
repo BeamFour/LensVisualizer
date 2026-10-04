@@ -20,6 +20,11 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-04",
+    type: "fix",
+    summary: "Fixed the controls dropping below the diagram when a converter is switched with an analysis tab open",
+  },
+  {
+    date: "2026-10-04",
     type: "improvement",
     summary: "Added a warning over MTF charts when the lens data is incomplete, listing each gap",
   },

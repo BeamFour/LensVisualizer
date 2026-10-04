@@ -60,6 +60,9 @@ Non-obvious constraints and failure modes: one trap per bullet, with the full ru
 - `analysisDrawerOpen` is NOT persisted to localStorage (the drawer always starts closed); `analysisDrawerTab` IS
   persisted so the last-used tab is remembered. The drawer also closes on `SET_LENS_A` and `ENTER_COMPARE` so stale
   analysis never shows for a new lens.
+- The drawer stays open across `SET_OPTICAL_CONFIGURATION` and `SET_TELECONVERTER`, which replace `L` without a
+  remount. `AnalysisDrawerContent` defers `L` in the same snapshot as its slider inputs and perspective context; a
+  live `L` beside deferred inputs throws in `createAnalysisComputationContext` for one render.
 - `AsphericComparisonOverlay` is an `OverlayModal` opened from `ElementInspector`, not a drawer tab; its open state in
   `useOverlayState.ts` is the only overlay outside the URL-shareable `panels` slice
   (`agent_docs/architecture/viewer-and-diagram.md`).
