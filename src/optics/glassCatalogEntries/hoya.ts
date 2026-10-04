@@ -750,6 +750,66 @@ export const HOYA_GLASS_ENTRIES: readonly GlassEntry[] = [
     source: "Hoya Zemax catalog 2017-04-01 via refractiveindex.info; NBFD15 page (formula 3 polynomial).",
   },
   {
+    name: "NBFD9",
+    vendor: "Hoya",
+    polynomial: [2.9828805, -0.011547679, 0.032835197, 0.00163548, -0.000073685794, 0.00001070514],
+    nd: 1.7569,
+    vd: 31.8,
+    code6: "757318",
+    source:
+      "Legacy HOYA glass library (HOYA.DAT, NBSF9 / NBFD9 record) distributed with the open-source Koko / KDP-2 lens design program, https://github.com/dinosauria123/Koko (accessed 2026-10-04); six-term A0-A5 dispersion formula for the discontinued glass, not a current HOYA publication.",
+  },
+  {
+    name: "NBFD14",
+    vendor: "Hoya",
+    polynomial: [3.1635382, -0.014237012, 0.028171078, 0.00074423713, -0.000023570264, 0.000003169303],
+    nd: 1.8017,
+    vd: 44.32,
+    code6: "802443",
+    source:
+      "Legacy HOYA glass library (HOYA.DAT, NBSF14 / NBFD14 record) distributed with the open-source Koko / KDP-2 lens design program, https://github.com/dinosauria123/Koko (accessed 2026-10-04); six-term A0-A5 dispersion formula for the discontinued glass, not a current HOYA publication.",
+  },
+  {
+    name: "LACL9",
+    vendor: "Hoya",
+    polynomial: [2.7575029, -0.0096805678, 0.019992375, 0.00038659868, -0.000001186911, 0.00000086085934],
+    nd: 1.6779,
+    vd: 50.55,
+    code6: "678506",
+    source:
+      "Legacy HOYA glass library (HOYA.DAT, LALK9 / LACL9 record) distributed with the open-source Koko / KDP-2 lens design program, https://github.com/dinosauria123/Koko (accessed 2026-10-04); six-term A0-A5 dispersion formula for the discontinued glass, not a current HOYA publication.",
+  },
+  {
+    name: "LAC6",
+    vendor: "Hoya",
+    polynomial: [2.6561981, -0.013549986, 0.013897575, 0.00096270799, -0.00010029633, 0.0000054414379],
+    nd: 1.6425,
+    vd: 57.96,
+    code6: "643580",
+    source:
+      "Legacy HOYA glass library (HOYA.DAT, LAK6 / LAC6 record) distributed with the open-source Koko / KDP-2 lens design program, https://github.com/dinosauria123/Koko (accessed 2026-10-04); six-term A0-A5 dispersion formula for the discontinued glass, not a current HOYA publication.",
+  },
+  {
+    name: "BAFD10",
+    vendor: "Hoya",
+    polynomial: [2.6521655, -0.0075962197, 0.023726622, 0.000514341, 0.0000098103531, 0.0000027725345],
+    nd: 1.65016,
+    vd: 39.34,
+    code6: "650393",
+    source:
+      "Legacy HOYA glass library (HOYA.DAT, BASF10 / BAFD10 record) distributed with the open-source Koko / KDP-2 lens design program, https://github.com/dinosauria123/Koko (accessed 2026-10-04); six-term A0-A5 dispersion formula for the discontinued glass, not a current HOYA publication.",
+  },
+  {
+    name: "SBF2",
+    vendor: "Hoya",
+    polynomial: [2.3022457, -0.010737695, 0.012895507, 0.00043069639, -0.000016622236, 0.0000011994611],
+    nd: 1.52944,
+    vd: 51.64,
+    code6: "529516",
+    source:
+      "Legacy HOYA glass library (HOYA.DAT, KZF2 / SBF2 record) distributed with the open-source Koko / KDP-2 lens design program, https://github.com/dinosauria123/Koko (accessed 2026-10-04); six-term A0-A5 dispersion formula for the discontinued glass, not a current HOYA publication.",
+  },
+  {
     name: "NBFD25",
     vendor: "Hoya",
     polynomial: [3.2879389, -0.015856356, 0.045638807, 0.0033027661, -0.00021690686, 0.000029625863],
@@ -1394,6 +1454,16 @@ export const HOYA_GLASS_ENTRIES: readonly GlassEntry[] = [
     code6: "683447",
     source:
       "HOYA Zemax OpticStudio DATA 2026-07-07 (HOYA20260707_include_obsolete.agf), vendor-published obsolete catalog row.",
+  },
+  {
+    name: "BAF10",
+    vendor: "Hoya",
+    polynomial: [2.7324621, -0.01249046, 0.018562334, 0.00099990536, -0.000068388552, 0.0000049257931],
+    nd: 1.67003,
+    vd: 47.19,
+    code6: "670472",
+    source:
+      "Hoya Zemax catalog 2017-04-01 via refractiveindex.info; BAF10 page (formula 3 polynomial), discontinued glass.",
   },
   {
     name: "LAFL4",

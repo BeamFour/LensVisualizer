@@ -110,7 +110,7 @@ const LENS_DATA = {
       nd: 1.72825,
       vd: 28.32,
       fl: -13.1,
-      glass: "S-TIH family / FD series (OHARA / HOYA)",
+      glass: "E-FD10 (HOYA) / S-TIH10 class (728283 dense flint; exact coordinate, supplier unspecified)",
       apd: false,
       cemented: "D1",
       role: "Flint-first front element of the cemented achromatic doublet G1b. High-dispersion dense flint (νd = 28.3) provides the chromatic corrector's diverging component and the primary spectral balancing for G1a's accumulated chromatic imbalance.",

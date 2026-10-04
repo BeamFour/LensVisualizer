@@ -19,6 +19,11 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-10-04",
+    type: "lens",
+    summary: "Added six Minolta MD Zoom patent models, from the 24-35mm f/3.5 to the 75-150mm f/4",
+  },
+  {
     date: "2026-10-03",
     type: "lens",
     summary: "Added post-war Biogon 35mm, S-Biogon 40mm and Sony RX1 Sonnar 35mm patent models",
