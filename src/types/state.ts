@@ -267,6 +267,9 @@ export interface URLState {
   configurationKey?: string;
   /** Single-lens `tc` query value; null clears a mounted converter on popstate. */
   teleconverterKey?: string | null;
+  /** Comparison `a_tc` / `b_tc` query values, one per pane. */
+  teleconverterKeyA?: string | null;
+  teleconverterKeyB?: string | null;
   focus?: number;
   aberration?: number;
   aperture?: number;

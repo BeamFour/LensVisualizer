@@ -125,8 +125,8 @@ export function createInitialState(
       lensKeyA,
       lensKeyB: urlState.lensKeyB || catalogKeys[Math.min(1, catalogKeys.length - 1)],
       selectedConfigurationKey: urlState.configurationKey ?? lensKeyA,
-      teleconverterKeyA: urlState.teleconverterKey ?? null,
-      teleconverterKeyB: null,
+      teleconverterKeyA: (urlState.comparing ? urlState.teleconverterKeyA : urlState.teleconverterKey) ?? null,
+      teleconverterKeyB: (urlState.comparing ? urlState.teleconverterKeyB : null) ?? null,
       comparing: urlState.comparing || false,
       scaleMode: prefs.scaleMode || "independent",
     },
@@ -353,8 +353,12 @@ export default function lensReducer(state: LensState, action: LensAction): LensS
         urlState.configurationKey !== undefined
           ? { ...state.lens, selectedConfigurationKey: urlState.configurationKey }
           : state.lens;
-      /* `in`, not `!== undefined`: a URL without `tc` hydrates null and must unmount the converter. */
+      /* `in`, not `!== undefined`: a URL without `tc` hydrates null and must unmount the converter. The
+         single-lens key and the per-pane comparison keys never arrive together (the URL boundary strips
+         whichever does not apply to the current mode). */
       if ("teleconverterKey" in urlState) lens = { ...lens, teleconverterKeyA: urlState.teleconverterKey ?? null };
+      if ("teleconverterKeyA" in urlState) lens = { ...lens, teleconverterKeyA: urlState.teleconverterKeyA ?? null };
+      if ("teleconverterKeyB" in urlState) lens = { ...lens, teleconverterKeyB: urlState.teleconverterKeyB ?? null };
       const panels = { ...state.panels };
       for (const { key, default: fallback } of VIEW_STATE_FIELDS) {
         if (key in urlState) {

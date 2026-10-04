@@ -107,6 +107,20 @@ describe("useLensState — URL params override defaults", () => {
     expect(unversioned.result.current[0].lens.teleconverterKeyA).toBeNull();
   });
 
+  it("mounts per-pane teleconverters on a compare route, each checked against its own pane's lens", () => {
+    window.history.replaceState(
+      {},
+      "",
+      `?v=1&a_tc=${teleconverterKey}&b_tc=${teleconverterKey}&tc=${teleconverterKey}`,
+    );
+    const { result } = renderHook(() => useLensState(COMPARISON_CATALOG_KEYS, teleconverterHostKey, bareLensKey));
+
+    expect(result.current[0].lens.comparing).toBe(true);
+    expect(result.current[0].lens.teleconverterKeyA).toBe(teleconverterKey);
+    /* Pane B's lens cannot take the converter, so its key is dropped. */
+    expect(result.current[0].lens.teleconverterKeyB).toBeNull();
+  });
+
   it("initializes a configuration variant from compare route identity and ignores cfg", () => {
     window.history.replaceState({}, "", `?v=1&cfg=${canonicalConfigurationKey}`);
     const { result } = renderHook(() =>

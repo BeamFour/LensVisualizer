@@ -42,7 +42,9 @@ interface ViewerChromeProps {
   onConfigurationChange: (key: string) => void;
   teleconverterOptions: ReadonlyArray<TeleconverterOption>;
   activeTeleconverterKey: string | null;
-  onTeleconverterChange: (key: string | null) => void;
+  teleconverterOptionsB: ReadonlyArray<TeleconverterOption>;
+  activeTeleconverterKeyB: string | null;
+  onTeleconverterChange: (panel: "a" | "b", key: string | null) => void;
   controlsBarProps: Omit<ComponentProps<typeof ControlsBar>, "compact" | "showScaleMode">;
   mobileView: MobileView;
   onMobileViewChange: (value: MobileView) => void;
@@ -74,6 +76,8 @@ export default function ViewerChrome({
   onConfigurationChange,
   teleconverterOptions,
   activeTeleconverterKey,
+  teleconverterOptionsB,
+  activeTeleconverterKeyB,
   onTeleconverterChange,
   controlsBarProps,
   mobileView,
@@ -142,6 +146,8 @@ export default function ViewerChrome({
         onConfigurationChange={onConfigurationChange}
         teleconverterOptions={teleconverterOptions}
         activeTeleconverterKey={activeTeleconverterKey}
+        teleconverterOptionsB={teleconverterOptionsB}
+        activeTeleconverterKeyB={activeTeleconverterKeyB}
         onTeleconverterChange={onTeleconverterChange}
       />
 

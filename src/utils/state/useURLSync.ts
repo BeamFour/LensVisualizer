@@ -100,11 +100,16 @@ export default function useURLSync(
         );
         /* Always set, null included, so navigating back to a URL without `tc` unmounts the converter. */
         urlState.teleconverterKey = resolveTeleconverterKey(urlState.configurationKey, parsed.teleconverterKey);
+        delete urlState.teleconverterKeyA;
+        delete urlState.teleconverterKeyB;
       } else {
         /* Compare identity lives in /compare/:slugA/:slugB — a cfg param must not
            reach the lens slice (mirrors the init path in useLensState). */
         delete urlState.configurationKey;
         delete urlState.teleconverterKey;
+        const { lensKeyA: paneLensA, lensKeyB: paneLensB } = stateRef.current.lens;
+        urlState.teleconverterKeyA = resolveTeleconverterKey(paneLensA, parsed.teleconverterKeyA);
+        urlState.teleconverterKeyB = resolveTeleconverterKey(paneLensB, parsed.teleconverterKeyB);
       }
       dispatch({ type: APPLY_URL_VIEW_STATE, state: urlState });
       const zoomAction = zoomActionFromFocalLength(parsed.zoom ?? null, stateRef.current, comparisonLenses);
@@ -142,6 +147,7 @@ export default function useURLSync(
     comparing,
     lens.selectedConfigurationKey,
     lens.teleconverterKeyA,
+    lens.teleconverterKeyB,
     panels.selectedElementId,
     panels.selectedElementIdA,
     panels.selectedElementIdB,

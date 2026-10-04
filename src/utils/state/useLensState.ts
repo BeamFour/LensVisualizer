@@ -56,7 +56,18 @@ export default function useLensState(
       if (urlState.comparing) {
         delete urlState.configurationKey;
         delete urlState.teleconverterKey;
+        /* Each pane's converter is checked against that pane's own lens. */
+        urlState.teleconverterKeyA = resolveTeleconverterKey(
+          urlState.lensKeyA ?? "",
+          parsedViewState.teleconverterKeyA,
+        );
+        urlState.teleconverterKeyB = resolveTeleconverterKey(
+          urlState.lensKeyB ?? "",
+          parsedViewState.teleconverterKeyB,
+        );
       } else if (canonicalLensKey) {
+        delete urlState.teleconverterKeyA;
+        delete urlState.teleconverterKeyB;
         urlState.configurationKey = resolveOpticalConfigurationKey(canonicalLensKey, parsedViewState.configurationKey);
         /* A converter mounts on the prescription actually shown, so it is checked against the resolved variant. */
         urlState.teleconverterKey = resolveTeleconverterKey(

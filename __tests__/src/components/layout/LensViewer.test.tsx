@@ -154,7 +154,7 @@ vi.mock("../../../../src/components/layout/lensViewer/ViewerChrome.js", () => ({
     onConfigurationChange: (key: string) => void;
     teleconverterOptions: ReadonlyArray<{ key: string; label: string }>;
     activeTeleconverterKey: string | null;
-    onTeleconverterChange: (key: string | null) => void;
+    onTeleconverterChange: (panel: "a" | "b", key: string | null) => void;
   }) => (
     <div data-testid="viewer-chrome">
       <span data-testid="chrome-mode">{comparing ? "compare" : "single"}</span>
@@ -167,11 +167,11 @@ vi.mock("../../../../src/components/layout/lensViewer/ViewerChrome.js", () => ({
       <span data-testid="active-configuration">{activeConfigurationKey}</span>
       <span data-testid="active-teleconverter">{activeTeleconverterKey ?? "none"}</span>
       {teleconverterOptions.map((option) => (
-        <button key={option.key} onClick={() => onTeleconverterChange(option.key)}>
+        <button key={option.key} onClick={() => onTeleconverterChange("a", option.key)}>
           mount {option.key}
         </button>
       ))}
-      <button onClick={() => onTeleconverterChange("not-a-real-converter")}>mount unknown</button>
+      <button onClick={() => onTeleconverterChange("a", "not-a-real-converter")}>mount unknown</button>
       {configurationOptions.map((option) => (
         <button key={option.key} onClick={() => onConfigurationChange(option.key)}>
           {option.label}
@@ -313,7 +313,7 @@ describe("LensViewer", () => {
     expect(screen.getByTestId("diagram-lens-key").textContent).toBe(alternateKey);
   });
 
-  it("offers and mounts teleconverters for an eligible lens, and never in comparison mode", () => {
+  it("offers and mounts teleconverters for an eligible lens and ignores one the lens cannot take", () => {
     /* The viewer reads the real catalogs, so resolve a real converter–host pair instead of naming a lens. */
     const teleconverterKey = TELECONVERTER_KEYS[0];
     const hostKey = CATALOG_KEYS.find((key) =>
@@ -386,6 +386,8 @@ describe("LensViewer", () => {
 
     expect(mocks.navigate).toHaveBeenCalledWith("/compare/apo-lanthar-50f2/apo-lanthar-50f2/", { replace: true });
     expect(mocks.navigate).toHaveBeenCalledWith("/compare/sonnar-50f15/apo-lanthar-50f2/", { replace: true });
+    /* Replacing the path drops the query; each switch reschedules the writer so per-pane state survives. */
+    expect(mocks.updateURLWithSliders).toHaveBeenCalledTimes(2);
   });
 
   it("offers configuration variants in compare without exposing debug fixtures", () => {

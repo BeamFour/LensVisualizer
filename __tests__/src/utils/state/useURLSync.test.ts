@@ -359,6 +359,35 @@ describe("useURLSync — updateURLWithSliders (debounced)", () => {
     }
   });
 
+  it("writes and hydrates per-pane teleconverters on compare pages", () => {
+    const dispatchMock = vi.fn();
+    const dispatch = dispatchMock as unknown as Dispatch<LensAction>;
+    const base = makeState();
+    const state: LensState = {
+      ...base,
+      lens: {
+        ...base.lens,
+        comparing: true,
+        lensKeyA: teleconverterHostKey,
+        lensKeyB: teleconverterHostKey,
+        teleconverterKeyA: teleconverterKey,
+      },
+    };
+    window.history.replaceState({}, "", `/compare/${teleconverterHostKey}/${teleconverterHostKey}/`);
+    replaceStateSpy.mockClear();
+    renderHook(() => useURLSync(state, dispatch, null, false, true));
+    act(() => vi.advanceTimersByTime(100));
+    expect(replaceStateSpy.mock.calls.at(-1)?.[2]).toBe(
+      `/compare/${teleconverterHostKey}/${teleconverterHostKey}/?v=1&a_tc=${teleconverterKey}`,
+    );
+
+    window.history.replaceState({}, "", `?v=1&b_tc=${teleconverterKey}&tc=${teleconverterKey}`);
+    act(() => window.dispatchEvent(new PopStateEvent("popstate")));
+    const applied = dispatchMock.mock.calls.find(([action]) => action.type === "APPLY_URL_VIEW_STATE")![0].state;
+    expect(applied).toMatchObject({ teleconverterKeyA: null, teleconverterKeyB: teleconverterKey });
+    expect(applied).not.toHaveProperty("teleconverterKey");
+  });
+
   it("strips configuration params from compare-mode history navigation", () => {
     const dispatchMock = vi.fn();
     const dispatch = dispatchMock as unknown as Dispatch<LensAction>;

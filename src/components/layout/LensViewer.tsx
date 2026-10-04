@@ -103,7 +103,8 @@ export default function LensVisualization({ initialLensKey, initialLensKeyB }: L
 
   /* ── Destructure state slices for convenient access ── */
   const { lens, display, rays, sharedSliders, panels, overlays } = state;
-  const { lensKeyA, lensKeyB, selectedConfigurationKey, teleconverterKeyA, comparing, scaleMode } = lens;
+  const { lensKeyA, lensKeyB, selectedConfigurationKey, teleconverterKeyA, teleconverterKeyB, comparing, scaleMode } =
+    lens;
   const { dark, highContrast, mobileView, desktopView } = display;
   const {
     showOnAxis,
@@ -151,20 +152,26 @@ export default function LensVisualization({ initialLensKey, initialLensKeyB }: L
     [configurationOptions, dispatch, teleconverterKeyA],
   );
 
-  /* Detachable teleconverters mount on the prescription actually shown, so options follow the configuration. */
-  const teleconverterOptions = useMemo(
-    () => (comparing ? [] : teleconverterOptionsForLens(diagramLensKey)),
-    [comparing, diagramLensKey],
+  /* Detachable teleconverters mount on the prescription actually shown: the configured diagram lens in the
+     single view (in comparison mode pane A's key already is the variant), and each pane's own lens when comparing. */
+  const teleconverterOptions = useMemo(() => teleconverterOptionsForLens(diagramLensKey), [diagramLensKey]);
+  const teleconverterOptionsB = useMemo(
+    () => (comparing ? teleconverterOptionsForLens(lensKeyB) : []),
+    [comparing, lensKeyB],
   );
   const activeTeleconverterKey = teleconverterOptions.some((option) => option.key === teleconverterKeyA)
     ? teleconverterKeyA
     : null;
+  const activeTeleconverterKeyB = teleconverterOptionsB.some((option) => option.key === teleconverterKeyB)
+    ? teleconverterKeyB
+    : null;
   const switchTeleconverter = useCallback(
-    (key: string | null) => {
-      if (key !== null && !teleconverterOptions.some((option) => option.key === key)) return;
-      dispatch({ type: SET_TELECONVERTER, panel: "a", key });
+    (panel: "a" | "b", key: string | null) => {
+      const options = panel === "b" ? teleconverterOptionsB : teleconverterOptions;
+      if (key !== null && !options.some((option) => option.key === key)) return;
+      dispatch({ type: SET_TELECONVERTER, panel, key });
     },
-    [dispatch, teleconverterOptions],
+    [dispatch, teleconverterOptions, teleconverterOptionsB],
   );
 
   /* ── Comparison mode orchestration ── */
@@ -242,17 +249,21 @@ export default function LensVisualization({ initialLensKey, initialLensKeyB }: L
     [viewerCatalogKeys],
   );
 
-  /* ── Lens switching (single-lens mode resets sliders, comparison mode does not) ── */
+  /* ── Lens switching (single-lens mode resets sliders, comparison mode does not) ──
+   * A compare-route switch replaces the path and so drops the query. The URL writer only reruns when the view
+   * state it watches changes, which a switch on the other pane (or a swap of identical converters) does not do,
+   * so it is scheduled explicitly: the surviving pane's `a_tc` / `b_tc` must stay in a shareable URL. */
   const switchLensA = useCallback(
     (key: string) => {
       dispatch({ type: SET_LENS_A, key });
       if (isComparePage) {
         void navigate(canonicalPagePath(`/compare/${key}/${lensKeyB}`), { replace: true });
+        updateURLWithSliders();
       } else if (isLensPage && !state.lens.comparing) {
         void navigate(canonicalPagePath(`/lens/${key}`), { replace: true });
       }
     },
-    [dispatch, isLensPage, isComparePage, lensKeyB, state.lens.comparing, navigate],
+    [dispatch, isLensPage, isComparePage, lensKeyB, state.lens.comparing, navigate, updateURLWithSliders],
   );
 
   const switchLensB = useCallback(
@@ -260,17 +271,19 @@ export default function LensVisualization({ initialLensKey, initialLensKeyB }: L
       dispatch({ type: SET_LENS_B, key });
       if (isComparePage) {
         void navigate(canonicalPagePath(`/compare/${lensKeyA}/${key}`), { replace: true });
+        updateURLWithSliders();
       }
     },
-    [dispatch, isComparePage, lensKeyA, navigate],
+    [dispatch, isComparePage, lensKeyA, navigate, updateURLWithSliders],
   );
 
   const swapLenses = useCallback(() => {
     dispatch({ type: SWAP_LENSES });
     if (isComparePage) {
       void navigate(canonicalPagePath(`/compare/${lensKeyB}/${lensKeyA}`), { replace: true });
+      updateURLWithSliders();
     }
-  }, [dispatch, isComparePage, lensKeyA, lensKeyB, navigate]);
+  }, [dispatch, isComparePage, lensKeyA, lensKeyB, navigate, updateURLWithSliders]);
 
   /* ── Context value (replaces sharedProps prop drilling) ── */
   const ctxValue = useMemo(
@@ -358,6 +371,8 @@ export default function LensVisualization({ initialLensKey, initialLensKeyB }: L
                 onConfigurationChange={switchOpticalConfiguration}
                 teleconverterOptions={teleconverterOptions}
                 activeTeleconverterKey={activeTeleconverterKey}
+                teleconverterOptionsB={teleconverterOptionsB}
+                activeTeleconverterKeyB={activeTeleconverterKeyB}
                 onTeleconverterChange={switchTeleconverter}
                 controlsBarProps={controlsBarProps}
                 mobileView={mobileView}

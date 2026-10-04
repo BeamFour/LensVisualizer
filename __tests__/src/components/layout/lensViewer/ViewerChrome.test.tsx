@@ -59,6 +59,8 @@ function renderChrome(dispatch = vi.fn()) {
         onConfigurationChange={vi.fn()}
         teleconverterOptions={[]}
         activeTeleconverterKey={null}
+        teleconverterOptionsB={[]}
+        activeTeleconverterKeyB={null}
         onTeleconverterChange={vi.fn()}
         controlsBarProps={{
           theme: themes.dark,

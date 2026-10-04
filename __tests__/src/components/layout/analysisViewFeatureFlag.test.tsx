@@ -108,6 +108,8 @@ describe("ENABLE_ANALYSIS_VIEW disabled behavior", () => {
         onConfigurationChange={vi.fn()}
         teleconverterOptions={[]}
         activeTeleconverterKey={null}
+        teleconverterOptionsB={[]}
+        activeTeleconverterKeyB={null}
         onTeleconverterChange={vi.fn()}
         controlsBarProps={{
           theme: themes.dark,
