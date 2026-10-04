@@ -49,14 +49,16 @@ import type { TeleconverterDataInput } from "../../types/teleconverter.js";
  * ║    2ω = 16.8° / 10.2° / 6.4°.                                        ║
  * ║                                                                      ║
  * ║  NOTE ON SEMI-DIAMETERS: the patent lists no effective diameters.    ║
- * ║    The values are the package's inferred rims, sized on the patent   ║
- * ║    master system across the zoom range. Surfaces 6–14 are 1% over    ║
- * ║    the envelope of the source-field chief rays, which land at        ║
- * ║    14.5–14.8 mm, past the 14.175 mm format corner; surfaces 1–5      ║
- * ║    keep larger earlier rims, 2–27% over that envelope. The           ║
- * ║    full-aperture axial beam needs less at every surface. The patent  ║
- * ║    figures corroborate the topology only; the rims are not           ║
- * ║    figure-audited. Faster masters are excluded through `minHostFno`. ║
+ * ║    The rims are measured from FIG. 1, which is drawn to scale (every ║
+ * ║    surface curve of the prescription registers on the drawing), and  ║
+ * ║    set 3% inside the drawn glass edge: RL11 10.4, RL12 9.4, RL21 8.9 ║
+ * ║    at its bevelled front and 9.2 at the junction, RL22 9.2, RL31 9.2 ║
+ * ║    at its bevelled front and 10.4 at the junction, RL32 10.4, RL33   ║
+ * ║    9.7 front and 11.4 rear, RL41 12.2, RL42 13.1 mm. Fujifilm's      ║
+ * ║    published lens-construction diagram shows the same proportions.   ║
+ * ║    The source package's rims (5.8–9.9 mm) only just passed the       ║
+ * ║    corner chief ray of the master system and darkened the corners;   ║
+ * ║    they are replaced.                                                ║
  * ║                                                                      ║
  * ║  NOTE ON FOCUS: a virtual object at masterImageDistanceMm images     ║
  * ║    25.635 mm behind the last vertex, 0.159 mm beyond the printed     ║
@@ -86,7 +88,7 @@ const TELECONVERTER_DATA = {
   /* ── Fit ── */
   magnification: 2,
   lensMounts: ["fujifilm-x"],
-  minHostFno: 2.8, // rims were inferred on the f/2.88 master; Fujifilm lists the f/2 XF 200mm as not compatible
+  minHostFno: 2.8, // the patent master is f/2.88; Fujifilm lists the f/2 XF 200mm as not compatible
 
   /* ── Patent metadata ── */
   patentNumber: "JP 2017-173692 A",
@@ -124,22 +126,22 @@ const TELECONVERTER_DATA = {
 
   /* ── Surface prescription ──
    *  Patent Table 3 rows 41–54, radii and spacings exactly as printed. No stop: the host lens's stop is the
-   *  system stop. The last gap is the physical distance to optical member PP. Semi-diameters are inferred. */
+   *  system stop. The last gap is the physical distance to optical member PP. Semi-diameters are from FIG. 1. */
   surfaces: [
-    { label: "1", R: 82.3854, d: 0.9, nd: 1.883, elemId: 1, sd: 6.47 }, // RL11 front
-    { label: "2", R: 19.013, d: 5.16, nd: 1.62004, elemId: 2, sd: 6.34 }, // RL11/RL12 junction
-    { label: "3", R: -33.9161, d: 2.5, nd: 1.0, elemId: 0, sd: 6.24 }, // RL12 rear → air
-    { label: "4", R: -34.6013, d: 0.91, nd: 1.883, elemId: 3, sd: 5.8 }, // RL21 front
-    { label: "5", R: 17.989, d: 4.15, nd: 1.74077, elemId: 4, sd: 5.79 }, // RL21/RL22 junction
-    { label: "6", R: -132.7745, d: 2.2, nd: 1.0, elemId: 0, sd: 6.092835 }, // RL22 rear → air
-    { label: "7", R: -31.1833, d: 0.93, nd: 1.883, elemId: 5, sd: 6.39161 }, // RL31 front
-    { label: "8", R: 53.486, d: 5.29, nd: 1.57501, elemId: 6, sd: 6.776063 }, // RL31/RL32 junction
-    { label: "9", R: -20.9775, d: 0.1, nd: 1.0, elemId: 0, sd: 7.672052 }, // RL32 rear → air
-    { label: "10", R: -24.999, d: 0.91, nd: 1.90043, elemId: 7, sd: 7.732445 }, // RL33 front
-    { label: "11", R: -264.634, d: 0.2, nd: 1.0, elemId: 0, sd: 8.23191 }, // RL33 rear → air
-    { label: "12", R: 31.0672, d: 7.34, nd: 1.673, elemId: 8, sd: 9.019888 }, // RL41 front
-    { label: "13", R: -24.632, d: 1, nd: 2.00069, elemId: 9, sd: 9.531606 }, // RL41/RL42 junction
-    { label: "14", R: -69.0128, d: 23.596, nd: 1.0, elemId: 0, sd: 9.902377 }, // RL42 rear → optical member PP
+    { label: "1", R: 82.3854, d: 0.9, nd: 1.883, elemId: 1, sd: 10.4 }, // RL11 front
+    { label: "2", R: 19.013, d: 5.16, nd: 1.62004, elemId: 2, sd: 9.4 }, // RL11/RL12 junction
+    { label: "3", R: -33.9161, d: 2.5, nd: 1.0, elemId: 0, sd: 9.4 }, // RL12 rear → air
+    { label: "4", R: -34.6013, d: 0.91, nd: 1.883, elemId: 3, sd: 8.9 }, // RL21 front
+    { label: "5", R: 17.989, d: 4.15, nd: 1.74077, elemId: 4, sd: 9.2 }, // RL21/RL22 junction
+    { label: "6", R: -132.7745, d: 2.2, nd: 1.0, elemId: 0, sd: 9.2 }, // RL22 rear → air
+    { label: "7", R: -31.1833, d: 0.93, nd: 1.883, elemId: 5, sd: 9.2 }, // RL31 front
+    { label: "8", R: 53.486, d: 5.29, nd: 1.57501, elemId: 6, sd: 10.4 }, // RL31/RL32 junction
+    { label: "9", R: -20.9775, d: 0.1, nd: 1.0, elemId: 0, sd: 10.4 }, // RL32 rear → air
+    { label: "10", R: -24.999, d: 0.91, nd: 1.90043, elemId: 7, sd: 9.7 }, // RL33 front
+    { label: "11", R: -264.634, d: 0.2, nd: 1.0, elemId: 0, sd: 11.4 }, // RL33 rear → air
+    { label: "12", R: 31.0672, d: 7.34, nd: 1.673, elemId: 8, sd: 12.2 }, // RL41 front
+    { label: "13", R: -24.632, d: 1, nd: 2.00069, elemId: 9, sd: 12.2 }, // RL41/RL42 junction
+    { label: "14", R: -69.0128, d: 23.596, nd: 1.0, elemId: 0, sd: 13.1 }, // RL42 rear → optical member PP
   ],
 
   /* ── Optical member PP (the patent's two plane surfaces after the converter) ── */

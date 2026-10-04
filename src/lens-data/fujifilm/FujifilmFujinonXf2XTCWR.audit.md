@@ -14,11 +14,8 @@
 - Geometry: `masterImageDistanceMm` 26.91 is the master back focus in air that Table 2 prints, 29.41 mm, minus the
   Table 3 gap d40 = 2.500 mm. The last gap, 23.596 mm, is the physical distance to PP (2.85 mm, nd 1.5168, then
   0.001 mm), which is listed in `rearPlates`; in air that is 25.476 mm, where Table 4 prints 25.47.
-- Semi-diameters are the package's inferred rims, not source values, sized on the patent master system across the
-  zoom range. Surfaces 6–14 are 1% over the envelope of the source-field chief rays, which land at 14.5–14.8 mm and
-  so cover the 14.175 mm format corner; the package enlarged them after its corner-coverage review. Surfaces 1–5
-  keep its earlier rims, 2–27% over the same envelope. The full-aperture axial beam needs less at every surface
-  (4.93 mm at surface 1). The patent figures corroborate topology only; the rims are not figure-audited.
+- Semi-diameters as delivered were the package's inferred rims, not source values; see the 2026-10-04 figure audit
+  below, which replaces them.
 - Glass review: the patent prints nd/νd only and the package delivered `Unmatched (…)` labels. Seven printed pairs
   equal Ohara catalog entries to the printed precision — S-LAH58 (1.88300 / 40.76, RL11, RL21, RL31), S-TIM2 (1.62004
   / 36.26), S-TIH13 (1.74077 / 27.79), S-TIL27 (1.57501 / 41.50) and S-NBH52 (1.67300 / 38.15). Ohara has no glass at
@@ -37,9 +34,41 @@
   - Focal length: with the printed 2.500 mm gap the prescription traces to 102.924 / 167.215 / 271.909 mm,
     0.07–0.11 mm from Table 4.
   - Lettering: FIG. 1 marks the fourth group "RG41"; the description, the reference signs and FIG. 5 give RG4.
-- Fit: `minHostFno: 2.8`, because the rims were inferred on the patent's f/2.88 master and are not sized for a faster
-  beam. This also keeps the converter off the f/2 XF 200mm, which Fujifilm's compatibility chart for this converter
+- Fit: `minHostFno: 2.8`, the speed of the patent master (f/2.88). This keeps the converter off the f/2 XF 200mm,
+  which Fujifilm's compatibility chart for this converter
   marks "Not compatible" (fujifilm-x.com support pages, read 2026-10-04).
 - On the catalog host `fuji-xf-50140mm-f28`: junction gap 2.4971 mm (patent 2.500; the host's back focus in air is
   29.4071 mm), focal length 102.939 / 167.239 / 271.947 mm against the printed 102.997 / 167.327 / 271.837 (host
   alone 51.505 / 83.685 / 135.982), f/5.756 / 5.755 / 5.760 against 5.76 / 5.80 / 5.76, host stop radius unchanged.
+
+## 2026-10-04 — Semi-diameters from the patent figure
+
+- Why: the delivered rims were a lower bound. The package sized them about 1% over the source-field chief rays of the
+  master system and did not claim full-bundle illumination. On the patent's own master at 140 mm they passed 34% of
+  the on-axis bundle at the format corner, about what the bare lens passes there (33%), where a 2× converter should
+  brighten the corner considerably.
+- Evidence: 図1 (FIG. 1, Example 1) of JP 2017-173692 A, rendered at 600 dpi. The drawing is to scale: with one scale
+  and one origin, every surface curve of the prescription lies on the drawn outlines. Element half-heights were read
+  from the drawn glass edges and confirmed on the zoomed render; RL21 and RL31 are drawn with a bevel on the front
+  surface and RL33's front surface ends where it meets the cylindrical edge. Fujifilm's published lens-construction
+  diagram for the XF2X TC WR, measured the same way, agrees within 0.4 mm on every element.
+- Rule: `sd` is 3% inside the drawn glass edge, rounded to 0.1 mm; a cemented junction takes the smaller neighbour.
+
+| Surface | Element | Delivered | Figure glass edge | New `sd` |
+|---|---|---:|---:|---:|
+| 1 | RL11 front | 6.47 | 10.74 | 10.4 |
+| 2–3 | RL11/RL12 junction, RL12 rear | 6.34, 6.24 | 9.73 | 9.4 |
+| 4 | RL21 front (bevelled) | 5.80 | 9.2 | 8.9 |
+| 5–6 | RL21/RL22 junction, RL22 rear | 5.79, 6.09 | 9.45 | 9.2 |
+| 7 | RL31 front (bevelled) | 6.39 | 9.5 | 9.2 |
+| 8–9 | RL31/RL32 junction, RL32 rear | 6.78, 7.67 | 10.74 | 10.4 |
+| 10 | RL33 front | 7.73 | 10.0 | 9.7 |
+| 11 | RL33 rear | 8.23 | 11.78 | 11.4 |
+| 12–13 | RL41 front, RL41/RL42 junction | 9.02, 9.53 | 12.54 | 12.2 |
+| 14 | RL42 rear | 9.90 | 13.55 | 13.1 |
+
+- Effect on the catalog host `fuji-xf-50140mm-f28`: first-order values, the junction and the host's stop are
+  unchanged. Corner coverage stays at 100%, the composed half-field at the wide end rises from 8.31° to 10.44°, and
+  the share of the on-axis bundle reaching the format corner at 140 mm rises from 34% to 76%.
+- Not done: the figure is a patent drawing, not a dimensioned part, so the rims remain estimates good to about ±0.3
+  mm.
