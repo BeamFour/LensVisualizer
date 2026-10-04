@@ -21,6 +21,9 @@ type LensViewQueryKey =
   | "shift"
   | "tilt"
   | "configurationKey"
+  | "teleconverterKey"
+  | "teleconverterKeyA"
+  | "teleconverterKeyB"
   | "selectedElementId"
   | "selectedElementIdA"
   | "selectedElementIdB"
@@ -119,13 +122,14 @@ function parseBooleanParam(params: URLSearchParams, key: string): boolean | unde
 }
 
 /* Syntactic bound only — catalog-aware validation happens at the lens-aware
-   boundaries. The shape is the validator's LENS_KEY_PATTERN, so every key
-   validateLensData accepts is representable as a cfg value. */
-const CONFIGURATION_KEY_MAX_LENGTH = 128;
+   boundaries. The shape is the validator's LENS_KEY_PATTERN, which lens and
+   teleconverter keys share, so every key the validators accept is
+   representable as a `cfg` or `tc` value. */
+const CATALOG_KEY_MAX_LENGTH = 128;
 
-function parseConfigurationKey(params: URLSearchParams): string | undefined {
-  const key = params.get("cfg");
-  if (!key || key.length > CONFIGURATION_KEY_MAX_LENGTH || !LENS_KEY_PATTERN.test(key)) return undefined;
+function parseCatalogKeyParam(params: URLSearchParams, name: "cfg" | "tc" | "a_tc" | "b_tc"): string | undefined {
+  const key = params.get(name);
+  if (!key || key.length > CATALOG_KEY_MAX_LENGTH || !LENS_KEY_PATTERN.test(key)) return undefined;
   return key;
 }
 
@@ -154,7 +158,10 @@ export function parseLensViewQuery(search: string): LensViewQueryState {
   const analysisDrawerOpen = parseBooleanParam(params, "ad");
   const movementMode = params.get("mv");
   const tab = params.get("tab");
-  const configurationKey = version === "1" ? parseConfigurationKey(params) : undefined;
+  const configurationKey = version === "1" ? parseCatalogKeyParam(params, "cfg") : undefined;
+  const teleconverterKey = version === "1" ? parseCatalogKeyParam(params, "tc") : undefined;
+  const teleconverterKeyA = version === "1" ? parseCatalogKeyParam(params, "a_tc") : undefined;
+  const teleconverterKeyB = version === "1" ? parseCatalogKeyParam(params, "b_tc") : undefined;
 
   if (selectedElementId != null) state.selectedElementId = selectedElementId;
   if (selectedElementIdA != null) state.selectedElementIdA = selectedElementIdA;
@@ -164,6 +171,9 @@ export function parseLensViewQuery(search: string): LensViewQueryState {
   if (petzvalOverlayOpen !== undefined) state.petzvalOverlayOpen = petzvalOverlayOpen;
   if (analysisDrawerOpen !== undefined) state.analysisDrawerOpen = analysisDrawerOpen;
   if (configurationKey) state.configurationKey = configurationKey;
+  if (teleconverterKey) state.teleconverterKey = teleconverterKey;
+  if (teleconverterKeyA) state.teleconverterKeyA = teleconverterKeyA;
+  if (teleconverterKeyB) state.teleconverterKeyB = teleconverterKeyB;
   if (isAnalysisTabId(tab)) state.analysisDrawerTab = tab;
   if (isGroupMovementMode(movementMode)) {
     state.groupMovementOpen = true;
@@ -182,6 +192,9 @@ export function buildLensViewQuery({
   shift,
   tilt,
   configurationKey,
+  teleconverterKey,
+  teleconverterKeyA,
+  teleconverterKeyB,
   selectedElementId,
   selectedElementIdA,
   selectedElementIdB,
@@ -200,7 +213,8 @@ export function buildLensViewQuery({
     Boolean(petzvalOverlayOpen) ||
     Boolean(analysisDrawerOpen) ||
     Boolean(groupMovementOpen) ||
-    (!comparing && Boolean(configurationKey));
+    (!comparing && Boolean(configurationKey)) ||
+    (comparing ? Boolean(teleconverterKeyA) || Boolean(teleconverterKeyB) : Boolean(teleconverterKey));
 
   const params = new URLSearchParams();
   if (usesV1ViewState) params.set("v", "1");
@@ -212,6 +226,11 @@ export function buildLensViewQuery({
   if (shift != null && Math.abs(shift) > 1e-9) params.set("shift", String(shift));
   if (tilt != null && Math.abs(tilt) > 1e-9) params.set("tilt", String(tilt));
   if (!comparing && configurationKey) params.set("cfg", configurationKey);
+  /* A converter is per-pane identity. A composed system is not a catalog key, so it cannot live in the
+     /compare/:slugA/:slugB path the way an optical-configuration variant does. */
+  if (!comparing && teleconverterKey) params.set("tc", teleconverterKey);
+  if (comparing && teleconverterKeyA) params.set("a_tc", teleconverterKeyA);
+  if (comparing && teleconverterKeyB) params.set("b_tc", teleconverterKeyB);
 
   if (comparing) {
     if (selectedElementIdA != null) params.set("a_el", String(selectedElementIdA));
@@ -257,6 +276,9 @@ export function buildLensViewQueryFromState(state: LensState, zoom: number | nul
       !comparing && state.lens.selectedConfigurationKey !== state.lens.lensKeyA
         ? state.lens.selectedConfigurationKey
         : undefined,
+    teleconverterKey: comparing ? undefined : state.lens.teleconverterKeyA,
+    teleconverterKeyA: comparing ? state.lens.teleconverterKeyA : undefined,
+    teleconverterKeyB: comparing ? state.lens.teleconverterKeyB : undefined,
     selectedElementId: state.panels.selectedElementId,
     selectedElementIdA: state.panels.selectedElementIdA,
     selectedElementIdB: state.panels.selectedElementIdB,
@@ -279,6 +301,9 @@ export function lensViewQueryToUrlState(state: LensViewQueryState, includeViewDe
   if (state.shift != null) urlState.shift = state.shift;
   if (state.tilt != null) urlState.tilt = state.tilt;
   if (state.configurationKey) urlState.configurationKey = state.configurationKey;
+  if (state.teleconverterKey) urlState.teleconverterKey = state.teleconverterKey;
+  if (state.teleconverterKeyA) urlState.teleconverterKeyA = state.teleconverterKeyA;
+  if (state.teleconverterKeyB) urlState.teleconverterKeyB = state.teleconverterKeyB;
   for (const { key, default: fallback } of VIEW_STATE_FIELDS) {
     if (includeViewDefaults || key in state) {
       (urlState as Record<string, unknown>)[key] = state[key] ?? fallback;

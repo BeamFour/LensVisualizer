@@ -128,6 +128,23 @@ flagged lenses, and Section E of `agent_docs/sd-audit-queue.md` queues them. Fin
 point and include spherical launch phase and launch-plane solid-angle weights. Only `finiteConjugates` stations are
 eligible; see `src/lens-data/LENS_DATA_SPEC.md` for source requirements.
 
+**Data limitations** (`mtfDataLimitations.ts`). `MtfSupport.limitations` are the model's standing assumptions;
+`assessMtfDataLimitations` lists what the lens data lacks for the chart on screen, and the tab holds the chart behind
+a warning until the reader has seen them. A gap is listed only when it changes that display:
+
+- `reference-only`: a glass blocks the preferred spectrum, so the chart is the reference wavelength alone.
+- `estimated-dispersion`: a spectral chart uses nd/νd-only glasses. They are named, and split between lens and
+  converter on a composed system. Synthetic rear plates are not counted: a flat plate only shifts focus with color,
+  and the estimate keeps its F−C span exact.
+- `image-plane`: the authored plane is inconsistent and the request was `auto` or `design`. A `best-axial` request
+  never uses the authored plane, so it has no gap.
+- `short-field`: requested field positions are `outside-modeled-field`.
+- `scale`: the prescription and marketed focal lengths differ by more than 10 % (`mtfPrescriptionScale`).
+
+A lens with a converter is assessed as one system; no separate gap is raised for the pairing. A reference-line chart
+the reader chose has no glass gap. A paused proposal to narrow the `estimated-dispersion` blur and refit the
+estimate is in `agent_docs/dispersion-estimate-exploration.md`.
+
 The MTF tab lazily creates a worker from serializable lens data. Worker initialization removes engine-generated
 synthetic surfaces/elements from `RuntimeLens.data` and rebuilds them once from `rearPlates`, preserving physical
 gaps and plate dispersion. The typed protocol (`init | compute | cancel` → `progress | result | error`) runs
@@ -218,6 +235,50 @@ What is hidden, and where:
 
 Folded paths and perspective-control lenses reject `rearPlates`; a camera-fixed plate would otherwise tilt with the
 lens. Lenses whose notes still fold a plate as t/n remain valid; see `src/lens-data/LENS_DATA_SPEC.md`.
+
+### Teleconverter Composition
+
+A detachable rear teleconverter is a `TeleconverterData` entity (`src/types/teleconverter.ts`), not a lens.
+`attachTeleconverter(host, tc)` in `src/optics/prescription/teleconverter.ts` returns an ordinary `LensData` — host
+surfaces, the junction gap, then the converter's surfaces — and that goes through the unchanged `buildLens()`. Nothing
+downstream is converter-aware: the exact tracer, prepared states and every analysis see one sequential lens whose stop
+is the host's. Built-in converters stay on `opticalConfiguration`.
+
+- **Fit and spacing** live in `src/optics/prescription/teleconverterCompatibility.ts`, which has no runtime imports so
+  the build script can load it under plain Node. `teleconverterCompatibility()` returns the composed spacing or the
+  first failing rule; field semantics are in `src/lens-data/TELECONVERTER_DATA_SPEC.md`.
+- **Spacing is air-equivalent.** The converter is placed by its virtual object (`masterImageDistanceMm` behind its
+  first vertex), so the junction gap is the host's air back focus minus that distance and replaces the host's last gap
+  in its scalar `d`, its `var` table and its `aberrationControl.var` entry. The converter's own plates only convert
+  its authored last gap.
+- **Host plates split around the converter.** A plate whose rear face is at least `masterImageDistanceMm` from the
+  image is lens-side and stays ahead; the rest are camera-side and stay behind. Drop-in filters are authored as drawn
+  elements, so the split only matters for a file that lists some other plate far ahead of the sensor. With plates ahead
+  the host's last gap is untouched and the last plate ahead trails into the converter. `expandRearPlates()` reads the
+  descriptor's `platesAhead` and emits those plates before the converter's first surface, so expansion stays the only
+  place plates become surfaces and the MTF worker's strip-and-rebuild reproduces the same stack.
+- **The stop is preserved through `nominalFno`.** `buildLens()` derives the physical stop from `nominalFno` and
+  whole-system EFL, so the composer rescales `nominalFno` at each zoom station by the exact paraxial ratio
+  EFL(composed) / EFL(host). The entrance pupil is then unchanged and the real trace to the stop, which only touches
+  surfaces ahead of it, lands on the same radius. A scalar f-number becomes a per-station array on zoom hosts. The
+  ratio is measured the way `buildLens()` measures EFL: on the plate-expanded prescription, with the first station
+  taken from the surfaces as authored rather than the resolved `var` table.
+- **Metadata `buildLens()` and the controls trust is rescaled** by the same ratio: `focalLengthDesign` (the build
+  throws when it disagrees with the Gaussian EFL), `zoomPositions`, `fstopSeries`, `maxFstop`. `imageCircleMm` is the
+  analysis field radius, so it grows only up to the format diagonal.
+- **Image-referenced object distances grow by the converter's extension**, because only the image plane moves:
+  `closeFocusM`, `zoomCloseFocusM`, and every `finiteConjugates` entry measured from the image plane. Entries measured
+  from the first surface are unchanged.
+- **Identity:** converter surface labels take the reserved `TC` prefix, element ids continue after the host's, and the
+  composed data carries an `attachedTeleconverter` descriptor. `validateLensData()` accepts the prefix only with the
+  descriptor and requires the prefixed surfaces to be exactly the trailing block; `LensDataInput` omits the descriptor
+  so catalog files cannot author it. A converter group annotation is added only when the host authors `groups`,
+  because authored groups replace the group-movement overlay's element-span fallback.
+- **Validation:** `validateTeleconverterData()` merges the converter behind a powerless reference host and reuses
+  `validateLensData()` under default thresholds, then checks the converter's own paraxial conjugate and magnification.
+
+Not composable: folded or mirror hosts, fisheye projections, and perspective-control hosts (the movement model poses
+the whole prescription while a converter is camera-fixed).
 
 ## optics.ts
 

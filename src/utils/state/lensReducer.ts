@@ -29,6 +29,7 @@ import { VIEW_STATE_FIELDS } from "./lensViewUrlState.js";
 export const SET_LENS_A = "SET_LENS_A";
 export const SET_LENS_B = "SET_LENS_B";
 export const SET_OPTICAL_CONFIGURATION = "SET_OPTICAL_CONFIGURATION";
+export const SET_TELECONVERTER = "SET_TELECONVERTER";
 export const SWAP_LENSES = "SWAP_LENSES";
 export const SET_DARK = "SET_DARK";
 export const SET_HIGH_CONTRAST = "SET_HIGH_CONTRAST";
@@ -124,6 +125,8 @@ export function createInitialState(
       lensKeyA,
       lensKeyB: urlState.lensKeyB || catalogKeys[Math.min(1, catalogKeys.length - 1)],
       selectedConfigurationKey: urlState.configurationKey ?? lensKeyA,
+      teleconverterKeyA: (urlState.comparing ? urlState.teleconverterKeyA : urlState.teleconverterKey) ?? null,
+      teleconverterKeyB: (urlState.comparing ? urlState.teleconverterKeyB : null) ?? null,
       comparing: urlState.comparing || false,
       scaleMode: prefs.scaleMode || "independent",
     },
@@ -219,7 +222,7 @@ export default function lensReducer(state: LensState, action: LensAction): LensS
     case SET_LENS_A: {
       const next = {
         ...state,
-        lens: { ...state.lens, lensKeyA: action.key, selectedConfigurationKey: action.key },
+        lens: { ...state.lens, lensKeyA: action.key, selectedConfigurationKey: action.key, teleconverterKeyA: null },
       };
       /* In single mode, reset sliders and close analysis drawer when switching lenses */
       if (!state.lens.comparing) {
@@ -242,15 +245,33 @@ export default function lensReducer(state: LensState, action: LensAction): LensS
     case SET_LENS_B:
       return {
         ...state,
-        lens: { ...state.lens, lensKeyB: action.key },
+        lens: { ...state.lens, lensKeyB: action.key, teleconverterKeyB: null },
         panels: { ...state.panels, selectedElementIdB: null },
       };
     case SET_OPTICAL_CONFIGURATION:
       return {
         ...state,
-        lens: { ...state.lens, selectedConfigurationKey: action.key },
+        lens: {
+          ...state.lens,
+          selectedConfigurationKey: action.key,
+          teleconverterKeyA: action.teleconverterKey ?? null,
+        },
         panels: { ...state.panels, selectedElementId: null },
       };
+    /* Like a configuration switch, mounting a converter changes the optics but not the user's slider intent:
+       sliders are kept, and only the element selection (whose ids may no longer exist) is cleared. */
+    case SET_TELECONVERTER:
+      return action.panel === "b"
+        ? {
+            ...state,
+            lens: { ...state.lens, teleconverterKeyB: action.key },
+            panels: { ...state.panels, selectedElementIdB: null },
+          }
+        : {
+            ...state,
+            lens: { ...state.lens, teleconverterKeyA: action.key },
+            panels: { ...state.panels, selectedElementId: null, selectedElementIdA: null },
+          };
     case SWAP_LENSES:
       return {
         ...state,
@@ -259,6 +280,8 @@ export default function lensReducer(state: LensState, action: LensAction): LensS
           lensKeyA: state.lens.lensKeyB,
           lensKeyB: state.lens.lensKeyA,
           selectedConfigurationKey: state.lens.lensKeyB,
+          teleconverterKeyA: state.lens.teleconverterKeyB,
+          teleconverterKeyB: state.lens.teleconverterKeyA,
         },
       };
 
@@ -326,10 +349,16 @@ export default function lensReducer(state: LensState, action: LensAction): LensS
 
     case APPLY_URL_VIEW_STATE: {
       const urlState = action.state;
-      const lens =
+      let lens =
         urlState.configurationKey !== undefined
           ? { ...state.lens, selectedConfigurationKey: urlState.configurationKey }
           : state.lens;
+      /* `in`, not `!== undefined`: a URL without `tc` hydrates null and must unmount the converter. The
+         single-lens key and the per-pane comparison keys never arrive together (the URL boundary strips
+         whichever does not apply to the current mode). */
+      if ("teleconverterKey" in urlState) lens = { ...lens, teleconverterKeyA: urlState.teleconverterKey ?? null };
+      if ("teleconverterKeyA" in urlState) lens = { ...lens, teleconverterKeyA: urlState.teleconverterKeyA ?? null };
+      if ("teleconverterKeyB" in urlState) lens = { ...lens, teleconverterKeyB: urlState.teleconverterKeyB ?? null };
       const panels = { ...state.panels };
       for (const { key, default: fallback } of VIEW_STATE_FIELDS) {
         if (key in urlState) {

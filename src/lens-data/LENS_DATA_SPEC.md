@@ -30,18 +30,29 @@ Per-lens patent audit logs use `*.audit.md` alongside the data file. They are no
 - Variable air gaps for focus and zoom
 - Mirror or blocking surfaces that participate in a folded path
 - Annular clear apertures or central obstructions when they are optically meaningful
-- **Required in-lens drop-in / slip-in filters** — a plane plate the source prescription lists ahead of the last lens
-  surface, when the manufacturer says a filter must stay inserted (super-telephoto filter holders shipped with an NC
-  or clear filter). Author it at the source position as two flat surfaces and a drawn `Plane-Parallel Plate` element
-  with the source's physical gaps; never fold t/n into a neighbouring air gap. Keep it out of `elementCount`.
+- **Required drop-in / slip-in filters** — a plane plate the source prescription lists at the lens's own filter
+  holder, whether ahead of the last lens surface or behind it, when the lens is computed with a filter in place
+  (super-telephoto holders shipped with an NC or clear filter, a mirror lens's plug-in filter). It belongs to the
+  lens: a teleconverter mounts behind it. Author it at the source position as two flat surfaces and a drawn
+  `Plane-Parallel Plate` element with the source's physical gaps; never fold t/n into a neighbouring air gap. When the
+  source gives no clear aperture, or only a ray-envelope "effective diameter" that would limit bundles the rest of
+  the model passes, size the semi-diameter by ray trace — the largest height on the plate of any ray that reaches the
+  image format or the diagram's off-axis field, at every focus and zoom end, plus 5%, rounded up to 0.5 mm — and log
+  the estimate in the `*.audit.md` sidecar. Count it in `elementCount` only when the maker's published count includes
+  it.
 
 **Model through `rearPlates`, not as surfaces or elements:**
-- **Sensor glass / cover glass and rear filter plates** that the source prescription lists behind the last lens
-  surface (cover glass, IR-cut / low-pass stacks, rear drop-in filters). See [Rear Plates](#rear-plates-rearplates).
+- **Camera-side plates** the source prescription lists behind the last lens surface: sensor cover glass and IR-cut /
+  low-pass stacks, which sit a few millimetres ahead of the image and stay with the camera when the lens or a
+  teleconverter changes. See [Rear Plates](#rear-plates-rearplates). A drop-in filter in the lens's own holder is not
+  one of these, even when it is the last glass in the prescription.
 
 **Do NOT include:**
 - **Optional front or mid-lens filters** — accessory UV, ND, polarizing or protection plates mounted ahead of or
-  inside the lens, and any plate the source does not list (required drop-in filters are included; see above)
+  inside the lens, and any plate the source does not list (required drop-in filters are included; see above). A
+  listed filter that the source itself calls optional, removable or free to sit elsewhere is also left out, as
+  several fisheye patents do: keep its air-equivalent spacing (gap before + t/n + gap after) where it stood, so the
+  published first-order values hold, and quote the source's wording in the file header and the `*.audit.md` sidecar
 - **Dummy / flare-cutter planes** — source-table bookkeeping surfaces that do not change medium and are not active
   blockers in the modeled path
 - **Mechanical components** — focus motors, aperture blades (mechanical detail), barrel, mounts
@@ -127,6 +138,7 @@ Keep it normalized even when the product's official styling varies by source:
 | `publishedAt` | `string` | Git-derived | Optional explicit UTC ISO timestamp (`YYYY-MM-DDTHH:mm:ssZ`) for a newly published replacement model. Overrides inherited file publication history in recent lenses, feeds, and SEO; last-modified remains Git-derived but cannot precede publication. Omit for normal additions and routine corrections. |
 | `visible` | `boolean` | `true` | Controls whether the lens appears in the UI catalog. Set to `false` to hide a lens from the dropdown without removing its data file. |
 | `opticalConfiguration` | `object` | | Links complete prescriptions that are switchable optical states of one catalog lens. See Alternate Optical Configurations below. |
+| `acceptsTeleconverters` | `boolean` | | `true` when the lens takes dedicated rear teleconverters made for one of its `lensMounts`. Universal converters ignore this flag. See [TELECONVERTER_DATA_SPEC.md](TELECONVERTER_DATA_SPEC.md). |
 | `subtitle` | `string` | | Compact patent/example/design-correlation context. Used as the UI-header fallback when structured patent metadata is unavailable and retained by several corpus reports for source/example matching. |
 | `specs` | `string[]` | | Spec strings displayed in header |
 | `focalLengthMarketing` | `number \| [number, number]` | | Marketed/nominal focal length in mm. Single number for primes (e.g. `50`); `[wide, tele]` tuple for zooms (e.g. `[70, 200]`). |
@@ -185,6 +197,9 @@ opticalConfiguration: {
   configurations can be selected independently.
 - Record material source differences between configurations in each file's header and `subtitle`. A shared
   `groupKey` communicates a UI relationship, not that the source necessarily publishes a matched before/after pair.
+- This mechanism is for converters built into one lens. A detachable teleconverter is its own
+  `*.teleconverter.ts` entity that the viewer composes onto any compatible host; never author a host + converter copy
+  as a hidden configuration member. See [TELECONVERTER_DATA_SPEC.md](TELECONVERTER_DATA_SPEC.md).
 
 ---
 
@@ -263,8 +278,8 @@ patentAssignees: ["Canon Inc."],
 
 ## Rear Plates (`rearPlates`)
 
-Use `rearPlates` when the source prescription lists plane-parallel plates between the last lens surface and the image
-plane: sensor cover glass, IR-cut or low-pass stacks, or a rear filter. Copy the source values as printed:
+Use `rearPlates` when the source prescription lists camera-side plane-parallel plates between the last lens surface and
+the image plane: sensor cover glass and IR-cut or low-pass stacks. Copy the source values as printed:
 
 ```ts
 surfaces: [
@@ -310,7 +325,8 @@ Rules:
   migrating.
 - BFD in the Summary tab and cardinal overlay is measured from the last lens vertex, so it includes the plates.
 - Not supported with `opticalPath` / non-refracting surfaces or with `perspectiveControl`. Keep the air-equivalent fold
-  for those lenses. A plate ahead of the last lens surface cannot use `rearPlates`; see What to Include.
+  for those lenses. A plate ahead of the last lens surface cannot use `rearPlates`, and a drop-in filter in the lens's
+  own holder is a drawn element wherever it sits; see What to Include.
 - Do not invent a camera stack: use `rearPlates` only for plates the source lists.
 
 ## Element Bulk Absorption
@@ -1279,7 +1295,9 @@ doublets: [
     and non-negative `gapAfterMm`, and is not combined with `opticalPath`, non-refracting surfaces, or
     `perspectiveControl`; authored surfaces may not use the reserved `RP<n>a` / `RP<n>b` labels or the engine-only
     `synthetic` field
-21. Perspective-control ranges, projection metadata, aberration-control gaps, explicit element spans, rim slope, edge thickness, and the remaining numeric bounds described above
+21. `acceptsTeleconverters`, when present, is a boolean; authored surface labels may not start with the reserved
+    `TC` prefix, and the composer-written `attachedTeleconverter` descriptor is not an authorable field
+22. Perspective-control ranges, projection metadata, aberration-control gaps, explicit element spans, rim slope, edge thickness, and the remaining numeric bounds described above
 
 On failure, `buildLens()` throws with all errors listed.
 

@@ -97,6 +97,11 @@ Verified in code on 2026-07-06 (pins re-checked 2026-09-09):
   semantic diagram disclosure, and the Nikon AF-S NIKKOR 500mm f/5.6 E PF ED VR production lens. See
   the "Diffractive Phase Surfaces" section of
   [`agent_docs/architecture/optics-engine.md`](agent_docs/architecture/optics-engine.md). (F26.)
+- **Detachable teleconverters** — `*.teleconverter.ts` entities composed onto compatible hosts by
+  `attachTeleconverter()` (`src/optics/teleconverter.ts`), a TC control in the viewer and per compare pane (`tc`,
+  `a_tc` / `b_tc`), `/teleconverters` pages and search. Workflow in `agent_docs/adding_a_teleconverter.md`. Open
+  follow-ups, none started: teleconverter patents in the patent/author indexes, teleconverter glass in the `reports/`
+  scans, zoom-range-limited fit, and converters on folded, fisheye or perspective-control hosts.
 - **F8** (field-selectable coma fans) is the shipped row above; **F25** (patent relationship map,
   `/relationships`) shipped 2026-07-22 — outcome record
   `agent_docs/records/relationship-map-2026-07-22.md`; its original spec lives in git history as

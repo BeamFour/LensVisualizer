@@ -29,7 +29,8 @@ import type { LensDataInput } from "../types/optics.js";
  * ║    physical patent count.]                                           ║
  * ║                                                                      ║
  * ║  Optical design only: glass/mirror surfaces, stop, variable gaps.    ║
- * ║  Source-listed rear cover/filter plates go in `rearPlates`; no front ║
+ * ║  Source-listed camera-side cover/filter plates go in `rearPlates`;   ║
+ * ║  a required drop-in filter is a drawn plate element. No front        ║
  * ║  filters, mechanics, or parent/donor designs.                        ║
  * ║  See LENS_DATA_SPEC.md § Scope: What to Include.                     ║
  * ╚══════════════════════════════════════════════════════════════════════╝
@@ -160,8 +161,9 @@ const LENS_DATA = {
     // folded systems declare opticalPath.imagePlane instead.
   ],
 
-  /* ── Rear plates ── only when the source lists cover glass / filter plates behind the last lens. Copy the source
-   *    values; never fold t/n into the last gap by hand. See LENS_DATA_SPEC.md § Rear Plates (rearPlates). */
+  /* ── Rear plates ── only when the source lists camera-side cover glass / filter stacks behind the last lens. Copy
+   *    the source values; never fold t/n into the last gap by hand. A drop-in filter in the lens's own holder is a
+   *    drawn Plane-Parallel Plate element instead. See LENS_DATA_SPEC.md § Rear Plates (rearPlates). */
   // rearPlates: [
   //   { label: "CG", thicknessMm: 0.0, nd: 1.5168, vd: 64.2, glass: "N-BK7", gapAfterMm: 0.0, source: "..." },
   // ],

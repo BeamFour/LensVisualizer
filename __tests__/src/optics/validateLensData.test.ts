@@ -3,6 +3,8 @@ import validateLensData from "../../../src/optics/validateLensData.js";
 import LENS_DEFAULTS from "../../../src/lens-data/defaults.js";
 import { MAX_RIM_SLOPE_TAN } from "../../../src/optics/internal/surfaceMath.js";
 import { ASPHERIC_COEFFICIENT_SCHEMA } from "../../../src/types/asphericSchema.js";
+import { attachTeleconverter } from "../../../src/optics/prescription/teleconverter.js";
+import { teleconverterFixture, teleconverterHostData } from "./testLensFixtures.js";
 
 /* Passthrough mock so a single test can make buildAsphereIndex throw once.
  * buildAsphereIndex cannot be made to throw from plain lens data, so the
@@ -157,6 +159,49 @@ describe("validateLensData", () => {
 
     expect(errors.some((error) => error.includes("reserved for generated rear plates"))).toBe(true);
     expect(errors.filter((error) => error.includes('"synthetic" is engine-generated'))).toHaveLength(2);
+  });
+
+  it("reserves the teleconverter label prefix for composed systems and checks their descriptor", () => {
+    const valid = makeValid();
+    const surfaces = valid.surfaces as Record<string, unknown>[];
+    const has = (errors: string[], text: string) => errors.some((error) => error.includes(text));
+
+    expect(
+      has(
+        validateLensData({ ...valid, surfaces: [surfaces[0], surfaces[1], { ...surfaces[2], label: "TC2" }] }),
+        "reserved for attached teleconverter surfaces",
+      ),
+    ).toBe(true);
+    expect(
+      has(validateLensData(makeValid({ acceptsTeleconverters: "yes" })), '"acceptsTeleconverters" must be a boolean'),
+    ).toBe(true);
+
+    const composed = attachTeleconverter(teleconverterHostData(), teleconverterFixture());
+    const descriptor = composed.attachedTeleconverter!;
+    expect(validateLensData(composed)).toEqual([]);
+    expect(
+      has(
+        validateLensData({ ...composed, attachedTeleconverter: { ...descriptor, lastSurfaceLabel: "TC1" } }),
+        "must name the trailing block of surfaces",
+      ),
+    ).toBe(true);
+    /* The descriptor claims the block starts one surface later than the prefixed labels do. */
+    expect(
+      has(
+        validateLensData({ ...composed, attachedTeleconverter: { ...descriptor, firstSurfaceLabel: "TC2" } }),
+        "label prefix must mark exactly",
+      ),
+    ).toBe(true);
+    expect(has(validateLensData({ ...composed, acceptsTeleconverters: true }), "converters do not stack")).toBe(true);
+    expect(
+      has(
+        validateLensData({
+          ...composed,
+          attachedTeleconverter: { ...descriptor, magnification: 1, firstElementId: 0 },
+        }),
+        '"attachedTeleconverter.magnification"',
+      ),
+    ).toBe(true);
   });
 
   it("rejects keys that are not URL- and cfg-safe", () => {

@@ -72,6 +72,7 @@ const LENS_DATA = {
   apertureMarketing: 2.0,
   apertureDesign: 2.06,
   lensMounts: ["fujifilm-x"],
+  acceptsTeleconverters: true, // ships with the dedicated XF1.4X TC F2 WR
   imageFormat: "aps-c",
   patentNumber: "US 2019/0265504 A1",
   patentAuthors: ["Hiroki Saito"],

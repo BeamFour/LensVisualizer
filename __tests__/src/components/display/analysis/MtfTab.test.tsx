@@ -11,6 +11,7 @@ import { mtfImagePlaneOffset } from "../../../../../src/optics/analysis/mtfFocus
 import type { MtfResult } from "../../../../../src/types/mtf.js";
 import type { MtfJob, MtfWorkerReply, MtfWorkerRequest } from "../../../../../src/components/hooks/mtfWorkerClient.js";
 import { MTF_PREFERENCES_KEY, resetMtfPreferencesCache } from "../../../../../src/utils/state/mtfPreferences.js";
+import { resetMtfDataWarnings } from "../../../../../src/utils/state/mtfDataWarnings.js";
 
 // The fixture's authored image plane sits far from its paraxial focus, so Auto refocuses it.
 const L = buildSimplePositiveElementLens();
@@ -79,6 +80,7 @@ beforeEach(() => {
   installMatchMediaMock(false);
   localStorage.clear();
   resetMtfPreferencesCache();
+  resetMtfDataWarnings();
 });
 afterEach(() => {
   cleanup();
@@ -177,6 +179,31 @@ describe("MTF tab", () => {
     const note = screen.getByText(/own prescription's paraxial focus/).textContent!;
     expect(note).toContain(`${Math.abs(offsetMm).toFixed(2)} mm behind`);
     expect(note).toContain("These curves use best axial focus");
+  });
+  it("holds the chart behind a data warning until the reader dismisses it", async () => {
+    stubWorker({ target: focusedState });
+    const tab = (
+      <MtfTab L={focusedL} t={mockTheme} preparedState={focusedState} currentEPSD={1} currentPhysStopSD={1} />
+    );
+    const { unmount } = render(tab);
+    const chart = await screen.findByRole("figure", { name: /image height/ });
+    // The fixture glass has only nd and νd, so the photopic chart starts blurred and inert behind the warning.
+    const warning = screen.getByRole("note", { name: "Limited data for this chart" });
+    expect(warning.textContent).toContain("Every glass is known only by nd and νd");
+    expect(chart.closest<HTMLElement>("[inert]")!.style.filter).toContain("blur");
+    fireEvent.click(within(warning).getByRole("button", { name: "Show chart anyway" }));
+    expect(screen.queryByRole("note")).toBeNull();
+    expect(screen.getByRole("figure", { name: /image height/ })).toBe(chart);
+    expect(chart.closest("[inert]")).toBeNull();
+    // The gaps stay one click away, and the dismissal survives the tab closing and reopening.
+    expect(screen.getByText(/Limited data for this chart \(1\)/)).toBeTruthy();
+    unmount();
+    render(tab);
+    await screen.findByRole("figure", { name: /image height/ });
+    expect(screen.queryByRole("note")).toBeNull();
+    // A single-wavelength chart the reader asks for has no gap to report.
+    fireEvent.change(screen.getByRole("combobox", { name: "MTF spectrum" }), { target: { value: "reference" } });
+    await vi.waitFor(() => expect(screen.queryByText(/Limited data for this chart/)).toBeNull());
   });
   it("switches chart views and frequencies from one computed result, keeping color slots fixed", async () => {
     const { calls } = stubWorker();

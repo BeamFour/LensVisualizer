@@ -36,6 +36,7 @@ Tags: `[policy]` how we work · `[recipe]` steps for one change type · `[archit
 ## Recipes
 
 - [recipe] [`adding_a_lens.md`](adding_a_lens.md) — lens data workflow and validation troubleshooting; field rules live in `src/lens-data/LENS_DATA_SPEC.md`
+- [recipe] [`adding_a_teleconverter.md`](adding_a_teleconverter.md) — detachable teleconverter workflow; field rules live in `src/lens-data/TELECONVERTER_DATA_SPEC.md`
 - [recipe] [`lens-data-integration-handoff.md`](lens-data-integration-handoff.md) — copy-ready AI handoff for constructing data/analysis pairs
 - [recipe] [`lens-patent-audit.md`](lens-patent-audit.md) — four-phase patent audit and the per-lens `*.audit.md` log format
 - [recipe] [`patent-figure-sd-audit-procedure.md`](patent-figure-sd-audit-procedure.md) — semi-diameter vs patent-figure runbook
@@ -53,10 +54,11 @@ Tags: `[policy]` how we work · `[recipe]` steps for one change type · `[archit
 - [queue] [`../FEATURE_ADDITION_PLAN.md`](../FEATURE_ADDITION_PLAN.md) — planned features; owns the per-item template and the "already shipped" list
 - [queue] [`../EFFICIENCY_IMPROVEMENT_PLAN.md`](../EFFICIENCY_IMPROVEMENT_PLAN.md) — open cleanup and performance items with verification gates
 - [queue] [`../TRACE_MODEL_IMPROVEMENT_PLAN.md`](../TRACE_MODEL_IMPROVEMENT_PLAN.md) — trace-model status, deferred items, suggested next work
-- [queue] [`sd-audit-queue.md`](sd-audit-queue.md) — semi-diameter floor failures, shape deviations, source blockers, MTF field and image-plane censuses, traced field-coverage shortfalls, the in-progress diagram sweep
+- [queue] [`sd-audit-queue.md`](sd-audit-queue.md) — semi-diameter floor failures, shape deviations, source blockers, MTF field and image-plane censuses, traced field-coverage shortfalls, prescription errors found in passing, the in-progress diagram sweep
 - [queue] [`lens-mount-format-backfill.md`](lens-mount-format-backfill.md) — mount/format metadata coverage and review queue
 - [queue] [`glass-relabel-followup.md`](glass-relabel-followup.md) — catalog-mismatch relabel status and closed families
 - [queue] [`proprietary-glass-backfill.md`](proprietary-glass-backfill.md) — patent line-index backfill for proprietary glasses
+- [queue] [`dispersion-estimate-exploration.md`](dispersion-estimate-exploration.md) — paused proposal: narrow the MTF warning's estimated-dispersion blur and refit the nd/νd estimate; findings and the audit script
 - [queue] [`seo-optimization-plan.md`](seo-optimization-plan.md) — SEO rollout and Search Console triage, blocked on user-supplied inputs
 
 ## Records

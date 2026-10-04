@@ -62,6 +62,39 @@ describe("lensViewUrlState", () => {
     );
   });
 
+  it("round-trips a v1 teleconverter key and applies the same bounds as cfg", () => {
+    const teleconverterKey = "reference-xf-14x-teleconverter";
+    const params = buildLensViewQuery({ teleconverterKey });
+
+    expect(params.toString()).toBe(`v=1&tc=${teleconverterKey}`);
+    expect(parseLensViewQuery(`?${params.toString()}`).teleconverterKey).toBe(teleconverterKey);
+    expect(lensViewQueryToUrlState(parseLensViewQuery(`?${params.toString()}`)).teleconverterKey).toBe(
+      teleconverterKey,
+    );
+    /* A null key (bare lens) serializes nothing, so the default URL stays clean. */
+    expect(buildLensViewQuery({ teleconverterKey: null }).toString()).toBe("");
+
+    expect(parseLensViewQuery("?v=1&tc=../other").teleconverterKey).toBeUndefined();
+    expect(parseLensViewQuery(`?v=1&tc=${"a".repeat(129)}`).teleconverterKey).toBeUndefined();
+    expect(parseLensViewQuery("?tc=valid-looking-key").teleconverterKey).toBeUndefined();
+    expect(buildLensViewQuery({ comparing: true, teleconverterKey }).toString()).toBe("");
+  });
+
+  it("carries one teleconverter per comparison pane as a_tc / b_tc and never in single-lens URLs", () => {
+    const params = buildLensViewQuery({ comparing: true, teleconverterKeyA: "tc-one", teleconverterKeyB: "tc-two" });
+
+    expect(params.toString()).toBe("v=1&a_tc=tc-one&b_tc=tc-two");
+    const parsed = parseLensViewQuery(`?${params.toString()}`);
+    expect(parsed.teleconverterKeyA).toBe("tc-one");
+    expect(parsed.teleconverterKeyB).toBe("tc-two");
+    expect(parsed.teleconverterKey).toBeUndefined();
+    expect(lensViewQueryToUrlState(parsed)).toMatchObject({ teleconverterKeyA: "tc-one", teleconverterKeyB: "tc-two" });
+    /* A single pane with a converter still versions the URL; the bare pane serializes nothing. */
+    expect(buildLensViewQuery({ comparing: true, teleconverterKeyB: "tc-two" }).toString()).toBe("v=1&b_tc=tc-two");
+    expect(buildLensViewQuery({ teleconverterKeyA: "tc-one", teleconverterKeyB: "tc-two" }).toString()).toBe("");
+    expect(parseLensViewQuery("?a_tc=tc-one").teleconverterKeyA).toBeUndefined();
+  });
+
   it("rejects malformed, oversized, unversioned, and comparison configuration params", () => {
     expect(parseLensViewQuery("?v=1&cfg=../other-lens").configurationKey).toBeUndefined();
     expect(parseLensViewQuery(`?v=1&cfg=${"a".repeat(129)}`).configurationKey).toBeUndefined();
@@ -243,6 +276,9 @@ describe("lensViewUrlState", () => {
       shift: -4.5,
       tilt: 3.25,
       configurationKey: "example-configuration",
+      teleconverterKey: "example-teleconverter",
+      teleconverterKeyA: "example-teleconverter-a",
+      teleconverterKeyB: "example-teleconverter-b",
       selectedElementId: 4,
       selectedElementIdA: 2,
       selectedElementIdB: 9,
@@ -256,7 +292,13 @@ describe("lensViewUrlState", () => {
     };
 
     const single = parseLensViewQuery(`?${buildLensViewQuery(fixture).toString()}`);
-    const { selectedElementIdA: _a, selectedElementIdB: _b, ...singleLensFields } = fixture;
+    const {
+      selectedElementIdA: _a,
+      selectedElementIdB: _b,
+      teleconverterKeyA: _tcA,
+      teleconverterKeyB: _tcB,
+      ...singleLensFields
+    } = fixture;
     expect(single).toMatchObject(singleLensFields);
 
     // Comparison mode serializes a_el/b_el instead of el and drops aberration.

@@ -40,10 +40,45 @@ export const MTF_PHOTOPIC_LINES: readonly MtfSpectralLine[] = Object.freeze([
 /** Prescription focal length may differ from the marketed value by this share before results are qualified. */
 const SCALE_NOTE_FRACTION = 0.1;
 
-const SPECTRUM_LABELS: Record<Exclude<MtfSpectrum, "reference">, string> = {
+export const MTF_SPECTRUM_LABELS: Record<Exclude<MtfSpectrum, "reference">, string> = {
   cdf: "C/d/F",
   photopic: "Photopic",
 };
+
+/** Prescription and marketed focal lengths when they differ enough to qualify lp/mm values. */
+export interface MtfScaleDifference {
+  designMm: number;
+  marketingMm: number;
+  /** |design / marketing − 1|. */
+  fraction: number;
+}
+
+/**
+ * Compare the prescription's focal length with the marketed one.
+ *
+ * @param source - lens data carrying `focalLengthDesign` and `focalLengthMarketing`
+ * @returns the two lengths and their relative difference, or null when either is missing
+ */
+export function mtfPrescriptionScale(source: {
+  focalLengthDesign?: number | readonly number[];
+  focalLengthMarketing?: number | readonly number[];
+}): MtfScaleDifference | null {
+  const first = (value: number | readonly number[] | undefined) => (Array.isArray(value) ? value[0] : value);
+  const designMm = first(source.focalLengthDesign) as number | undefined;
+  const marketingMm = first(source.focalLengthMarketing) as number | undefined;
+  if (!designMm || !marketingMm) return null;
+  return { designMm, marketingMm, fraction: Math.abs(designMm / marketingMm - 1) };
+}
+
+/**
+ * Whether a scale difference is large enough to qualify reported lp/mm.
+ *
+ * @param scale - result of `mtfPrescriptionScale`
+ * @returns true above the 10 % note threshold
+ */
+export function mtfScaleNeedsNote(scale: MtfScaleDifference | null): scale is MtfScaleDifference {
+  return scale !== null && scale.fraction > SCALE_NOTE_FRACTION;
+}
 
 /** Spectrum actually used for a request, and a note when it differs from the preferred one or estimates dispersion. */
 export interface MtfSpectrumChoice {
@@ -57,6 +92,8 @@ export interface MtfSpectralData {
   blocker: string | null;
   /** Glasses whose C/F/g indices are estimated from nd and vd. */
   estimatedGlasses: number;
+  /** Ids of the elements those glasses belong to, in surface order. */
+  estimatedElementIds: number[];
 }
 
 /**
@@ -72,23 +109,24 @@ export interface MtfSpectralData {
 export function assessMtfSpectralData(state: PreparedOpticalState): MtfSpectralData {
   const { lens } = state;
   const estimated = new Set<number>();
+  const blocked = (blocker: string): MtfSpectralData => ({ blocker, estimatedGlasses: 0, estimatedElementIds: [] });
   for (const [i, dispersion] of lens.dispersion.entries()) {
     if (dispersion.quality === "air" || dispersion.quality === "sellmeier") continue;
     const surface = state.surfaces[i];
     const element = lens.source.elements.find((e) => e.id === surface.elemId);
-    if (dispersion.quality === "constant") return { blocker: "a glass has no Abbe number", estimatedGlasses: 0 };
-    if (element?.indexReference === "e")
-      return { blocker: "an e-line glass has no catalog dispersion data", estimatedGlasses: 0 };
+    if (dispersion.quality === "constant") return blocked("a glass has no Abbe number");
+    if (element?.indexReference === "e") return blocked("an e-line glass has no catalog dispersion data");
     if (dispersion.quality !== "abbe") continue;
     const vd = element?.vd ?? lens.runtime.vdByIdx[i] ?? 0;
     if (vd > MTF_ESTIMATED_DISPERSION_MAX_VD && element?.dPgF === undefined)
-      return {
-        blocker: `a low-dispersion glass (νd ${vd.toFixed(1)}) has no partial-dispersion data`,
-        estimatedGlasses: 0,
-      };
+      return blocked(`a low-dispersion glass (νd ${vd.toFixed(1)}) has no partial-dispersion data`);
     estimated.add(surface.elemId ?? -1 - i);
   }
-  return { blocker: null, estimatedGlasses: estimated.size };
+  return {
+    blocker: null,
+    estimatedGlasses: estimated.size,
+    estimatedElementIds: [...estimated].filter((id) => id >= 0),
+  };
 }
 
 /**
@@ -111,7 +149,7 @@ export function resolveMtfSpectrum(state: PreparedOpticalState, preferred: MtfSp
     };
   return {
     spectrum: "reference",
-    note: `${SPECTRUM_LABELS[preferred]} MTF is unavailable because ${blocker}; showing the reference wavelength.`,
+    note: `${MTF_SPECTRUM_LABELS[preferred]} MTF is unavailable because ${blocker}; showing the reference wavelength.`,
   };
 }
 
@@ -186,16 +224,14 @@ export function assessMtfSupport(state: PreparedOpticalState, options: MtfOption
     !MTF_GRID_CAPS.includes(options.maxGridSize ?? MTF_DEFAULT_GRID_CAP)
   )
     return reject("invalid-input", "MTF requires finite physical apertures, fields and image-space frequencies.");
-  const first = (value: number | readonly number[] | undefined) => (Array.isArray(value) ? value[0] : value);
-  const design = first(lens.source.focalLengthDesign) as number | undefined;
-  const marketing = first(lens.source.focalLengthMarketing) as number | undefined;
-  if (design && marketing && (design / marketing < 0.5 || design / marketing > 2)) {
+  const scale = mtfPrescriptionScale(lens.source);
+  if (scale && (scale.designMm / scale.marketingMm < 0.5 || scale.designMm / scale.marketingMm > 2)) {
     return reject("unverified-scale", "Prescription scale needs verification before reporting lp/mm.");
   }
-  if (design && marketing && Math.abs(design / marketing - 1) > SCALE_NOTE_FRACTION) {
+  if (mtfScaleNeedsNote(scale)) {
     support.limitations.push(
-      `The prescription focal length (${design.toFixed(1)} mm) differs from the marketed ${marketing} mm by ${Math.round(
-        Math.abs(design / marketing - 1) * 100,
+      `The prescription focal length (${scale.designMm.toFixed(1)} mm) differs from the marketed ${scale.marketingMm} mm by ${Math.round(
+        scale.fraction * 100,
       )} %; lp/mm are reported at the prescription's scale.`,
     );
   }
@@ -207,7 +243,7 @@ export function assessMtfSupport(state: PreparedOpticalState, options: MtfOption
       "Mixed d/e references are converted to the d line with compatible catalog dispersion, anchored to each authored index.",
     );
   if (options.spectrum !== "reference") {
-    const label = SPECTRUM_LABELS[options.spectrum];
+    const label = MTF_SPECTRUM_LABELS[options.spectrum];
     const spectral = assessMtfSpectralData(state);
     if (spectral.blocker)
       return reject(

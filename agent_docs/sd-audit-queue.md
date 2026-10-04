@@ -175,6 +175,15 @@ them is fixed by raising semi-diameters alone: each needs the source, decision o
 `npm run audit:field-coverage` skips fisheye projections and folded paths, whose field is declared rather than traced,
 hidden lenses, and files with no usable `imageFormat` (the same backfill as Section A).
 
+## Section G — prescription errors found in passing
+
+Files whose authored surfaces do not reproduce the source's own first-order values. Fisheye projections skip the
+Gaussian focal-length check in `buildLens()`, so these do not fail validation.
+
+| Lens | Finding | Fix |
+|---|---|---|
+| Nikon Fisheye-Nikkor 6mm f/2.8 | The file's surfaces trace to EFL 37.41 mm and a back focus of 273 mm; US 3,737,214 Example I states f = 6.3 and B.f. = 37.657. The table prints `R18 = −45.0`; `+45.0` gives EFL 6.300 and back focus 37.658. The file also places the stop ahead of the filter, while Fig. 1 draws it behind R17, and omits the listed filter plate R11/R12 (1.8 mm, n 1.51823). | Re-audit: correct R18 and the element types it changes, move the stop per Fig. 1, draw the filter plate, re-derive semi-diameters, and rewrite the analysis, which treats 37.4 mm as the Gaussian focal length. |
+
 ## In-progress diagram sweep
 
 The oldest-200 hosted-diagram audit (patent and live-view review of each lens, semi-diameters included) is paused at

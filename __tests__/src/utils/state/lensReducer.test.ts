@@ -12,6 +12,8 @@ import lensReducer, {
   SET_LENS_A,
   SET_LENS_B,
   SET_OPTICAL_CONFIGURATION,
+  SET_TELECONVERTER,
+  SWAP_LENSES,
   SET_SCALE_MODE,
   SET_DARK,
   SET_HIGH_CONTRAST,
@@ -137,6 +139,34 @@ describe("createInitialState", () => {
       CATALOG_KEYS,
     );
     expect(state.lens.selectedConfigurationKey).toBe("nikon_58_tc_in");
+  });
+
+  it("hydrates already-validated teleconverter keys for the mode the URL describes", () => {
+    const single = createInitialState(
+      {},
+      { singleLens: "nikon_58", teleconverterKey: "tc_14", teleconverterKeyB: "tc_20" },
+      true,
+      CATALOG_KEYS,
+    );
+    expect(single.lens.teleconverterKeyA).toBe("tc_14");
+    expect(single.lens.teleconverterKeyB).toBeNull();
+
+    const compare = createInitialState(
+      {},
+      {
+        comparing: true,
+        lensKeyA: "nikon_58",
+        lensKeyB: "canon_50",
+        teleconverterKey: "ignored",
+        teleconverterKeyA: "tc_14",
+        teleconverterKeyB: "tc_20",
+      },
+      true,
+      CATALOG_KEYS,
+    );
+    expect(compare.lens.teleconverterKeyA).toBe("tc_14");
+    expect(compare.lens.teleconverterKeyB).toBe("tc_20");
+    expect(createInitialState({}, {}, true, CATALOG_KEYS).lens.teleconverterKeyA).toBeNull();
   });
 
   it("hydrates shareable panel state from URL params", () => {
@@ -310,6 +340,57 @@ describe("lensReducer", () => {
       expect(next.lens.selectedConfigurationKey).toBe("nikon_58_tc_in");
       expect(next.panels.selectedElementId).toBeNull();
     });
+
+    it("keeps only the teleconverter the dispatcher resolved for the new prescription", () => {
+      state.lens = { ...state.lens, teleconverterKeyA: "tc_14" };
+      const kept = lensReducer(state, {
+        type: SET_OPTICAL_CONFIGURATION,
+        key: "nikon_58_tc_in",
+        teleconverterKey: "tc_14",
+      });
+      const dropped = lensReducer(state, { type: SET_OPTICAL_CONFIGURATION, key: "nikon_58_tc_in" });
+
+      expect(kept.lens.teleconverterKeyA).toBe("tc_14");
+      expect(dropped.lens.teleconverterKeyA).toBeNull();
+    });
+  });
+
+  describe("SET_TELECONVERTER", () => {
+    it("mounts and removes a converter without resetting sliders, clearing the stale element selection", () => {
+      state.sliders = { ...state.sliders, focusT: 0.4, zoomT: 0.6, stopdownT: 0.2 };
+      state.panels = { ...state.panels, selectedElementId: 3, analysisDrawerOpen: true };
+      const mounted = lensReducer(state, { type: SET_TELECONVERTER, panel: "a", key: "tc_14" });
+
+      expect(mounted.lens.teleconverterKeyA).toBe("tc_14");
+      expect(mounted.lens.teleconverterKeyB).toBeNull();
+      expect(mounted.sliders).toBe(state.sliders);
+      expect(mounted.panels.selectedElementId).toBeNull();
+      expect(mounted.panels.analysisDrawerOpen).toBe(true);
+      expect(
+        lensReducer(mounted, { type: SET_TELECONVERTER, panel: "a", key: null }).lens.teleconverterKeyA,
+      ).toBeNull();
+    });
+
+    it("targets comparison pane B independently", () => {
+      state.panels = { ...state.panels, selectedElementIdA: 2, selectedElementIdB: 5 };
+      const next = lensReducer(state, { type: SET_TELECONVERTER, panel: "b", key: "tc_20" });
+
+      expect(next.lens.teleconverterKeyB).toBe("tc_20");
+      expect(next.lens.teleconverterKeyA).toBeNull();
+      expect(next.panels.selectedElementIdB).toBeNull();
+      expect(next.panels.selectedElementIdA).toBe(2);
+    });
+
+    it("is dropped when that pane's lens changes and travels with the lens on swap", () => {
+      state.lens = { ...state.lens, comparing: true, teleconverterKeyA: "tc_14", teleconverterKeyB: "tc_20" };
+
+      expect(lensReducer(state, { type: SET_LENS_A, key: "zeiss_35" }).lens.teleconverterKeyA).toBeNull();
+      expect(lensReducer(state, { type: SET_LENS_A, key: "zeiss_35" }).lens.teleconverterKeyB).toBe("tc_20");
+      expect(lensReducer(state, { type: SET_LENS_B, key: "zeiss_35" }).lens.teleconverterKeyB).toBeNull();
+      const swapped = lensReducer(state, { type: SWAP_LENSES });
+      expect(swapped.lens.teleconverterKeyA).toBe("tc_20");
+      expect(swapped.lens.teleconverterKeyB).toBe("tc_14");
+    });
   });
 
   /* ── Single-field setters (scale mode, display, sliders, shared sliders) ── */
@@ -461,6 +542,22 @@ describe("lensReducer", () => {
         },
       });
       expect(next.lens.selectedConfigurationKey).toBe("nikon_58_tc_in");
+      /* Comparison URLs hydrate each pane separately. */
+      const panes = lensReducer(next, {
+        type: APPLY_URL_VIEW_STATE,
+        state: { teleconverterKeyA: "tc_14", teleconverterKeyB: null },
+      });
+      expect(panes.lens.teleconverterKeyA).toBe("tc_14");
+      expect(panes.lens.teleconverterKeyB).toBeNull();
+      /* A URL state without the key leaves the mounted converter alone; an explicit null unmounts it. */
+      const mounted = lensReducer(next, { type: APPLY_URL_VIEW_STATE, state: { teleconverterKey: "tc_14" } });
+      expect(mounted.lens.teleconverterKeyA).toBe("tc_14");
+      expect(lensReducer(mounted, { type: APPLY_URL_VIEW_STATE, state: { focus: 0.1 } }).lens.teleconverterKeyA).toBe(
+        "tc_14",
+      );
+      expect(
+        lensReducer(mounted, { type: APPLY_URL_VIEW_STATE, state: { teleconverterKey: null } }).lens.teleconverterKeyA,
+      ).toBeNull();
       expect(next.sliders.focusT).toBe(0.4);
       expect(next.sliders.aberrationT).toBe(0.7);
       expect(next.sliders.stopdownT).toBe(0.2);
@@ -567,6 +664,16 @@ describe("lensReducer", () => {
       const next = lensReducer(state, { type: ENTER_COMPARE, catalogKeys: CATALOG_KEYS });
       expect(next.lens.lensKeyB).toBe("canon_50");
     });
+
+    it("compares a mounted teleconverter against its own bare host", () => {
+      state.lens = { ...state.lens, lensKeyA: "nikon_58", lensKeyB: "canon_50", teleconverterKeyA: "tc_14" };
+      const next = lensReducer(state, { type: ENTER_COMPARE, catalogKeys: CATALOG_KEYS });
+
+      expect(next.lens.lensKeyA).toBe("nikon_58");
+      expect(next.lens.lensKeyB).toBe("nikon_58");
+      expect(next.lens.teleconverterKeyA).toBe("tc_14");
+      expect(next.lens.teleconverterKeyB).toBeNull();
+    });
   });
 
   describe("EXIT_COMPARE", () => {
@@ -588,6 +695,14 @@ describe("lensReducer", () => {
       expect(next.sliders.stopdownT).toBe(0.4);
       expect(next.sliders.shiftMm).toBe(3);
       expect(next.sliders.tiltDeg).toBe(4);
+    });
+
+    it("keeps pane A's teleconverter for the single-lens view and drops pane B's", () => {
+      state.lens = { ...state.lens, comparing: true, teleconverterKeyA: "tc_14", teleconverterKeyB: "tc_20" };
+      const next = lensReducer(state, { type: EXIT_COMPARE });
+
+      expect(next.lens.teleconverterKeyA).toBe("tc_14");
+      expect(next.lens.teleconverterKeyB).toBeNull();
     });
 
     it("preserves zoomT on exit", () => {

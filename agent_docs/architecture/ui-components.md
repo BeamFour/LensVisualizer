@@ -96,7 +96,12 @@ on unmount. `MtfChart` gives each frequency a fixed `chartSeries` slot, labels c
 (Home/End, Escape) and announces values through a polite live region. When the working aperture is faster than
 f/8 and the lens reaches it, "Compare f/8" runs a second worker request with pupil and stop radii scaled by N/8 and
 draws it with thin lines in the same slots. `mtf/MtfControls`, `mtf/MtfFieldSummary` and `mtf/MtfValueTable` hold
-the controls, status counts and per-field values; the table copies as CSV (`mtf/mtfCsv.ts`). Worker caching, numerical status and
+the controls, status counts and per-field values; the table copies as CSV (`mtf/mtfCsv.ts`). When
+`assessMtfDataLimitations` lists a gap, `mtf/MtfDataWarning` blurs the chart and field summary, marks them `inert`
+and covers them with a warning card that lists each gap. "Show chart anyway" records the listed kinds for that lens
+system in `src/utils/state/mtfDataWarnings.ts` (`useMtfDataWarning`); the warning then collapses to a `<details>` line
+above the chart. Dismissals are in memory only: they survive tab switches, reset on reload, and a kind of gap not yet
+dismissed on that lens brings the card back. Worker caching, numerical status, the gap kinds and
 optical eligibility are documented in [`Simulated MTF`](optics-engine.md#simulated-mtf).
 
 ## Display Overlays

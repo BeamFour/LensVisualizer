@@ -7,6 +7,7 @@
 
 import type { ImageFormatId, LensMountId } from "../utils/catalog/lensTaxonomy.js";
 import type { AsphericCoefficients } from "./asphericSchema.js";
+import type { AttachedTeleconverterInfo } from "./teleconverter.js";
 
 /** One sparse coefficient in a rotationally symmetric optical-path polynomial W(h). */
 export interface RadialPhaseTerm {
@@ -373,6 +374,10 @@ export interface LensData {
   groupCount?: number;
   visible?: boolean;
   opticalConfiguration?: OpticalConfigurationData;
+  /** The lens takes dedicated (non-universal) rear teleconverters made for one of its mounts. */
+  acceptsTeleconverters?: boolean;
+  /** Written only by `attachTeleconverter()` on a composed host + converter system; never authored. */
+  attachedTeleconverter?: AttachedTeleconverterInfo;
   perspectiveControl?: PerspectiveControlConfig;
   projection?: LensProjectionConfig;
   opticalPath?: OpticalPathData;
@@ -441,8 +446,9 @@ type DefaultedFields =
   | "apertureStep"
   | "maxFstop";
 
-/** Raw lens data shape before defaults merging (used in .data.ts files) */
-export type LensDataInput = Omit<LensData, DefaultedFields> & Partial<Pick<LensData, DefaultedFields>>;
+/** Raw lens data shape before defaults merging (used in .data.ts files); composer-only fields are not authorable. */
+export type LensDataInput = Omit<LensData, DefaultedFields | "attachedTeleconverter"> &
+  Partial<Pick<LensData, DefaultedFields>>;
 
 /** Entrance pupil data */
 export interface EntrancePupil {

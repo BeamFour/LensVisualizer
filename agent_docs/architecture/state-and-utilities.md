@@ -48,11 +48,22 @@ Canonical lens identity stays in route paths: `/lens/:slug` and `/compare/:slugA
 shareable view state:
 
 - Stable slider params remain unversioned: `focus`, `aberration`, `aperture`, `zoom`, `shift`, and `tilt`.
-- Versioned v1 view params are `v=1`, `el`, `a_el`, `b_el`, `gm`, `chr`, `ptz`, `mv`, `ad`, `tab`, and `cfg`.
+- Versioned v1 view params are `v=1`, `el`, `a_el`, `b_el`, `gm`, `chr`, `ptz`, `mv`, `ad`, `tab`, `cfg`, `tc`,
+  `a_tc`, and `b_tc`.
 - Single-lens optical configuration uses `cfg`; the parser accepts only a bounded catalog-key shape, and lens-aware
   initialization/popstate handling validates it against the canonical lens's `opticalConfiguration` group. Invalid,
   stale, and cross-group values fall back to the canonical prescription and disappear on the next URL write.
   Comparison identity stays in `/compare/:slugA/:slugB`, so `cfg` is ignored and omitted in compare mode.
+- A mounted detachable teleconverter is lens identity too: `LensSlice.teleconverterKeyA` (single-lens view and pane
+  A) and `teleconverterKeyB`. It serializes as `tc` on `/lens/:slug` and as `a_tc` / `b_tc` in compare mode, and is
+  validated like `cfg`: bounded key syntax in the parser, then `resolveTeleconverterKey()` against the lens it mounts
+  on at init and popstate, so a converter the lens cannot take is dropped. A composed lens + converter is not a
+  catalog key, which is why it cannot live in the compare path the way a configuration variant does.
+  `resolveTeleconverterKey()` accepts hidden test models (`visible: false`), so the URL is how they are mounted;
+  `teleconverterOptionsForLens()` offers published converters plus the mounted one.
+- Entering or leaving compare mode navigates to a different route, which mounts a fresh viewer initialized from the
+  URL. Identity that must survive the transition travels in that navigation's query; `toggleCompare` builds it with
+  `buildLensViewQuery()`.
 - Single-lens selection uses `el`; comparison selection uses `a_el` and `b_el`.
 - Overlay flags: `gm` (Abbe/glass-map modal), `chr` (chromatic-aberration overlay), `ptz` (Petzval-curvature overlay),
   `mv` (lens-group movement overlay mode: `focus`, `zoom`, or `combined`), `ad` (analysis drawer); `tab` names the

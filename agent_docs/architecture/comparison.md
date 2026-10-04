@@ -70,6 +70,14 @@ Compare identity may be a hidden member of a visible lens's `opticalConfiguratio
 the visible catalog plus those group members; unrelated hidden debug/reference fixtures remain unavailable. This makes
 configurations such as TC OUT versus TC IN directly comparable without an ambiguous pane-specific `cfg` query.
 
+Each pane can also carry a detachable teleconverter (`teleconverterKeyA` / `teleconverterKeyB`, URL `a_tc` / `b_tc`).
+`useComparisonMode` builds each pane through `resolveLensSystemData()`, and `ComparisonLayout` reads the converter back
+from the built lens so pane identity follows the built system. Both panes may hold the same lens: pressing COMPARE
+with a converter mounted opens lens + converter against the bare lens. Changing a pane's lens clears that pane's
+converter, and a swap carries each converter with its lens. A compare-route lens switch replaces the path and drops
+the query, so `LensViewer` reschedules the URL writer after it; otherwise the other pane's `a_tc` / `b_tc` would be
+missing from the address bar until some unrelated view state changed.
+
 ## Header Details And Vertical Space
 
 Desktop comparison panes expose an independent Details disclosure for specifications and current optical readouts.

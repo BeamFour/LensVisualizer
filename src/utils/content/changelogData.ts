@@ -20,6 +20,26 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-04",
+    type: "fix",
+    summary: "Fixed the controls dropping below the diagram when a converter is switched with an analysis tab open",
+  },
+  {
+    date: "2026-10-04",
+    type: "improvement",
+    summary: "Added a warning over MTF charts when the lens data is incomplete, listing each gap",
+  },
+  {
+    date: "2026-10-04",
+    type: "feature",
+    summary: "Added teleconverters: mount the Fujifilm XF1.4X, XF2X or GF1.4X on compatible lenses",
+  },
+  {
+    date: "2026-10-04",
+    type: "improvement",
+    summary: "Drew the rear filters of 21 Canon, Nikon and Minolta telephoto lenses as lens elements",
+  },
+  {
+    date: "2026-10-04",
     type: "lens",
     summary: "Added six Minolta MD Zoom patent models, from the 24-35mm f/3.5 to the 75-150mm f/4",
   },

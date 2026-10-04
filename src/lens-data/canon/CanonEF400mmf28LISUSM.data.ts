@@ -9,15 +9,16 @@ import type { LensDataInput } from "../../types/optics.js";
  * ║                                                                                                              ║
  * ║ Modeled prescription: 16 optical elements / 12 air-separated groups, all spherical, plus the rear filter.   ║
  * ║ Canon markets 17 elements / 13 groups because its published count includes both the front protection glass  ║
- * ║ and the rear filter. HG is a drawn element; the rear filter FL is modeled in `rearPlates` (traced, not      ║
- * ║ drawn, not counted in elementCount). The inactive flare-cutter plane FC is omitted.                         ║
+ * ║ and the rear filter. HG and the rear filter FL are both drawn elements; FL is a plane-parallel plate with a ║
+ * ║ ray-trace estimated semi-diameter (the patent lists none) and is not counted in elementCount. The inactive  ║
+ * ║ flare-cutter plane FC is omitted.                                                                           ║
  * ║                                                                                                              ║
  * ║ No dimensional scaling is applied. The patent publishes f = 392.15 mm, Fno = 2.9, and 2ω = 6.3°.            ║
  * ║ Marketing metadata remains separate: 400 mm f/2.8, 3.0 m minimum focus, 0.15× maximum magnification.        ║
  * ║ nominalFno therefore uses the modeled/patent value 2.9 rather than the marketed f/2.8.                      ║
  * ║                                                                                                              ║
  * ║ Rear stack: patent D29 = 15.00 mm, FL 2.20 mm (N17 = 1.516330, ν17 = 64.1), D31 = 15.28 mm to the inactive  ║
- * ║ FC plane, D32 = 38.95 mm to IP. FL is modeled in `rearPlates` with gapAfterMm 54.23 (D31 + D32).            ║
+ * ║ FC plane, D32 = 38.95 mm to IP. FL's rear surface carries the 54.23 mm to the image (D31 + D32).            ║
  * ║ The literal air-equivalent R29→IP distance is 70.680871512 mm; the rounded source prescription focuses      ║
  * ║ +0.016884094 mm farther back, so R29→FL is stored as 15.016884094 mm (printed 15.00 + 0.016884094) to keep  ║
  * ║ the image plane at the independently computed paraxial infinity focus.                                      ║
@@ -49,7 +50,7 @@ const LENS_DATA = {
   specs: [
     "400mm f/2.8 (marketed)",
     "Patent f = 392.15 mm, F/2.9",
-    "17 elements / 13 groups marketed; 16 / 12 modeled plus traced rear filter",
+    "17 elements / 13 groups marketed; 16 / 12 modeled plus drawn rear filter",
     "3.0 m minimum focus",
     "1 fluorite + 2 UD elements (manufacturer correlation)",
   ],
@@ -252,6 +253,16 @@ const LENS_DATA = {
       role: "Negative partner of the final cemented pair; the pair remains net positive within L3c.",
       cemented: "L3c-2",
     },
+    {
+      id: 17,
+      name: "FL",
+      label: "Drop-in filter FL",
+      type: "Plane-Parallel Plate",
+      nd: 1.51633,
+      vd: 64.1,
+      glass: "S-BSL7",
+      role: "Plane-parallel filter plate of the patent prescription (US 6,115,188 A, Numerical Example 25 surfaces R30–R31), in the rear filter holder. The design is computed with it in place, so it is drawn and traced as part of the working system. Semi-diameter is a ray-trace estimate; the source lists none. Not counted in elementCount.",
+    },
   ],
 
   /* ── Surface prescription ── */
@@ -285,19 +296,11 @@ const LENS_DATA = {
     { label: "27", R: 55.777, d: 9.7, nd: 1.6779, elemId: 15, sd: 21.0 },
     { label: "28", R: -98.88, d: 1.8, nd: 1.882997, elemId: 16, sd: 21.0 },
     { label: "29", R: 259.489, d: 15.016884094, nd: 1.0, elemId: 0, sd: 21.0 },
-  ],
-
-  /* ── Rear filter FL (patent surfaces R30–R31): traced, not drawn ── */
-  rearPlates: [
-    {
-      label: "FL",
-      thicknessMm: 2.2,
-      nd: 1.51633,
-      vd: 64.1,
-      glass: "S-BSL7",
-      gapAfterMm: 54.23, // D31 15.28 to the inactive FC plane + D32 38.95 to IP
-      source: "US 6,115,188 A, Numerical Example 25 surfaces R30–R31 (FC plane R32 omitted)",
-    },
+    // Drop-in filter FL (US 6,115,188 A, Numerical Example 25 surfaces R30–R31), drawn as a plane-parallel plate.
+    // Its sd is a ray-trace estimate (the source lists none).
+    // Gap to the image: FC plane R32 omitted; D31 15.28 to the inactive FC plane + D32 38.95 to IP
+    { label: "30", R: 1e15, d: 2.2, nd: 1.51633, elemId: 17, sd: 20.5 },
+    { label: "31", R: 1e15, d: 54.23, nd: 1.0, elemId: 0, sd: 20.5 }, // drop-in filter → image plane
   ],
 
   asph: {},

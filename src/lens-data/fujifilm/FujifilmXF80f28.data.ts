@@ -20,6 +20,7 @@ const LENS_DATA = {
   apertureMarketing: 2.8,
   apertureDesign: 2.88,
   lensMounts: ["fujifilm-x"],
+  acceptsTeleconverters: true, // XF1.4X TC WR and XF2X TC WR per Fujifilm's compatibility charts
   imageFormat: "aps-c",
   patentNumber: "US 2018/0246292 A1",
   patentAuthors: ["Ryoko Tomioka", "Daiki Kawamura"],

@@ -13,16 +13,16 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 ## Summary
 
 - **870** lenses scanned
-- **9755** glass elements examined
-- **3025** elements have multiple coordinate-compatible candidates
+- **9776** glass elements examined
+- **3027** elements have multiple coordinate-compatible candidates
 - **552** lens files are affected
-- **293** ambiguous elements retain authored dPgF at the runtime g-line, independent of the selected catalog row
+- **294** ambiguous elements retain authored dPgF at the runtime g-line, independent of the selected catalog row
 - **202** ambiguous elements provide complete C/F/g indices and bypass catalog dispersion entirely
 
 | Selection criterion | Elements |
 |---|---:|
-| Smallest reference-index residual | 1695 |
-| Evidence-source priority | 1028 |
+| Smallest reference-index residual | 1696 |
+| Evidence-source priority | 1029 |
 | Vendor context | 289 |
 | Stable canonical-name order | 11 |
 | Smallest Abbe residual | 2 |
@@ -204,6 +204,7 @@ resolves for. Per-candidate residuals are one `explainCompatibleGlassResolution`
 | `648338 class (vendor unresolved; multiple catalog equivalents)` | 1.64769 / 33.80 (d) | E-FD2 — smallest d-line \|Δn\| (1.8e-7 vs 1.2e-6) | S-TIM22 (Ohara, code, preferred code row)<br>H-ZF1 (CDGM, code, alternate code row) | 1 | [CANON EF 400mm f/2.8 L IS II USM](../../src/lens-data/canon/CanonEF400mmf28LISIIUSM.data.ts) L24 |
 | `654397 anomalous-dispersion class (vendor unresolved; multiple catalog equivalents)` | 1.65412 / 39.70 (d) | N-KZFS5 — smallest d-line \|Δn\| (4.4e-7 vs 4.8e-6) | S-NBH5 (Ohara, code, preferred code row)<br>BPH5 (Ohara, code, alternate code row) | 1 | [CANON EF 400mm f/2.8 L IS II USM](../../src/lens-data/canon/CanonEF400mmf28LISIIUSM.data.ts) L25a |
 | `808228 anomalous high-dispersion class (vendor unresolved; multiple catalog equivalents)` | 1.80810 / 22.80 (d) | S-NPH1 — smallest d-line \|Δn\| (5.3e-6 vs 1.1e-5) | FD225 (Hoya, code, alternate code row) | 1 | [CANON EF 400mm f/2.8 L IS II USM](../../src/lens-data/canon/CanonEF400mmf28LISIIUSM.data.ts) L25b |
+| `516641 class (vendor unresolved; multiple catalog equivalents)` | 1.51633 / 64.14 (d) | S-BSL7 — smallest d-line \|Δn\| (7.5e-8 vs 8.3e-8) | K-BK7 (Sumita, code, alternate code row)<br>L-BSL7 (Ohara, code, alternate code row) | 1 | [CANON EF 400mm f/2.8 L IS II USM](../../src/lens-data/canon/CanonEF400mmf28LISIIUSM.data.ts) G |
 | `806333 dense-flint class; spectral proxy NBFD15 (HOYA)` | 1.80610 / 33.27 (d) | NBFD15 — direct name evidence outranks six-digit code evidence. | J-LASFH6 (Hikari, code, vendor ✗, alternate code row) | 2 | [CANON EF 400mm f/2.8 L IS III USM](../../src/lens-data/canon/CanonEF400mmf28LISIIIUSM.data.ts) L1-3 |
 | `618634 phosphate-crown class; spectral proxy PCD4 (HOYA)` | 1.61800 / 63.40 (d) | PCD4 — direct name evidence outranks six-digit code evidence. | S-PHM52 (Ohara, code, vendor ✗, preferred code row)<br>N-PSK53A (Schott, code, vendor ✗, alternate code row)<br>K-PSKn2 (Sumita, code, vendor ✗, alternate code row) | 1 | [CANON EF 400mm f/2.8 L IS III USM](../../src/lens-data/canon/CanonEF400mmf28LISIIIUSM.data.ts) L2-1 |
 | `S-BSL7 coefficient proxy (patent 516641; production supplier unspecified)` | 1.51633 / 64.10 (d) | S-BSL7 — direct name evidence outranks six-digit code evidence. | K-BK7 (Sumita, code, alternate code row)<br>L-BSL7 (Ohara, code, alternate code row) | 2 | [CANON EF 400mm f/2.8 L IS USM](../../src/lens-data/canon/CanonEF400mmf28LISUSM.data.ts) HG |
@@ -958,7 +959,7 @@ resolves for. Per-candidate residuals are one `explainCompatibleGlassResolution`
 | `FC5 (HOYA) / S-FSL5 (OHARA)` | 1.48749 / 70.44 (d) | S-FSL5 — smallest d-line \|Δn\| (6.5e-8 vs 5.1e-7) | FC5 (Hoya, name, vendor ✓) | 1 | [MINOLTA AF APO Tele 200mm f/2.8](../../src/lens-data/minolta/MinoltaAF200mmf28.data.ts) L8 |
 | `S-BSM14 class (OHARA; close vintage 603/607 match)` | 1.60311 / 60.74 (d) | S-BSM14 — direct name evidence outranks six-digit code evidence. | J-SK14 (Hikari, code, vendor ✗, alternate code row)<br>BACD14 (Hoya, code, vendor ✗, alternate code row) | 3 | [MINOLTA AF APO TELE 300mm f/2.8](../../src/lens-data/minolta/MinoltaAF300mmf28.data.ts) L5 |
 | `S-TIH1 class (OHARA; close vintage 717/295 match)` | 1.71736 / 29.42 (d) | S-TIH1 — direct name evidence outranks six-digit code evidence. | SF1 (Schott, code, vendor ✗, preferred code row) | 1 | [MINOLTA AF APO TELE 300mm f/2.8](../../src/lens-data/minolta/MinoltaAF300mmf28.data.ts) L6 |
-| `BSC7 / N-BK7 class (517/642)` | 1.51680 / 64.20 (d) | N-BK7 — direct name evidence outranks alias evidence. | S-BSL7 (Ohara, alias)<br>H-K9L (CDGM, code, alternate code row)<br>H-K9LGT (CDGM, code, alternate code row) | 3 | [MINOLTA AF Reflex 500mm f/8](../../src/lens-data/minolta/MinoltaAFReflex500mmf8.data.ts) L1 |
+| `BSC7 / N-BK7 class (517/642)` | 1.51680 / 64.20 (d) | N-BK7 — direct name evidence outranks alias evidence. | S-BSL7 (Ohara, alias)<br>H-K9L (CDGM, code, alternate code row)<br>H-K9LGT (CDGM, code, alternate code row) | 4 | [MINOLTA AF Reflex 500mm f/8](../../src/lens-data/minolta/MinoltaAFReflex500mmf8.data.ts) L1 |
 | `LAC8 / N-LAK8 class (713/539)` | 1.71300 / 53.93 (d) | LAC8 — smallest d-line \|Δn\| (1.8e-7 vs 3.2e-6) | N-LAK8 (Schott, name)<br>MP-LAC8-30 (Hoya, code, alternate code row) | 1 | [MINOLTA AF Reflex 500mm f/8](../../src/lens-data/minolta/MinoltaAFReflex500mmf8.data.ts) L3 |
 | `LAF2 / N-LAF2 / S-LAM2 class (744/449)` | 1.74400 / 44.93 (d) | S-LAM2 — smallest d-line \|Δn\| (3.2e-6 vs 2.8e-5) | N-LAF2 (Schott, name)<br>J-LAF2 (Hikari, alias)<br>H-LaF3B (CDGM, code, preferred code row) | 1 | [MINOLTA AF Zoom 35-70mm f/4](../../src/lens-data/minolta/MinoltaAF3570mmf4.data.ts) L1 |
 | `E-FD1L / N-SF1 / S-TIH1 class (717/295; patent νd = 29.42)` | 1.71736 / 29.42 (d) | S-TIH1 — direct name evidence outranks alias evidence. | SF1 (Schott, alias) | 1 | [MINOLTA AF Zoom 35-70mm f/4](../../src/lens-data/minolta/MinoltaAF3570mmf4.data.ts) L2g |

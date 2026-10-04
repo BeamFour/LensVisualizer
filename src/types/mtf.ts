@@ -96,6 +96,15 @@ export interface MtfFocus {
   imagePlaneInconsistent: boolean;
 }
 
+/** What a lens's data lacks for the chart on screen; see `assessMtfDataLimitations`. */
+export type MtfDataLimitationKind = "reference-only" | "estimated-dispersion" | "image-plane" | "short-field" | "scale";
+
+/** One data gap, worded for the reader of the chart it qualifies. */
+export interface MtfDataLimitation {
+  kind: MtfDataLimitationKind;
+  text: string;
+}
+
 export type MtfFieldStatus = "converged" | "unconverged" | "unavailable" | "pending";
 
 export interface MtfFieldResult {

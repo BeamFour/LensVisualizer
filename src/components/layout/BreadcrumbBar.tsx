@@ -14,6 +14,7 @@ import { Link, useLocation } from "react-router";
 import type { Theme } from "../../types/theme.js";
 import { headerSearchBtn, headerStrip } from "../../utils/style/styles.js";
 import { LENS_CATALOG } from "../../utils/catalog/lensCatalog.js";
+import { TELECONVERTER_CATALOG } from "../../utils/catalog/teleconverterCatalog.js";
 import { deriveMaker } from "../../utils/catalog/lensMetadata.js";
 import {
   IMAGE_FORMAT_BY_ID,
@@ -51,6 +52,9 @@ function validBreadcrumbSource(source: LensBreadcrumbSource | undefined): LensBr
   }
   if (source.type === "mount" && isLensMountId(source.id)) return source;
   if (source.type === "format" && isImageFormatId(source.id)) return source;
+  if (source.type === "teleconverter" && typeof source.id === "string" && TELECONVERTER_CATALOG[source.id]) {
+    return source;
+  }
   return null;
 }
 
@@ -184,6 +188,18 @@ export default function BreadcrumbBar({ theme: t, isWide, lensKey }: BreadcrumbB
                   <span style={separatorStyle}>/</span>
                   <Link to={`/formats/${source.id}/`} style={linkStyle}>
                     {IMAGE_FORMAT_BY_ID[source.id].label}
+                  </Link>
+                  <span style={separatorStyle}>/</span>
+                  <span style={{ color: t.body }}>{lensA.name}</span>
+                </>
+              ) : source?.type === "teleconverter" ? (
+                <>
+                  <Link to="/teleconverters/" style={linkStyle}>
+                    Teleconverters
+                  </Link>
+                  <span style={separatorStyle}>/</span>
+                  <Link to={`/teleconverters/${source.id}/`} style={linkStyle}>
+                    {TELECONVERTER_CATALOG[source.id].name}
                   </Link>
                   <span style={separatorStyle}>/</span>
                   <span style={{ color: t.body }}>{lensA.name}</span>

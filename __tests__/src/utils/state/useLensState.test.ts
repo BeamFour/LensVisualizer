@@ -8,6 +8,7 @@ import { renderHook, act } from "@testing-library/react";
 import useLensState from "../../../../src/utils/state/useLensState.js";
 import { PREFS_KEY } from "../../../../src/utils/state/preferences.js";
 import { CATALOG_KEYS, COMPARISON_CATALOG_KEYS } from "../../../../src/utils/catalog/lensCatalog.js";
+import { ALL_TELECONVERTER_KEYS, resolveTeleconverterKey } from "../../../../src/utils/catalog/teleconverterCatalog.js";
 import { clearBrowserState, installMatchMediaMock } from "../../../testUtils.js";
 
 /* ── Mock window.matchMedia (not implemented in jsdom) ── */
@@ -82,6 +83,41 @@ describe("useLensState — URL params override defaults", () => {
     const { result } = renderHook(() => useLensState(CATALOG_KEYS, canonicalConfigurationKey));
 
     expect(result.current[0].lens.selectedConfigurationKey).toBe(canonicalConfigurationKey);
+  });
+
+  /* Catalog-aware converter validation needs a real pair; resolve it from the catalogs rather than naming a lens.
+     Hidden test models count: a URL mounts them like any other converter. */
+  const teleconverterKey = ALL_TELECONVERTER_KEYS[0];
+  const teleconverterHostKey = CATALOG_KEYS.find((key) => resolveTeleconverterKey(key, teleconverterKey) !== null)!;
+  const bareLensKey = CATALOG_KEYS.find((key) => resolveTeleconverterKey(key, teleconverterKey) === null)!;
+
+  it("mounts a compatible teleconverter from the URL and drops one the lens cannot take", () => {
+    window.history.replaceState({}, "", `/lens/${teleconverterHostKey}/?v=1&tc=${teleconverterKey}`);
+    const mounted = renderHook(() => useLensState(CATALOG_KEYS, teleconverterHostKey));
+    expect(mounted.result.current[0].lens.teleconverterKeyA).toBe(teleconverterKey);
+
+    window.history.replaceState({}, "", `/lens/${bareLensKey}/?v=1&tc=${teleconverterKey}`);
+    const rejected = renderHook(() => useLensState(CATALOG_KEYS, bareLensKey));
+    expect(rejected.result.current[0].lens.teleconverterKeyA).toBeNull();
+
+    /* Unversioned URLs never carry identity fields. */
+    window.history.replaceState({}, "", `/lens/${teleconverterHostKey}/?tc=${teleconverterKey}`);
+    const unversioned = renderHook(() => useLensState(CATALOG_KEYS, teleconverterHostKey));
+    expect(unversioned.result.current[0].lens.teleconverterKeyA).toBeNull();
+  });
+
+  it("mounts per-pane teleconverters on a compare route, each checked against its own pane's lens", () => {
+    window.history.replaceState(
+      {},
+      "",
+      `?v=1&a_tc=${teleconverterKey}&b_tc=${teleconverterKey}&tc=${teleconverterKey}`,
+    );
+    const { result } = renderHook(() => useLensState(COMPARISON_CATALOG_KEYS, teleconverterHostKey, bareLensKey));
+
+    expect(result.current[0].lens.comparing).toBe(true);
+    expect(result.current[0].lens.teleconverterKeyA).toBe(teleconverterKey);
+    /* Pane B's lens cannot take the converter, so its key is dropped. */
+    expect(result.current[0].lens.teleconverterKeyB).toBeNull();
   });
 
   it("initializes a configuration variant from compare route identity and ignores cfg", () => {
