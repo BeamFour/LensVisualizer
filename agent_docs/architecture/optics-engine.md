@@ -128,6 +128,22 @@ flagged lenses, and Section E of `agent_docs/sd-audit-queue.md` queues them. Fin
 point and include spherical launch phase and launch-plane solid-angle weights. Only `finiteConjugates` stations are
 eligible; see `src/lens-data/LENS_DATA_SPEC.md` for source requirements.
 
+**Data limitations** (`mtfDataLimitations.ts`). `MtfSupport.limitations` are the model's standing assumptions;
+`assessMtfDataLimitations` lists what the lens data lacks for the chart on screen, and the tab holds the chart behind
+a warning until the reader has seen them. A gap is listed only when it changes that display:
+
+- `reference-only`: a glass blocks the preferred spectrum, so the chart is the reference wavelength alone.
+- `estimated-dispersion`: a spectral chart uses nd/νd-only glasses. They are named, and split between lens and
+  converter on a composed system. Synthetic rear plates are not counted: a flat plate only shifts focus with color,
+  and the estimate keeps its F−C span exact.
+- `image-plane`: the authored plane is inconsistent and the request was `auto` or `design`. A `best-axial` request
+  never uses the authored plane, so it has no gap.
+- `short-field`: requested field positions are `outside-modeled-field`.
+- `scale`: the prescription and marketed focal lengths differ by more than 10 % (`mtfPrescriptionScale`).
+
+A lens with a converter is assessed as one system; no separate gap is raised for the pairing. A reference-line chart
+the reader chose has no glass gap.
+
 The MTF tab lazily creates a worker from serializable lens data. Worker initialization removes engine-generated
 synthetic surfaces/elements from `RuntimeLens.data` and rebuilds them once from `rearPlates`, preserving physical
 gaps and plate dispersion. The typed protocol (`init | compute | cancel` → `progress | result | error`) runs

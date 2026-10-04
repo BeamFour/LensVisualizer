@@ -1,11 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { build, buildRearPlateLens, buildSimplePositiveElementLens, REAR_PLATE_FIXTURE } from "./testLensFixtures.js";
+import {
+  build,
+  buildChromaticPositiveElementLens,
+  buildRearPlateLens,
+  buildSimplePositiveElementLens,
+  REAR_PLATE_FIXTURE,
+  teleconverterFixture,
+  teleconverterHostData,
+} from "./testLensFixtures.js";
 import { prepareRuntimeState } from "../../../src/optics/compat.js";
 import { assessMtfSupport } from "../../../src/optics/analysis/mtfSupport.js";
 import type { MtfOptions } from "../../../src/types/mtf.js";
 import { LINE_NM } from "../../../src/optics/spectralLines.js";
 import { geometricOtf, otfMagnitude } from "../../../src/optics/analysis/mtfMath.js";
-import { computeMtf } from "../../../src/optics/mtf.js";
+import { assessMtfDataLimitations, computeMtf } from "../../../src/optics/mtf.js";
+import { attachTeleconverter } from "../../../src/optics/prescription/teleconverter.js";
 import {
   findMtfFieldFootprint,
   mtfLaunchGrid,
@@ -388,5 +397,66 @@ describe("MTF refinement and focus", () => {
     });
     expect(focused.focus).toMatchObject({ mode: "design", appliedShiftMm: 0, imagePlaneInconsistent: false });
     expect(Math.abs(focused.focus!.imagePlaneOffsetMm!)).toBeLessThan(1e-9);
+  });
+});
+
+describe("MTF data limitations", () => {
+  const base = buildSimplePositiveElementLens();
+  const state = prepareRuntimeState(base, 0, 0);
+  const photopic = {
+    preferredSpectrum: "photopic",
+    spectrum: "photopic",
+    referenceWavelengthNm: 555,
+    result: null,
+  } as const;
+  const reference = {
+    preferredSpectrum: "reference",
+    spectrum: "reference",
+    referenceWavelengthNm: LINE_NM.d,
+  } as const;
+  it("ties glass gaps to the charted spectrum and names the estimated glasses", () => {
+    // An nd/νd-only glass is a gap in a spectral chart, not in a single-wavelength chart the reader asked for.
+    const [estimated] = assessMtfDataLimitations(state, photopic);
+    expect(estimated.kind).toBe("estimated-dispersion");
+    expect(estimated.text).toContain("Every glass is known only by nd and νd");
+    expect(assessMtfDataLimitations(state, { ...reference, result: null })).toEqual([]);
+    // A glass that blocks spectral sampling leaves the reference line alone on the chart.
+    const noAbbe = build({ ...base.data, elements: base.elements.map((e) => ({ ...e, vd: undefined })) });
+    const [fallback] = assessMtfDataLimitations(prepareRuntimeState(noAbbe, 0, 0), {
+      ...reference,
+      preferredSpectrum: "photopic",
+      result: null,
+    });
+    expect(fallback.kind).toBe("reference-only");
+    expect(fallback.text).toContain("a glass has no Abbe number. The chart shows the 587.6 nm reference wavelength");
+    // An estimated rear plate is not a gap; an estimated converter glass is named as the converter's.
+    const resolved = buildChromaticPositiveElementLens();
+    const plated = build({ ...resolved.data, rearPlates: [{ ...REAR_PLATE_FIXTURE, glass: undefined }] });
+    const platedState = prepareRuntimeState(plated, 0, 0);
+    expect(platedState.lens.dispersion.map((d) => d.quality)).toContain("abbe");
+    expect(assessMtfDataLimitations(platedState, photopic)).toEqual([]);
+    const host = teleconverterHostData();
+    const hostData = { ...host, elements: host.elements.map((e) => ({ ...e, glass: "N-BK7" })) };
+    const composed = build(attachTeleconverter(hostData, teleconverterFixture()));
+    const [converter] = assessMtfDataLimitations(prepareRuntimeState(composed, 0, 0), photopic);
+    expect(converter.text).toContain("1 of 2 glasses (TL1 in the converter) is known only by nd and νd");
+  });
+  it("reports the image plane, the field and the scale only where the chart depends on them", () => {
+    const options = { ...mtfTestOptions, fieldFractions: [0, 1], pupilSemiDiameterMm: 0.1, stopSemiDiameterMm: 0.1 };
+    const gaps = (target: typeof state, focus: MtfOptions["focus"]) =>
+      assessMtfDataLimitations(target, { ...reference, result: computeMtf(target, { ...options, focus }) });
+    // The fixture's image plane contradicts its paraxial focus: a gap unless best axial focus was requested.
+    expect(gaps(state, "best-axial")).toEqual([]);
+    expect(gaps(state, "auto")[0].text).toContain("refocused to best axial focus");
+    expect(gaps(state, "design")[0]).toMatchObject({ kind: "image-plane" });
+    expect(gaps(state, "design")[0].text).toContain("out of focus");
+    // Format heights beyond the modeled edge are counted, and a rescaled prescription is flagged.
+    const edge = computeMtf(state, options).geometry!.modeledEdgeHeightMm;
+    const wide = build({ ...base.data, imageCircleMm: 3 * edge, focalLengthDesign: 50, focalLengthMarketing: 58 });
+    const [field, scale] = gaps(prepareRuntimeState(wide, 0, 0), "best-axial");
+    expect(field.kind).toBe("short-field");
+    expect(field.text).toContain("1 of 2 field positions lies beyond it and is not charted");
+    expect(scale.kind).toBe("scale");
+    expect(scale.text).toContain("differs from the marketed 58 mm by 14%");
   });
 });

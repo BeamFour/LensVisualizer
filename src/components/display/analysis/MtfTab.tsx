@@ -4,13 +4,15 @@ import type { RuntimeLens } from "../../../types/optics.js";
 import type { MtfMethod, MtfOptions, MtfResult, MtfSpectrum } from "../../../types/mtf.js";
 import type { PreparedOpticalState } from "../../../optics/types.js";
 import type { Theme } from "../../../types/theme.js";
-import { assessMtfSupport, resolveMtfSpectrum } from "../../../optics/mtf.js";
+import { assessMtfDataLimitations, assessMtfSupport, resolveMtfSpectrum } from "../../../optics/mtf.js";
 import { formatFNumber } from "../../../optics/optics.js";
 import { useMtfComputation } from "../../hooks/useMtfComputation.js";
+import { useMtfDataWarning } from "../../hooks/useMtfDataWarning.js";
 import { useMtfPreferences } from "../../hooks/useMtfPreferences.js";
 import { AnalysisEmptyState } from "./analysisUi.js";
 import MtfChart from "./MtfChart.js";
 import MtfControls from "./mtf/MtfControls.js";
+import MtfDataWarning from "./mtf/MtfDataWarning.js";
 import MtfFieldSummary from "./mtf/MtfFieldSummary.js";
 
 interface MtfTabProps {
@@ -86,6 +88,17 @@ export default function MtfTab({
   );
   const { result, stale, running, error } = useMtfComputation(L, job);
   const shown = support.available ? result : null;
+  const dataLimitations = useMemo(
+    () =>
+      assessMtfDataLimitations(preparedState, {
+        preferredSpectrum: preferences.spectrum,
+        spectrum: spectrum.spectrum,
+        referenceWavelengthNm: support.referenceWavelengthNm,
+        result: shown,
+      }),
+    [preparedState, preferences.spectrum, spectrum.spectrum, support.referenceWavelengthNm, shown],
+  );
+  const [warningAcknowledged, acknowledgeWarning] = useMtfDataWarning(L.data.key, dataLimitations);
   // Stop-down scales the pupil and stop radii by N/8, as the aperture control does.
   const compareF8Available = !!fNumber && fNumber < COMPARISON_F_NUMBER - 0.05 && L.maxFstop >= COMPARISON_F_NUMBER;
   const comparisonJob = useMemo(() => {
@@ -134,16 +147,23 @@ export default function MtfTab({
               Calculating f/8 comparison…
             </p>
           ) : null}
-          <MtfChart
-            result={shown}
-            view={preferences.view}
-            frequencies={preferences.frequencies}
+          <MtfDataWarning
+            limitations={dataLimitations}
+            acknowledged={warningAcknowledged}
+            onAcknowledge={acknowledgeWarning}
             t={t}
-            stale={stale}
-            comparison={comparisonJob && !comparison.stale ? comparison.result : null}
-            comparisonLabel="f/8"
-          />
-          <MtfFieldSummary result={shown} frequencies={preferences.frequencies} t={t} />
+          >
+            <MtfChart
+              result={shown}
+              view={preferences.view}
+              frequencies={preferences.frequencies}
+              t={t}
+              stale={stale}
+              comparison={comparisonJob && !comparison.stale ? comparison.result : null}
+              comparisonLabel="f/8"
+            />
+            <MtfFieldSummary result={shown} frequencies={preferences.frequencies} t={t} />
+          </MtfDataWarning>
         </>
       )}
       <p style={muted}>

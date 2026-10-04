@@ -20,6 +20,11 @@ export interface ChangelogEntry {
 export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-04",
+    type: "improvement",
+    summary: "Added a warning over MTF charts when the lens data is incomplete, listing each gap",
+  },
+  {
+    date: "2026-10-04",
     type: "feature",
     summary: "Added teleconverters: mount the Fujifilm XF1.4X, XF2X or GF1.4X on compatible lenses",
   },
