@@ -22,6 +22,7 @@ import { conicPolySag, FLAT_R_THRESHOLD, MAX_RIM_SLOPE_TAN, sagSlopeRaw } from "
 import { traceExactSurfaceStack } from "./internal/exactSurfaceTrace.js";
 import type { ExactTraceLens } from "./internal/exactSurfaceTrace.js";
 import { REAR_PLATE_LABEL_PATTERN } from "./prescription/rearPlates.js";
+import { TELECONVERTER_LABEL_PREFIX } from "./prescription/teleconverterCompatibility.js";
 
 /* Validation operates on untrusted data — use a permissive record type
  * so dynamic-key checks compile without casts on every property access. */
@@ -337,7 +338,7 @@ function validateOpticalPath(value: unknown, surfaceLabels: Set<string>, errors:
   }
 }
 
-function validateRearPlates(data: UntrustedLensData, errors: string[]): void {
+export function validateRearPlates(data: UntrustedLensData, errors: string[]): void {
   const plates = data.rearPlates;
   if (!Array.isArray(plates) || plates.length === 0) {
     errors.push(`"rearPlates" must be a non-empty array when provided`);
@@ -379,7 +380,7 @@ function validateRearPlates(data: UntrustedLensData, errors: string[]): void {
   }
 }
 
-function validateLensMounts(value: unknown, errors: string[]): void {
+export function validateLensMounts(value: unknown, errors: string[]): void {
   if (!Array.isArray(value)) {
     errors.push(`"lensMounts" must be a non-empty array of canonical mount ids when provided`);
     return;
@@ -400,6 +401,51 @@ function validateLensMounts(value: unknown, errors: string[]): void {
       errors.push(`"lensMounts" must not contain duplicate mount id "${mount}"`);
     }
     seen.add(mount);
+  }
+}
+
+/**
+ * Check the composer-written teleconverter descriptor against the surface list.
+ *
+ * The descriptor is what distinguishes a composed host + converter system from authored data: only with it present
+ * may surfaces carry the reserved converter label prefix, and those surfaces must be exactly the trailing block.
+ */
+function validateAttachedTeleconverter(data: UntrustedLensData, errors: string[]): void {
+  const info = data.attachedTeleconverter;
+  if (!info || typeof info !== "object" || Array.isArray(info)) {
+    errors.push(`"attachedTeleconverter" must be an object when provided`);
+    return;
+  }
+  for (const field of ["key", "name", "hostKey", "hostName", "firstSurfaceLabel", "lastSurfaceLabel"]) {
+    if (typeof info[field] !== "string" || !info[field]) {
+      errors.push(`"attachedTeleconverter.${field}" must be a non-empty string`);
+    }
+  }
+  if (typeof info.magnification !== "number" || !Number.isFinite(info.magnification) || info.magnification <= 1) {
+    errors.push(`"attachedTeleconverter.magnification" must be a finite number > 1`);
+  }
+  if (!Number.isInteger(info.firstElementId) || info.firstElementId <= 0) {
+    errors.push(`"attachedTeleconverter.firstElementId" must be a positive integer`);
+  }
+  if (data.acceptsTeleconverters !== undefined) {
+    errors.push(`A composed teleconverter system cannot declare "acceptsTeleconverters" (converters do not stack)`);
+  }
+  if (!Array.isArray(data.surfaces)) return;
+
+  const labels: unknown[] = data.surfaces.map((surface: UntrustedLensData) => surface?.label);
+  const first = labels.indexOf(info.firstSurfaceLabel);
+  const last = labels.indexOf(info.lastSurfaceLabel);
+  if (first < 1 || last !== labels.length - 1) {
+    errors.push(`"attachedTeleconverter" must name the trailing block of surfaces, behind at least one host surface`);
+    return;
+  }
+  const misplaced = labels.findIndex(
+    (label, i) => (typeof label === "string" && label.startsWith(TELECONVERTER_LABEL_PREFIX)) !== i >= first,
+  );
+  if (misplaced >= 0) {
+    errors.push(
+      `surfaces[${misplaced}] ("${String(labels[misplaced])}"): the "${TELECONVERTER_LABEL_PREFIX}" label prefix must mark exactly the attached teleconverter's surfaces`,
+    );
   }
 }
 
@@ -800,6 +846,9 @@ export default function validateLensData(data: UntrustedLensData): string[] {
   if (data.visible !== undefined && typeof data.visible !== "boolean")
     errors.push(`"visible" must be a boolean (got ${typeof data.visible})`);
   if (data.opticalConfiguration !== undefined) validateOpticalConfiguration(data.opticalConfiguration, errors);
+  if (data.acceptsTeleconverters !== undefined && typeof data.acceptsTeleconverters !== "boolean")
+    errors.push(`"acceptsTeleconverters" must be a boolean (got ${typeof data.acceptsTeleconverters})`);
+  if (data.attachedTeleconverter !== undefined) validateAttachedTeleconverter(data, errors);
   if (data.perspectiveControl !== undefined) {
     validatePerspectiveControl(data.perspectiveControl, errors);
     if (data.imageFormat === undefined) {
@@ -839,6 +888,11 @@ export default function validateLensData(data: UntrustedLensData): string[] {
     }
     if (s.synthetic !== undefined) {
       errors.push(`surfaces[${i}] ("${s.label}"): "synthetic" is engine-generated; declare plates in "rearPlates"`);
+    }
+    if (data.attachedTeleconverter === undefined && s.label.startsWith(TELECONVERTER_LABEL_PREFIX)) {
+      errors.push(
+        `surfaces[${i}] ("${s.label}"): labels starting with "${TELECONVERTER_LABEL_PREFIX}" are reserved for attached teleconverter surfaces`,
+      );
     }
     surfaceLabels.add(s.label);
     if (s.label === "STO") stoCount++;

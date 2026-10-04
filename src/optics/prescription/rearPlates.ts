@@ -7,7 +7,7 @@
  * drawn element spans, element lists and diagram scale (see `buildElementSpans` and `buildLens`).
  */
 
-import type { ElementData, LensData, RearPlateData, SurfaceData } from "../../types/optics.js";
+import type { ElementData, LensData, SurfaceData } from "../../types/optics.js";
 import { IMAGE_FORMAT_BY_ID, isImageFormatId } from "../../utils/catalog/lensTaxonomy.js";
 
 /** Flat-surface radius used by authored prescriptions. */
@@ -45,18 +45,9 @@ export function rearPlateSurfaceLabels(plateIndex: number): [string, string] {
   return [`RP${plateIndex + 1}a`, `RP${plateIndex + 1}b`];
 }
 
-/**
- * Sum of the air-equivalent distances of a plate stack: Σ(t/n + gapAfter).
- *
- * Adding the physical gap before the first plate gives the legacy folded back-focus value, so migrations can check
- * that paraxial focus is unchanged.
- *
- * @param plates - authored rear plates
- * @returns air-equivalent length of the plates and trailing gaps in mm
- */
-export function rearPlateAirEquivalentMm(plates: readonly RearPlateData[]): number {
-  return plates.reduce((sum, plate) => sum + plate.thicknessMm / plate.nd + plate.gapAfterMm, 0);
-}
+/* The air-equivalent fold lives in the import-free teleconverter fit module so the build script can load it under
+ * plain Node; re-exported here so plate callers keep one import path. */
+export { rearPlateAirEquivalentMm } from "./teleconverterCompatibility.js";
 
 /**
  * Append synthetic plate surfaces and elements for lenses that declare `rearPlates`.

@@ -127,6 +127,7 @@ Keep it normalized even when the product's official styling varies by source:
 | `publishedAt` | `string` | Git-derived | Optional explicit UTC ISO timestamp (`YYYY-MM-DDTHH:mm:ssZ`) for a newly published replacement model. Overrides inherited file publication history in recent lenses, feeds, and SEO; last-modified remains Git-derived but cannot precede publication. Omit for normal additions and routine corrections. |
 | `visible` | `boolean` | `true` | Controls whether the lens appears in the UI catalog. Set to `false` to hide a lens from the dropdown without removing its data file. |
 | `opticalConfiguration` | `object` | | Links complete prescriptions that are switchable optical states of one catalog lens. See Alternate Optical Configurations below. |
+| `acceptsTeleconverters` | `boolean` | | `true` when the lens takes dedicated rear teleconverters made for one of its `lensMounts`. Universal converters ignore this flag. See [TELECONVERTER_DATA_SPEC.md](TELECONVERTER_DATA_SPEC.md). |
 | `subtitle` | `string` | | Compact patent/example/design-correlation context. Used as the UI-header fallback when structured patent metadata is unavailable and retained by several corpus reports for source/example matching. |
 | `specs` | `string[]` | | Spec strings displayed in header |
 | `focalLengthMarketing` | `number \| [number, number]` | | Marketed/nominal focal length in mm. Single number for primes (e.g. `50`); `[wide, tele]` tuple for zooms (e.g. `[70, 200]`). |
@@ -185,6 +186,9 @@ opticalConfiguration: {
   configurations can be selected independently.
 - Record material source differences between configurations in each file's header and `subtitle`. A shared
   `groupKey` communicates a UI relationship, not that the source necessarily publishes a matched before/after pair.
+- This mechanism is for converters built into one lens. A detachable teleconverter is its own
+  `*.teleconverter.ts` entity that the viewer composes onto any compatible host; never author a host + converter copy
+  as a hidden configuration member. See [TELECONVERTER_DATA_SPEC.md](TELECONVERTER_DATA_SPEC.md).
 
 ---
 
@@ -1279,7 +1283,9 @@ doublets: [
     and non-negative `gapAfterMm`, and is not combined with `opticalPath`, non-refracting surfaces, or
     `perspectiveControl`; authored surfaces may not use the reserved `RP<n>a` / `RP<n>b` labels or the engine-only
     `synthetic` field
-21. Perspective-control ranges, projection metadata, aberration-control gaps, explicit element spans, rim slope, edge thickness, and the remaining numeric bounds described above
+21. `acceptsTeleconverters`, when present, is a boolean; authored surface labels may not start with the reserved
+    `TC` prefix, and the composer-written `attachedTeleconverter` descriptor is not an authorable field
+22. Perspective-control ranges, projection metadata, aberration-control gaps, explicit element spans, rim slope, edge thickness, and the remaining numeric bounds described above
 
 On failure, `buildLens()` throws with all errors listed.
 
