@@ -239,11 +239,12 @@ class.
 
 #### E13 — Negative Meniscus, concave to object
 
-nd = 1.7569, νd = 31.8. Glass: E-LAF11 (Hikari) class (757318 lanthanum flint; catalog equivalent). f = −37.91 mm.
+nd = 1.7569, νd = 31.8. Glass: NBFD9 (Hoya) class (757318 lanthanum flint; catalog equivalent). f = −37.91 mm.
 
 The last element faces the small air space d21 (2.0 mm) with a strongly concave surface (r22 = −27.71 mm) and leaves
-the lens through an almost flat surface (r23 = −831.7 mm). The discontinued HIKARI glass E-LAF11 (1.75692 / 31.59)
-matches the printed coordinate in nd and to 0.21 in νd, and is used as the catalog equivalent.
+the lens through an almost flat surface (r23 = −831.7 mm). The discontinued HOYA glass NBFD9 (1.75690 / 31.80) matches the
+printed coordinate exactly and is used as the catalog equivalent; its dispersion formula comes from a legacy HOYA glass
+library rather than a current HOYA publication.
 
 ## Glass Identification
 
@@ -265,7 +266,7 @@ catalogs.
 | 743525 | 1.7425 | 52.5 | E10 | lanthanum crown | close by distance; nd outside print precision |
 | N-LAK21 | 1.6405 | 60.1 | E11 | lanthanum crown | exact |
 | 670571 (J-LAK02 class) | 1.67 | 57.1 | E12 | lanthanum crown | equivalent |
-| E-LAF11 (Hikari) class (757318) | 1.7569 | 31.8 | E13 | lanthanum flint | E-LAF11 (1.75692 / 31.59; nd-exact, Δνd −0.21) |
+| NBFD9 (Hoya) class (757318) | 1.7569 | 31.8 | E13 | lanthanum flint | NBFD9 (1.75690 / 31.80; exact, discontinued) |
 
 Every element has nd above 1.6, and nine of the thirteen have nd above 1.7. The positive elements of L1 and L3 are
 flints, while the negative elements of those groups are lanthanum glasses of higher Abbe number. This is a reversal of

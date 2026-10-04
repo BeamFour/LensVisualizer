@@ -237,7 +237,7 @@ const LENS_DATA = {
       nd: 1.7569,
       vd: 31.8,
       fl: -37.91,
-      glass: "E-LAF11 (Hikari) class (757318 lanthanum flint; nd-exact, Δνd −0.21; equivalent)",
+      glass: "NBFD9 (Hoya) class (757318 lanthanum flint; exact coordinate match, discontinued glass; equivalent)",
       apd: false,
       role: "Rear negative meniscus of L4, concave to the object",
     },

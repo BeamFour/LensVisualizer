@@ -191,6 +191,7 @@ const GLASS_CATALOG_SOURCE_ORDER = [
   "E-CF6",
   "MC-TAF101-100",
   "NBFD15",
+  "NBFD9",
   "NBFD25",
   "NBFD29",
   "NBFD32",

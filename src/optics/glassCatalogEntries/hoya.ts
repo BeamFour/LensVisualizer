@@ -750,6 +750,16 @@ export const HOYA_GLASS_ENTRIES: readonly GlassEntry[] = [
     source: "Hoya Zemax catalog 2017-04-01 via refractiveindex.info; NBFD15 page (formula 3 polynomial).",
   },
   {
+    name: "NBFD9",
+    vendor: "Hoya",
+    polynomial: [2.9828805, -0.011547679, 0.032835197, 0.00163548, -0.000073685794, 0.00001070514],
+    nd: 1.7569,
+    vd: 31.8,
+    code6: "757318",
+    source:
+      "Legacy HOYA glass library (HOYA.DAT, NBSF9 / NBFD9 record) distributed with the open-source Koko / KDP-2 lens design program, https://github.com/dinosauria123/Koko (accessed 2026-10-04); six-term A0-A5 dispersion formula for the discontinued glass, not a current HOYA publication.",
+  },
+  {
     name: "NBFD25",
     vendor: "Hoya",
     polynomial: [3.2879389, -0.015856356, 0.045638807, 0.0033027661, -0.00021690686, 0.000029625863],

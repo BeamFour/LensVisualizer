@@ -14,7 +14,7 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 - **870** lenses scanned
 - **9755** glass elements examined
-- **3013** elements have multiple coordinate-compatible candidates
+- **3014** elements have multiple coordinate-compatible candidates
 - **551** lens files are affected
 - **290** ambiguous elements retain authored dPgF at the runtime g-line, independent of the selected catalog row
 - **202** ambiguous elements provide complete C/F/g indices and bypass catalog dispersion entirely
@@ -22,7 +22,7 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | Selection criterion | Elements |
 |---|---:|
 | Smallest reference-index residual | 1695 |
-| Evidence-source priority | 1024 |
+| Evidence-source priority | 1025 |
 | Vendor context | 281 |
 | Stable canonical-name order | 11 |
 | Smallest Abbe residual | 2 |
@@ -2209,6 +2209,7 @@ resolves for. Per-candidate residuals are one `explainCompatibleGlassResolution`
 | `755275 — nd/νd coordinate code (vendor unresolved)` | 1.75520 / 27.50 (d) | E-FD4 — smallest d-line \|Δn\| (2.6e-7 vs 3.8e-7) | H-ZF6 (CDGM, code, alternate code row) | 1 | [YASHICA ML 24mm f/2.8](../../src/lens-data/yashica/YashicaML24mmf28.data.ts) L7 |
 | `640602 — nd/νd coordinate code (vendor unresolved)` | 1.64000 / 60.20 (d) | J-LAK01 — smallest d-line \|Δn\| (1.3e-8 vs 2.0e-7) | LACL60 (Hoya, code, preferred code row) | 1 | [YASHICA ML 24mm f/2.8](../../src/lens-data/yashica/YashicaML24mmf28.data.ts) L8 |
 | `487704 - FK5 class (vendor unresolved)` | 1.48749 / 70.40 (d) | FK5 — direct name evidence outranks six-digit code evidence. | N-FK5 (Schott, code, preferred code row)<br>H-QK3L (CDGM, code, alternate code row)<br>FC5 (Hoya, code, alternate code row) | 2 | [YASHICA ML 300mm f/5.6 C](../../src/lens-data/yashica/YashicaML300mmf56.data.ts) L1 |
+| `757318 - E-LAF11 catalog equivalent (production supplier unspecified)` | 1.75690 / 31.80 (d) | E-LAF11 — direct name evidence outranks six-digit code evidence. | NBFD9 (Hoya, code, preferred code row) | 1 | [YASHICA ML 300mm f/5.6 C](../../src/lens-data/yashica/YashicaML300mmf56.data.ts) L2 |
 | `788475 - lanthanum glass class (vendor unresolved)` | 1.78800 / 47.50 (d) | N-LAF21 — smallest d-line \|Δn\| (6.0e-8 vs 2.8e-6) | TAF4 (Hoya, code, alternate code row) | 1 | [YASHICA ML 300mm f/5.6 C](../../src/lens-data/yashica/YashicaML300mmf56.data.ts) L6 |
 | `717295 d-line class (historical vendor unresolved)` | 1.71736 / 29.50 (d) | SF1 — smallest d-line \|Δn\| (1.5e-7 vs 1.8e-6) | S-TIH1 (Ohara, code, alternate code row) | 1 | [YASHICA YASHINON-DX 21mm f/3.3](../../src/lens-data/yashica/YashicaYashinonDX21mmf33.data.ts) L7 |
 | `H-FK61 catalog proxy; 497816 low-dispersion crown class (supplier unconfirmed)` | 1.49700 / 81.61 (d) | H-FK61 — direct name evidence outranks six-digit code evidence. | FCD1 (Hoya, code, alternate code row)<br>S-FPL51 (Ohara, code, preferred code row)<br>M-FCD1 (Hoya, code, alternate code row) | 3 | [ZEISS BATIS 18mm f/2.8](../../src/lens-data/carl-zeiss-oberkochen/ZeissBatis2818.data.ts) L112 |
