@@ -205,14 +205,14 @@ The six current catalogs checked were OHARA, HOYA, Schott, Sumita, HIKARI and CD
 |---|---|---|---|---|---|
 | 600644 | 1.6000 / 64.4 | L1, L13 | Unmatched (phosphate-crown class) | J-PSK03, S-PHM53 (+0.0030, +1.0); LBC3N (+0.0063, −0.7) | positive crown at both ends |
 | 743492 | 1.7435 / 49.2 | L2, L3 | lanthanum flint, NBF1 / S-LAM60 class | NBF1 (−0.0002, +0.02); S-LAM60 (−0.0003, +0.1) | strong negative menisci |
-| 711433 | 1.7106 / 43.3 | L4 | Unmatched (lanthanum-flint class) | J-LAF02, H-LaF62 (+0.0094, +0.3 to +0.4) | positive half of c |
+| 711433 | 1.7106 / 43.3 | L4 | Unmatched (lanthanum-flint class) | LAFL4 (+0.0021, 0.0); J-LAF02, H-LaF62 (+0.0094, +0.3 to +0.4) | positive half of c |
 | 639557 | 1.6385 / 55.7 | L5 | dense barium crown, S-BSM18 / BACD18 class | K-SK18, BACD18, S-BSM18 (< 0.0001, −0.2 to −0.3) | negative half of c |
 | 717294 | 1.7174 / 29.4 | L6 | dense flint, S-TIH1 / SF1 class | SF1, S-TIH1, E-FD1 (< 0.0001, +0.1) | positive flint closing group I |
 | 517640 | 1.5168 / 64.0 | L7, L8, L9, L12 | borosilicate crown, N-BK7 / BSC7 class | N-BK7, J-BK7A (0.0000, +0.1 to +0.2) | positive crowns of group II |
 | 805254 | 1.8052 / 25.4 | L10 | dense flint, SF6 / S-TIH6 class | SF6, S-TIH6, K-SFLD6 (< 0.0001, < 0.05) | positive flint of II-2 |
 | 757297 | 1.7569 / 29.7 | L11 | Unmatched (lanthanum dense-flint class) | NBFD29 (+0.0136, +0.04) | strong negative flint of II-2 |
 
-The L1/L13 glass sits exactly at the edge of the round-trip window (Δnd = +0.0030 to S-PHM53 and J-PSK03), which the LensVisualizer resolver rejects. It is labelled Unmatched with its class stated. The 711433 and 757297 glasses have no current catalog equivalent within Δnd 0.003 / Δνd 2.
+The L1/L13 glass sits exactly at the edge of the round-trip window (Δnd = +0.0030 to S-PHM53 and J-PSK03), which the LensVisualizer resolver rejects. It is labelled Unmatched with its class stated. The 711433 glass lies 0.0021 in nd below HOYA LAFL4 (1.7127 / 43.3) at the same Abbe number, too far for a catalog-equivalent label, so it also stays Unmatched. The 757297 glass has no current catalog equivalent within Δnd 0.003 / Δνd 2; Embodiment 2 prints 1.7569 / 31.8 (the LaF11 coordinate) for the same element, but Table 1 and Claim 7 both print 29.7 and that value is kept.
 
 The palette is conventional for the period. It contains no fluorite, ED or anomalous-partial-dispersion glass, and the patent publishes no line indices or partial dispersions. Chromatic statements in this analysis are first-order, Abbe-only estimates. They support no claim about secondary spectrum.
 
@@ -300,7 +300,7 @@ The following elements of the data file are modelled rather than published:
 
 - **Stop.** The stop position and the per-station iris radii are inferred and calibrated, as described under Optical Architecture.
 - **Back focus.** The back focus is the computed paraxial d-line infinity image distance at each station.
-- **Semi-diameters.** These come from exact ray envelopes of the f/4 axial beam, the corner chief ray and off-axis bundles at all modelled zoom and focus states, with geometric limits at r5 and r20. Group II (r12–r15 and r21–r24) was then trimmed toward the smaller rims drawn in FIG. 1, stopping where the f/4 axial beam still clears; the drawn L12 and L13 rims (about 7.0 and 7.3 mm) are smaller than that beam at the tele station, so the figure is not followed exactly and the wide-station corner bundle is vignetted at L13.
+- **Semi-diameters.** These come from exact ray envelopes of the f/4 axial beam, the corner chief ray and off-axis bundles at all modelled zoom and focus states, with geometric limits at r5 and r20. Group II (r12–r15 and r21–r24) was then trimmed toward the smaller rims drawn in FIG. 1, stopping where the f/4 axial beam still clears; the drawn L12 and L13 rims (about 7.0 and 7.3 mm) are smaller than that beam at the tele station, so the figure is not followed exactly and the wide-station corner bundle is vignetted at L13. The rear of group I (r6–r11) was raised 5–8 % to the drawn rims of L3–L6; r5 stays at its air-gap limit.
 - **Intermediate stations.** Four of the seven zoom keyframes (EFL 28, 31.5, 39.5 and 44 mm) are derived from the patent's two-group law, not published. They keep the interpolated infinity image within 0.115 mm of the film plane between keyframes.
 - **Viewer field display.** LensVisualizer's paraxial-linear chief-ray model displays a 35.8° wide-end half-field. Exact chief rays to the 42.4° format corner, however, pass every modelled semi-diameter.
 

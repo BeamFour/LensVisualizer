@@ -21,8 +21,8 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 | Selection criterion | Elements |
 |---|---:|
-| Smallest reference-index residual | 1697 |
-| Evidence-source priority | 1022 |
+| Smallest reference-index residual | 1695 |
+| Evidence-source priority | 1024 |
 | Vendor context | 281 |
 | Stable canonical-name order | 11 |
 | Smallest Abbe residual | 2 |
@@ -990,9 +990,9 @@ resolves for. Per-candidate residuals are one `explainCompatibleGlassResolution`
 | `603380 — flint class` | 1.60342 / 38.00 (d) | J-F5 — smallest d-line \|Δn\| (1.6e-8 vs 1.3e-7) | E-F5 (Hoya, code, alternate code row)<br>F5 (Schott, code, preferred code row) | 1 | [MINOLTA MD ZOOM 35-135mm f/3.5-4.5](../../src/lens-data/minolta/Minolta35135mmf3545MDZoom.data.ts) N11 |
 | `517522 — crown-flint class` | 1.51742 / 52.20 (d) | J-KF6 — smallest d-line \|Δn\| (9.7e-9 vs 9.9e-8) | E-CF6 (Hoya, code, preferred code row) | 1 | [MINOLTA MD ZOOM 35-135mm f/3.5-4.5](../../src/lens-data/minolta/Minolta35135mmf3545MDZoom.data.ts) N14 |
 | `805254 — dense-flint coordinate class (supplier/melt unresolved)` | 1.80520 / 25.40 (d) | SF6 — smallest d-line \|Δn\| (1.8e-5 vs 1.9e-5) | S-TIH6 (Ohara, code, preferred code row)<br>N-SF6 (Schott, code, alternate code row) | 2 | [MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) G1 |
-| `697555 — lanthanum-crown coordinate class (supplier/melt unresolved)` | 1.69680 / 55.50 (d) | J-LAK14 — smallest d-line \|Δn\| (1.3e-8 vs 2.3e-6) | LAC14 (Hoya, code, alternate code row)<br>S-LAL14 (Ohara, code, preferred code row) | 1 | [MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) G4 |
+| `697555 — lanthanum-crown coordinate class (J-LAK14 catalog equivalent; supplier/melt unresolved)` | 1.69680 / 55.50 (d) | J-LAK14 — direct name evidence outranks six-digit code evidence. | LAC14 (Hoya, code, alternate code row)<br>S-LAL14 (Ohara, code, preferred code row) | 1 | [MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) G4 |
 | `517640 — crown coordinate class (N-BK7 / BSC7 family; supplier/melt unresolved)` | 1.51680 / 64.00 (d) | N-BK7 — direct name evidence outranks alias evidence. | S-BSL7 (Ohara, alias) | 1 | [MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) G9 |
-| `670472 — extra-dense barium-flint coordinate class (catalog unresolved)` | 1.67000 / 47.20 (d) | BAF10 — smallest d-line \|Δn\| (2.8e-5 vs 3.0e-5) | H-ZBaF52 (CDGM, code, preferred code row) | 1 | [MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) G12 |
+| `670472 — barium-flint coordinate class (BAF10 catalog equivalent; supplier/melt unresolved)` | 1.67000 / 47.20 (d) | BAF10 — direct name evidence outranks six-digit code evidence. | H-ZBaF52 (CDGM, code, preferred code row) | 1 | [MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) G12 |
 | `517641 crown / BK7-family class` | 1.51680 / 64.10 (d) | N-BK7 — alias evidence outranks six-digit code evidence. | J-BK7A (Hikari, code, preferred code row) | 2 | [MINOLTA MD ZOOM 75-150mm f/4](../../src/lens-data/minolta/Minolta75150mmf40MDZoom.data.ts) L1 |
 | `805255 dense flint / SF6-family class` | 1.80518 / 25.50 (d) | SF6 — direct name evidence outranks six-digit code evidence. | J-SF6 (Hikari, code, alternate code row)<br>H-ZF7LA (CDGM, code, preferred code row)<br>FD60 (Hoya, code, alternate code row) | 2 | [MINOLTA MD ZOOM 75-150mm f/4](../../src/lens-data/minolta/Minolta75150mmf40MDZoom.data.ts) L3 |
 | `589611 crown class (L-BAL35 / N-SK5 / K-SKLD5 coordinate family)` | 1.58913 / 61.10 (d) | N-SK5 — direct name evidence outranks alias evidence. | S-BAL35 (Ohara, alias) | 1 | [MINOLTA MD ZOOM 75-150mm f/4](../../src/lens-data/minolta/Minolta75150mmf40MDZoom.data.ts) L7 |

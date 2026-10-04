@@ -99,7 +99,8 @@ const LENS_DATA = {
       nd: 1.80741,
       vd: 31.6,
       fl: 72.5,
-      glass: "Unmatched (807316 high-index flint; nearest current NBFD15 / H-ZLaF56B differ by Δνd ≈ +1.7)",
+      glass:
+        "Unmatched (807316 lanthanum dense flint; coordinate of discontinued Schott LaSF8, not in the catalog; nearest current NBFD15 / H-ZLaF56B differ by Δνd ≈ +1.7)",
       apd: false,
       role: "Positive element of L1 behind the front meniscus",
     },

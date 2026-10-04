@@ -8,9 +8,9 @@
 **Filed:** August 28, 1990
 **Granted:** September 28, 1993
 **Inventor:** Hiromu Umeda
-**Assignee:** Minolta Camera Kabushiki Kaisha
+**Assignee:** Minolta Camera Co., Ltd. (printed as Minolta Camera Kabushiki Kaisha)
 **Title:** Lens System
-**Embodiment analyzed:** Table 4 single worked numerical embodiment; the project job card labels it “Example 1”
+**Embodiment analyzed:** Table 4, the single worked numerical embodiment (the patent does not number it)
 
 The implemented prescription transcribes the single numerical zoom example in Table 4 of US 5,249,079 A. The patent describes a four-unit zoom arranged positive, negative, positive, positive from object to image, with the diaphragm in the third unit and a deflecting lens element immediately behind it. Figure 1 supplies the unit arrangement and zoom-motion context; Table 4 supplies the radii, axial spacings, refractive indices, Abbe numbers, and the two published zoom endpoints.[1]
 
@@ -32,7 +32,7 @@ The lens is a four-unit all-spherical zoom with power sequence positive / negati
 
 - **L1, surfaces 1-5:** positive, standalone air-bounded EFL +69.930371 mm.
 - **L2, surfaces 6-13:** negative, standalone air-bounded EFL -17.273260 mm.
-- **L3, surfaces 15-19:** positive, standalone air-bounded EFL +45.385376 mm; the diaphragm lies immediately in front of this unit and N8/G8 is the patent’s deflecting element.
+- **L3, diaphragm r14 plus surfaces 15-19:** positive, standalone air-bounded EFL +45.385376 mm for the glass surfaces; the patent places diaphragm E in this unit (d14 = 1.24 mm is fixed, so the stop travels with L3) and N8/G8 is the patent’s deflecting element.
 - **L4, surfaces 20-27:** positive, standalone air-bounded EFL +72.973084 mm.
 
 These unit focal lengths are computed for the isolated source-defined units in air. They describe the signs and relative strengths of the unit prescriptions. They are not in-situ powers of the assembled zoom.
@@ -42,6 +42,8 @@ Two cemented pairs occur in the prescription. N1 and N2 share the r2 interface i
 Only three inter-unit spacings are published as zoom variables: d5, d13, and d19. Their wide/tele values are 0.823/27.032 mm, 18.996/1.100 mm, and 9.041/0.728 mm. The three gaps sum to 28.860 mm at both endpoints, leaving the r1-to-r27 vertex track at 88.740 mm in either source state.
 
 A surface-1-anchored comparison gives a useful description of the internal spacing change without claiming an absolute barrel trajectory. Relative to the wide state, the L2 front surface moves +26.209 mm image-side and the diaphragm/L3 front moves +8.313 mm, while the L1 front, L4 front, and r27 return to the same positions in that temporary coordinate system. Figure 1 shows lens-unit motion during zooming, but Table 4 does not publish the absolute lens-to-film motion. The anchored coordinates therefore describe only the internal geometry implied by the table, not the manufactured cam path.[1]
+
+Figure 1 is drawn at the longest-focal-length setting, and the patent states that its arrows show the units shifting from Tele to Wide.[1] Using the calculated back focal distances as the image-plane reference (53.269 mm wide, 78.370 mm tele), zooming from wide to tele moves L1 and L4 together 25.101 mm toward the object, moves the diaphragm and L3 16.788 mm toward the object, and leaves L2 nearly stationary (1.108 mm toward the image). These image-referenced figures depend on the calculated, not published, back focus.
 
 The source gives only the two endpoint spacing states. LensVisualizer linearly interpolates those endpoint spacings for continuous display. That interpolation is a model convenience, not a claim that the production cam follows a linear law. It is not a source-published zoom cam.
 
@@ -113,7 +115,7 @@ N11 is a positive meniscus at the front of L4. Current glass catalogs contain co
 
 ### N12 — Biconcave Negative
 
-**nd = 1.80741, νd = 31.59. Glass: 807316 — high-index flint class. f = -27.458178 mm.**
+**nd = 1.80741, νd = 31.59. Glass: Unmatched (807316 lanthanum dense flint; coordinate of discontinued Schott LaSF8). f = -27.458178 mm.**
 
 N12 is biconcave and is the principal standalone negative element in L4. It is followed by two positive elements, and the complete unit remains positive at +72.973084 mm standalone EFL.
 
@@ -145,7 +147,7 @@ Table 4 gives d-line refractive index and Abbe number but no glass names, manufa
 | 541472 — light flint class | 1.54072 | 47.20 | N9 | Current OHARA S-TIL2 is 1.54072 / 47.23[5] |
 | 755275 — dense flint class | 1.75520 | 27.51 | N10 | Current catalog family coordinate; supplier not assigned |
 | 603380 — flint class | 1.60342 | 38.00 | N11 | Current HIKARI J-F5 is 1.603420 / 38.03[6] |
-| 807316 — high-index flint class | 1.80741 | 31.59 | N12 | Supplier unresolved |
+| 807316 — lanthanum dense flint | 1.80741 | 31.59 | N12 | Unmatched: coordinate of the discontinued Schott LaSF8; no public dispersion coefficients located |
 | 517522 — crown-flint class | 1.51742 | 52.20 | N14 | Exact coordinate of current HIKARI J-KF6[7] |
 
 The slight differences between some patent Abbe values and modern catalog entries are retained rather than “corrected.” For example, Table 4 gives N9 as νd = 47.20 while the current OHARA S-TIL2 catalog gives 47.23; N11 is 38.00 in the patent versus 38.03 for current HIKARI J-F5. Those catalog matches are evidence of coordinate-family equivalence, not proof of original melt identity.

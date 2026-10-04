@@ -55,6 +55,9 @@ import type { LensDataInput } from "../../types/optics.js";
  * ║    L13 7.3 mm): SD 12-15 = 10.6/10.6/10.4/10.2 and SD 21-24 =        ║
  * ║    8.1/8.2/8.3/8.3 mm, kept about 0.5 mm outside the f/4 axial       ║
  * ║    beam, so the wide corner bundle vignettes at L13.                 ║
+ * ║    Group I rear (SD 6-11) was raised 5-8 % to the drawn rims         ║
+ * ║    (L3 about 17, L4/L5 16.4, L6 14.8 mm): 16.2/16.0/16.0/16.0/       ║
+ * ║    14.6/14.4 mm. SD 5 stays at its D4 gap limit.                     ║
  * ║                                                                      ║
  * ║  Optical design only: glass surfaces, stop, variable gaps.           ║
  * ║  No rear plates (SLR film camera).                                   ║
@@ -129,7 +132,7 @@ const LENS_DATA = {
       nd: 1.7106,
       vd: 43.3,
       fl: 73.72,
-      glass: "Unmatched (711433 lanthanum-flint class; no current catalog glass within Δnd 0.003 / Δνd 2)",
+      glass: "Unmatched (711433 lanthanum-flint class; nearest catalog coordinate is HOYA LAFL4 at Δnd +0.0021, outside the relabel window)",
       role: "Component I-2, sub-component c (front): positive half of the weakly negative cemented doublet (φ3)",
       cemented: "c",
     },
@@ -244,12 +247,12 @@ const LENS_DATA = {
     { label: "3", R: 73.24, d: 1.5, nd: 1.7435, elemId: 2, sd: 21.8 },
     { label: "4", R: 21.13, d: 7.5, nd: 1.0, elemId: 0, sd: 17.0 },
     { label: "5", R: 148.3, d: 1.5, nd: 1.7435, elemId: 3, sd: 16.2 }, // SD limited by D4 gap intrusion
-    { label: "6", R: 32.7, d: 3.5, nd: 1.0, elemId: 0, sd: 15.4 },
-    { label: "7", R: 129.8, d: 4.0, nd: 1.7106, elemId: 4, sd: 15.25 },
-    { label: "8", R: -86.7, d: 1.0, nd: 1.6385, elemId: 5, sd: 15.25 }, // L4→L5 cemented junction
-    { label: "9", R: 66.78, d: 2.5, nd: 1.0, elemId: 0, sd: 15.25 },
-    { label: "10", R: 33.47, d: 3.0, nd: 1.7174, elemId: 6, sd: 13.8 },
-    { label: "11", R: 78.98, d: 27.93, nd: 1.0, elemId: 0, sd: 13.45 }, // D11: zoom + focus
+    { label: "6", R: 32.7, d: 3.5, nd: 1.0, elemId: 0, sd: 16.2 },
+    { label: "7", R: 129.8, d: 4.0, nd: 1.7106, elemId: 4, sd: 16.0 },
+    { label: "8", R: -86.7, d: 1.0, nd: 1.6385, elemId: 5, sd: 16.0 }, // L4→L5 cemented junction
+    { label: "9", R: 66.78, d: 2.5, nd: 1.0, elemId: 0, sd: 16.0 },
+    { label: "10", R: 33.47, d: 3.0, nd: 1.7174, elemId: 6, sd: 14.6 },
+    { label: "11", R: 78.98, d: 27.93, nd: 1.0, elemId: 0, sd: 14.4 }, // D11: zoom + focus
     { label: "12", R: 53.95, d: 2.5, nd: 1.5168, elemId: 7, sd: 10.6 },
     { label: "13", R: -159.9, d: 0.1, nd: 1.0, elemId: 0, sd: 10.6 },
     { label: "14", R: 19.8, d: 3.36, nd: 1.5168, elemId: 8, sd: 10.4 },

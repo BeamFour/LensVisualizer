@@ -36,7 +36,7 @@ The system is retrofocus throughout the range. Measured from the r20 vertex (par
 
 **Zoom kinematics.** Only d8 varies: 13.02, 7.59 and 3.0 mm in wide-to-tele order (the patent prints them tele-first, printed p. 6). With the image plane fixed, group II moves monotonically 8.62 mm toward the object from wide to tele. Group I follows a reversing path. It first moves 1.62 mm toward the image, to a minimum r1-to-image distance of 91.78 mm at f = 31.25 mm, and then returns 0.22 mm, ending with a track of 92.00 mm at tele against 93.40 mm at wide. The turning point is the standard two-group result: with f = F_I·m₂, the track is stationary where group II works at unit magnification (m₂ = −1), which occurs at f = |F_I|. Across the range m₂ runs from −0.788 at wide to −1.092 at tele.
 
-**Aperture stop.** The patent publishes no stop position or diameter; neither the table nor Fig. 1 shows one. The model places the stop at the middle of d12, between L6 and L7. This is an inference: d12 gave the best fit of ray-derived element heights to the Fig. 1 proportions among the surveyed gaps, and it is Example 1's one enlarged air space in the L5–L8 region. The iris radius is calibrated to f/3.5 at each station (6.36 mm at wide to 7.45 mm at tele) through the `from-nominal-fno` aperture model; this reproduces f/3.5 by construction and is not evidence of the production diaphragm. A fixed iris of the tele size would give f/2.99 at the wide end. The patent does not describe how the production lens holds a constant f/3.5.
+**Aperture stop.** The patent publishes no stop position or diameter; neither the table nor Fig. 1 shows one. The model places the stop at the middle of d12, between L6 and L7. This is an inference: d12 gave the best fit of ray-derived element heights to the Fig. 1 proportions among the surveyed gaps, and it is Example 1's one enlarged air space in the L5–L8 region. The iris radius is calibrated to f/3.5 at each station (paraxially 6.36 mm at wide to 7.45 mm at tele; the viewer's real-ray solve gives 6.52 to 7.80 mm) through the `from-nominal-fno` aperture model; this reproduces f/3.5 by construction and is not evidence of the production diaphragm. A fixed iris of the tele size would give f/2.99 at the wide end. The patent does not describe how the production lens holds a constant f/3.5.
 
 **Zoom stations.** The data file uses five stations at 24.61, 26.70, 29.00, 31.50 and 34.14 mm. The second and fourth are derived, not published: their d8 values are solved for those focal lengths so that linear interpolation of d8 and back focus stays within 0.048 mm of focus, against 0.190 mm with the three published states alone.
 
@@ -113,7 +113,7 @@ L9 and L10 form the rear positive pair, where the chief-ray height grows again b
 
 #### L10 — Biconvex Positive
 
-nd = 1.52584, νd = 52.06. Glass: 526521 — crown/light-flint boundary (catalog unresolved). f = +45.5 mm.
+nd = 1.52584, νd = 52.06. Glass: Unmatched (526521 crown/light-flint boundary; nearest HOYA CF2 at Δνd −1.0). f = +45.5 mm.
 
 L10 has the same focal length as L7 to the quoted precision, but a strongly asymmetric bending: r20 = −25.02 against r19 = 539.97. It contributes −7.3% distortion at wide and −5.6% at tele, and −0.295/−0.514 mm of spherical aberration. With a modeled semi-diameter of 8.1 mm, it has the thinnest modeled edge in the lens, 0.80 mm.
 

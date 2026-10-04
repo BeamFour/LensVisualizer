@@ -132,11 +132,13 @@ to the balance between spherical aberration and zonal coma from the middle to th
 
 #### E2 — Biconvex Positive
 
-nd = 1.80741, νd = 31.6. Glass: Unmatched (807316 high-index flint). f = +72.50 mm.
+nd = 1.80741, νd = 31.6. Glass: Unmatched (807316 lanthanum dense flint). f = +72.50 mm.
 
 E2 is nearly plano-convex, with a weak front surface (r3 = 374.7 mm) and almost all of its power at the rear. It is
 the first of two positive flint elements in L1. No current catalog glass lies within the matching tolerance of this
-coordinate; the nearest candidates differ by about 1.7 in νd.
+coordinate; the nearest candidates differ by about 1.7 in νd. The six-digit code 807316 is that of the discontinued
+Schott glass LaSF8 in the Newport Glass cross-reference; this is a coordinate match, not a supplier identification, and
+no dispersion data for it are in the viewer's catalog, so the element stays unmatched.
 
 #### E3 — Biconcave Negative
 
@@ -253,7 +255,7 @@ catalogs.
 | Glass (label) | nd | νd | Elements | Class | Match |
 |---|---|---|---|---|---|
 | TAF1 / N-LAF34 class | 1.7725 | 49.8 | E1, E3 | lanthanum flint | equivalent |
-| Unmatched (807316) | 1.80741 | 31.6 | E2 | high-index flint | none within tolerance |
+| Unmatched (807316) | 1.80741 | 31.6 | E2 | lanthanum dense flint | none in current catalogs; code of discontinued Schott LaSF8 |
 | S-TIH53WN / FDS90 class | 1.84666 | 23.9 | E4 | dense flint | exact |
 | S-LAH60 | 1.834 | 37.1 | E5 | lanthanum flint | close |
 | H-LaK12 | 1.6968 | 56.5 | E6 | lanthanum crown | equivalent |
@@ -416,3 +418,5 @@ patent does not state that reason.
    https://forum.mflenses.com/testing-minolta-md-zoom-28-85mm-3-5-4-5-t76421.html
 9. Glass catalogs as distributed with opticalglass 2.0.2: OHARA (2025-03-12), HOYA (2026-04-01), Schott (2025),
    Sumita (ver. 14.01.03), HIKARI (general catalog) and CDGM (2024-09).
+10. Newport Glass Works. Optical glass cross-reference, nd = 1.800 to 1.899. Code 807316, Schott LaSF8.
+    http://www.newportglass.com/OPTGLA8.htm

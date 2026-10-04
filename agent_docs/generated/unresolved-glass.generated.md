@@ -11,8 +11,8 @@ or per-lens patent backfills.
 - **870** lenses scanned
 - **9760** non-air surfaces examined
 - **9770** element glass declarations examined
-- **257** non-explicit-unmatched annotations did not resolve
-- **138** distinct unresolved glass-like tokens found
+- **250** non-explicit-unmatched annotations did not resolve
+- **134** distinct unresolved glass-like tokens found
 
 ## Tokens by Frequency
 
@@ -20,7 +20,6 @@ or per-lens patent backfills.
 |---|---:|---:|---|
 | 493836 | 6 | 2 | |
 | 662561 | 4 | 1 | |
-| 807316 | 4 | 4 | |
 | 863252 | 4 | 2 | |
 | 531559 | 3 | 2 | |
 | 856401 | 3 | 2 | |
@@ -28,7 +27,6 @@ or per-lens patent backfills.
 | 486815 | 2 | 1 | |
 | 514428 | 2 | 1 | |
 | 620586 | 2 | 1 | |
-| 621613 | 2 | 1 | |
 | 627376 | 2 | 2 | |
 | 633315 | 2 | 2 | |
 | 680557 | 2 | 1 | |
@@ -45,6 +43,7 @@ or per-lens patent backfills.
 | 803404 | 2 | 2 | |
 | 804238 | 2 | 2 | |
 | 806418 | 2 | 2 | |
+| 807316 | 2 | 2 | |
 | 815233 | 2 | 2 | |
 | 819287 | 2 | 2 | |
 | G2 | 2 | 1 | |
@@ -54,7 +53,6 @@ or per-lens patent backfills.
 | 514530 | 1 | 1 | |
 | 518523 | 1 | 1 | |
 | 520701 | 1 | 1 | |
-| 526521 | 1 | 1 | |
 | 534554 | 1 | 1 | |
 | 534556 | 1 | 1 | |
 | 545486 | 1 | 1 | |
@@ -83,14 +81,12 @@ or per-lens patent backfills.
 | 646287 | 1 | 1 | |
 | 656277 | 1 | 1 | |
 | 658397 | 1 | 1 | |
-| 658585 | 1 | 1 | |
 | 667311 | 1 | 1 | |
 | 668358 | 1 | 1 | |
 | 670266 | 1 | 1 | |
 | 672323 | 1 | 1 | |
 | 672388 | 1 | 1 | |
 | 673343 | 1 | 1 | |
-| 678490 | 1 | 1 | |
 | 680312 | 1 | 1 | |
 | 681472 | 1 | 1 | |
 | 682366 | 1 | 1 | |
@@ -175,13 +171,6 @@ or per-lens patent backfills.
 - [CARL ZEISS JENA PANCOLAR 50mm f/2](../../src/lens-data/carl-zeiss-jena/CarlZeissJenaPancolar50mmf2.data.ts) 7: `SSK / LaK (Jena in-house, 662/561)`
 - [CARL ZEISS JENA PANCOLAR 50mm f/2](../../src/lens-data/carl-zeiss-jena/CarlZeissJenaPancolar50mmf2.data.ts) 9: `SSK / LaK (Jena in-house, 662/561)`
 
-### 807316 — 4 occurrences
-
-- [MINOLTA MD ZOOM 35-135mm f/3.5-4.5](../../src/lens-data/minolta/Minolta35135mmf3545MDZoom.data.ts) 22: `807316 — high-index flint class`
-- [MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) 17: `807316 — dense flint coordinate class (catalog unresolved)`
-- [MINOLTA AF 100mm f/2.8 Macro](../../src/lens-data/minolta/MinoltaAF100mmf28Macro.data.ts) 13: `807316 - dense lanthanum flint (patent nd=1.80741, vd=31.59; unresolved)`
-- [MINOLTA AF 35-105mm f/3.5-4.5 New (v2)](../../src/lens-data/minolta/MinoltaAF35105mmf3545v2.data.ts) 17: `807316 - high-index dense flint class (unresolved)`
-
 ### 863252 — 4 occurrences
 
 - [SONY FE 14mm f/1.8 GM](../../src/lens-data/sony/SonyFE14mmf18GM.data.ts) 18: `863252 - dense flint (Sony patent nd=1.86252, vd=25.2; no exact public catalog match)`
@@ -221,11 +210,6 @@ or per-lens patent backfills.
 
 - [NIKON SERIES E 135mm f/2.8](../../src/lens-data/nikon/NikonSeriesE135mmf28.data.ts) 1: `620586 — patent crown glass (nd=1.62041, νd=58.6; no catalog match verified)`
 - [NIKON SERIES E 135mm f/2.8](../../src/lens-data/nikon/NikonSeriesE135mmf28.data.ts) 3: `620586 — patent crown glass (nd=1.62041, νd=58.6; no catalog match verified)`
-
-### 621613 — 2 occurrences
-
-- [MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) 14: `621613 — crown coordinate class (catalog unresolved)`
-- [MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) 19: `621613 — crown coordinate class (catalog unresolved)`
 
 ### 627376 — 2 occurrences
 
@@ -307,6 +291,11 @@ or per-lens patent backfills.
 - [NIKON AF-S NIKKOR 180-400mm f/4E TC1.4 FL ED VR](../../src/lens-data/nikon/NikonAFSNikkor180400mmf4ETC14.data.ts) 47: `806418 lanthanum flint class (catalog unresolved)`
 - [NIKON AF-S NIKKOR 180-400mm f/4E TC1.4 FL ED VR — TC 1.4x Engaged](../../src/lens-data/nikon/NikonAFSNikkor180400mmf4ETC14TCIn.data.ts) 59: `806418 lanthanum flint class (catalog unresolved)`
 
+### 807316 — 2 occurrences
+
+- [MINOLTA AF 100mm f/2.8 Macro](../../src/lens-data/minolta/MinoltaAF100mmf28Macro.data.ts) 13: `807316 - dense lanthanum flint (patent nd=1.80741, vd=31.59; unresolved)`
+- [MINOLTA AF 35-105mm f/3.5-4.5 New (v2)](../../src/lens-data/minolta/MinoltaAF35105mmf3545v2.data.ts) 17: `807316 - high-index dense flint class (unresolved)`
+
 ### 815233 — 2 occurrences
 
 - [NIKON AF-S NIKKOR 180-400mm f/4E TC1.4 FL ED VR](../../src/lens-data/nikon/NikonAFSNikkor180400mmf4ETC14.data.ts) 35: `815233 dense flint class (catalog unresolved)`
@@ -346,10 +335,6 @@ or per-lens patent backfills.
 ### 520701 — 1 occurrence
 
 - [NIKON NIKKOR-SW 75mm f/4.5](../../src/lens-data/nikon/NikonNikkorSW75mmf45.data.ts) 5: `520701 — low-index high-Abbe crown coordinate class (vendor unresolved)`
-
-### 526521 — 1 occurrence
-
-- [MINOLTA MD ZOOM 24-35mm f/3.5](../../src/lens-data/minolta/Minolta2435mmf35MDZoom.data.ts) 19: `526521 — crown/light-flint boundary (catalog unresolved)`
 
 ### 534554 — 1 occurrence
 
@@ -463,10 +448,6 @@ or per-lens patent backfills.
 
 - [SONY FE 70-200mm f/2.8 GM OSS II](../../src/lens-data/sony/SonyFE70200mmf28GMII.data.ts) 25: `658397 — short flint (patent nd=1.65803, nu_d=39.7)`
 
-### 658585 — 1 occurrence
-
-- [MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) 8: `658585 — coordinate class (catalog unresolved)`
-
 ### 667311 — 1 occurrence
 
 - [FUJIFILM FUJINON XF 60mm f/2.4 R Macro](../../src/lens-data/fujifilm/FujifilmXF60mmf24R.data.ts) 6: `667311 - dense flint (patent nd=1.66680, vd=31.1; no exact public catalog match)`
@@ -490,10 +471,6 @@ or per-lens patent backfills.
 ### 673343 — 1 occurrence
 
 - [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) 22: `673343 — catalog unresolved (supplier unconfirmed)`
-
-### 678490 — 1 occurrence
-
-- [MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) 4: `678490 — coordinate class (catalog unresolved)`
 
 ### 680312 — 1 occurrence
 

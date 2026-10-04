@@ -2,16 +2,16 @@
 
 ## Patent Reference and Design Identification
 
-**Patent:** JPS56-150717A (特開昭56-150717)
+**Patent:** JP S56-150717 A (特開昭56-150717)
 **Application Number:** 昭55-54976
 **Filed:** 24 April 1980
 **Published:** 21 November 1981
-**Inventor:** Hisashi Tokumaru (得丸祥)
+**Inventors:** Hisashi Tokumaru (得丸祥); Mitsuo Yasukuni (安国光雄)
 **Applicant:** Minolta Camera Co., Ltd.
 **Title:** ズームレンズ系 (Zoom lens system)
 **Embodiment analyzed:** Example 1 (実施例1)
 
-The implemented prescription is Example 1 of JPS56-150717A. The patent gives a 77–146 mm zoom with a design F-number of 4.1, twelve elements in eight air-spaced groups, and a four-part power sequence consisting of a positive focusing group F, a negative variator V, a positive compensator C, and a master group M. The numerical prescription is printed on PDF pages 2–3 of the supplied publication; Figure 1 on PDF page 5 shows the same F/V/C/M layout. The final data file preserves that prescription without uniform scaling.
+The implemented prescription is Example 1 of JP S56-150717 A. The patent gives a 77–146 mm zoom with a design F-number of 4.1, twelve elements in eight air-spaced groups, and a four-part power sequence consisting of a positive focusing group F, a negative variator V, a positive compensator C, and a master group M. The numerical prescription is printed on PDF pages 2–3 of the supplied publication; Figure 1 on PDF page 5 shows the same F/V/C/M layout. The final data file preserves that prescription without uniform scaling.
 
 The production correlation is strong but is not a manufacturer-confirmed patent attribution. Minolta's *MD Zoom Lenses* manual lists a 75–150 mm f/4 MD Zoom with twelve elements in eight groups, a 1.2 m minimum focusing distance, a 49 mm filter thread, and 35 mm SLR coverage. Those production facts agree closely with Example 1's 77–146 mm, F/4.1 numerical design and its twelve-element/eight-group architecture. Figure 6 of the patent also uses an image height of Y′ = 21.6 mm, essentially the half-diagonal of the 35 mm frame. The patent itself does not name the commercial 75–150 mm lens, so the identification remains a documented correlation rather than a direct statement by Minolta.
 
@@ -77,7 +77,7 @@ The compensator is the reversing moving component. Its axial position advances f
 ### L9/L10 — Cemented Master Pair M910
 
 **L9:** nd = 1.65844, νd = 50.9. Glass: 658509 dense crown / N-SSK5 class. Standalone f = +34.710 mm.  
-**L10:** nd = 1.80741, νd = 31.6. Glass: Unmatched (807316 high-index flint/crown class; catalog unresolved). Standalone f = -49.501 mm.
+**L10:** nd = 1.80741, νd = 31.6. Glass: Unmatched (807316 lanthanum dense flint; coordinate of discontinued Schott LaSF8). Standalone f = -49.501 mm.
 
 M910 is the front cemented pair of the master component. Its standalone net focal length is +96.670 mm. This pair is also the part of the design explicitly constrained by the patent's conditional expressions. The calculation uses the complete cemented pair and the two exterior surface powers defined by the patent; it does not substitute the standalone focal lengths of L9 or L10 for those condition variables.
 
@@ -110,7 +110,7 @@ The prescription contains ten distinct d-line `(nd, νd)` coordinates. The paten
 | 1.58913 / 61.1 — 589611 crown / SK5 family | L7 | Class | Coordinate-compatible SK5-family assignment. |
 | 1.74000 / 28.3 — 740283 dense flint | L8 | Class | Coordinate-exact equivalents exist in more than one vendor family. |
 | 1.65844 / 50.9 — 658509 dense crown / N-SSK5 class | L9 | Class | Near-exact N-SSK5-family coordinate match. |
-| 1.80741 / 31.6 — 807316 high-index class | L10 | Unmatched | No defensible current public-catalog identity established. |
+| 1.80741 / 31.6 — 807316 lanthanum dense flint | L10 | Unmatched | Coordinate of the discontinued Schott LaSF8; no public dispersion coefficients were located, so the element stays on the patent νd. |
 | 1.67270 / 32.2 — 673322 dense flint / SF5 class | L11 | Class | Coordinate-exact SF5-family matches exist. |
 | 1.67100 / 51.8 — 671518 crown | L12 | H-LaK67 (CDGM) coordinate equivalent | 1.67000 / 51.76: Δnd −0.0010, Δνd −0.04; a catalog equivalent for dispersion, not a supplier identification. |
 
@@ -147,6 +147,6 @@ The modeled semi-diameter set passes the portable geometry checks applied to the
 
 ## Sources
 
-1. Japan Patent Office, **JPS56-150717A**, “ズームレンズ系” (Zoom lens system), published 21 November 1981. Example 1 prescription: supplied PDF pp. 2–3; optical layout: Figure 1, p. 5; aberration plots and `Y′ = 21.6`: Figure 6, p. 6; conditional expressions: pp. 1–2. Convenience family/index page: <https://patents.google.com/patent/JPS56150717A/en>.
+1. Japan Patent Office, **JP S56-150717 A**, “ズームレンズ系” (Zoom lens system), published 21 November 1981. Example 1 prescription: supplied PDF pp. 2–3; optical layout: Figure 1, p. 5; aberration plots and `Y′ = 21.6`: Figure 6, p. 6; conditional expressions: pp. 1–2. Convenience family/index page: <https://patents.google.com/patent/JPS56150717A/en>.
 2. Minolta Camera Co., Ltd., **Minolta MD Zoom Lenses owner's manual** (1985), production specifications and one-touch zoom/focus operation for the 75–150 mm f/4 MD Zoom. Archived copy recorded in the dossier: <https://manuals.plus/m/540c39fa1e885dc79fc174e827a42f8cfa39b959cc8ef98ddcf78fdc7c166c11>.
 3. Current authoritative optical-glass catalog families recorded in the dossier: SCHOTT, OHARA, HOYA, HIKARI, CDGM, and SUMITA. Catalog-coordinate matches are used only as class/equivalence evidence unless otherwise stated.

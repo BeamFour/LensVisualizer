@@ -28,10 +28,12 @@ import type { LensDataInput } from "../../types/optics.js";
  * ║ SEMI-DIAMETERS: inferred from exact spherical-ray envelopes at both source   ║
  * ║ endpoints and zoomT = 0.25, 0.50, 0.75. On-axis rays sample the full stop;  ║
  * ║ off-axis rays use 0.6 of the interpolated patent half-field and the default  ║
- * ║ pupil fractions, with about 8-12% modeled mechanical clearance. No patent   ║
- * ║ semi-diameters are claimed. Checked against US 4,192,577 FIG. 1 (0.186 mm/px ║
- * ║ from the r1-r22 span): all drawn rims fall within about 10% of the modeled   ║
- * ║ set except G12, raised from 12.1/12.5 to 13.2/13.8 mm (drawn about 13.9 mm). ║
+ * ║ pupil fractions, with modeled mechanical clearance. No patent               ║
+ * ║ semi-diameters are claimed. The envelope set was then fitted to the rims     ║
+ * ║ drawn in US 4,192,577 FIG. 1 (pixel profile, 0.107 mm/px from the r1-r22     ║
+ * ║ span): V1 was already within 2%; V2, V3, R1 rear and R2 were raised 5-10% to ║
+ * ║ the drawn 13.5-14.1 mm, G4's front to 15.0 mm (drawn flange 15.9 mm), and    ║
+ * ║ G12 to 13.2/13.8 mm. r7 stays at 12.6 mm, the D7 gap-intrusion limit.        ║
  * ║                                                                              ║
  * ║ No scaling, aspheres, rear plates, dummy planes, or finite-focus             ║
  * ║ reconstruction are used.                                                     ║
@@ -97,8 +99,8 @@ const LENS_DATA = {
       vd: 49,
       indexReference: "d",
       fl: 116.9755,
-      glass: "678490 — coordinate class (catalog unresolved)",
-      role: "Rear positive element of the front focusing group V1.",
+      glass: "Unmatched (678490 lanthanum flint; no public catalog glass at this coordinate)",
+      role: "Rear positive element of the front positive group V1.",
     },
     {
       id: 4,
@@ -110,7 +112,7 @@ const LENS_DATA = {
       vd: 55.5,
       indexReference: "d",
       fl: -31.5473,
-      glass: "697555 — lanthanum-crown coordinate class (supplier/melt unresolved)",
+      glass: "697555 — lanthanum-crown coordinate class (J-LAK14 catalog equivalent; supplier/melt unresolved)",
       role: "Front negative element of variator group V2.",
     },
     {
@@ -123,7 +125,7 @@ const LENS_DATA = {
       vd: 58.5,
       indexReference: "d",
       fl: -87.0069,
-      glass: "658585 — coordinate class (catalog unresolved)",
+      glass: "Unmatched (658585 lanthanum crown; nearest LAK11 class at Δνd −1.2)",
       role: "Second negative element of variator group V2.",
     },
     {
@@ -162,7 +164,7 @@ const LENS_DATA = {
       vd: 61.3,
       indexReference: "d",
       fl: 55.2087,
-      glass: "621613 — crown coordinate class (catalog unresolved)",
+      glass: "Unmatched (621613 dense crown; no public catalog glass at this coordinate, nearest SK16 class at Δnd −0.0010, Δνd −1.0)",
       role: "Front positive element of relay subgroup R1.",
     },
     {
@@ -189,7 +191,7 @@ const LENS_DATA = {
       vd: 31.6,
       indexReference: "d",
       fl: -49.8094,
-      glass: "807316 — dense flint coordinate class (catalog unresolved)",
+      glass: "Unmatched (807316 lanthanum dense flint; coordinate of discontinued Schott LaSF8, no public dispersion coefficients)",
       cemented: "D2",
       role: "Negative component of the relay R1 cemented pair.",
     },
@@ -203,7 +205,7 @@ const LENS_DATA = {
       vd: 61.3,
       indexReference: "d",
       fl: 67.6409,
-      glass: "621613 — crown coordinate class (catalog unresolved)",
+      glass: "Unmatched (621613 dense crown; no public catalog glass at this coordinate, nearest SK16 class at Δnd −0.0010, Δνd −1.0)",
       role: "Weak front component of relay subgroup R2.",
     },
     {
@@ -216,7 +218,7 @@ const LENS_DATA = {
       vd: 47.2,
       indexReference: "d",
       fl: -65.9234,
-      glass: "670472 — extra-dense barium-flint coordinate class (catalog unresolved)",
+      glass: "670472 — barium-flint coordinate class (BAF10 catalog equivalent; supplier/melt unresolved)",
       role: "Rear negative component of relay subgroup R2.",
     },
   ],
@@ -227,23 +229,23 @@ const LENS_DATA = {
     { label: "3", R: 148.12, d: 0.1, nd: 1, elemId: 0, sd: 25.2 },
     { label: "4", R: 70.02, d: 4.6, nd: 1.6783, elemId: 3, sd: 24.9 },
     { label: "5", R: 580, d: 1.09, nd: 1, elemId: 0, sd: 24.6 },
-    { label: "6", R: -683.8, d: 1.3, nd: 1.6968, elemId: 4, sd: 13.8 },
-    { label: "7", R: 22.73, d: 4.6, nd: 1, elemId: 0, sd: 12.5 },
-    { label: "8", R: -268.06, d: 1.2, nd: 1.6583, elemId: 5, sd: 12.5 },
-    { label: "9", R: 72.97, d: 0.5, nd: 1, elemId: 0, sd: 12.6 },
-    { label: "10", R: 33.01, d: 3, nd: 1.8052, elemId: 6, sd: 12.9 },
-    { label: "11", R: 103, d: 30.19, nd: 1, elemId: 0, sd: 12.7 },
-    { label: "12", R: -43.55, d: 1.2, nd: 1.67, elemId: 7, sd: 12.6 },
-    { label: "13", R: -104.04, d: 9.07, nd: 1, elemId: 0, sd: 13 },
+    { label: "6", R: -683.8, d: 1.3, nd: 1.6968, elemId: 4, sd: 15 },
+    { label: "7", R: 22.73, d: 4.6, nd: 1, elemId: 0, sd: 12.6 },
+    { label: "8", R: -268.06, d: 1.2, nd: 1.6583, elemId: 5, sd: 13.6 },
+    { label: "9", R: 72.97, d: 0.5, nd: 1, elemId: 0, sd: 13.6 },
+    { label: "10", R: 33.01, d: 3, nd: 1.8052, elemId: 6, sd: 13.8 },
+    { label: "11", R: 103, d: 30.19, nd: 1, elemId: 0, sd: 13.6 },
+    { label: "12", R: -43.55, d: 1.2, nd: 1.67, elemId: 7, sd: 13.3 },
+    { label: "13", R: -104.04, d: 9.07, nd: 1, elemId: 0, sd: 13.5 },
     // Stop position inferred from Fig. 1; fixed 0.50 mm in front of surface 14 (relay-side placement).
     { label: "STO", R: 1e15, d: 0.5, nd: 1, elemId: 0, sd: 12.262 },
     { label: "14", R: 90.98, d: 4.5, nd: 1.6214, elemId: 8, sd: 13.8 },
     { label: "15", R: -54.03, d: 0.1, nd: 1, elemId: 0, sd: 14 },
     { label: "16", R: 36.97, d: 6.5, nd: 1.5168, elemId: 9, sd: 13.8 },
-    { label: "17", R: -45.15, d: 2, nd: 1.8074, elemId: 10, sd: 13.4 },
-    { label: "18", R: 375.3, d: 27.5, nd: 1, elemId: 0, sd: 13 },
-    { label: "19", R: 295.8, d: 4, nd: 1.6214, elemId: 11, sd: 12.8 },
-    { label: "20", R: -48.74, d: 7.05, nd: 1, elemId: 0, sd: 12.9 },
+    { label: "17", R: -45.15, d: 2, nd: 1.8074, elemId: 10, sd: 13.6 },
+    { label: "18", R: 375.3, d: 27.5, nd: 1, elemId: 0, sd: 13.5 },
+    { label: "19", R: 295.8, d: 4, nd: 1.6214, elemId: 11, sd: 13.4 },
+    { label: "20", R: -48.74, d: 7.05, nd: 1, elemId: 0, sd: 13.5 },
     { label: "21", R: -24.41, d: 2, nd: 1.67, elemId: 12, sd: 13.2 },
     { label: "22", R: -56.36, d: 44.567922, nd: 1, elemId: 0, sd: 13.8 },
   ],
@@ -297,7 +299,7 @@ const LENS_DATA = {
 
   closeFocusM: 1.5,
   focusDescription:
-    "Front-group focus is qualitative only; no finite-focus spacings (NO_INTERNAL_RECONSTRUCTION).",
+    "Front-group (V1) focus is inferred, not patent-stated; no finite-focus spacings (NO_INTERNAL_RECONSTRUCTION).",
 
   nominalFno: 3.6,
   fstopSeries: [3.6, 4, 5.6, 8, 11, 16],

@@ -39,9 +39,10 @@ import type { LensDataInput } from "../../types/optics.js";
  * ║    element heights to Fig. 1 proportions, and d12 is Example 1's one ║
  * ║    enlarged air space in the L5–L8 region.                           ║
  * ║  NOTE ON APERTURE: constant f/3.5 via zoomApertureModel              ║
- * ║    "from-nominal-fno" (iris radius 6.36 → 7.45 mm wide → tele).      ║
+ * ║    "from-nominal-fno". Paraxial iris radius 6.36 → 7.45 mm wide →    ║
+ * ║    tele; the engine's real-ray solve draws 6.52 → 7.80 mm.           ║
  * ║    Calibrated to the patent FNO; not a published stop diameter.      ║
- * ║    STO sd below is the largest (tele) station radius.                ║
+ * ║    STO sd below is the paraxial tele-station radius.                 ║
  * ║  NOTE ON SEMI-DIAMETERS: modeled, none published. 1.08 × max of the  ║
  * ║    f/3.5 axial marginal and the ±0.5-pupil full-field (Y′ 21.6)      ║
  * ║    real-ray bundle over the five infinity stations, rounded up to    ║
@@ -186,7 +187,7 @@ const LENS_DATA = {
       nd: 1.52584,
       vd: 52.06,
       fl: 45.5,
-      glass: "526521 — crown/light-flint boundary (catalog unresolved)",
+      glass: "Unmatched (526521 crown/light-flint boundary; nearest HOYA CF2 at Δnd +0.0005, Δνd −1.0)",
       role: "Biconvex positive rear element",
     },
   ],

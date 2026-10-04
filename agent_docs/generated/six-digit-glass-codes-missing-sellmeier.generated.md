@@ -10,11 +10,11 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 ## Summary
 
 - **870** lenses scanned
-- **1932** total code-only elements found
-- **359** elements in this report
-- **132** distinct lens files affected
-- **30** active unreviewed elements have no review-record hit or explicit disposition
-- **195** explicitly unmatched/unknown/proprietary/unidentified elements are self-recording review dispositions
+- **1921** total code-only elements found
+- **350** elements in this report
+- **130** distinct lens files affected
+- **23** active unreviewed elements have no review-record hit or explicit disposition
+- **193** explicitly unmatched/unknown/proprietary/unidentified elements are self-recording review dispositions
 - **0** dispositions lack any review record
 
 ## Prioritized Unreviewed Queue
@@ -27,7 +27,6 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | Tier | Code | Active elements / lens files | Visible lenses | Strict surfaces | Completion candidates | Near-complete candidates | Local patent lenses | Representative rows |
 |---|---|---:|---:|---:|---|---|---:|---|
 | A | 683315 | 2 / 2 | 2 | 2 | MINOLTA AF 20mm f/2.8 | — | 2/2 | [MINOLTA AF 20mm f/2.8](../../src/lens-data/minolta/MinoltaAF20mmf28.data.ts) Element 4 (1.68300 / 31.52)<br>[Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) Element 2 (1.68287 / 31.50) |
-| A | 526521 | 1 / 1 | 1 | 1 | MINOLTA MD ZOOM 24-35mm f/3.5 | — | 1/1 | [MINOLTA MD ZOOM 24-35mm f/3.5](../../src/lens-data/minolta/Minolta2435mmf35MDZoom.data.ts) Element 10 (1.52584 / 52.06) |
 | C | 680557 | 2 / 1 | 1 | 2 | — | — | 1/1 | [Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) Element 1 (1.67975 / 55.70)<br>[Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) Element 3 (1.67975 / 55.70) |
 | C | 682419 | 2 / 1 | 1 | 2 | — | — | 1/1 | [CARL ZEISS JENA FLEKTOGON 50mm f/4](../../src/lens-data/carl-zeiss-jena/ZeissFlektogon50mmf4.data.ts) Element 3 (1.68169 / 41.90)<br>[CARL ZEISS JENA FLEKTOGON 50mm f/4](../../src/lens-data/carl-zeiss-jena/ZeissFlektogon50mmf4.data.ts) Element 4 (1.68169 / 41.90) |
 | D | 575391 | 1 / 1 | 1 | 1 | — | — | 1/1 | [Minolta Auto Tele Rokkor-PF 100mm f/2](../../src/lens-data/minolta/Minolta100mmf2AutoTeleRokkor.data.ts) Element 5 (1.57526 / 39.10) |
@@ -47,10 +46,6 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | D | 839196 | 1 / 1 | 1 | 1 | — | — | 1/1 | [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) Element L32 (1.83909 / 19.60) |
 | D | 868323 | 1 / 1 | 1 | 1 | — | — | 1/1 | [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) Element L33 (1.86758 / 32.30) |
 | D | 958300 | 1 / 1 | 1 | 1 | — | — | 1/1 | [SONY FE 400-800mm f/6.3-8 G OSS](../../src/lens-data/sony/SonyFE400800mmF638GOSS.data.ts) Element L51 (1.95787 / 30.00) |
-| E | 807316 | 2 / 2 | 2 | 2 | MINOLTA MD ZOOM 35-135mm f/3.5-4.5 | — | 0/2 | [MINOLTA MD ZOOM 35-135mm f/3.5-4.5](../../src/lens-data/minolta/Minolta35135mmf3545MDZoom.data.ts) Element N12 (1.80741 / 31.59)<br>[MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) Element G10 (1.80740 / 31.60) |
-| E | 621613 | 2 / 1 | 1 | 2 | — | — | 0/1 | [MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) Element G8 (1.62140 / 61.30)<br>[MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) Element G11 (1.62140 / 61.30) |
-| E | 658585 | 1 / 1 | 1 | 1 | — | — | 0/1 | [MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) Element G5 (1.65830 / 58.50) |
-| E | 678490 | 1 / 1 | 1 | 1 | — | — | 0/1 | [MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) Element G3 (1.67830 / 49.00) |
 
 ## Codes by Frequency
 
@@ -58,7 +53,6 @@ Completion counts are conditional on finding a source-verified catalog identity 
 |---|---:|---:|---|---|
 | 486815 | 9 | 4 | patents/US3743384.pdf<br>patents/US3774991.pdf | All rows have review records |
 | 493836 | 9 | 4 | patents/JPA 1996327896-000000.pdf<br>patents/JP2004109559A.pdf<br>patents/JPA 1989039542-000000.pdf | All rows have review records |
-| 807316 | 5 | 5 | patents/US4764000.pdf<br>patents/US4871239.pdf<br>patents/JPA 1981150717-000000.pdf | 3/5 rows have review records |
 | 847238 | 5 | 3 | patents/CN211826699U.pdf<br>patents/CN211955966U.pdf<br>patents/CN114755806A.pdf | All rows explicitly disposed |
 | 531559 | 4 | 3 | patents/US20200142167A1.pdf<br>patents/US20230213739A1.pdf<br>patents/WO2021039813A1.pdf | All rows have review records |
 | 545560 | 4 | 1 | patents/US20180364457A1.pdf | All rows explicitly disposed |
@@ -67,7 +61,6 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 863252 | 4 | 2 | patents/WO2021199923A1.pdf<br>patents/WO_2025263124_A1.pdf | All rows have review records |
 | 961323 | 4 | 2 | patents/WO2021200206A1.pdf<br>patents/WO_2024247472_A1.pdf | All rows explicitly disposed |
 | 544561 | 3 | 1 | patents/US20210149156A1.pdf | All rows explicitly disposed |
-| 621613 | 3 | 2 | patents/JPA 1981150717-000000.pdf | 1/3 rows have review records |
 | 684313 | 3 | 2 | patents/US20150124127A1.pdf | All rows explicitly disposed |
 | 720521 | 3 | 3 | patents/US4444473.pdf<br>patents/US4124276.pdf | All rows have review records |
 | 777297 | 3 | 3 | patents/WO2021199923A1.pdf<br>patents/WO_2025263124_A1.pdf<br>patents/JP2023039817A.pdf | All rows have review records |
@@ -105,6 +98,7 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 804238 | 2 | 2 | patents/WO2019131993A1.pdf | All rows have review records |
 | 804466 | 2 | 1 | patents/JP2015166834A.pdf | All rows explicitly disposed |
 | 806418 | 2 | 2 | patents/WO2019131993A1.pdf | All rows have review records |
+| 807316 | 2 | 2 | patents/US4764000.pdf<br>patents/US4871239.pdf | All rows have review records |
 | 815233 | 2 | 2 | patents/WO2019131993A1.pdf | All rows have review records |
 | 819287 | 2 | 2 | patents/WO2019131993A1.pdf | All rows have review records |
 | 830427 | 2 | 1 | patents/JP2015041012A.pdf | All rows explicitly disposed |
@@ -132,7 +126,6 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 523701 | 1 | 1 | patents/US20100194930A1.pdf | All rows explicitly disposed |
 | 525558 | 1 | 1 | patents/US8994842.pdf | All rows explicitly disposed |
 | 525563 | 1 | 1 | patents/US7307794.pdf | All rows explicitly disposed |
-| 526521 | 1 | 1 | patents/JPA 1981158314-000000.pdf | No review-record hit |
 | 530558 | 1 | 1 | patents/US20130335830A1.pdf | All rows explicitly disposed |
 | 534554 | 1 | 1 | patents/US3737214.pdf | All rows have review records |
 | 534555 | 1 | 1 | patents/US4110006.pdf | All rows explicitly disposed |
@@ -191,7 +184,6 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 656277 | 1 | 1 | patents/WO2024154461A1.pdf | No review-record hit |
 | 656337 | 1 | 1 | patents/JPA 2021076740-000000.pdf | All rows explicitly disposed |
 | 658397 | 1 | 1 | patents/JP2023039817A.pdf | All rows have review records |
-| 658585 | 1 | 1 | Missing from untracked local patents/ references (US4192577, 4192577) | No review-record hit |
 | 662331 | 1 | 1 | patents/JPA 2021076740-000000.pdf | All rows explicitly disposed |
 | 662577 | 1 | 1 | patents/US2896506.pdf | All rows explicitly disposed |
 | 666552 | 1 | 1 | patents/US9651761.pdf | All rows explicitly disposed |
@@ -205,7 +197,7 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 676440 | 1 | 1 | patents/US7542219.pdf | All rows explicitly disposed |
 | 678314 | 1 | 1 | patents/US20100208366A1.pdf | All rows explicitly disposed |
 | 678322 | 1 | 1 | patents/WO2021200206A1.pdf | All rows explicitly disposed |
-| 678490 | 1 | 1 | Missing from untracked local patents/ references (US4192577, 4192577) | No review-record hit |
+| 678490 | 1 | 1 | Missing from untracked local patents/ references (US4192577, 4192577) | All rows explicitly disposed |
 | 678508 | 1 | 1 | patents/GB_978797_A.pdf | All rows explicitly disposed |
 | 680312 | 1 | 1 | patents/JP2015041012A.pdf | All rows have review records |
 | 681472 | 1 | 1 | patents/DE_1157000_B.pdf | No review-record hit |
@@ -226,7 +218,6 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 700555 | 1 | 1 | patents/WO_2025263124_A1.pdf | All rows have review records |
 | 701301 | 1 | 1 | patents/US4277149.pdf | All rows have review records |
 | 704408 | 1 | 1 | patents/JPB 1963011590-000000.pdf | No review-record hit |
-| 711433 | 1 | 1 | Missing from untracked local patents/ references (US4147410, 4147410) | All rows explicitly disposed |
 | 712525 | 1 | 1 | patents/JP2021076829A.pdf | All rows explicitly disposed |
 | 717295 | 1 | 1 | patents/CN211826699U.pdf | All rows explicitly disposed |
 | 721234 | 1 | 1 | patents/WO2024154461A1.pdf | No review-record hit |
@@ -730,44 +721,25 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | L1 (Element 1) | 1 | `789457 - high-index lanthanum flint (catalog unresolved)` | 1.78850 / 45.70 | No catalog entry | abbe | patents/US4182550.pdf | Audit-log hit |
 | L6 (Element 6) | 10 | `Unmatched (781445 patent coordinate; vendor unresolved)` | 1.78100 / 44.50 | No catalog entry | abbe | patents/US4182550.pdf | Explicit disposition in data |
 
-### [MINOLTA MD ZOOM 24-35mm f/3.5](../../src/lens-data/minolta/Minolta2435mmf35MDZoom.data.ts) - JP S56-158314 A
-
-| Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
-|---|---|---|---|---|---|---|---|
-| L10 (Element 10) | 19 | `526521 — crown/light-flint boundary (catalog unresolved)` | 1.52584 / 52.06 | No catalog entry | abbe | patents/JPA 1981158314-000000.pdf | No review-record hit |
-
 ### [MINOLTA MD ZOOM 24-50mm f/4](../../src/lens-data/minolta/Minolta2450mmf4MDZoom.data.ts) - US 4,147,410
 
 | Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
 |---|---|---|---|---|---|---|---|
 | L1 (Element 1) | 1 | `Unmatched (600644 phosphate-crown class; nearest current catalog coordinates sit at Δnd +0.003, outside the runtime window)` | 1.60000 / 64.40 | No catalog entry | abbe | Missing from untracked local patents/ references (US4147410, 4147410) | Explicit disposition in data |
-| L4 (Element 4) | 7 | `Unmatched (711433 lanthanum-flint class; no current catalog glass within Δnd 0.003 / Δνd 2)` | 1.71060 / 43.30 | No catalog entry | abbe | Missing from untracked local patents/ references (US4147410, 4147410) | Explicit disposition in data |
 | L11 (Element 11) | 19 | `Unmatched (757297 lanthanum dense-flint class; no current catalog glass within Δnd 0.003 / Δνd 2)` | 1.75690 / 29.70 | No catalog entry | abbe | Missing from untracked local patents/ references (US4147410, 4147410) | Explicit disposition in data |
 | L13 (Element 13) | 23 | `Unmatched (600644 phosphate-crown class; nearest current catalog coordinates sit at Δnd +0.003, outside the runtime window)` | 1.60000 / 64.40 | No catalog entry | abbe | Missing from untracked local patents/ references (US4147410, 4147410) | Explicit disposition in data |
-
-### [MINOLTA MD ZOOM 35-135mm f/3.5-4.5](../../src/lens-data/minolta/Minolta35135mmf3545MDZoom.data.ts) - US 5,249,079 A
-
-| Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
-|---|---|---|---|---|---|---|---|
-| N12 (Element N12) | 22 | `807316 — high-index flint class` | 1.80741 / 31.59 | No catalog entry | abbe | Missing from untracked local patents/ references (US5249079A, US5249079, 5249079) | No review-record hit |
 
 ### [MINOLTA MD ZOOM 50-135mm f/3.5](../../src/lens-data/minolta/Minolta50135mmf35MDZoom.data.ts) - US 4,192,577
 
 | Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
 |---|---|---|---|---|---|---|---|
-| G3 (Element G3) | 4 | `678490 — coordinate class (catalog unresolved)` | 1.67830 / 49.00 | No catalog entry | abbe | Missing from untracked local patents/ references (US4192577, 4192577) | No review-record hit |
-| G5 (Element G5) | 8 | `658585 — coordinate class (catalog unresolved)` | 1.65830 / 58.50 | No catalog entry | abbe | Missing from untracked local patents/ references (US4192577, 4192577) | No review-record hit |
-| G8 (Element G8) | 14 | `621613 — crown coordinate class (catalog unresolved)` | 1.62140 / 61.30 | No catalog entry | abbe | Missing from untracked local patents/ references (US4192577, 4192577) | No review-record hit |
-| G10 (Element G10) | 17 | `807316 — dense flint coordinate class (catalog unresolved)` | 1.80740 / 31.60 | No catalog entry | abbe | Missing from untracked local patents/ references (US4192577, 4192577) | No review-record hit |
-| G11 (Element G11) | 19 | `621613 — crown coordinate class (catalog unresolved)` | 1.62140 / 61.30 | No catalog entry | abbe | Missing from untracked local patents/ references (US4192577, 4192577) | No review-record hit |
+| G3 (Element G3) | 4 | `Unmatched (678490 lanthanum flint; no public catalog glass at this coordinate)` | 1.67830 / 49.00 | No catalog entry | abbe | Missing from untracked local patents/ references (US4192577, 4192577) | Explicit disposition in data |
 
-### [MINOLTA MD ZOOM 75-150mm f/4](../../src/lens-data/minolta/Minolta75150mmf40MDZoom.data.ts) - JPS56-150717A
+### [MINOLTA MD ZOOM 75-150mm f/4](../../src/lens-data/minolta/Minolta75150mmf40MDZoom.data.ts) - JP S56-150717 A
 
 | Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
 |---|---|---|---|---|---|---|---|
-| L5 (Element 5) | r7 | `Unmatched (621613 crown class; catalog unresolved)` | 1.62135 / 61.30 | No catalog entry | abbe | patents/JPA 1981150717-000000.pdf | Explicit disposition in data |
-| L6 (Element 6) | r9 | `Unmatched (750501 high-index crown class; catalog unresolved)` | 1.74950 / 50.10 | No catalog entry | abbe | patents/JPA 1981150717-000000.pdf | Explicit disposition in data |
-| L10 (Element 10) | rb | `Unmatched (807316 high-index flint/crown class; catalog unresolved)` | 1.80741 / 31.60 | No catalog entry | abbe | patents/JPA 1981150717-000000.pdf | Explicit disposition in data |
+| L6 (Element 6) | r9 | `Unmatched (750501 lanthanum crown/flint boundary; no public catalog glass at this coordinate)` | 1.74950 / 50.10 | No catalog entry | abbe | patents/JPA 1981150717-000000.pdf | Explicit disposition in data |
 
 ### [MINOLTA VARISOFT ROKKOR 85mm f/2.8](../../src/lens-data/minolta/MinoltaVarisoft85mmf28.data.ts) - US 4,124,276
 

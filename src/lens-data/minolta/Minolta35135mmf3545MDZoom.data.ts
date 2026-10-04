@@ -4,8 +4,8 @@ import type { LensDataInput } from "../../types/optics.js";
  * ╔══════════════════════════════════════════════════════════════════════╗
  * ║  LENS DATA — MINOLTA MD ZOOM 35-135mm f/3.5-4.5                    ║
  * ╠══════════════════════════════════════════════════════════════════════╣
- * ║  Source: US 5,249,079 A, Table 4 (single worked embodiment; the    ║
- * ║  job card labels it Example 1). Four-unit +/−/+/+ all-spherical    ║
+ * ║  Source: US 5,249,079 A, Table 4 (the single worked numerical      ║
+ * ║  embodiment). Four-unit +/−/+/+ all-spherical                      ║
  * ║  zoom, 14 elements / 12 air-separated groups.                      ║
  * ║                                                                      ║
  * ║  PUBLISHED ZOOM STATES: d5, d13, and d19 are copied from Table 4.  ║
@@ -55,12 +55,13 @@ const LENS_DATA = {
   key: "minolta-md-zoom-35-135mm-f35-45",
   maker: "Minolta",
   name: "MINOLTA MD ZOOM 35-135mm f/3.5-4.5",
-  subtitle: "US 5,249,079 A — Table 4 / job-card Example 1; centered-formula correlation",
+  subtitle: "US 5,249,079 A — Table 4 (sole numerical embodiment); centered-formula correlation",
   specs: ["14 ELEMENTS / 12 GROUPS", "35-135mm f/3.5-4.5", "4-GROUP ZOOM", "ALL-SPHERICAL"],
 
   focalLengthMarketing: [35, 135],
   focalLengthDesign: [35.958411, 131.527694],
   apertureMarketing: 3.5,
+  apertureDesign: 3.608, // Table 4 printed F-number at the wide end (3.608-4.56)
   lensMounts: ["minolta-sr"],
   imageFormat: "135-full-frame",
   patentNumber: "US 5,249,079 A",
@@ -229,7 +230,7 @@ const LENS_DATA = {
       vd: 31.59,
       indexReference: "d",
       fl: -27.458178,
-      glass: "807316 — high-index flint class",
+      glass: "Unmatched (807316 lanthanum dense flint; coordinate of discontinued Schott LaSF8, no public dispersion coefficients)",
       role: "Strong negative member of L4.",
     },
     {
@@ -321,10 +322,11 @@ const LENS_DATA = {
     ["27", "BF"],
   ],
 
+  /* The patent places diaphragm E inside L3 (d14 is fixed, d13 varies), so L3 starts at the stop. */
   groups: [
     { text: "L1", fromSurface: "1", toSurface: "5" },
     { text: "L2", fromSurface: "6", toSurface: "13" },
-    { text: "L3", fromSurface: "15", toSurface: "19" },
+    { text: "L3", fromSurface: "STO", toSurface: "19" },
     { text: "L4", fromSurface: "20", toSurface: "27" },
   ],
   doublets: [
@@ -338,6 +340,7 @@ const LENS_DATA = {
 
   nominalFno: [3.610666, 4.55663],
   fstopSeries: [3.5, 4, 4.5, 5.6, 8, 11, 16, 22],
+  maxFstop: 22, // production minimum aperture; the patent publishes none
 
   yScFill: 0.36,
 } satisfies LensDataInput;

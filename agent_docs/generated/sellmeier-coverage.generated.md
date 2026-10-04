@@ -1332,7 +1332,7 @@ Incomplete visible lenses, still ordered by descending trusted chromatic complet
 
 | Surface | Element | Runtime quality | Glass annotation | Reason |
 |---|---|---|---|---|
-| 22 | Element N12 | abbe | `807316 — high-index flint class` | No catalog match |
+| 22 | Element N12 | abbe | `Unmatched (807316 lanthanum dense flint; coordinate of discontinued Schott LaSF8, no public dispersion coefficients)` | Explicit unmatched/proprietary annotation |
 
 ### [NIKON AF-P DX NIKKOR 70-300mm f/4.5-6.3 G ED VR](../../src/lens-data/nikon/NikonAFPDX70300mmf4563G.data.ts) - 92.9% trusted (13/14); 92.9% Sellmeier (13/14) - US 2021/0026133 A1
 
@@ -1416,7 +1416,7 @@ Incomplete visible lenses, still ordered by descending trusted chromatic complet
 
 | Surface | Element | Runtime quality | Glass annotation | Reason |
 |---|---|---|---|---|
-| 3 | Element 2 | abbe | `Unmatched (807316 high-index flint; nearest current NBFD15 / H-ZLaF56B differ by Δνd ≈ +1.7)` | Explicit unmatched/proprietary annotation |
+| 3 | Element 2 | abbe | `Unmatched (807316 lanthanum dense flint; coordinate of discontinued Schott LaSF8, not in the catalog; nearest current NBFD15 / H-ZLaF56B differ by Δνd ≈ +1.7)` | Explicit unmatched/proprietary annotation |
 
 ### [NIKON AI ZOOM-NIKKOR 80-200mm f/4](../../src/lens-data/nikon/NikonAINikkor80200mmf4.data.ts) - 92.3% trusted (12/13); 92.3% Sellmeier (12/13) - US 4,452,513
 
@@ -1583,7 +1583,7 @@ Incomplete visible lenses, still ordered by descending trusted chromatic complet
 
 | Surface | Element | Runtime quality | Glass annotation | Reason |
 |---|---|---|---|---|
-| 19 | Element 10 | abbe | `526521 — crown/light-flint boundary (catalog unresolved)` | No catalog match |
+| 19 | Element 10 | abbe | `Unmatched (526521 crown/light-flint boundary; nearest HOYA CF2 at Δnd +0.0005, Δνd −1.0)` | Explicit unmatched/proprietary annotation |
 
 ### [NIKON NIKKOR Z DX 16-50mm f/3.5-6.3 VR](../../src/lens-data/nikon/NikonZDX1650mmf3563VR.data.ts) - 90.0% trusted (9/10); 90.0% Sellmeier (9/10) - WO 2020/012638 A1
 
@@ -2264,13 +2264,13 @@ Incomplete visible lenses, still ordered by descending trusted chromatic complet
 | 10 | element | constant | `(none)` | No glass annotation |
 | 14 | element | constant | `(none)` | No glass annotation |
 
-### [MINOLTA MD ZOOM 75-150mm f/4](../../src/lens-data/minolta/Minolta75150mmf40MDZoom.data.ts) - 75.0% trusted (9/12); 75.0% Sellmeier (9/12) - JPS56-150717A
+### [MINOLTA MD ZOOM 75-150mm f/4](../../src/lens-data/minolta/Minolta75150mmf40MDZoom.data.ts) - 75.0% trusted (9/12); 75.0% Sellmeier (9/12) - JP S56-150717 A
 
 | Surface | Element | Runtime quality | Glass annotation | Reason |
 |---|---|---|---|---|
-| r7 | Element 5 | abbe | `Unmatched (621613 crown class; catalog unresolved)` | Explicit unmatched/proprietary annotation |
-| r9 | Element 6 | abbe | `Unmatched (750501 high-index crown class; catalog unresolved)` | Explicit unmatched/proprietary annotation |
-| rb | Element 10 | abbe | `Unmatched (807316 high-index flint/crown class; catalog unresolved)` | Explicit unmatched/proprietary annotation |
+| r7 | Element 5 | abbe | `Unmatched (621613 dense crown; no public catalog glass at this coordinate, nearest SK16 class at Δnd −0.0009, Δνd −1.0)` | Explicit unmatched/proprietary annotation |
+| r9 | Element 6 | abbe | `Unmatched (750501 lanthanum crown/flint boundary; no public catalog glass at this coordinate)` | Explicit unmatched/proprietary annotation |
+| rb | Element 10 | abbe | `Unmatched (807316 lanthanum dense flint; coordinate of discontinued Schott LaSF8, no public dispersion coefficients)` | Explicit unmatched/proprietary annotation |
 
 ### [NIKON NIKKOR Z 24-50mm f/4-6.3](../../src/lens-data/nikon/NikonNikkorZ2450mmf463.data.ts) - 75.0% trusted (9/12); 75.0% Sellmeier (9/12) - JP 2021-189377 A
 
@@ -2454,7 +2454,7 @@ Incomplete visible lenses, still ordered by descending trusted chromatic complet
 | Surface | Element | Runtime quality | Glass annotation | Reason |
 |---|---|---|---|---|
 | 1 | Element 1 | abbe | `Unmatched (600644 phosphate-crown class; nearest current catalog coordinates sit at Δnd +0.003, outside the runtime window)` | Explicit unmatched/proprietary annotation |
-| 7 | Element 4 | abbe | `Unmatched (711433 lanthanum-flint class; no current catalog glass within Δnd 0.003 / Δνd 2)` | Explicit unmatched/proprietary annotation |
+| 7 | Element 4 | abbe | `Unmatched (711433 lanthanum-flint class; nearest catalog coordinate is HOYA LAFL4 at Δnd +0.0021, outside the relabel window)` | Explicit unmatched/proprietary annotation |
 | 19 | Element 11 | abbe | `Unmatched (757297 lanthanum dense-flint class; no current catalog glass within Δnd 0.003 / Δνd 2)` | Explicit unmatched/proprietary annotation |
 | 23 | Element 13 | abbe | `Unmatched (600644 phosphate-crown class; nearest current catalog coordinates sit at Δnd +0.003, outside the runtime window)` | Explicit unmatched/proprietary annotation |
 
@@ -2640,11 +2640,11 @@ Incomplete visible lenses, still ordered by descending trusted chromatic complet
 
 | Surface | Element | Runtime quality | Glass annotation | Reason |
 |---|---|---|---|---|
-| 4 | Element G3 | abbe | `678490 — coordinate class (catalog unresolved)` | No catalog match |
-| 8 | Element G5 | abbe | `658585 — coordinate class (catalog unresolved)` | No catalog match |
-| 14 | Element G8 | abbe | `621613 — crown coordinate class (catalog unresolved)` | No catalog match |
-| 17 | Element G10 | abbe | `807316 — dense flint coordinate class (catalog unresolved)` | No catalog match |
-| 19 | Element G11 | abbe | `621613 — crown coordinate class (catalog unresolved)` | No catalog match |
+| 4 | Element G3 | abbe | `Unmatched (678490 lanthanum flint; no public catalog glass at this coordinate)` | Explicit unmatched/proprietary annotation |
+| 8 | Element G5 | abbe | `Unmatched (658585 lanthanum crown; nearest LAK11 class at Δνd −1.2)` | Explicit unmatched/proprietary annotation |
+| 14 | Element G8 | abbe | `Unmatched (621613 dense crown; no public catalog glass at this coordinate, nearest SK16 class at Δnd −0.0010, Δνd −1.0)` | Explicit unmatched/proprietary annotation |
+| 17 | Element G10 | abbe | `Unmatched (807316 lanthanum dense flint; coordinate of discontinued Schott LaSF8, no public dispersion coefficients)` | Explicit unmatched/proprietary annotation |
+| 19 | Element G11 | abbe | `Unmatched (621613 dense crown; no public catalog glass at this coordinate, nearest SK16 class at Δnd −0.0010, Δνd −1.0)` | Explicit unmatched/proprietary annotation |
 
 ### [PENTAX SMC DA 18-55mm f/3.5-5.6 AL](../../src/lens-data/pentax/PentaxDA1855mmF3556AL.data.ts) - 58.3% trusted (7/12); 58.3% Sellmeier (7/12) - US 7,307,794 B2
 
