@@ -2,9 +2,9 @@ import type { LensDataInput } from "../../types/optics.js";
 
 /**
  * JP2025186709A, Numerical Example 1, original pp11–13 and Figure1 p20.
- * RUNTIME DEPENDENCY: unmerged user-approved asphere-cap root fix
- * 13ff56639c973f14e7cf3108ecbd9aa2c7f4627f (base main 709dda72).
- * Optical prescription and apertures are unchanged from the blocked source-faithful candidate.
+ * Corner field relies on authored asphere-cap intersection selection: the L1 front polynomial's
+ * continuation crosses the corner chief ray outside SD before the real surface.
+ * Prescription and apertures are source-faithful; nothing is adjusted to work around the engine.
  * 14 elements / 12 groups; six aspherical faces on L1, L6 and L14.
  * No scaling. Source d-line values and (1+K) conic convention retained.
  * PUBLISHED focus: G2 moves 1.4959 mm objectward, other groups fixed.

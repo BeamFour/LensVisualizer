@@ -378,13 +378,13 @@ value is changed to resolve that wording.
 
 ## Verification and Modeling Limits
 
-**Runtime requirement:** exact unmerged engine-fix commit
-13ff56639c973f14e7cf3108ecbd9aa2c7f4627f, based on released main 709dda72.
-At the source corner field, released main selected an extrapolated first-asphere
-intersection outside the declared optical radius. The specified dependency
-selects the valid authored cap; the unchanged source prescription then transmits
-all 27 surfaces at both published corner states. This dependency is not a claim
-that the fix has been merged or deployed. [6]
+**Engine requirement:** the corner field depends on authored asphere-cap
+intersection selection. At the source corner field, the first asphere's
+polynomial continuation crosses the ray outside the declared optical radius
+before the ray reaches the real surface; an engine that accepted that exterior
+root clipped the chief ray there. Selecting the first hit on the authored cap
+lets the unchanged source prescription transmit all 27 surfaces at both
+published corner states. [6]
 
 The semi-diameters are inferred from Figure 1's curved optical extents and
 checked with exact rays. Mechanical flange rectangles are not used as optical
@@ -420,4 +420,4 @@ camera stack, and do not certify production MTF or chromatic performance.
 3. Sigma Corporation, [Launch schedule of Sigma 12mm F1.4 DC | Contemporary](https://www.sigma-global.com/en/news/2025/08/19/011064/), 19 August 2025.
 4. [US20250383527A1](https://patents.google.com/patent/US20250383527A1/en), same-priority application metadata, for inventor romanization only.
 5. Manufacturer optical-glass catalogs: [OHARA](https://www.ohara-inc.co.jp/en/product/catalog/), July 2026; [HOYA](https://www.hoya-opticalworld.com/english/datadownload/index.html), July 2026 including obsolete grades; [Schott](https://www.schott.com/en-gb/products/optical-glass), preferred/special catalog; [Sumita](https://www.sumita-opt.co.jp/en/download/), August 2026; [CDGM](https://www.cdgmgd.com/go.htm?k=ge_lei_xia_zai&url=downList), September 2026; [HIKARI](https://www.hikari-g.co.jp/optical_glass/catalog/), all-glass workbook. Exact catalog bytes and applicable rows are identified in the accompanying evidence.
-6. LensVisualizer, [authored asphere-cap root selection at commit 13ff5663](https://github.com/ronbuening/LensVisualizer/commit/13ff56639c973f14e7cf3108ecbd9aa2c7f4627f). Unmerged runtime dependency; source prescription and aperture values remain unchanged.
+6. LensVisualizer, [authored asphere-cap intersection selection (pull request #760)](https://github.com/ronbuening/LensVisualizer/pull/760). Engine change only; source prescription and aperture values remain unchanged.

@@ -159,19 +159,24 @@ export function selectAsphericCapHit(
     (domainRadius === null ||
       (Number.isFinite(domainRadius) && hit.radius + geometryError < domainRadius * (1 - 1e-12)));
   if (hit.t >= minT && hit.t <= maxT && hit.radius + geometryError <= radius) {
-    const startRadius = Math.hypot(
-      ray.origin[0] + direction[0] * requestedMinT,
-      ray.origin[1] + direction[1] * requestedMinT,
-    );
-    // Radius is convex, so the endpoint maximum bounds the complete original interval
-    // [requestedMinT, hit.t], including every possible earlier cap hit. Do not start
-    // this proof at a rounded radial-cylinder entry. A non-real conic span falls back.
-    if (constantRadiusUnique || monotoneWithinRadius(Math.max(startRadius, hit.radius))) return hit;
+    const startX = ray.origin[0] + direction[0] * requestedMinT;
+    const startY = ray.origin[1] + direction[1] * requestedMinT;
+    const startRadius = Math.sqrt(startX * startX + startY * startY);
+    // Radius is convex along the ray, so {t >= requestedMinT : r(t) <= rho} is one interval containing hit.t.
+    // With rho = max(start, hit) it covers all of [requestedMinT, hit.t]; capped at the authored radius it still
+    // covers every cap point. A strictly monotone f on that interval leaves hit as the only cap root after minT.
+    if (constantRadiusUnique || monotoneWithinRadius(Math.min(Math.max(startRadius, hit.radius), radius))) return hit;
   }
   // A whole-cap certificate uses the full authored radius, not rounded interval endpoints.
   // Every real physical cap point is covered, including any entry-edge sliver.
   const uniqueCapRoot = constantRadiusUnique || monotoneWithinRadius(radius);
-  const capHit = intersectProfile(ray, profile, vertexZ, { ...options, minT, maxT }, !uniqueCapRoot);
+  const capHit = intersectProfile(
+    ray,
+    profile,
+    vertexZ,
+    { ...options, minT, maxT },
+    uniqueCapRoot ? "monotone" : "ordered",
+  );
   // A numerical failure inside the cap is unresolved, not proof that only the exterior root exists.
   if (!capHit.ok && capHit.failureReason === "noBracket") return hit;
   // Keep established numerics when the ordered cap search confirms the same root.
@@ -192,7 +197,7 @@ function intersectProfile(
     refractiveIndex,
     directionNormalized = false,
   }: SurfaceIntersectionOptions = {},
-  ordered = false,
+  scan: BracketScan = "default",
 ): SurfaceIntersectionResult {
   const direction = directionNormalized ? ray.direction : normalize(ray.direction);
   if (!direction) return failure("invalidDirection", null, 0);
@@ -209,7 +214,7 @@ function intersectProfile(
   const domainRadius = profile.finiteRadiusLimit();
   const evalAt = (t: number): SurfaceEvaluation =>
     evaluateProfile(ray.origin, direction, profile, vertexZ, t, domainRadius);
-  const bracket = findBracket(evalAt, minT, maxT, tolerance, bracketSamples, ordered);
+  const bracket = findBracket(evalAt, minT, maxT, tolerance, bracketSamples, scan);
   if (bracket.kind === "success")
     return makeSuccess(bracket.value, profile, vertexZ, tolerance, refractiveIndex, bracket.iterations);
   if (bracket.kind === "failure") return failure(bracket.failureReason, bracket.residual, bracket.iterations);
@@ -315,6 +320,12 @@ function evaluateProfile(
   return { t, point, radius, value, derivative };
 }
 
+/**
+ * Bracket search mode: `ordered` refuses whole-interval shortcuts so the first root wins; `monotone` is for a
+ * caller-certified strictly monotone f, where same-signed valid endpoints prove that no root exists.
+ */
+type BracketScan = "default" | "ordered" | "monotone";
+
 type BracketResult =
   | { kind: "success"; value: SurfaceEvaluation; iterations: number }
   | { kind: "failure"; failureReason: SurfaceIntersectionFailureReason; residual: number | null; iterations: number }
@@ -326,8 +337,9 @@ function findBracket(
   maxT: number,
   tolerance: number,
   bracketSamples: number,
-  ordered: boolean,
+  scan: BracketScan,
 ): BracketResult {
+  const ordered = scan === "ordered";
   const loEval = evalAt(minT);
   const loValid = isFiniteValueEvaluation(loEval);
   if (loValid && Math.abs(loEval.value) <= tolerance) return { kind: "success", value: loEval, iterations: 0 };
@@ -338,6 +350,11 @@ function findBracket(
     return { kind: "success", value: hiEval, iterations: 0 };
   if (!ordered && loValid && hiValid && !sameSign(loEval.value, hiEval.value))
     return { kind: "bracket", lo: minT, hi: maxT, fLo: loEval.value };
+  // A strictly monotone f with same-signed endpoints has no interior root; sampling could only rediscover that.
+  if (scan === "monotone" && loValid && hiValid) {
+    const residual = Math.abs(loEval.value) < Math.abs(hiEval.value) ? loEval.value : hiEval.value;
+    return { kind: "failure", failureReason: "noBracket", residual, iterations: 0 };
+  }
 
   /* Scan for the first sign change between surface points. Points outside the surface's domain are skipped, but
    * the domain edge itself joins the scan: a steep near-hemispherical rim is crossed in the sliver between that

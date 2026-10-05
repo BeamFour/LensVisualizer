@@ -480,7 +480,7 @@ describe("authored asphere cap selection", () => {
   });
 });
 
-describe("prototype monotonic cap proof", () => {
+describe("asphere cap uniqueness certificate", () => {
   it("does not trust an inside-cap endpoint root when earlier physical roots exist", () => {
     const p = createSurfaceProfile({ R: 1e15 }, { K: 0, A3: -6, A4: 11, A5: -6, A6: 1, A8: 0, A10: 0, A12: 0, A14: 0 });
     const r = { origin: [0, 4, 0] as Vec3, direction: [0, -1, 0] as Vec3 };
@@ -510,9 +510,43 @@ describe("prototype monotonic cap proof", () => {
     expect(createSurfaceProfile({ R: 50 }, immutable)).toBe(createSurfaceProfile({ R: 50 }, immutable));
     expect(createSurfaceProfile({ R: -50 }, immutable)).not.toBe(createSurfaceProfile({ R: 50 }, immutable));
   });
+
+  // Counts surface evaluations so a certified hit is shown to skip the redundant cap search, not just to agree with it.
+  const countingProfile = (p: ReturnType<typeof createSurfaceProfile>) => {
+    const counter = { evaluations: 0 };
+    const profile = { ...p, slope: (radius: number) => (counter.evaluations++, p.slope(radius)) };
+    return { profile, counter };
+  };
+
+  it("certifies an inside-cap hit from an origin far outside the cap without a second solve", () => {
+    // Over the whole ray prefix the r^4 extension is far too steep to certify; capped at the authored radius it is not.
+    const { profile, counter } = countingProfile(
+      createSurfaceProfile({ R: 1e15 }, { K: 0, A4: 1e-4, A6: 0, A8: 0, A10: 0, A12: 0, A14: 0 }),
+    );
+    const ray = { origin: [0, -100, -100] as Vec3, direction: normalize([0, 1, 1])! };
+    const unbounded = intersectSurfaceProfile(ray, profile, 0, { maxT: 150 });
+    const established = counter.evaluations;
+    const hit = intersectSurfaceProfile(ray, profile, 0, { maxT: 150, clearRadius: 5 });
+    expect(hit).toEqual(unbounded);
+    expect(hit.ok && hit.radius).toBeLessThan(1e-6);
+    expect(counter.evaluations - established).toBe(established);
+  });
+
+  it("proves a monotone cap miss from its two endpoints instead of scanning", () => {
+    const { profile, counter } = countingProfile(
+      createSurfaceProfile({ R: 1e15 }, { K: 0, A4: 0.001, A6: 0, A8: 0, A10: 0, A12: 0, A14: 0 }),
+    );
+    const ray = { origin: [0, -1, -5] as Vec3, direction: normalize([0, 1, 1])! };
+    const exterior = intersectSurfaceProfile(ray, profile, 0, { maxT: 15 });
+    const established = counter.evaluations;
+    expect(exterior.ok && exterior.radius).toBeGreaterThan(2);
+    // The ray leaves the authored cap before reaching the surface: keep the exterior hit for first-clip diagnostics.
+    expect(intersectSurfaceProfile(ray, profile, 0, { maxT: 15, clearRadius: 2 })).toEqual(exterior);
+    expect(counter.evaluations - established).toBe(established + 2);
+  });
 });
 
-describe("prototype proof fallback boundaries", () => {
+describe("asphere cap certificate fallbacks", () => {
   it("falls back when the original pre-hit interval leaves the real conic domain", () => {
     const p = createSurfaceProfile({ R: 5 }, { K: 0, A4: 0.0001, A6: 0, A8: 0, A10: 0, A12: 0, A14: 0 });
     const ray = { origin: [0, 8, -10] as Vec3, direction: normalize([0, -0.5, 1])! };
