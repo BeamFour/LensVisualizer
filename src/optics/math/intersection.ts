@@ -97,6 +97,17 @@ export function intersectSurfaceProfile(
 ): SurfaceIntersectionResult {
   const hit = intersectProfile(ray, profile, vertexZ, options);
   if (!hit.ok) return hit;
+  return selectAsphericCapHit(ray, profile, vertexZ, options, hit);
+}
+
+/** Select an authored cap after an established successful solve, avoiding a second old solve. */
+export function selectAsphericCapHit(
+  ray: Ray3,
+  profile: SurfaceProfile,
+  vertexZ: number,
+  options: SurfaceIntersectionOptions,
+  hit: SurfaceIntersectionSuccess,
+): SurfaceIntersectionResult {
   const radius = options.clearRadius;
   if (profile.kind !== "aspheric" || !(radius !== undefined && Number.isFinite(radius) && radius > 0)) return hit;
 
@@ -119,7 +130,48 @@ export function intersectSurfaceProfile(
     maxT = Math.min(maxT, (-dotXY + root) / speed2);
   }
   if (!isValidBounds(minT, maxT) || !Number.isFinite(maxT)) return hit;
-  const capHit = intersectProfile(ray, profile, vertexZ, { ...options, minT, maxT }, true);
+  const transverseSpeed = Math.sqrt(speed2);
+  const axialSpeed = Math.abs(direction[2]);
+  const requestedMinT = options.minT ?? 0;
+  // Absolute operand scale matters when origin + direction*t nearly cancels.
+  // Refuse the certificate when coordinate roundoff can exceed solver tolerance.
+  const geometryError =
+    16 *
+    Number.EPSILON *
+    (Math.abs(ray.origin[0]) +
+      Math.abs(ray.origin[1]) +
+      transverseSpeed * Math.max(Math.abs(requestedMinT), Math.abs(hit.t), Math.abs(maxT)));
+  const geometryCertain =
+    Number.isFinite(geometryError) && geometryError <= (options.tolerance ?? INTERSECTION_TOLERANCE);
+  const monotoneWithinRadius = (radialBound: number): boolean => {
+    if (!geometryCertain) return false;
+    const conservativeRadius = radialBound * (1 + 1e-12) + geometryError + 1e-12;
+    const slopeBound = profile.maxAbsSlope?.(conservativeRadius) ?? Infinity;
+    // |d sag/dt| <= max|sag'| * transverseSpeed, so f' has one strict sign.
+    // Unknown, nonfinite and conic-edge bounds cannot certify uniqueness.
+    return Number.isFinite(slopeBound) && slopeBound >= 0 && axialSpeed > slopeBound * transverseSpeed + 1e-10;
+  };
+  const domainRadius = profile.finiteRadiusLimit();
+  const constantRadiusUnique =
+    geometryCertain &&
+    speed2 === 0 &&
+    axialSpeed > 1e-10 &&
+    (domainRadius === null ||
+      (Number.isFinite(domainRadius) && hit.radius + geometryError < domainRadius * (1 - 1e-12)));
+  if (hit.t >= minT && hit.t <= maxT && hit.radius + geometryError <= radius) {
+    const startRadius = Math.hypot(
+      ray.origin[0] + direction[0] * requestedMinT,
+      ray.origin[1] + direction[1] * requestedMinT,
+    );
+    // Radius is convex, so the endpoint maximum bounds the complete original interval
+    // [requestedMinT, hit.t], including every possible earlier cap hit. Do not start
+    // this proof at a rounded radial-cylinder entry. A non-real conic span falls back.
+    if (constantRadiusUnique || monotoneWithinRadius(Math.max(startRadius, hit.radius))) return hit;
+  }
+  // A whole-cap certificate uses the full authored radius, not rounded interval endpoints.
+  // Every real physical cap point is covered, including any entry-edge sliver.
+  const uniqueCapRoot = constantRadiusUnique || monotoneWithinRadius(radius);
+  const capHit = intersectProfile(ray, profile, vertexZ, { ...options, minT, maxT }, !uniqueCapRoot);
   // A numerical failure inside the cap is unresolved, not proof that only the exterior root exists.
   if (!capHit.ok && capHit.failureReason === "noBracket") return hit;
   // Keep established numerics when the ordered cap search confirms the same root.

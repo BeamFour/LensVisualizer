@@ -5,7 +5,7 @@
  * failure reasons for regression tests and diagnostics.
  */
 
-import { intersectSurfaceProfile } from "../math/intersection.js";
+import { selectAsphericCapHit } from "../math/intersection.js";
 import { createAsphericProfile } from "../math/surfaceProfile.js";
 import type { AsphericCoefficients } from "../../types/optics.js";
 import { FLAT_R_THRESHOLD, conicPolySag, sagSlopeRaw } from "./surfaceMath.js";
@@ -147,10 +147,16 @@ export function intersectSagSurface(
   const asphere = L.asphByIdx[surfaceIdx];
   if (!hit.ok || !asphere || surface.sd === undefined) return hit;
   // Runtime builder/validator and legacy vector/folded callers use the same cap selection as prepared traces.
-  const physical = intersectSurfaceProfile(ray, createAsphericProfile(surface.R, asphere), vertexZ, {
-    ...options,
-    clearRadius: surface.sd,
-  });
+  const physical = selectAsphericCapHit(
+    ray,
+    createAsphericProfile(surface.R, asphere),
+    vertexZ,
+    {
+      ...options,
+      clearRadius: surface.sd,
+    },
+    hit,
+  );
   if (!physical.ok) {
     if (physical.failureReason === "noBracket") return hit;
     return failure(

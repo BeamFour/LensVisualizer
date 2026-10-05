@@ -54,6 +54,8 @@ export interface SurfaceProfile {
   normalAt(point: Vec3, vertexZ: number): Vec3;
   pointAt(vertexZ: number, x: number, y: number): Vec3;
   finiteRadiusLimit(): number | null;
+  /** Conservative absolute radial slope bound; absent for unproved/custom geometry. */
+  maxAbsSlope?(radius: number): number;
 }
 
 /** Compiled refract/reflect/block behavior for one physical surface. */

@@ -479,3 +479,88 @@ describe("authored asphere cap selection", () => {
     });
   });
 });
+
+describe("prototype monotonic cap proof", () => {
+  it("does not trust an inside-cap endpoint root when earlier physical roots exist", () => {
+    const p = createSurfaceProfile({ R: 1e15 }, { K: 0, A3: -6, A4: 11, A5: -6, A6: 1, A8: 0, A10: 0, A12: 0, A14: 0 });
+    const r = { origin: [0, 4, 0] as Vec3, direction: [0, -1, 0] as Vec3 };
+    const old = intersectSurfaceProfile(r, p, 0, { maxT: 4 });
+    expect(old.ok && old.radius).toBe(0);
+    const hit = intersectSurfaceProfile(r, p, 0, { maxT: 4, clearRadius: 5 });
+    expect(hit.ok && hit.radius).toBeCloseTo(3, 8);
+  });
+
+  it.each([-1, 1])("bounds conic, even and odd slopes throughout a real radial interval (%s)", (sign) => {
+    const p = createSurfaceProfile(
+      { R: 20 * sign },
+      { K: -0.5, A3: 0.0002 * sign, A4: -0.00001, A6: 1e-8, A8: 0, A10: 0, A12: 0, A14: 0 },
+    );
+    const bound = p.maxAbsSlope!(10);
+    for (let i = 0; i <= 1000; i++) expect(Math.abs(p.slope(i / 100))).toBeLessThanOrEqual(bound);
+    expect(p.maxAbsSlope!(30)).toBe(Infinity);
+  });
+
+  it("caches only immutable coefficients and keeps mutable profile value semantics", () => {
+    const a = { K: 0, A4: 0.00001, A6: 0, A8: 0, A10: 0, A12: 0, A14: 0 };
+    const p = createSurfaceProfile({ R: 50 }, a);
+    const before = p.maxAbsSlope!(5);
+    a.A4 = 0.01;
+    expect(p.maxAbsSlope!(5)).toBeGreaterThan(before);
+    const immutable = Object.freeze({ ...a });
+    expect(createSurfaceProfile({ R: 50 }, immutable)).toBe(createSurfaceProfile({ R: 50 }, immutable));
+    expect(createSurfaceProfile({ R: -50 }, immutable)).not.toBe(createSurfaceProfile({ R: 50 }, immutable));
+  });
+});
+
+describe("prototype proof fallback boundaries", () => {
+  it("falls back when the original pre-hit interval leaves the real conic domain", () => {
+    const p = createSurfaceProfile({ R: 5 }, { K: 0, A4: 0.0001, A6: 0, A8: 0, A10: 0, A12: 0, A14: 0 });
+    const ray = { origin: [0, 8, -10] as Vec3, direction: normalize([0, -0.5, 1])! };
+    const hit = intersectSurfaceProfile(ray, p, 0, { maxT: 30, clearRadius: 4.5 });
+    expect(hit.ok).toBe(true);
+    if (hit.ok) {
+      expect(hit.radius).toBeLessThan(4.5);
+      expect(hit.residual).toBeLessThan(1e-8);
+    }
+    expect(p.maxAbsSlope!(8)).toBe(Infinity);
+  });
+
+  it("does not turn an axial conic-domain miss into a successful cap hit", () => {
+    const p = createSurfaceProfile({ R: 5 }, { K: 0, A4: 0.0001, A6: 0, A8: 0, A10: 0, A12: 0, A14: 0 });
+    const r = { origin: [0, 6, -10] as Vec3, direction: [0, 0, 1] as Vec3 };
+    expect(intersectSurfaceProfile(r, p, 0, { maxT: 30, clearRadius: 8 })).toMatchObject({
+      ok: false,
+      failureReason: "noBracket",
+    });
+  });
+
+  it("respects a caller's positive lower bound and retains the first remaining root", () => {
+    const p = createSurfaceProfile({ R: 1e15 }, { K: 0, A3: -6, A4: 11, A5: -6, A6: 1, A8: 0, A10: 0, A12: 0, A14: 0 });
+    const r = { origin: [0, 4, 0] as Vec3, direction: [0, -1, 0] as Vec3 };
+    const hit = intersectSurfaceProfile(r, p, 0, { minT: 1.1, maxT: 4, clearRadius: 5 });
+    expect(hit.ok && hit.radius).toBeCloseTo(2, 8);
+  });
+});
+
+it("preserves a real axial-plane intersection at extreme cancelling coordinates", () => {
+  const p = createSurfaceProfile({ R: 1e15 }, { K: 0, A4: 0, A6: 0, A8: 0, A10: 0, A12: 0, A14: 0 });
+  const r = { origin: [0, 1e16, -1e16] as Vec3, direction: normalize([0, -1, 1])! };
+  const options = { maxT: 2e16, clearRadius: 4 };
+  const hit = intersectSurfaceProfile(r, p, 0, options);
+  expect(hit).toEqual(intersectSurfaceProfile(r, { ...p, maxAbsSlope: undefined }, 0, options));
+  expect(hit.ok).toBe(true);
+  if (hit.ok) {
+    expect(hit.point[1]).toBe(0);
+    expect(hit.point[2]).toBe(0);
+  }
+});
+
+it.each([-1, NaN, Infinity])(
+  "does not certify an earlier-root-free interval from an invalid slope bound (%s)",
+  (bound) => {
+    const p = createSurfaceProfile({ R: 1e15 }, { K: 0, A3: -6, A4: 11, A5: -6, A6: 1, A8: 0, A10: 0, A12: 0, A14: 0 });
+    const ray = { origin: [0, 4, 0] as Vec3, direction: [0, -1, 0] as Vec3 };
+    const hit = intersectSurfaceProfile(ray, { ...p, maxAbsSlope: () => bound }, 0, { maxT: 4, clearRadius: 5 });
+    expect(hit.ok && hit.radius).toBeCloseTo(3, 8);
+  },
+);
