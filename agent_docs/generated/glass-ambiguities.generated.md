@@ -12,16 +12,16 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 ## Summary
 
-- **876** lenses scanned
-- **9838** glass elements examined
-- **3058** elements have multiple coordinate-compatible candidates
-- **558** lens files are affected
+- **877** lenses scanned
+- **9852** glass elements examined
+- **3061** elements have multiple coordinate-compatible candidates
+- **559** lens files are affected
 - **294** ambiguous elements retain authored dPgF at the runtime g-line, independent of the selected catalog row
 - **202** ambiguous elements provide complete C/F/g indices and bypass catalog dispersion entirely
 
 | Selection criterion | Elements |
 |---|---:|
-| Smallest reference-index residual | 1724 |
+| Smallest reference-index residual | 1727 |
 | Evidence-source priority | 1032 |
 | Vendor context | 289 |
 | Stable canonical-name order | 11 |
@@ -1840,6 +1840,8 @@ resolves for. Per-candidate residuals are one `explainCompatibleGlassResolution`
 | `S-NBM51 (Ohara) / N-KZFS4 class` | 1.61340 / 44.27 (d) | S-NBM51 — Annotation vendor context matches Ohara. | N-KZFS4 (Schott, name, vendor ✗) | 2 | [SIGMA 105mm f/1.4 DG HSM \| Art](../../src/lens-data/sigma/Sigma105mmf14DGHSMArt.data.ts) L6 |
 | `S-LAH55V (Ohara) / TAFD5G class (dense lanthanum flint)` | 1.83481 / 42.72 (d) | S-LAH55V — Annotation vendor context matches Ohara. | TAFD5G (Hoya, name, vendor ✗) | 1 | [SIGMA 105mm f/1.4 DG HSM \| Art](../../src/lens-data/sigma/Sigma105mmf14DGHSMArt.data.ts) L7 |
 | `E-FDS1 (Hoya) / N-SF66 class` | 1.92286 / 20.88 (d) | E-FDS1 — Annotation vendor context matches Hoya. | N-SF66 (Schott, name, vendor ✗) | 1 | [SIGMA 105mm f/1.4 DG HSM \| Art](../../src/lens-data/sigma/Sigma105mmf14DGHSMArt.data.ts) L9 |
+| `PCD4 / K-PSKn2 class (supplier unconfirmed)` | 1.61800 / 63.40 (d) | PCD4 — smallest d-line \|Δn\| (2.1e-6 vs 3.7e-6) | K-PSKn2 (Sumita, name) | 1 | [SIGMA 12mm f/1.4 DC Contemporary](../../src/lens-data/sigma/Sigma12mmf14DCContemporary.data.ts) L2 |
+| `FCD515 / FCD505 class (supplier unconfirmed)` | 1.59282 / 68.62 (d) | FCD515 — smallest d-line \|Δn\| (4.3e-6 vs 6.8e-6) | FCD505 (Hoya, name) | 2 | [SIGMA 12mm f/1.4 DC Contemporary](../../src/lens-data/sigma/Sigma12mmf14DCContemporary.data.ts) L3 |
 | `TAFD55-W / TAFD55 (HOYA, 001/291 high-index flint)` | 2.00100 / 29.13 (d) | TAFD55 — direct name evidence outranks six-digit code evidence. | S-LAH99 (Ohara, code, vendor ✗, preferred code row)<br>J-LASFH16 (Hikari, code, vendor ✗, alternate code row) | 1 | [SIGMA 14-24mm f/2.8 DG HSM \| Art](../../src/lens-data/sigma/Sigma1424mmf28DGHSM.data.ts) L2 |
 | `M-BACD5N (HOYA, 589613 moldable barium crown)` | 1.58913 / 61.25 (d) | M-BACD5N — direct name evidence outranks six-digit code evidence. | N-SK5 (Schott, code, vendor ✗, preferred code row) | 1 | [SIGMA 14-24mm f/2.8 DG HSM \| Art](../../src/lens-data/sigma/Sigma1424mmf28DGHSM.data.ts) L3 |
 | `FCD100 (HOYA) / S-FPL53-class fluorophosphate` | 1.43700 / 95.10 (d) | FCD100 — Annotation vendor context matches Hoya. | S-FPL53 (Ohara, name, vendor ✗) | 3 | [SIGMA 14-24mm f/2.8 DG HSM \| Art](../../src/lens-data/sigma/Sigma1424mmf28DGHSM.data.ts) L5 |

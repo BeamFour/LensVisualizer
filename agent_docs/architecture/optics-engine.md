@@ -328,6 +328,15 @@ otherwise land on that extension. For the same reason `math/intersection.ts` eva
 radius (`finiteRadiusLimit()`): samples past it count as no surface rather than as the clamped sag, and when a scan
 step crosses the domain edge the edge is bisected and sampled, so a root just inside it still brackets.
 
+Aspheric hits are then restricted to the authored cap (`selectAsphericCapHit` in `math/intersection.ts`, reached from
+both solvers with the surface's `sd`): the first root inside the radial cylinder `r <= sd`, in ray order, wins over
+any polynomial-continuation root outside it, while a ray with no cap root keeps its exterior hit so aperture clipping
+still reports the first clip. The cap is the authored `sd`, independent of the iris, inner holes and clip margin, and a
+physical hit blocked by the iris is never skipped for a later clear one. To avoid a second solve, a conservative
+slope certificate (`SurfaceProfile.maxAbsSlope`; `|dz| > maxAbsSlope * |dxy|` makes the sag equation strictly
+monotone over the covered radii) reuses the established hit or proves a cap miss from the cylinder endpoints; any
+uncertified case falls back to an ordered bracket scan of the cylinder interval.
+
 The exact tracer in `internal/exactSurfaceTrace.ts` exposes these entry points:
 
 - `traceExactSurfaceStack({ x0, y0, ux0, uy0 }, options)` — slope launch, normalizes

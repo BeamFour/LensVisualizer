@@ -5,6 +5,8 @@
  * failure reasons for regression tests and diagnostics.
  */
 
+import { selectAsphericCapHit } from "../math/intersection.js";
+import { createAsphericProfile } from "../math/surfaceProfile.js";
 import type { AsphericCoefficients } from "../../types/optics.js";
 import { FLAT_R_THRESHOLD, conicPolySag, sagSlopeRaw } from "./surfaceMath.js";
 
@@ -36,7 +38,7 @@ export interface SurfaceIntersectionOptions {
 
 /** Minimal RuntimeLens-shaped surface/asphere lookup needed by the solver. */
 export interface SurfaceIntersectionLens {
-  S: readonly { R: number }[];
+  S: readonly { R: number; sd?: number }[];
   asphByIdx: Record<number, AsphericCoefficients>;
 }
 
@@ -134,6 +136,42 @@ export function surfaceNormalAtHit(x: number, y: number, surfaceIdx: number, L: 
  * @returns hit geometry or typed failure diagnostics
  */
 export function intersectSagSurface(
+  ray: SurfaceIntersectionRay,
+  surfaceIdx: number,
+  vertexZ: number,
+  L: SurfaceIntersectionLens,
+  options: SurfaceIntersectionOptions = {},
+): SurfaceIntersectionResult {
+  const hit = intersectUnboundedSagSurface(ray, surfaceIdx, vertexZ, L, options);
+  const surface = L.S[surfaceIdx];
+  const asphere = L.asphByIdx[surfaceIdx];
+  if (!hit.ok || !asphere || surface.sd === undefined) return hit;
+  // Runtime builder/validator and legacy vector/folded callers use the same cap selection as prepared traces.
+  const physical = selectAsphericCapHit(
+    ray,
+    createAsphericProfile(surface.R, asphere),
+    vertexZ,
+    {
+      ...options,
+      clearRadius: surface.sd,
+    },
+    hit,
+  );
+  if (!physical.ok) {
+    if (physical.failureReason === "noBracket") return hit;
+    return failure(
+      surfaceIdx,
+      physical.failureReason === "invalidDirection" ? "invalidRayDirection" : physical.failureReason,
+      physical.residual,
+      physical.iterations,
+    );
+  }
+  if (physical.radius > surface.sd + DEFAULT_TOLERANCE || Math.abs(physical.t - hit.t) <= DEFAULT_TOLERANCE * 10)
+    return hit;
+  return { ...physical, surfaceIdx, point: [...physical.point], normal: [...physical.normal] };
+}
+
+function intersectUnboundedSagSurface(
   ray: SurfaceIntersectionRay,
   surfaceIdx: number,
   vertexZ: number,

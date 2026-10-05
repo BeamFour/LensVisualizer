@@ -11,17 +11,17 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 ## Summary
 
-- **876** lenses scanned
-- **864** visible lenses scanned
-- **581** lenses fully covered by trusted chromatic data
-- **579** visible lenses fully covered by trusted chromatic data
-- **575** lenses fully covered by strict Sellmeier data
-- **573** visible lenses fully covered by strict Sellmeier data
+- **877** lenses scanned
+- **865** visible lenses scanned
+- **582** lenses fully covered by trusted chromatic data
+- **580** visible lenses fully covered by trusted chromatic data
+- **576** lenses fully covered by strict Sellmeier data
+- **574** visible lenses fully covered by strict Sellmeier data
 - **6** lenses fully covered only after measured line-index data
 - **6** visible lenses fully covered only after measured line-index data
-- **9126 / 9843** non-air surfaces use strict catalog Sellmeier data
+- **9140 / 9857** non-air surfaces use strict catalog Sellmeier data
 - **92.7%** strict Sellmeier surface coverage overall
-- **9141 / 9843** non-air surfaces use trusted chromatic data
+- **9155 / 9857** non-air surfaces use trusted chromatic data
 - **92.9%** trusted chromatic coverage overall
 - **150 / 195** native e-line surfaces use name-verified catalog Sellmeier data
 
@@ -374,6 +374,7 @@ Six-digit codes are not considered because their encoded coordinates are nd/νd.
 | [OLYMPUS OM-SYSTEM ZUIKO AUTO-ZOOM 65-200mm f/4](../../src/lens-data/olympus/OlympusZuikoAutoZoom65200mmf4.data.ts) | 14/14 | 14 | 14/14 |
 | [PANASONIC LEICA DG NOCTICRON 42.5mm f/1.2 ASPH POWER O.I.S.](../../src/lens-data/panasonic/PanasonicDGNocticron42mmf12.data.ts) | 14/14 | 14 | 14/14 |
 | [PENTAX-06 TELEPHOTO ZOOM 15-45mm f/2.8](../../src/lens-data/pentax/Pentax06TelephotoZoom1545mmF28.data.ts) | 14/14 | 14 | 14/14 |
+| [SIGMA 12mm f/1.4 DC Contemporary](../../src/lens-data/sigma/Sigma12mmf14DCContemporary.data.ts) | 14/14 | 14 | 14/14 |
 | [SIGMA 50mm f/1.4 DG DN | Art](../../src/lens-data/sigma/SigmaDGDNArt50mmf14.data.ts) | 14/14 | 14 | 14/14 |
 | [SIGMA 85mm f/1.4 DG HSM | Art](../../src/lens-data/sigma/Sigma85mmf14Art.data.ts) | 14/14 | 14 | 14/14 |
 | [SONY FE 20mm f/1.8 G](../../src/lens-data/sony/SonyFE20mmf18G.data.ts) | 14/14 | 14 | 14/14 |

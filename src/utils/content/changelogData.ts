@@ -21,6 +21,16 @@ export const CHANGELOG: ChangelogEntry[] = [
   {
     date: "2026-10-05",
     type: "lens",
+    summary: "Added the Sigma 12mm f/1.4 DC Contemporary patent model",
+  },
+  {
+    date: "2026-10-05",
+    type: "fix",
+    summary: "Fixed steep wide-angle rays clipping on phantom asphere surfaces beyond the glass edge",
+  },
+  {
+    date: "2026-10-05",
+    type: "lens",
     summary: "Added six Nikon models, from the Nikkor-QD·C Auto 15mm f/5.6 to the Z 70-200mm f/2.8 VR S II",
   },
   {
