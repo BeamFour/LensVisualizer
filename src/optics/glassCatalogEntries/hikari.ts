@@ -1846,4 +1846,25 @@ export const HIKARI_GLASS_ENTRIES: readonly GlassEntry[] = [
     source:
       "Nikon/Hikari Optical Glass Catalog 2023, J-SK11 data sheet; vendor nine-term power-series coefficients and d-line code.",
   },
+  {
+    name: "J-SFH8",
+    vendor: "Hikari",
+    powerSeries: [
+      [2.55435034, 0],
+      [-0.0100436655, 2],
+      [0, 4],
+      [0.0222501317, -2],
+      [0.00274804538, -4],
+      [-0.000599590054, -6],
+      [0.000136350999, -8],
+      [-0.000014533726, -10],
+      [0.000000728771109, -12],
+    ],
+    nd: 1.622,
+    vd: 30.66,
+    PgF: 0.6248,
+    code6: "622307",
+    source:
+      "Nikon/Hikari Optical Glass Catalog 2025, J-SFH8 data sheet (1st edition 2021-04-01); vendor nine-term power-series coefficients, partial dispersion, and d-line code.",
+  },
 ];
