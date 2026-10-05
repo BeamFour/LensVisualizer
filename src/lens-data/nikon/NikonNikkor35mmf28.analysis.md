@@ -8,7 +8,7 @@
 **Title:** Retrofocus Type Wide-Angle Photographic Lens  
 **Embodiment analyzed:** Example I (Example 1)
 
-The NIKON NEW NIKKOR 35mm f/2.8 model transcribes Example I, associated provisionally with the New Nikkor 35mm f/2.8 introduced in 1975.
+The NIKON NEW NIKKOR 35mm f/2.8 model transcribes Example I, associated provisionally with the lens Nikon's own history designates the "NEW Nikkor 35mm f/2.8", introduced in 1975 for the Nikon F mount and the 135 format.
 The patent's priority date is June 7, 1972.
 The manufacturer-to-patent attribution remains unconfirmed: Nikon's retrospective does not name this patent.
 The correlation rests on several independent architectural observations:
@@ -85,13 +85,14 @@ The patent does not provide enough spectral information to assign a measured sec
 
 ### L5 — Positive Meniscus, concave to object
 
-nd = 1.74443, νd = 49.4. Glass: Unmatched (nd 1.74443, vd 49.4). f = +36.801 mm.
+nd = 1.74443, νd = 49.4. Glass: 744494 lanthanum flint (nearest NBF1 HOYA / S-LAM60 OHARA, Δnd −0.0011; supplier unconfirmed). f = +36.801 mm.
 
 L5 is component C, with its concave side facing the stop.
 It restores positive power after L4.
 The narrow air separation from the following element is preserved exactly; it is not a cemented doublet.
-The facing surfaces of L4 and L5 curve toward each other, so their 1.31 mm axial air gap closes at a height of about 7.4 mm.
-The model therefore holds those two surfaces at a 7.0 mm semi-diameter, although Figure 1 draws both elements about 8.3 mm tall.
+The facing surfaces of L4 and L5 curve toward each other, so their 1.31 mm axial air gap closes at a height of 7.40 mm.
+Figure 1 draws the two rims touching, which is what that geometry produces, but draws them about 8.3 mm tall, which the prescription cannot reach.
+The model therefore sets those two surfaces to a 7.3 mm semi-diameter, 0.03 mm short of contact.
 
 ### L6 — Biconvex Positive
 
@@ -121,8 +122,9 @@ These are coordinate classes rather than production supplier identifications.
 Modern OHARA S-BSL7 and L-BSL7 must not be interchanged merely because their names are related.
 Candidate coordinate residuals are retained in the numerical record.
 L1, L2, L3, L4 and L6 use explicitly qualified catalog-equivalent class labels after coefficient round-trip checks.
-L5 (nd 1.74443, νd 49.4) retains an Unmatched label: the nearest catalog glasses, Hoya NBF1 and Ohara S-LAM60, are about 0.0011 lower in nd, too far to stand in for the patent coordinate.
-Its dispersion is modeled from the Abbe number alone.
+L5 (nd 1.74443, νd 49.4) has no exact catalog counterpart in the repository catalog or in the HOYA, Sumita and Hikari vendor files.
+Its label names the nearest catalog glasses, Hoya NBF1 (1.74330 / 49.22) and Ohara S-LAM60 (1.74320 / 49.34), about 0.0011 lower in nd.
+The model keeps the patent nd and νd and borrows only the shape of the NBF1 dispersion curve; this is a nearest-neighbour proxy, weaker than the five coordinate matches.
 These labels may enable approximate catalog dispersion in the application; those curves are proxies, not historical melt evidence.
 No catalog line indices are assigned to the elements as if the patent had published them.
 
@@ -133,7 +135,8 @@ They do not establish anomalous partial dispersion or apochromatic performance.
 
 Only the patent's infinity prescription is represented.
 The patent publishes no focusing data, so the model contains no focus movement and no variable spacings.
-No claim is made about production focusing travel, minimum focus distance, magnification or finite-distance performance.
+Collector references give the production lens a closest focus of about 0.3 m; Nikon's retrospective does not state it, and the patent gives no travel from which a close-focus state could be built.
+No claim is made about production focusing travel, magnification or finite-distance performance.
 
 ## Patent Conditions and Modeling Limits
 
@@ -145,17 +148,17 @@ The printed normalized BFD is 107.289; direct calculation from the rounded presc
 This small source residual is preserved rather than silently correcting the table.
 The modeled image gap uses the computed value after uniform scaling.
 
-The patent gives no iris diameter. The stored stop semi-diameter, 7.061 mm, is the paraxial value for f/2.8.
-The application solves the wide-open iris from the nominal f-number with real rays and uses a 7.278 mm stop radius.
+The patent gives no iris diameter. The stored stop semi-diameter, 7.278 mm, is the height at which the real axial f/2.8 beam crosses the stop plane; the paraxial value is 7.061 mm.
+The application solves the same 7.278 mm wide-open iris from the nominal f-number. The aperture scale runs to f/22, the production minimum aperture given by collector references.
 
 Element semi-diameters are not published either. They follow the optical rims drawn in Figure 1 where the prescription allows:
 14.0 mm at the front surface (the patent's 0.8 f bound), 11.4 mm at the rear of L1, 11.2 mm for L2, 9.9 mm for L3 and 9.3 mm for L6.
-L4 and L5 are drawn about 8.3 mm tall, but the model uses 7.6 mm on their outer surfaces and 7.0 mm on the facing surfaces because of the closing air gap described above.
+L4 and L5 are drawn about 8.3 mm tall, but the model uses 7.6 mm on their outer surfaces and 7.3 mm on the facing surfaces because of the closing air gap described above.
 These are modeled clear apertures, not production mechanical dimensions.
 
 With these apertures the axial f/2.8 beam passes every surface unclipped; its largest height behind the stop is 7.13 mm at the rear of L5.
 The chief ray reaches the patent's 62° field edge (image height 21.0 mm at 31.1°) and the 135-format corner (21.65 mm at 31.8°) without clipping.
-The full-aperture oblique beam at the corner is not passed whole: it is cut on one side by the rear group, by roughly a quarter of its height at the L4–L5 gap and the rear of L5 and by about a fifth to a quarter at L6.
+The full-aperture oblique beam at the corner is not passed whole: it is cut on one side by the rear group, by roughly a fifth of its height at the L4–L5 gap, a quarter at the rear of L5 and about a fifth to a quarter at L6.
 That is ordinary wide-open vignetting for a compact retrofocus lens, and its exact amount depends on the estimated rims rather than on patent data.
 
 ## Sources

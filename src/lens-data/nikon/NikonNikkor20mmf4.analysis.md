@@ -34,12 +34,16 @@ correlated with. That association has the following support and limits:
 
 Accordingly, exact production correspondence is unconfirmed. The production name identifies the
 correlated lens, and the subtitle states that the model is the scaled patent example and that the
-production lens differs. Mount and image-format fields are omitted rather than implying that a
-related product specification proves coverage of this particular scaled example. With the present
-clear apertures the traced chief ray reaches the 20.0 mm image height of the published 45° half-field
-at 45.5° and would still pass at the 21.65 mm corner of the 135 format (47.6°), but only about 23% of
-the meridional pupil height survives there and the patent publishes no aberration data beyond 45°.
-That is not treated as evidence of 135-format coverage.
+production lens differs. Nikon's Tale 86 calls the 1974 lens the "New Nikkor 20mm f/4"; it was
+re-issued with the same optics as the Ai Nikkor 20mm f/4 in 1977. [2,7]
+
+The mount and image-format fields are those of the production lens: Nikon F mount and the 135
+format. They describe the correlated product, not a claim that this scaled example was designed
+for that frame. The patent example publishes a full field of 90°, which at this scale is an image
+height of 20.0 mm (traced chief ray at 45.5°). The 21.63 mm corner of the 135 format needs a full
+field of about 94.5°. The traced chief ray still passes there (47.6°), but only about 30% of the
+meridional pupil height survives and the patent publishes no aberration data beyond 45°, so the
+last 1.6 mm of the frame diagonal lies outside the published design field.
 
 ## Optical Architecture
 
@@ -117,15 +121,15 @@ The biconcave member is the negative-power part of cemented L6. The patent assoc
 
 ### L6b — Positive Meniscus
 
-nd = 1.76684, νd = 46.2. Glass: Unmatched (nd 1.76684 / νd 46.2 lanthanum dense flint; no catalog glass reproduces both coordinates). f = +43.089 mm.
+nd = 1.76684, νd = 46.2. Glass: 767462 lanthanum dense flint (nearest J-LASFH2 HIKARI, nd identical, catalog νd 46.78, Δνd +0.58; supplier unconfirmed). f = +43.089 mm.
 
-This meniscus is positive in isolation and shares R14 with L6a. The assembled L6 component nevertheless remains negative. The J-LASFH2 comparison has matching nd but νd = 46.78, a +0.58 residual. It is not a close coordinate match; the patent value 46.2 is retained without assigning that catalog identity or spectral properties.
+This meniscus is positive in isolation and shares R14 with L6a. The assembled L6 component nevertheless remains negative. No current catalog glass reproduces both coordinates. J-LASFH2 (HIKARI) has the same nd to five decimals and νd = 46.78, a +0.58 residual; its dispersion curve is used as the nearest stand-in. The stored values remain the patent's 1.76684 / 46.2, and the label does not identify the historical glass.
 
 ### L7 — Positive Meniscus
 
 nd = 1.51680, νd = 64.2. Glass: 517642 borosilicate crown, BK7 class (J-BK7A HIKARI / N-BK7 SCHOTT coordinate-compatible; supplier unconfirmed). f = +32.529 mm.
 
-The penultimate positive meniscus has a relatively thin center and a strong rear curvature. Its 4.9 mm clear aperture follows the rim drawn in Fig. 2(A) and leaves positive edge thickness.
+The penultimate positive meniscus has a relatively thin center and a strong rear curvature. Its 5.4 mm clear aperture is the largest that leaves a workable edge (about 0.17 mm); Fig. 2(A) draws it at 4.9 mm.
 
 ### L8 — Positive Meniscus
 
@@ -141,7 +145,8 @@ separate from the air-surrounded values above.
 
 The patent gives d-line indices and Abbe numbers but no vendor or melt names. Ten of the eleven
 elements carry a catalog-equivalent label: a current catalog glass whose nd and νd reproduce the
-patent pair, used for its dispersion curve. The labels name coordinate classes and do not assert
+patent pair, used for its dispersion curve. The eleventh, L6b, uses the nearest catalog glass with
+its νd residual stated. The labels name coordinate classes and do not assert
 the historical supplier or melt. The catalog column below is the glass whose curve the model uses.
 
 | Model elements | Class and catalog glass used | Catalog nd | Catalog νd | Patent-minus-catalog νd |
@@ -154,15 +159,16 @@ the historical supplier or melt. The catalog column below is the glass whose cur
 | L5a | F5 class — J-F5 (HIKARI) | 1.60342 | 38.03 | -0.03 |
 | L5b | F5 class — J-F5 (HIKARI) | 1.60342 | 38.03 | -0.03 |
 | L6a | SF14 class — J-SF14 (HIKARI) | 1.76182 | 26.58 | -0.08 |
-| L6b | Unmatched; J-LASFH2 rejected as close match | 1.76684 | 46.78 | -0.58 |
+| L6b | Nearest only — J-LASFH2 (HIKARI) | 1.76684 | 46.78 | -0.58 |
 | L7 | BK7 class — J-BK7A (HIKARI) | 1.51680 | 64.13 | +0.07 |
 | L8 | BaF12 class — S-BAM12 (OHARA) | 1.63930 | 44.87 | +0.13 |
 
 Other coordinate-compatible members of the same classes include S-BSM16 and S-LAL14 (OHARA),
 K-LaK12 (SUMITA), N-BAF4 (SCHOTT; the obsolete HOYA BAF4 at νd 43.88 is closer in νd but has no
 dispersion data in the model's catalog), F5 and N-BK7 (SCHOTT), S-TIH14 (OHARA) and BAF12 (SUMITA).
-L6b keeps the patent nd/νd with a generic dispersion model because no catalog glass reproduces
-both coordinates.
+L6b keeps the patent nd/νd; because no catalog glass reproduces both coordinates, its chromatic
+curve is that of J-LASFH2, whose νd is 0.58 higher. The HOYA and Sumita vendor files hold nothing
+closer (nearest M-TAF101 at 1.76802 / 49.24).
 
 The cited OHARA table supplies direct candidate line indices for its listed types; Hikari and
 SCHOTT provide additional comparisons, and HOYA supplies coordinate alternatives. OHARA S-
@@ -223,20 +229,28 @@ EFL/(2×4) calibrates the aperture to f/4.000000. The independently evaluated
 paraxial pupil gives f/3.925996. This explicit difference matters: the exact result is a
 calibration to the published f/4, not independent evidence for an unpublished diaphragm size.
 
-The patent lists no clear apertures. The semi-diameters follow the optical rims drawn in
-Fig. 2(A), measured at 0.0445 mm per pixel after scaling: L3 through L8 are within about 0.3 mm
-of the drawing except where a floor applies, the elements around the stop are held just above
-the f/4 axial beam (4.5–4.7 mm against a 3.9–4.3 mm marginal ray), and L1 (16.0 mm) and the rear
-of L2 (11.0 mm) are kept larger than drawn (14.8 and 9.4 mm) so the 45° chief ray is not blocked.
-All values satisfy the rim-slope, edge-thickness and gap-clearance conditions.
+The patent lists no clear apertures. Fig. 2(A) is drawn to scale in its curvatures and vertex
+spacings (the scaled prescription overlays the drawn surfaces at 0.0445 mm per pixel), but its rim
+heights are not usable as clear apertures behind L4a. The drawn L4b–L7 rims (4.2–4.9 mm) sit only
+2–14% above the f/4 axial beam (3.9–4.3 mm); taken literally they would pass 87% of the pupil at
+20°, 63% at 35° and 40% at 45°. The patent's own coma plot, Fig. 2(B), is drawn out to about 0.87
+of the full aperture on both sides at 35° and 45°, which those rims cannot transmit. The drawing
+also closes L1 to a knife edge at 15.0 mm where the prescription's surfaces meet at 17.3 mm.
+
+The model therefore uses the figure for L1 through L4a (16.0, 12.8/11.0, 9.0/7.3 and 6.6 mm; L1 and
+the rear of L2 kept larger than the drawn 14.8 and 9.4 mm so the 45° chief ray is not blocked) and
+ray-supported rims from the L4 cement to L8: 6.3 and 6.1 mm on L4b, 6.0 mm on L5a/L5b, 5.1 mm on
+L6, 5.4 mm on L7 and 6.2 mm on L8. These keep the drawn order of heights (L4 tapering toward the
+stop, L5 and L6 the smallest, L7 below L8) with 25–48% margin over the axial marginal ray. All
+values satisfy the rim-slope, edge-thickness and gap-clearance conditions; L7 is limited to 5.4 mm
+by its edge thickness.
 
 An exact meridional trace at f/4 and infinity gives the following share of the stop height that
-passes every clear aperture: 97% at 10°, 87% at 20°, 73% at 30°, 63% at 35°, 54% at 40° and 40%
-at 45°. The lower rays are cut by the L4–L5 rims ahead of the stop and the upper rays by the
-L6–L8 rims behind it, so vignetting begins early and grows steadily, as the small central and
-rear elements in the patent drawing imply. The chief ray passes at every field through 45.5°
-(image height 20.0 mm; traced distortion about −1.9% at 45°, the same sign and order as Fig. 2(E)). These
-are figure-based model apertures, not a measured production vignetting curve.
+passes every clear aperture: 100% through 30°, 89% at 35°, 71% at 40°, 50% at 45° and 30% at the
+135-format corner (47.6°). Beyond 30° the lower rays are cut by the L4–L5 rims (joined by the front-group rims
+from 40°) and the upper rays by the L6–L8 rims. The chief ray passes at every field through 47.6°
+(image height 20.0 mm at 45.5°; traced distortion about −1.9% at 45°, the same sign and order as
+Fig. 2(E)). These are model apertures, not a measured production vignetting curve.
 
 ## Sources / References
 

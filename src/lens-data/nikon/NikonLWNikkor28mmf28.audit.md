@@ -1097,3 +1097,63 @@ labels do resolve. No nearer catalog glass was found for L1.
 The display name stays `NIKON LW-NIKKOR 28mm f/2.8`. The subtitle was shortened to
 "US 4,203,653 EXAMPLE 1 — NIPPON KOGAKU K.K. / IKUO MORI"; the r5 sign note and the correlated product link remain
 in the data-file header and the analysis. The data-file header's semi-diameter note was rewritten for the values above.
+
+## 2026-10-05 — Second review (site diagram, labels, travel, glass, metadata)
+
+Independent second pass over the committed files. Where this section and the semi-diameter figure pass above differ on
+r6/r7, this section describes the current files. R, d, nd, νd, stop position, STO semi-diameter and the focus gaps are
+unchanged; paraxial EFL 28.0315 mm and BFD 36.2531 mm are identical before and after.
+
+**Prescription and glass against the rendered table.** All ten radii, nine separations and five nd/νd pairs of the
+First Embodiment (col. 3) were re-read from the page image and equal the stored values ÷ 28; r5 keeps the negative
+sign of claim 4. The patent prints no partial-dispersion data, so none is authored. All five glass labels resolve in
+the runtime catalog within tolerance (J-LAK02, K-BaSF5, SF56A, J-LASF015, LAKN12); no relabel was needed.
+
+**r6 / r7 (L3 rear, L4 front).** The first pass left these at 6.3 mm under the default 90 % gap rule, which clipped
+the exact f/2.8 marginal ray. The combined sag of the two surfaces across the 0.728 mm d6 gap is:
+
+| Rim height (mm) | Combined sag (mm) | Share of gap | Air left at rim (mm) |
+|---|---|---|---|
+| 6.30 | 0.651 | 89.5 % | 0.077 |
+| 6.45 | 0.683 | 93.8 % | 0.045 |
+| 6.60 | 0.715 | 98.2 % | 0.013 |
+| 6.67 | 0.730 | 100.3 % | surfaces cross |
+| 7.30 (Fig. 1 rim) | 0.875 | 120 % | impossible with the tabulated radii |
+
+Fig. 1 draws the two surfaces meeting at the common 7.3 mm rim, which the tabulated radii cannot do; the figure is
+schematic at this gap (the first pass also found r5–r10 drawn 21 % short axially). The drawing does show that the
+designer intended the facing rims to run essentially to contact. A per-lens `gapSagFrac: 0.99` is therefore authored
+(precedents: 0.97, 1 and 1.0 in three other lens files with touching rims) and r6/r7 are set to 6.6 mm, below the
+6.67 mm contact height. The surfaces do not cross, the repository surface validator reports no errors, and the
+exact-ray trace no longer flags an axial clip at r6 or r7 (marginal ray 6.44 / 6.45 mm) at infinity or at 0.5 m. The
+full-field bundle loses less at these rims than before (r6 53 % of one side against 58 %, r7 48 % against 55 %).
+Image-circle check: not undersized. Traced field coverage: 100 %. Engine half-field estimate unchanged at 38.54°.
+
+**r2 (L1 rear).** Re-measured on a 300 dpi crop: the r2 arc ends about 212 px above the axis, 10.4 mm, where the
+mounting step begins. That agrees with the first pass. The value stays 11.8 mm: r2 is the surface that limits the
+engine's field estimate (38.5° against the 38.3° format corner), so following the schematic figure would put the
+estimate below the corner. The corner chief ray needs 9.32 mm there and is clear either way.
+
+**Site diagram.** Local page compared with Fig. 1 at infinity and at 0.5 m: L1 tallest, L2 biconvex ahead of the
+stop, stop midway in d4, L3/L4 with a common outer height and facing rims now nearly meeting, L5 slightly taller,
+image plane at the long back focus. Element labels 1–5, type strings (signs of R and of fl agree), the two group
+captions, the empty doublet list, the legend (no anomalous-dispersion or aspheric markers), the aperture readout
+(EFL 28.03 mm, f/2.8 to f/22) and the specification chips are correct.
+
+**Focus.** The `var` row for gap 10 is ordered infinity then close, and the back focus grows from 36.253 to 38.100 mm
+(1.847 mm of extension), the correct direction for unit focus. A paraxial check of the close state gives an object
+424.36 mm ahead of r1 and an object-to-image distance of 500.07 mm, i.e. 0.5 m from the film plane. The movement
+overlay shows both groups moving 1.85 mm toward the object together. The close state remains a calculated
+reconstruction; the patent publishes infinity only.
+
+**Name and metadata.** Nikon's own history article (_Thousand and One Nights_ No. 8, Nikonos lens chronology) lists
+"LW NIKKOR 28mm f/2.8 (exclusively for on-land use)" under 1983; the barrel is engraved LW-NIKKOR. The display name
+`NIKON LW-NIKKOR 28mm f/2.8` is kept. The patent front page prints no kind code, so "US 4,203,653" is kept; inventor
+Ikuo Mori, assignee Nippon Kogaku K.K. and grant year 1980 agree with the front page. `apertureDesign: 2.8` was
+added (the patent's relative aperture 1:2.8). Mount `nikonos` and format `135-full-frame` are canonical ids. No
+maker-published image circle or blade count was found in the sources consulted, so those fields stay unset.
+
+**Open limits.** L1 rear remains about 13 % larger than the drawn rim. A 0.7 mm step remains between the 7.3 mm
+outer rims and the 6.6 mm facing rims of L3 and L4, where Fig. 1 draws a flush contact that the tabulated radii do not
+permit. The authored STO semi-diameter 6.286 mm is the paraxial calibration; the engine derives a 6.46 mm exact-ray
+stop radius for f/2.8.

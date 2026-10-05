@@ -48,16 +48,21 @@ import type { LensDataInput } from "../../types/optics.js";
  * ║  D2 doublet is drawn narrower than the F/5.6 axial beam and is kept          ║
  * ║  ray-based. All values are modeled clear apertures, not production           ║
  * ║  mechanical dimensions. Two geometry limits are raised because the 110°      ║
- * ║  table needs them: r2 is used to 70.4° rim slope (maxRimAngleDeg = 71; Fig.  ║
- * ║  1 draws the rear of L1 equally deep), and the L1–L2 air gap closes to 0.34  ║
- * ║  mm at the rim (gapSagFrac = 0.97).                                          ║
+ * ║  table needs them: r2 must reach 30.8 mm to pass the corner chief ray        ║
+ * ║  (30.77 mm), a 69.9° rim slope (maxRimAngleDeg = 70; Fig. 1 draws the rear   ║
+ * ║  of L1 equally deep), and the L1–L2 air gap closes to 0.53 mm at that rim    ║
+ * ║  (gapSagFrac = 0.95). Both are the smallest values that keep the corner      ║
+ * ║  chief ray unclipped.                                                        ║
  * ║                                                                              ║
  * ║  NOTE ON GLASS: The patent prints n and ν without naming the spectral line   ║
  * ║  or any glass. They are traced as d-line values on that assumption. Catalog  ║
  * ║  names in the glass labels are coordinate-compatible classes that supply a   ║
  * ║  dispersion curve; they do not identify the historical supplier or melt.     ║
- * ║  Six coordinates and the filter have no compatible catalog glass and stay    ║
- * ║  Unmatched (Abbe-number dispersion fallback).                                ║
+ * ║  L9 / L11 (nearest FF5, Δnd −0.002) and L12 (J-SFH2, a modern glass) borrow  ║
+ * ║  the nearest catalog curve only. L6, L13 and the filter have no compatible   ║
+ * ║  catalog glass and stay Unmatched (Abbe-number dispersion fallback). The     ║
+ * ║  unusual indices of L6 and L13 are printed identically in both patent        ║
+ * ║  tables and reproduce the printed f and B.f., so they are not misprints.     ║
  * ║                                                                              ║
  * ║  NOTE ON FOCUS: Only the infinity prescription is published. var is empty    ║
  * ║  and closeFocusM = 1e15 marks focus as not modeled; it is not a minimum      ║
@@ -76,8 +81,9 @@ const LENS_DATA = {
   specs: ["14 ELEMENTS / 12 GROUPS + BUILT-IN FILTER", "MODELED EFL 15.309 mm", "F/5.6 · 110° FIELD", "ALL-SPHERICAL"],
 
   focalLengthMarketing: 15,
-  focalLengthDesign: 15.30900368087626,
+  focalLengthDesign: 15.309,
   apertureMarketing: 5.6,
+  apertureDesign: 5.6,
   lensMounts: ["nikon-f"],
   imageFormat: "135-full-frame",
   patentNumber: "JP S48-71634 A",
@@ -217,7 +223,7 @@ const LENS_DATA = {
       vd: 35.6,
       indexReferenceNote: "Patent n/ν spectral line not stated; values are traced as d-line on that assumption.",
       fl: 11.329126352489267,
-      glass: "Unmatched (595356 flint coordinate; no coordinate-compatible catalog glass)",
+      glass: "595356 — flint (nearest FF5 HOYA, Δnd −0.0021; not a period identification, supplier unconfirmed)",
       cemented: "D2",
       role: "Positive front member of cemented doublet D2, ahead of the stop.",
     },
@@ -243,7 +249,7 @@ const LENS_DATA = {
       vd: 35.6,
       indexReferenceNote: "Patent n/ν spectral line not stated; values are traced as d-line on that assumption.",
       fl: 20.098138065469993,
-      glass: "Unmatched (595356 flint coordinate; no coordinate-compatible catalog glass)",
+      glass: "595356 — flint (nearest FF5 HOYA, Δnd −0.0024; not a period identification, supplier unconfirmed)",
       role: "Thick plano-convex positive element directly behind the stop.",
     },
     {
@@ -255,7 +261,8 @@ const LENS_DATA = {
       vd: 23.1,
       indexReferenceNote: "Patent n/ν spectral line not stated; values are traced as d-line on that assumption.",
       fl: -11.012497635516699,
-      glass: "Unmatched (861231 dense flint coordinate; no period catalog glass established)",
+      glass:
+        "861231 — dense flint (nearest J-SFH2 HIKARI, Δnd −0.0007; modern coordinate-compatible curve, not a period glass; supplier unconfirmed)",
       role: "Strong biconcave negative element of the lowest Abbe number in the table.",
     },
     {
@@ -290,7 +297,7 @@ const LENS_DATA = {
    */
   surfaces: [
     { label: "1", R: 48.15, d: 3.1, nd: 1.78764, elemId: 1, sd: 39 },
-    { label: "2", R: 32.8, d: 10.3, nd: 1.0, elemId: 0, sd: 30.9 },
+    { label: "2", R: 32.8, d: 10.3, nd: 1.0, elemId: 0, sd: 30.8 },
     { label: "3", R: 46.24, d: 9.5, nd: 1.71341, elemId: 2, sd: 31 },
     { label: "4", R: 138.86, d: 0.1, nd: 1.0, elemId: 0, sd: 30.6 },
     { label: "5", R: 28, d: 1, nd: 1.6932, elemId: 3, sd: 19 },
@@ -346,8 +353,8 @@ const LENS_DATA = {
   maxFstop: 22,
 
   /* ── Geometry limits ── see NOTE ON SEMI-DIAMETERS */
-  maxRimAngleDeg: 71,
-  gapSagFrac: 0.97,
+  maxRimAngleDeg: 70,
+  gapSagFrac: 0.95,
 
   yScFill: 0.35,
 } satisfies LensDataInput;

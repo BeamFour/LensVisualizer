@@ -14,14 +14,14 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 - **876** lenses scanned
 - **9838** glass elements examined
-- **3057** elements have multiple coordinate-compatible candidates
+- **3058** elements have multiple coordinate-compatible candidates
 - **558** lens files are affected
 - **294** ambiguous elements retain authored dPgF at the runtime g-line, independent of the selected catalog row
 - **202** ambiguous elements provide complete C/F/g indices and bypass catalog dispersion entirely
 
 | Selection criterion | Elements |
 |---|---:|
-| Smallest reference-index residual | 1723 |
+| Smallest reference-index residual | 1724 |
 | Evidence-source priority | 1032 |
 | Vendor context | 289 |
 | Stable canonical-name order | 11 |
@@ -1367,6 +1367,7 @@ resolves for. Per-candidate residuals are one `explainCompatibleGlassResolution`
 | `639450 — barium flint, BaF12 class (BAF12 SUMITA / S-BAM12 OHARA coordinate-compatible; supplier unconfirmed)` | 1.63930 / 45.00 (d) | S-BAM12 — smallest d-line \|Δn\| (1.3e-7 vs 1.9e-6) | BAF12 (Sumita, name, vendor ✓) | 1 | [NIKON NEW NIKKOR 20mm f/4](../../src/lens-data/nikon/NikonNikkor20mmf4.data.ts) L8 |
 | `713539 — lanthanum crown, LaK8 class (J-LAK8 HIKARI / LAC8 HOYA coordinate-compatible; supplier unconfirmed)` | 1.71300 / 53.90 (d) | J-LAK8 — smallest d-line \|Δn\| (1.5e-8 vs 1.8e-7) | LAC8 (Hoya, name, vendor ✓)<br>MP-LAC8-30 (Hoya, code, vendor ✓, alternate code row) | 1 | [NIKON NEW NIKKOR 35mm f/2.8](../../src/lens-data/nikon/NikonNikkor35mmf28.data.ts) L3 |
 | `717295 — dense flint, SF1 class (J-SF1 HIKARI / SF1 SCHOTT coordinate-compatible; supplier unconfirmed)` | 1.71736 / 29.50 (d) | J-SF1 — smallest d-line \|Δn\| (2.7e-8 vs 1.5e-7) | SF1 (Schott, name, vendor ✓)<br>S-TIH1 (Ohara, code, vendor ✗, alternate code row) | 1 | [NIKON NEW NIKKOR 35mm f/2.8](../../src/lens-data/nikon/NikonNikkor35mmf28.data.ts) L4 |
+| `744494 — lanthanum flint (nearest NBF1 HOYA / S-LAM60 OHARA, Δnd −0.0011; supplier unconfirmed)` | 1.74443 / 49.40 (d) | NBF1 — smallest d-line \|Δn\| (1.1e-3 vs 1.2e-3) | S-LAM60 (Ohara, name, vendor ✓) | 1 | [NIKON NEW NIKKOR 35mm f/2.8](../../src/lens-data/nikon/NikonNikkor35mmf28.data.ts) L5 |
 | `E-FD2 (HOYA catalog equivalent; SF2-class dense flint, patent 648338, vendor unspecified)` | 1.64831 / 33.80 (d) | E-FD2 — Annotation vendor context matches Hoya. | SF2 (Schott, name, vendor ✗)<br>H-ZF1 (CDGM, code, vendor ✗, alternate code row)<br>S-TIM22 (Ohara, code, vendor ✗, preferred code row) | 1 | [NIKON NIKKOR 28mm f/2.8 (Nikon 28Ti)](../../src/lens-data/nikon/Nikon28Ti28mmf28.data.ts) L2b |
 | `S-TIM35 catalog-equivalent coefficient proxy (patent 699301; production supplier unspecified)` | 1.69895 / 30.10 (d) | S-TIM35 — direct name evidence outranks six-digit code evidence. | E-FD15 (Hoya, code, alternate code row) | 1 | [NIKON NIKKOR 300mm f/2S IF-ED](../../src/lens-data/nikon/NikonAiSNikkor300mmf2IFED.data.ts) L10 |
 | `744449 - lanthanum glass class (vendor unresolved)` | 1.74400 / 44.90 (d) | H-LaF3B — smallest d-line \|Δn\| (1.0e-7 vs 2.8e-5) | N-LAF2 (Schott, code, alternate code row) | 1 | [NIKON NIKKOR 300mm f/4.5 ED](../../src/lens-data/nikon/NikonNikkor300mmf45ED.data.ts) L2 |

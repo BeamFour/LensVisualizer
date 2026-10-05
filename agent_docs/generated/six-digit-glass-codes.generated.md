@@ -10,8 +10,8 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 ## Summary
 
 - **876** lenses scanned
-- **1920** total code-only elements found
-- **1920** elements in this report
+- **1917** total code-only elements found
+- **1917** elements in this report
 - **310** distinct lens files affected
 
 ## Codes by Frequency
@@ -182,7 +182,6 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 581409 | 2 | 2 | patents/JPWO2020158622A1.pdf<br>patents/US20240151940A1.pdf | No review-record hit |
 | 589613 | 2 | 2 | patents/JP2020086133A.pdf<br>patents/US8422143.pdf | No review-record hit |
 | 592670 | 2 | 2 | patents/US20150092100A1.pdf<br>patents/JP2017116646A.pdf | No review-record hit |
-| 595356 | 2 | 1 | patents/JP_S4871634_A.pdf | All rows explicitly disposed |
 | 600644 | 2 | 1 | patents/US_4147410_A.pdf | All rows explicitly disposed |
 | 606437 | 2 | 2 | patents/WO2024062958A1.pdf<br>patents/US20210132345A1.pdf | No review-record hit |
 | 617540 | 2 | 1 | patents/JPA 1999030748-000000.pdf | No review-record hit |
@@ -462,7 +461,6 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | 852428 | 1 | 1 | patents/JPA 2021076740-000000.pdf | All rows explicitly disposed |
 | 854404 | 1 | 1 | patents/US20140098253A1.pdf | No review-record hit |
 | 856323 | 1 | 1 | patents/WO2021200206A1.pdf | All rows explicitly disposed |
-| 861231 | 1 | 1 | patents/JP_S4871634_A.pdf | All rows explicitly disposed |
 | 866450 | 1 | 1 | patents/CN116520542A.pdf | All rows have review records |
 | 868323 | 1 | 1 | patents/WO2024154461A1.pdf | No review-record hit |
 | 874287 | 1 | 1 | patents/US20130314588A1.pdf | All rows explicitly disposed |
@@ -2595,9 +2593,6 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 | Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
 |---|---|---|---|---|---|---|---|
 | L6 (Element L6) | 13 | `Unmatched (841433 lanthanum dense flint coordinate; no coordinate-compatible catalog glass)` | 1.84131 / 43.30 | No catalog entry | abbe | patents/JP_S4871634_A.pdf | Explicit disposition in data |
-| L9 (Element L9) | 18 | `Unmatched (595356 flint coordinate; no coordinate-compatible catalog glass)` | 1.59483 / 35.60 | No catalog entry | abbe | patents/JP_S4871634_A.pdf | Explicit disposition in data |
-| L11 (Element L11) | 21 | `Unmatched (595356 flint coordinate; no coordinate-compatible catalog glass)` | 1.59508 / 35.60 | No catalog entry | abbe | patents/JP_S4871634_A.pdf | Explicit disposition in data |
-| L12 (Element L12) | 23 | `Unmatched (861231 dense flint coordinate; no period catalog glass established)` | 1.86142 / 23.10 | No catalog entry | abbe | patents/JP_S4871634_A.pdf | Explicit disposition in data |
 | L13 (Element L13) | 25 | `Unmatched (448672 low-index crown coordinate; no coordinate-compatible catalog glass)` | 1.44772 / 67.20 | No catalog entry | abbe | patents/JP_S4871634_A.pdf | Explicit disposition in data |
 
 ### [NIKON NIKKOR-SW 75mm f/4.5](../../src/lens-data/nikon/NikonNikkorSW75mmf45.data.ts) - JP S53-57028 A

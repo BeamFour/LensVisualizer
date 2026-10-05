@@ -30,6 +30,12 @@ import type { LensDataInput } from "../../types/optics.js";
  * STO sd is the real-ray value for f/2.891 at wide (buildLens recomputes it); the same fixed iris reproduces the
  * published f/2.904 and f/2.905 at mid and tele.
  *
+ * FOCAL LENGTHS — focalLengthDesign and zoomPositions are the patent's printed f (71.402 / 134.997 / 195.996 mm). The
+ * paraxial EFL computed from the tabulated surfaces is 71.404 / 135.000 / 196.005 mm (difference is table rounding).
+ * nominalFno is the patent's FNO in the same wide / middle / tele order. fstopSeries starts at f/4 because the UI
+ * prepends the wide-open value (f/2.89–2.91) itself; f/2.8 is the marketing aperture and is not reachable.
+ * Nikon publishes 11 blades, f/22 minimum aperture and Z TC-1.4x / TC-2.0x compatibility (acceptsTeleconverters).
+ *
  * Glass names are coordinate-compatible catalog counterparts; they do not establish supplier or melt.
  */
 
@@ -41,7 +47,7 @@ const LENS_DATA = {
   specs: ["18 ELEMENTS / 16 GROUPS", "f = 71.4–196.0 mm", "F/2.89–2.91", "2ω = 34.7°–12.5°", "4 ASPHERICAL SURFACES"],
 
   focalLengthMarketing: [70, 200],
-  focalLengthDesign: [71.404, 196.005],
+  focalLengthDesign: [71.402, 195.996],
   apertureMarketing: 2.8,
   apertureDesign: 2.891,
   lensMounts: ["nikon-z"],
@@ -428,9 +434,10 @@ const LENS_DATA = {
     "Two-group floating internal focus (patent ¶0140): G5 moves toward the image and G6 toward the object; G1–G4, G7 and the image plane stay fixed. Close-focus spacings are a constrained reconstruction, not patent data: solved for Nikon's 0.38 / 0.6 / 0.8 m minimum focus distances, with 0.30× at wide and 0.25× at tele. The 135 mm state uses a declared travel-ratio rule (β ≈ 0.25×), and intermediate states are interpolated.",
 
   nominalFno: [2.891, 2.904, 2.905],
-  fstopSeries: [2.8, 4, 5.6, 8, 11, 16, 22],
+  fstopSeries: [4, 5.6, 8, 11, 16, 22],
   maxFstop: 22,
   apertureBlades: 11,
+  acceptsTeleconverters: true, // Nikon lists Z TELECONVERTER TC-1.4x / TC-2.0x compatibility
 
   gapSagFrac: 0.96, // surfaces 12/13 tele axial aperture; see header
   scFill: 0.65,

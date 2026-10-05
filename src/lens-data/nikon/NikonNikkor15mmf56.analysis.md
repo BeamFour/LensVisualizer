@@ -33,9 +33,9 @@ The front block, surfaces 1–10, has isolated EFL -21.397461 mm. The block betw
 
 The stop is inferred in the air gap between surfaces 20 and 21. The undimensioned iris location is modeled at the gap midpoint. Its physical semi-diameter, 3.326993599 mm, is calibrated by exact on-axis spherical Snell tracing to the published F/5.6 target. This match is a calibration dependency, not independent evidence of the historical diaphragm diameter. With that same iris, the paraxial pupil calculation gives F/5.496339; the two conventions are deliberately kept separate.
 
-The patent lists no semi-diameters. The modeled clear apertures follow the element rims of patent Fig. 1 (PDF p. 4), which draws the aspheric embodiment; its front group L1–L5 and filter share most radii with the spherical table. Measured at 0.1317 mm per pixel of the 352 dpi scan, the figure rims are about 38.5 mm (L1 front), 31 mm (L2), 18.8 / 14.8 mm (L3), 13.2 / 11 mm (L4), 10 / 8.2 mm (L5) and 9.7 mm (filter). An exact chief ray of this table at the 135 corner (ω = 55.3°, image height 21.65 mm) needs 38.4, 30.8, 30.5, 29.5, 18.9, 15.0, 14.2, 11.7, 11.1 and 9.6 mm on surfaces 1–10, so figure and ray trace agree within about 1 mm. Surfaces 1–12 are set to the larger of the two (39.0, 30.9, 31.0, 30.6, 19.0, 15.2, 14.3, 11.9, 11.2, 9.8, 9.7, 9.7 mm). Doublet D1 has very different thicknesses in the two tables and uses one common 8.0 mm rim. Behind the stop the figure is followed where it clears the beam (L11 front 4.3 mm, L14 7.6 / 7.8 mm); the figure draws doublet D2 narrower than the F/5.6 axial beam, so D2 and L8 remain ray-based.
+The patent lists no semi-diameters. The modeled clear apertures follow the element rims of patent Fig. 1 (PDF p. 4), which draws the aspheric embodiment; its front group L1–L5 and filter share most radii with the spherical table. Measured at 0.1317 mm per pixel of the 352 dpi scan, the figure rims are about 38.5 mm (L1 front), 31 mm (L2), 18.8 / 14.8 mm (L3), 13.2 / 11 mm (L4), 10 / 8.2 mm (L5) and 9.7 mm (filter). An exact chief ray of this table at the 135 corner (ω = 55.3°, image height 21.65 mm) needs 38.4, 30.8, 30.5, 29.5, 18.9, 15.0, 14.2, 11.7, 11.1 and 9.6 mm on surfaces 1–10, so figure and ray trace agree within about 1 mm. Surfaces 1–12 are set to the larger of the two (39.0, 30.8, 31.0, 30.6, 19.0, 15.2, 14.3, 11.9, 11.2, 9.8, 9.7, 9.7 mm). Doublet D1 has very different thicknesses in the two tables and uses one common 8.0 mm rim. Behind the stop the figure is followed where it clears the beam (L11 front 4.3 mm, L14 7.6 / 7.8 mm); the figure draws doublet D2 narrower than the F/5.6 axial beam, so D2 and L8 remain ray-based.
 
-With these apertures the traced chief ray reaches the full 135 corner at 55.3°, slightly beyond the 55° half-field the patent states (image height 21.43 mm). A meridional ray fan passes unvignetted to at least 33°, about 88% of the stop width at 45°, about 71% at 50°, and about 20% at the corner, where L1's front rim and the rear group cut the bundle from both sides. Two default geometry limits are raised because the 110° table requires it: surface 2 (R = 32.80 mm) is used to a 30.9 mm semi-diameter, a 70.4° rim slope, and the 10.3 mm air gap between L1 and L2 closes to about 0.34 mm at that rim. Fig. 1 draws the rear of L1 equally deep. These are modeled clear apertures; they do not establish the production lens's mechanical diameters, and skew-ray clearance is not checked.
+With these apertures the traced chief ray reaches the full 135 corner at 55.3°, slightly beyond the 55° half-field the patent states (image height 21.43 mm). A meridional ray fan passes unvignetted to at least 33°, about 88% of the stop width at 45°, about 71% at 50°, and about 20% at the corner, where L1's front rim and the rear group cut the bundle from both sides. Two default geometry limits are raised because the 110° table requires it: surface 2 (R = 32.80 mm) is used to a 30.8 mm semi-diameter, the smallest 0.1 mm step that clears the 30.77 mm corner chief ray, which is a 69.9° rim slope, and the 10.3 mm air gap between L1 and L2 closes to about 0.53 mm at that rim. Fig. 1 draws the rear of L1 equally deep. These are modeled clear apertures; they do not establish the production lens's mechanical diameters, and skew-ray clearance is not checked.
 
 ## Element-by-Element Analysis
 
@@ -97,7 +97,7 @@ This negative meniscus separates the two bonded assemblies ahead of the stop. It
 
 ### L9 — Biconvex Positive
 
-nd = 1.59483, νd = 35.6. Glass: Unmatched — no coordinate-compatible catalog glass; dispersion falls back to the Abbe number. f = +11.33 mm.
+nd = 1.59483, νd = 35.6. Glass: flint — nearest FF5 (HOYA) at 1.59270 / 35.45, Δnd ≈ −0.0021; the catalog curve supplies dispersion only and is not a period identification. f = +11.33 mm.
 
 The positive front member of D2 is biconvex when isolated in air. In the assembled prescription its rear surface leads directly into L10. Both surfaces and the common aperture are retained without an artificial air film. [1, spherical reference table]
 
@@ -109,13 +109,13 @@ The rear member of D2 is plano-concave. Its image-side face is plane and exits t
 
 ### L11 — Plano-Convex
 
-nd = 1.59508, νd = 35.6. Glass: Unmatched — no coordinate-compatible catalog glass; dispersion falls back to the Abbe number. f = +20.10 mm.
+nd = 1.59508, νd = 35.6. Glass: flint — nearest FF5 (HOYA) at 1.59270 / 35.45, Δnd ≈ −0.0024; the catalog curve supplies dispersion only and is not a period identification. f = +20.10 mm.
 
 A plano-convex positive lens begins the post-stop block. The object-side plane is a refracting glass-entry surface, not an inactive dummy plane. Its finite rear curvature provides its standalone positive power. [1, spherical reference table]
 
 ### L12 — Biconcave Negative
 
-nd = 1.86142, νd = 23.1. Glass: Unmatched — no coordinate-compatible catalog glass; dispersion falls back to the Abbe number. f = -11.01 mm.
+nd = 1.86142, νd = 23.1. Glass: dense flint — nearest J-SFH2 (HIKARI) at 1.86074 / 23.08, Δnd ≈ −0.0007; a modern coordinate-compatible curve used for dispersion only, explicitly not a period glass. f = -11.01 mm.
 
 The biconcave negative element follows L11 across air. It carries the smallest Abbe coordinate among the powered elements. That coordinate is evidence of relative dispersion within the patent table, not sufficient evidence of a named dense-flint melt or a quantitative correction allocation. [1, spherical reference table]
 
@@ -133,7 +133,7 @@ The final biconvex lens has a weak front curvature and a stronger convex rear fa
 
 ## Glass Identification
 
-No glass is assigned a confirmed manufacturer or melt identity. The source provides n and ν coordinates, with no wavelength specification or spectral-line indices; reading them as d-line values is an assumption. On that assumption nine of the fourteen lens elements fall on standard catalog classes within Δnd 0.0005 and Δνd 0.4, and the model uses those catalog dispersion curves. The names identify coordinate-compatible catalog classes, not the glass supplier of the 1970s lens. The direct vendor review examined the current HOYA catalogue including obsolete entries and OHARA’s published numerical table, supplemented by a direct Hikari comparison. Current project catalogue shards supplied a separately identified, secondary six-vendor comparison; they do not substitute for a complete primary historical-catalogue search.
+No glass is assigned a confirmed manufacturer or melt identity. The source provides n and ν coordinates, with no wavelength specification or spectral-line indices; reading them as d-line values is an assumption. On that assumption nine of the fourteen lens elements fall on standard catalog classes within Δnd 0.0005 and Δνd 0.4, and three more (L9, L11, L12) borrow the nearest catalog curve at a larger index offset; the model uses those catalog dispersion curves for twelve of the fourteen elements while tracing the patent's own n values. The names identify coordinate-compatible catalog classes, not the glass supplier of the 1970s lens. The direct vendor review examined the current HOYA catalogue including obsolete entries and OHARA’s published numerical table, supplemented by a direct Hikari comparison. Current project catalogue shards supplied a separately identified, secondary six-vendor comparison; they do not substitute for a complete primary historical-catalogue search.
 
 | Source n | Source ν | Used in | Disposition |
 |---|---:|---|---|
@@ -141,16 +141,16 @@ No glass is assigned a confirmed manufacturer or melt identity. The source provi
 | 1.50976 | 63.4 | L14 | BK1 class (nearest BK1 SUMITA, Δnd ≈ +0.0003) |
 | 1.54800 | 45.9 | L7 | LLF1 class (J-LLF1 HIKARI / LLF1 SCHOTT) |
 | 1.59160 | 58.2 | L10 | SK13/BaCD13 class (nearest BACD13 HOYA, Δnd ≈ +0.0002) |
-| 1.59483 | 35.6 | L9 | Unmatched; no coordinate-compatible catalog glass |
-| 1.59508 | 35.6 | L11 | Unmatched; no coordinate-compatible catalog glass |
+| 1.59483 | 35.6 | L9 | Nearest FF5 HOYA (Δnd ≈ −0.0021, Δνd −0.15); dispersion curve only |
+| 1.59508 | 35.6 | L11 | Nearest FF5 HOYA (Δnd ≈ −0.0024, Δνd −0.15); dispersion curve only |
 | 1.69320 | 53.5 | L3, L4 | LaK13 class (nearest LAC13 HOYA / S-LAL13 OHARA, Δnd ≈ +0.0003) |
 | 1.69684 | 55.6 | L5, L8 | LaK14 class (J-LAK14 HIKARI / S-LAL14 OHARA) |
 | 1.71341 | 53.9 | L2 | LaK8 class (nearest J-LAK8 HIKARI / LAC8 HOYA, Δnd ≈ −0.0004) |
 | 1.78764 | 47.5 | L1 | LaSF014 class (nearest J-LASF014 HIKARI / TAF4 HOYA, Δnd ≈ +0.0004) |
 | 1.84131 | 43.3 | L6 | Unmatched; no coordinate-compatible catalog glass |
-| 1.86142 | 23.1 | L12 | Unmatched; no coordinate-compatible catalog glass |
+| 1.86142 | 23.1 | L12 | Nearest J-SFH2 HIKARI (Δnd ≈ −0.0007); modern curve, not a period glass |
 
-Coordinate proximity under an assumed d-line convention cannot establish the original spectral reference, historical melt, or supplier, so every class label above is a dispersion model only. L6, L9, L11 and L13 have no catalog glass within tolerance. L12 (1.86142 / 23.1) lies near the modern J-SFH2 coordinate, but that glass postdates the design and is not used as a label. OHARA S- and L-prefixes remain distinct in the review. The plate’s missing Abbe value is left missing. No catalogue nC, nF, ng, or ΔPgF is written into the prescription; no apochromatic or anomalous-dispersion performance is asserted. [4–6]
+Coordinate proximity under an assumed d-line convention cannot establish the original spectral reference, historical melt, or supplier, so every class label above is a dispersion model only. L6 and L13 have no catalog glass within tolerance. Their unusual coordinates (1.84131 / 43.3 and 1.44772 / 67.2) are printed identically in both of the patent's tables, and substituting the nearest period-plausible indices moves the computed back focus by 0.24 mm or more against the printed 38.77 mm, so they are the values the designer used, not misprints. The two 35.6 flints differ from each other by 0.00025 in index and sit about 0.002 above FF5, the nearest catalog flint. L12 (1.86142 / 23.1) lies near the modern J-SFH2 coordinate; that glass postdates the design and is used only as a dispersion curve. OHARA S- and L-prefixes remain distinct in the review. The plate’s missing Abbe value is left missing. No catalogue nC, nF, ng, or ΔPgF is written into the prescription; no apochromatic or anomalous-dispersion performance is asserted. [4–6]
 
 ## Focus Mechanism
 

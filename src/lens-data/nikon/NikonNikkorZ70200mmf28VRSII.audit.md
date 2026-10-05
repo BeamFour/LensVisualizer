@@ -803,3 +803,42 @@ The STO semi-diameter (17.96 mm, wide-end f/2.891 calibration) is unchanged.
 - L41: HIKARI J-SFH8 (1.62200 / 30.66, code 622307) is now in the shared glass catalog, and the label resolves to it with Δnd ≈ 2e-8. The "not in the LensVisualizer catalog" wording was removed from the data file and analysis; the authored `dPgF` (+0.0328, from the patent's θgF = 0.625) and the supplier-unconfirmed caveat stay. All 18 elements now resolve to catalog dispersion curves.
 - The remaining labels were reviewed against the stored patent coordinates. L45 (J-PSKH4, Δnd +4.3e-4) and L71 (M-BACD12 family, Δnd −2.2e-4) stay labelled as not coordinate-identical; no exact catalog row was found. L32's label resolves through the HIKARI J-LASFH17 row of the same coordinate.
 - Subtitle changed to the house form "WO 2026/172598 A1 Example 1 — strong production correlation; not manufacturer-confirmed". The display name is unchanged. The correlation caveat remains in the data-file header and the analysis.
+
+## 2026-10-05 — Second review (site diagram, labels, travel, glass, metadata)
+
+**Sources.** WO 2026/172598 A1, PDF pp. 32–35 (general data, Table 1 rows 1–37, asphere blocks, variable-gap and group tables) and p. 83 (Fig. 1), re-rasterized for this review. Nikon's global product page, Nikon USA product page and Nikon's 2026-02-24 news release for the production facts. The local site was captured at 71.4, 135 and 196 mm, each at infinity and at closest focus, plus the zoom and focus group-movement overlays.
+
+**Prescription and glass, re-read from the table image.** All 35 lens surfaces (R, D, nd, νd), the FL plate (1.600 / 1.51680 / 64.13, D37 = 0.174), the stop at surface 19, and the four asphere blocks (κ = 1 → K = 0; A4–A10 signs and exponents) equal the stored values. No transcription difference was found. The patent prints θgF to two decimals for every glass (0.53–0.63). All 18 elements resolve to catalog dispersion curves, and catalog Sellmeier data ranks above `dPgF` in the chromatic engine, so authoring two-decimal θgF values would add nothing and would be less precise than the curves. L41 keeps its `dPgF` (+0.0328) because its θgF = 0.625 is printed to three decimals in the conditions table. No glass label changed; no vendor glass missing from the repo catalog was needed.
+
+**Zoom and focus travel.**
+
+| Item | Patent | Stored / site | Result |
+| --- | --- | --- | --- |
+| Station order | wide 71.402, middle 134.997, tele 195.996 | `zoomPositions` and every `var` row in that order | agrees |
+| D6 (G1–G2) | 2.309 / 34.810 / 51.249 | same | G2 moves toward the image, 48.94 mm |
+| D8 (G2–G3) | 16.234 / 12.596 / 10.303 | same | G3 moves toward the image, less far than G2 |
+| D14 (G3–G4) | 44.546 / 15.684 / 1.537 | same | closes onto fixed G4 |
+| D27 / D31 / D33 | 3.004, 29.459, 5.625 / 5.450, 25.898, 6.740 / 3.287, 29.790, 5.011 | same (infinity column) | G5 and G6 shift slightly imageward at the middle station and return |
+| FNO | 2.891 / 2.904 / 2.905 | `nominalFno` in that order | agrees |
+| Fig. 1 arrows | G1, G4, G7 fixed; G2, G3 toward image; focus: G5 toward image, G6 toward object | zoom overlay shows only G2 and G3 with long travel (maximum 48.94 mm); focus overlay shows G5 moving right and G6 moving left | agrees |
+
+The patent publishes infinity spacings only (D0 = ∞, β blank), so the close column remains the documented reconstruction. In each close column D27 grows (G5 toward the image), D33 grows (G6 toward the object) and D31 shrinks by the sum, which is the direction of the Fig. 1 focus arrows. The paraxial probe finds the close states focused at object-to-image distances of 379.4, 599.4 and 799.4 mm with magnifications −0.300, −0.253 and −0.250, matching `zoomCloseFocusM` [0.38, 0.6, 0.8] and Nikon's minimum focus distances at 70, 135 and 200 mm (Nikon also lists 0.38 m at 85 mm and 0.5 m at 105 mm, which the three-station model interpolates rather than reproduces). The 135 mm and close-focus renders, which the first pass did not inspect, show no overlap or inverted gap: at 135 mm close focus G5 sits 14.2 mm behind L47 and G6 10.2 mm behind G5; at 196 mm close focus the G5–G6 gap is 7.7 mm.
+
+**Diagram against Fig. 1.** The three site renders match the three figure panels in element order, shape and relative rim heights: G1 tallest with L12/L13 stepped below L11; L21 taller than G3; L41/L42 the tallest elements behind the zoom groups; D1, D2 and L47 stepping down; G5 the smallest group; L61/L71 again taller. Group brackets G1–G7 carry the patent's signs (+ − − + − + −), D1 = L43+L44 and D2 = L45+L46 are the two cemented pairs of ¶0144, the stop is drawn between L42 and L43, and the four aspheric markers sit on surfaces 17, 18, 23 and 34. The patent names no vibration-reduction group in Example 1 and none is labelled. No semi-diameter was changed in this review.
+
+**Production correlation of special elements.** Nikon lists 18 elements in 16 groups with 1 ED, 1 Super ED, 1 aspherical ED, 2 aspherical, 1 fluorite and 1 SR element. The model has the same census by inference: fluorite L13, Super ED-class L33, ED-class L44, aspherical ED-class L42 (both faces), aspherical L45 and L71, and the high-θgF short-flint L41 as the SR candidate. The patent itself calls none of them ED, fluorite or SR, so every `apd` tag stays "inferred".
+
+**Changes.**
+
+| Field | Before | After | Reason |
+| --- | --- | --- | --- |
+| `focalLengthDesign` | [71.404, 196.005] | [71.402, 195.996] | The patent's printed f, now identical to `zoomPositions` and the "71.4–196.0" chip. 71.404 / 135.000 / 196.005 are the EFLs computed from the rounded table and are recorded in the header and analysis as computed values. |
+| `fstopSeries` | starts at 2.8 | starts at 4 | f/2.8 is the marketing aperture; the design opens to f/2.891–2.905, and the control already prepends the wide-open value, so the 2.8 entry was never reachable. |
+| `acceptsTeleconverters` | absent | true | Nikon states compatibility with the Z TELECONVERTER TC-1.4x and TC-2.0x. No Nikon Z converter is modeled in the corpus yet, so nothing changes on the page today. |
+| Header comment | — | focal-length / aperture note added | States which numbers are printed and which are computed. |
+
+**Retained after checking.** Name "NIKON NIKKOR Z 70-200mm f/2.8 VR S II" (Nikon's designation is "NIKKOR Z 70-200mm f/2.8 VR S II", announced 2026-02-24), mount `nikon-z`, format `135-full-frame` (patent Y = 21.70), 18/16 counts, 11 blades, f/22 minimum aperture, `closeFocusM` 0.38, patent number, inventor, applicant and year, `zoomLabels`, `varLabels`, `specs`.
+
+**Checks on the result.** The surface validator reports no errors; engine EFL 71.404 mm, f/2.891 and stop radius 17.96 mm are unchanged; the image-circle floor passes; traced field coverage is 100 % of 21.65 mm at all three stations; the meridional real-ray check shows no axial clipping and no blocked chief ray at infinity or closest focus; all 18 glasses resolve.
+
+**Open limitations.** Close-focus spacings remain a reconstruction (the 135 mm state by a declared travel-ratio rule). Semi-diameters are modeled or figure-measured, not published. The sibling first-generation file does not set `acceptsTeleconverters`, although Nikon lists the same converters for it; that file was outside this review.

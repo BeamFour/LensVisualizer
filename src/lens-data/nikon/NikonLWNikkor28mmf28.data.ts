@@ -38,13 +38,13 @@ import type { LensDataInput } from "../../types/optics.js";
  * ║    L1 14.4 / 11.8, L2 7.9, L3 front and L4 rear 7.3, L5 8.5 mm.      ║
  * ║    L1 rear is held at 11.8 mm (figure ≈10.4 mm) so the 135-corner    ║
  * ║    bundle and the engine's field estimate (38.5°, corner 38.3°) are  ║
- * ║    not cut below their earlier extent. L3 rear / L4 front            ║
- * ║    stay 6.3 mm: Fig. 1 draws them in rim contact at ≈7.3 mm, but the ║
- * ║    0.728 mm d6 gap closes at 6.67 mm and the shared-band rule allows ║
- * ║    6.3 mm (89.5% of the gap). These rims pass a stop radius of       ║
- * ║    6.32 mm: all of the paraxially calibrated 6.286 mm stop, but the  ║
- * ║    exact-ray f/2.8 marginal ray (6.44–6.45 mm at r6/r7) is trimmed   ║
- * ║    by about 2% of its height. L2's edge thickness is 0.58 mm.        ║
+ * ║    not cut below their earlier extent. L3 rear / L4 front are        ║
+ * ║    6.6 mm with gapSagFrac 0.99: Fig. 1 draws them in rim contact at  ║
+ * ║    ≈7.3 mm, but with the tabulated radii the 0.728 mm d6 gap closes  ║
+ * ║    at 6.67 mm, so the figure is not to scale there. At 6.6 mm the    ║
+ * ║    rims keep 0.013 mm of air (98.2% of the gap) and clear the exact- ║
+ * ║    ray f/2.8 marginal ray (6.44–6.45 mm at r6/r7; engine stop radius ║
+ * ║    6.46 mm). L2's edge thickness is 0.58 mm.                         ║
  * ║                                                                      ║
  * ║  Optical design only: glass surfaces, stop, variable gap. No rear    ║
  * ║  plates, filters, mechanics or parent designs.                       ║
@@ -63,6 +63,7 @@ const LENS_DATA = {
   focalLengthMarketing: 28,
   focalLengthDesign: 28.03,
   apertureMarketing: 2.8,
+  apertureDesign: 2.8,
   lensMounts: ["nikonos"],
   imageFormat: "135-full-frame",
   patentNumber: "US 4,203,653",
@@ -146,8 +147,8 @@ const LENS_DATA = {
     { label: "4", R: -47.488, d: 4.214, nd: 1.0, elemId: 0, sd: 7.9 },
     { label: "STO", R: 1e15, d: 4.214, nd: 1.0, elemId: 0, sd: 6.286 }, // STO position inferred from Fig. 1 (0.50 × d4); sd calibrated to f/2.8
     { label: "5", R: -15.764, d: 3.136, nd: 1.7847, elemId: 3, sd: 7.3 }, // r5 = −0.563 (claim 4); description table prints +0.563
-    { label: "6", R: 63.644, d: 0.728, nd: 1.0, elemId: 0, sd: 6.3 },
-    { label: "7", R: -58.744, d: 2.044, nd: 1.80411, elemId: 4, sd: 6.3 },
+    { label: "6", R: 63.644, d: 0.728, nd: 1.0, elemId: 0, sd: 6.6 },
+    { label: "7", R: -58.744, d: 2.044, nd: 1.80411, elemId: 4, sd: 6.6 },
     { label: "8", R: -18.116, d: 0.112, nd: 1.0, elemId: 0, sd: 7.3 },
     { label: "9", R: -489.496, d: 2.436, nd: 1.732, elemId: 5, sd: 8.5 },
     { label: "10", R: -23.492, d: 36.253, nd: 1.0, elemId: 0, sd: 8.5 },
@@ -181,6 +182,7 @@ const LENS_DATA = {
 
   /* ── Layout tuning ── */
   yScFill: 0.45,
+  gapSagFrac: 0.99, // L3 rear / L4 front rims nearly meet (0.013 mm of air at 6.6 mm); Fig. 1 draws rim contact
 } satisfies LensDataInput;
 
 export default LENS_DATA;

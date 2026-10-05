@@ -10,11 +10,11 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 ## Summary
 
 - **876** lenses scanned
-- **1920** total code-only elements found
-- **348** elements in this report
+- **1917** total code-only elements found
+- **345** elements in this report
 - **131** distinct lens files affected
 - **23** active unreviewed elements have no review-record hit or explicit disposition
-- **194** explicitly unmatched/unknown/proprietary/unidentified elements are self-recording review dispositions
+- **191** explicitly unmatched/unknown/proprietary/unidentified elements are self-recording review dispositions
 - **0** dispositions lack any review record
 
 ## Prioritized Unreviewed Queue
@@ -72,7 +72,6 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 514428 | 2 | 1 | patents/JP2016021011A.pdf | All rows have review records |
 | 531557 | 2 | 2 | patents/WO2022071249A1.pdf<br>patents/US8994842.pdf | All rows explicitly disposed |
 | 540473 | 2 | 1 | patents/GB_135853_A.pdf | All rows explicitly disposed |
-| 595356 | 2 | 1 | patents/JP_S4871634_A.pdf | All rows explicitly disposed |
 | 600644 | 2 | 1 | patents/US_4147410_A.pdf | All rows explicitly disposed |
 | 620586 | 2 | 1 | patents/US4303314.pdf | All rows have review records |
 | 621569 | 2 | 1 | patents/GB_135853_A.pdf | All rows explicitly disposed |
@@ -294,7 +293,6 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 850440 | 1 | 1 | patents/US20180164556A1.pdf | All rows explicitly disposed |
 | 852428 | 1 | 1 | patents/JPA 2021076740-000000.pdf | All rows explicitly disposed |
 | 856323 | 1 | 1 | patents/WO2021200206A1.pdf | All rows explicitly disposed |
-| 861231 | 1 | 1 | patents/JP_S4871634_A.pdf | All rows explicitly disposed |
 | 866450 | 1 | 1 | patents/CN116520542A.pdf | All rows have review records |
 | 868323 | 1 | 1 | patents/WO2024154461A1.pdf | No review-record hit |
 | 874287 | 1 | 1 | patents/US20130314588A1.pdf | All rows explicitly disposed |
@@ -922,9 +920,6 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
 |---|---|---|---|---|---|---|---|
 | L6 (Element L6) | 13 | `Unmatched (841433 lanthanum dense flint coordinate; no coordinate-compatible catalog glass)` | 1.84131 / 43.30 | No catalog entry | abbe | patents/JP_S4871634_A.pdf | Explicit disposition in data |
-| L9 (Element L9) | 18 | `Unmatched (595356 flint coordinate; no coordinate-compatible catalog glass)` | 1.59483 / 35.60 | No catalog entry | abbe | patents/JP_S4871634_A.pdf | Explicit disposition in data |
-| L11 (Element L11) | 21 | `Unmatched (595356 flint coordinate; no coordinate-compatible catalog glass)` | 1.59508 / 35.60 | No catalog entry | abbe | patents/JP_S4871634_A.pdf | Explicit disposition in data |
-| L12 (Element L12) | 23 | `Unmatched (861231 dense flint coordinate; no period catalog glass established)` | 1.86142 / 23.10 | No catalog entry | abbe | patents/JP_S4871634_A.pdf | Explicit disposition in data |
 | L13 (Element L13) | 25 | `Unmatched (448672 low-index crown coordinate; no coordinate-compatible catalog glass)` | 1.44772 / 67.20 | No catalog entry | abbe | patents/JP_S4871634_A.pdf | Explicit disposition in data |
 
 ### [NIKON NIKKOR-SW 75mm f/4.5](../../src/lens-data/nikon/NikonNikkorSW75mmf45.data.ts) - JP S53-57028 A

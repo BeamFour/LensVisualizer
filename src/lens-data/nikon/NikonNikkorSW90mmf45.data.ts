@@ -67,6 +67,7 @@ const LENS_DATA = {
   focalLengthMarketing: 90,
   focalLengthDesign: 90.4, // Nikon published focal length (Nikon Imaging Japan product page)
   apertureMarketing: 4.5,
+  apertureDesign: 4.5, // patent aperture ratio 1:4.5
   lensMounts: ["large-format-lens-board"],
   imageFormat: "5x7", // Nikon labels the 235 mm f/16 image circle as 5x7
   imageCircleMm: 235, // Nikon published image circle at f/16

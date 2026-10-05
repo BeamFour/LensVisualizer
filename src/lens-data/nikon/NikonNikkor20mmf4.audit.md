@@ -1,6 +1,6 @@
 # Lens Patent — Nikon New Nikkor 20mm f/4 (US 3,549,241 Example 2) — Audit Log
 
-The display name is NIKON NEW NIKKOR 20mm f/4 (set 2026-10-05; file stem and key unchanged). Semi-diameters and glass labels described in the earlier sections were superseded by the 2026-10-05 sections at the end of this log. Historical Stage1–3 construction records below are retained for provenance. The Stage4 correction register and final gate supersede their candidate readings and approvals.
+The display name is NIKON NEW NIKKOR 20mm f/4 (set 2026-10-05; file stem and key unchanged). Semi-diameters and glass labels described in the earlier sections were superseded by the 2026-10-05 sections at the end of this log. The rear-group semi-diameters, the L6b glass label and the mount/format fields of those sections were in turn revised by the second review at the very end. Historical Stage1–3 construction records below are retained for provenance. The Stage4 correction register and final gate supersede their candidate readings and approvals.
 
 ## Job and reference versions
 US3549241A, Example 2, exact stem NikonNikkor20mmf4. Original PDF and job card bytes are retained. The four-field selection was not changed. Current project references are pinned at 3d44a1be91db853725ac841b65a9e228f2c544ef; identities and byte hashes appear in manifest.references. Protocol and dossier contract CHAT-1.0 apply. Read relevant data/analysis specification sections, template, defaults, authoring/integration and glass guides, taxonomy, and formatting configuration. No existing lens prescription seeded extraction.
@@ -155,3 +155,61 @@ Open limitations:
 - Display name: NIKON NIKKOR 20mm f/4 became NIKON NEW NIKKOR 20mm f/4, after the 1974 production lens the patent family is correlated with. The caveat that Example 2 has 11 elements in 9 groups against the production lens's 10 in 8 is kept in the subtitle, header and analysis.
 - Presentation: the data file was converted from a JSON-style literal to the house layout (boxed header with scaling, surface-label, stop, semi-diameter, correlation and glass notes; one surface per line). Float noise from the 0.2 scaling was trimmed (for example 31.900000000000002 → 31.9); a comparison of every R, d, nd, element nd/νd/fl, variable gap, closeFocusM and focalLengthDesign found no difference above 1e-9. The specs line, subtitle and focus description were rewritten as plain reader-facing statements.
 - The prescription was not re-read row by row in this pass; the earlier audit's table check and the EFL/BFD agreement with the patent (100.011 and 170.537 native against the printed 100 and 170.5) stand.
+
+## 2026-10-05 — Second review (site diagram, labels, travel, glass, metadata)
+
+Independent second review of the lens as rendered on the local site against US 3,549,241 (image-only PDF; sheet 2 for Fig. 2(A)/(B)/(F), page 7 for the Embodiment II table and the close-range text).
+
+### Is Fig. 2(A) to scale, and are its rims clear apertures?
+
+The scaled prescription was overlaid on a 600 dpi crop of Fig. 2(A) at 44.95 px/mm (first vertex to last vertex, 38.53 mm), with a 0.73° scan skew removed. The overlaid spheres follow the drawn R1–R6, R9, R11–R15, R17 and R19 over their whole drawn height, and the drawn edge thicknesses of L5a, L5b and L8 agree with the prescription at the drawn heights (for example L5a 2.2 mm drawn against 2.1 mm computed). Vertex positions agree within 0.3 mm (L3 and L4 are drawn about 0.3 mm rearward). The figure is therefore a scale drawing of the surfaces, radially as well as axially.
+
+Its rim heights are nevertheless not clear apertures behind L4a, for three reasons found in the patent itself:
+
+| Test | Result |
+|---|---|
+| Drawn rear rims against the f/4 axial marginal ray | L4b rear 4.2 mm drawn / 4.13 mm ray; L5 4.6 / 4.20–4.26; L6 4.5 / 3.90–4.08; L7 4.9 / 4.21–4.28; L8 5.8 / 4.32–4.37. The axial beam passes, with only 2–14% margin from L4b to L7 (33% on L8). |
+| Drawn rims against the 45° chief ray | Passes behind L3 (chief height below 4 mm in L5–L8). In front, the drawn L2 rear rim (9.4 mm) is below the 45.5° chief-ray height (9.64 mm) and the drawn L1 rim (14.8–15.0 mm) is at the chief-ray height (14.87 mm), so the drawn front rims would leave no bundle around the chief ray at the published field edge. |
+| Drawn L1 edge | Drawn as a knife edge at 15.0 mm; the two prescription spheres meet at 17.3 mm and are still 0.85 mm apart at 15.0 mm. |
+| Fig. 2(B) coma plot | The 35° and 45° coma curves are drawn from about −0.86 to +0.89 of the full-aperture abscissa. With the drawn rear rims the traced meridional pupil is only 63% at 35° and 40% at 45° (87% at 20°), which cannot carry those curves. |
+
+Conclusion: the surfaces are to scale but the outlines are draughtsman's element outlines, and following them behind L4a cost real throughput that the patent's own aberration plot contradicts. The rear group was returned to ray-supported rims, keeping the drawn order of heights.
+
+| Surface(s) | First pass (mm) | Now (mm) | f/4 axial ray (mm) | Full f/4 bundle at 30° (mm) | Reason |
+|---|---:|---:|---:|---:|---|
+| 1–7 (L1–L4a front) | 16.0, 16.0, 12.8, 11.0, 9.0, 7.3, 6.6 | unchanged | 2.4–3.2 | 11.7, 10.9, 10.0, 8.6, 7.6, 6.5, 6.4 | Figure-based values already pass the full bundle to 30°; kept. |
+| 9 (L4 cement) | 5.7 | 6.3 | 3.42 | 6.22 | Keeps the drawn step down from L4a. |
+| 10 (L4b rear) | 4.5 | 6.1 | 4.13 | 6.08 | Was 9% above the axial ray. |
+| 11, 11p, 12p, 12 (L5a, L5b) | 4.7 | 6.0 | 4.20–4.26 | 5.97–5.15 | Drawn as one common height; kept common. |
+| STO | 4.01366 | unchanged | 4.01 | — | Calibrated to f/4.000; the engine still derives f/4 and a 4.01366 mm stop radius. |
+| 13, 14, 15 (L6) | 4.5 | 5.1 | 3.90–4.08 | 4.18–5.07 | Smallest group, as drawn. |
+| 16, 17 (L7) | 4.9 | 5.4 | 4.21–4.28 | 5.34–5.41 | Edge thickness 0.17 mm at 5.4 mm; the pre-figure 5.7 mm left 0.06 mm. |
+| 18, 19 (L8) | 5.8 | 6.2 | 4.32–4.37 | 5.88–6.01 | L8 above L7, as drawn. |
+
+Results on the edited file: the surface validator reports no errors; an exact analytic meridional trace gives a meridional pupil of 100% through 30°, 89% at 35° (−0.84 to +0.93 of the stop height, close to the extent of the Fig. 2(B) curves), 71% at 40°, 50% at 45°, 47% at 45.5° (20.0 mm) and 30% at 47.6° (21.65 mm), with the chief ray clear throughout and the same figures at the close state (100% at 30°, 89% at 35°, 50% at 45°). The image-circle audit, now active because the format is declared, reports 100% (47.6° to 21.65 mm of 21.65 mm, corner clear) and the field-coverage audit reports the single station at ≥99%. The scratch clear-aperture probe still fails to find the chief ray beyond about 42° for this lens (solver limitation noted in the first pass); it flags no axial clipping. EFL 20.0022 mm, BFD 34.1074 mm and the element focal lengths are unchanged. The local render shows the tall L1, the L2/L3 steps and a compact L4–L8 block that tapers to the stop; L5–L8 are now visibly taller than the stop opening rather than nearly equal to it, which is the one intended departure from the drawing.
+
+### Labels, travel and prescription
+
+The Embodiment II table was re-read from a rendered page: all 18 radii, 18 thicknesses and 11 index/Abbe pairs equal the stored values after the 0.2 scale (n7 is printed with a damaged digit and equals n7′ = 1.60342). Element type strings agree with the radius signs and focal-length signs, the two cemented components are L4 (surfaces 7–10) and L6 (13–15), and the stop marker sits in the R12–R13 gap as drawn.
+
+Focus: the patent states that the air space between the two halves of L5 "is shortened" as the lens is focused closer, and Fig. 2(F) gives d11′ = 1.57 at 1/25 against 2.16 at infinity. The stored rows are [infinity, close]: split gap 0.432 → 0.314 mm and image gap 34.1 → 34.9086 mm (growing, as for a lens moved forward). The probe finds that the close state focuses at 0.562 m object-to-image at magnification −0.0404 with the image plane held at the infinity offset, consistent with the paraxial 0.567 m at −0.04. No change to the travel.
+
+### Glass
+
+L6b (1.76684 / 46.2) was relabelled from the forced-fallback wording to the nearest catalog glass, J-LASFH2 (HIKARI, catalog 1.76684 / 46.78: nd equal to five decimals, Δνd +0.58), with the residual stated in the label and the analysis. It is a nearest-curve stand-in, not a coordinate identity. All eleven elements now resolve to a catalog dispersion curve. The HOYA (including obsolete) and Sumita vendor files hold nothing closer (nearest M-TAF101, 1.76802 / 49.24). The patent prints no partial-dispersion data.
+
+### Metadata and name
+
+| Field | Before | Now | Basis |
+|---|---|---|---|
+| name | NIKON NEW NIKKOR 20mm f/4 | unchanged | Nikon's Thousand and One Nights No. 86 names "the New Nikkor 20mm f/4 … in 1974"; No. 20 captions it "(new) Nikkor Auto 20mm f/4" and dates the Ai Nikkor re-issue to 1977. The lens barrel carries only "NIKKOR 20mm 1:4", which would not separate it from the Ai version or from other 20 mm Nikkors, and "Auto" appears only in the Tale 20 translation, so Nikon's Tale 86 form is the most accurate unambiguous one. |
+| lensMounts, imageFormat | omitted | nikon-f, 135-full-frame | Production lens. The patent example publishes 90° (20.0 mm at this scale); the 135 corner needs about 94.5°, stated in the header and analysis. |
+| maxFstop, fstopSeries | 16 (default), ends at 16 | 22, ends at 22 | Production minimum aperture f/22. Nikon's two Tales do not print the aperture range; f/22 is from the lens's aperture ring as described in secondary sources. |
+| focalLengthDesign | 20.002236991495387 | 20.0022 | Float noise. |
+| closeFocusM | 0.5669178814289962 | 0.567 | Float noise; calculated conjugate of the published 1/25 state. |
+| var 19 close | 34.908575762007075 | 34.908576 | Float noise. |
+| element fl | 14–17 digits | 3 decimals | Float noise; values agree with the recomputed thick-lens focal lengths. |
+
+Not added: an image-circle value and a diaphragm blade count (Nikon's pages publish neither) and a teleconverter flag (the sibling K-era 28 mm entry carries none). Patent number, inventor, assignee (Nippon Kogaku K.K.), year 1970, 11 elements / 9 groups and the legend flags (no aspheres, no anomalous-dispersion claim) were checked and left as they were.
+
+Open limits: the rear rims are ray-derived, not published; the choice of an unvignetted field of 30° is a modelling judgement anchored on Fig. 2(B). The engine's paraxial half-field estimate remains 40.64° (set by surface 4). The f/22 minimum aperture lacks a Nikon primary citation.

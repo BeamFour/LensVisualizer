@@ -143,3 +143,31 @@ Glass labels: the stored n / ν values are unchanged patent values, and the pate
 Display name: `name` is now NIKON NIKKOR-QD·C AUTO 15mm f/5.6, the 1973 production lens whose 14-element / 12-group construction the table is correlated with. The correlation remains unconfirmed by Nikon and is stated as such in the subtitle, data-file header and analysis. File names and `key` are unchanged.
 
 Presentation: the data file was converted from JSON style to house style (boxed header with note blocks, unquoted keys, one surface per line). All R, d, nd, vd, fl values, the stop semi-diameter and `closeFocusM` are numerically identical; only the semi-diameters above, glass labels, element roles, `name`, `subtitle`, `specs`, `focusDescription` and the two geometry limits changed. Workflow wording was removed from user-facing strings and from the analysis.
+
+## 2026-10-05 — Second review (site diagram, labels, travel, glass, metadata)
+
+Independent second pass on the local site render against `patents/JP_S4871634_A.pdf` (PDF pp. 3–4 rendered at 400–700 dpi).
+
+Table reread: all 28 radii, 27 thicknesses and 15 n / ν pairs of the spherical reference table agree with the stored prescription. The patent prints "フィルター" in the ν6 column, so the plate has no dispersion value anywhere in the document. No other focus state is tabulated, so the infinity-only model with the `closeFocusM` sentinel stays.
+
+Geometry overrides: a scan of the surface 2 semi-diameter against the field-coverage audit gave 91% at 29.5 mm (the largest value the default limits allow), 94% at 30.0, 96% at 30.3, 98% at 30.5, 99% at 30.7 (corner chief ray clipped, 30.77 > 30.7) and 100% at 30.8 mm. The overrides are therefore needed, but the first pass's 30.9 mm was one step larger than required. Surface 2 is now 30.8 mm, which lowers the rim slope from 70.4° to 69.9° and widens the L1–L2 rim clearance from 0.34 to 0.53 mm.
+
+| Field | Before | After | Smallest passing value |
+|---|---:|---:|---|
+| Surface 2 `sd` | 30.9 | 30.8 | 30.8 (corner chief ray 30.77) |
+| `maxRimAngleDeg` | 71 | 70 | 69.8 fails (69.9° rim slope) |
+| `gapSagFrac` | 0.97 | 0.95 | 0.94 fails (sag 9.77 mm of 10.30 mm gap) |
+
+After the change the surface validator reports no errors, the image-circle audit reports the lens as not undersized, and field coverage is 100% (55.3° → 21.65 mm, corner clear). EFL 15.3090 mm, BFD 38.7929 mm and the stop semi-diameter are unchanged.
+
+Site render vs Fig. 1 (3× screenshot): the rear rim of L1 and the front rim of L2 do not cross; L2's front rim (31.0 mm) sits about 0.8 mm behind L1's edge line with a visible gap. Element order, cemented interfaces, stop position between the two flat faces r20 / r21, and the image-plane distance match the figure. Rear-group rims measured on the 700 dpi figure (0.0662 mm/px) against the stored values: D1 9.5 / 7.6 (stored common 8.0), L8 4.3 (5.0 / 4.6), D2 3.1 (4.5), L11 4.4 (4.3 / 4.8), L12 4.6 (4.9 / 5.4), L13 5.9 (5.5 / 5.9), L14 7.9 (7.6 / 7.8). The figure belongs to the aspheric embodiment, whose D2 has r19 = −4.60 instead of −12.50 and whose drawn D2 rim is below the 3.31 mm axial beam of this table, so L8 and D2 stay ray-based; everything else is within about 0.5 mm. Element types, `fl` signs, group and doublet ranges, legend tags (no APD, no aspheres) and the aperture readout were checked and left as they were.
+
+Glass: L12 now carries the J-SFH2 (HIKARI) curve (catalog 1.86074 / 23.08, Δnd −0.0007), stated as a modern coordinate-compatible curve and not a period glass. L9 and L11 (1.59483 and 1.59508 / 35.6) now carry the nearest catalog flint FF5 (HOYA, 1.59270 / 35.45, Δnd −0.0021 and −0.0024, Δνd −0.15), which is inside the resolver tolerance; the labels state the offset and make no period identification. Stored n / ν are unchanged, so paraxial quantities are unchanged. Twelve of fourteen lens elements now resolve to a catalog dispersion curve. L6 (1.84131 / 43.3), L13 (1.44772 / 67.2) and the filter remain Unmatched: the nearest entries in the repo catalog and in the HOYA (including obsolete) and SUMITA vendor files are TAFD5 1.83500 / 42.98 and TAFD6 1.84750 / 43.03 for L6, and FC3 / FK3 1.46450 / 65.77 and FC1 1.47079 / 66.71 for L13, all outside tolerance. KF6 / E-CF6 (1.51742) matches the filter index to five digits, but no Abbe number is published and none was invented.
+
+Misprint test for the unusual indices: each printed value appears identically in both of the patent's tables. Substituting plausible alternatives in the stored prescription moves the computed back focus away from the printed 38.77 mm (model 38.793 mm): L6 as 1.83500 gives 38.55 mm and as 1.80411 gives 37.35 mm; L13 as 1.46450 gives 36.66 mm (EFL 14.56 mm) and as 1.47069 gives 35.93 mm; L9 as 1.59270 gives 39.23 mm; L12 as 1.84666 gives 36.93 mm. The printed indices are therefore the values the design was computed with, not transcription or typesetting slips.
+
+Name: Nikon's own history (NIKKOR — The Thousand and One Nights, Tale 86) refers to the lens as the "Nikkor Auto 15mm f/5.6", released 1973 and designed by Ikuo Mori; Tale 9 (13mm f/5.6) credits the same designer. The lens itself is engraved "NIKKOR-QD·C Auto 1:5.6 f=15mm" (QD = fourteen elements, ·C = multicoating; 14 elements / 12 groups, f/5.6–22, 0.3 m, built-in filters). The stored `NIKON NIKKOR-QD·C AUTO 15mm f/5.6` follows the house form of the corpus (`NIKON NIKKOR-N AUTO 28mm f/2`, `NIKON REFLEX-NIKKOR·C 500mm f/8`) and is kept. The patent's inventor is Tomowaki Takahashi, so the correlation caveat stays in the subtitle, header and analysis.
+
+Metadata: `focalLengthDesign` is trimmed from 15.30900368087626 to 15.309, and `apertureDesign: 5.6` is added (the stop is calibrated to the patent's F/5.6). `maxFstop` 22, mount `nikon-f`, format `135-full-frame`, counts 14 / 12, assignee and year were confirmed. `apertureBlades` is not set: a seven-blade iris is reported by a collector reference only, not by a Nikon page read in this pass. `acceptsTeleconverters` is not set.
+
+Open limits: no rim of this table is directly drawn in the patent; skew rays are not checked; the FF5 and J-SFH2 curves are stand-ins at the stated index offsets.

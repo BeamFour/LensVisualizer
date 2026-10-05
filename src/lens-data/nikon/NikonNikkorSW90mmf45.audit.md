@@ -709,3 +709,80 @@ L1 (BAK1) and L3B (SF1) were already coordinate-exact. All seven elements now re
 
 Name `NIKON NIKKOR-SW 90mm f/4.5` retained (matches the SW 75mm sibling). Subtitle, specs and focus description were
 reviewed and contain no workflow jargon; the data file was already in house style. No change.
+
+## 2026-10-05 — Second review (site diagram, labels, travel, glass, metadata)
+
+Independent second pass over the lens as rendered on the local site, against US 4,176,915 (page 2 FIG. 1, page 6
+Example 1 table) and Nikon's own publications.
+
+**Prescription and glass rows.** The Example 1 table was re-read from a fresh render. All eleven radii, ten spacings
+and seven nd/νd pairs equal the stored values after the uniform 0.9040227 scale (r1 106.395 → 96.1835, d3 27.23 →
+24.6165, r11 −44.543 → −40.2679); nd/νd are 1.57250/57.5, 1.80218/44.4, 1.67163/38.8, 1.52000/70.1, 1.60717/40.2,
+1.71736/29.5, 1.73350/51.0 as stored. EFL 90.4009, BFD 62.9794, element focal lengths and type strings agree with the
+thick-lens values. No change.
+
+**Diagram against FIG. 1.** The site render at infinity and at the 1.0 m state was compared with FIG. 1 and the rims
+re-measured by hand on both sides of the tilted axis (scale 0.0798 mm per displayed pixel from the r1–r11 vertex
+distance).
+
+| Feature | Figure, second reading (mm) | Stored | Finding |
+|---|---|---|---|
+| L1 outer rim (r1) | 32.1 | 32.3 | agrees |
+| L1 concave rim corner (r2) | 22.2 | 21.5 | 3% short; held by the 0.9·R rim limit (21.53) |
+| L2A flat rim (r3) | 20.35 | 20.4 | agrees |
+| L2 barrel (r4–r6) | 12.6 | 12.7 | agrees |
+| L3A rim (r7, r8) | 10.85 | 10.85 | agrees |
+| L3B rear rim (r9) | 18.5 | 18.5 | agrees |
+| L4 concave rim corner (r10) | 19.5 | 19.6 | agrees |
+| L4 outer rim (r11) | 24.7 | 24.61 | agrees |
+| Diaphragm bar within d6 | 0.61–0.66 | 0.611 | agrees within reading uncertainty |
+
+Relative heights (L1 tallest, then L4, L2A, L3B, the L2 barrel, L3A), the bevel from L2A's rim down to the triplet
+barrel, the stepped L3 doublet and the stop position all read the same on the site and in the figure. No semi-diameter
+was changed. Nikon's brochure gives a ø70 mm rear mount and ø85 mm front mount, both comfortably larger than the
+modeled 49.2 mm and 64.6 mm clear diameters.
+
+**Labels and annotations.** Element names, diagram labels, types versus radius signs and focal-length signs, the L2
+and L3 cemented ranges (surfaces 3–6 and 7–9), the front/rear group ranges, the BF variable label, spec chips and
+legend colouring (only L2A above nd 1.78; no anomalous-dispersion or aspheric markers) are correct. The aperture
+readout starts at f/4.5 and ends at Nikon's f/64.
+
+**Focus travel.** Surface 11 is stored as infinity then close, 62.9794 → 73.5341 mm: the back focus grows by 10.55 mm
+toward the near conjugate, as unit focus requires. The stored close gap focuses an object 841.44 mm in front of r1,
+999.99 mm object-to-image, magnification −0.117. The site movement overlay shows both groups moving 10.55 mm away
+from the fixed image plane. The patent gives no finite-distance state and Nikon no minimum focus, so the 1.0 m state
+remains a labelled modeling choice. No change.
+
+**Glass.** All seven labels resolve to the intended catalog curves (BAK1, NBFD14, S-NBH52V, J-PKH1, BAFD3, SF1,
+LAKN12). The local vendor files were searched for closer matches:
+
+| Element | Patent nd / νd | Vendor-file hit | Status |
+|---|---|---|---|
+| L2B | 1.67163 / 38.8 | none closer than S-NBH52V; BASF12 legacy row 1.66998 / 39.2 is next | label retained |
+| L2C | 1.52000 / 70.1 | K-PMK30(M) SUMITA 1.52002 / 70.2 (a current moulding glass, not a 1970s type) | not in the repo catalog; label retained |
+| L3A | 1.60717 / 40.2 | BASF3 legacy row 1.60717 / 40.2, coordinate-exact | not in the repo catalog; BAFD3 (Δνd +0.16) retained |
+
+The patent prints no partial-dispersion data, so none is authored.
+
+**Metadata.** Nikon's large-format brochure (Code No. 8CE60100, 2002–2004) lists the lens as "Nikkor-SW 90mm f/4.5S":
+7 elements in 4 groups, 80° / ø154 mm at f/4.5, 105° / ø235 mm at f/16 with the format note 5″ × 7″, minimum aperture
+f/64, Copal No. 0 shutter, ø82 mm × 0.75 attachment thread, flange focal distance 97.4 mm. The same brochure labels
+the SW 75mm f/4.5S circle of ø200 mm as 120 × 165 mm rather than 5 × 7, so `5x7` here and `4x5` for the 75 mm sibling
+are both the maker's own classification (5 × 7 diagonal 218.5 mm against the 235 mm circle). Nikon's design-history
+article by Haruo Sato writes "Nikkor-SW 90mm f/4.5" without the suffix; the display name follows that form and the
+sibling. Nikon's pages give neither a release year nor a blade count, so neither is asserted and `apertureBlades` is
+left unset. The Nikon Imaging Japan product page cited for the 90.4 mm focal length now redirects to the product index
+and could not be re-read in this pass.
+
+| Field | Before | After | Reason |
+|---|---|---|---|
+| `apertureDesign` | absent | 4.5 | patent aperture ratio 1:4.5; field was missing while the sibling carries it |
+
+**Checks on the result.** The surface validator reports no errors; the traced field-coverage audit stays at 100%
+(52.4° → 117.50 mm); EFL, BFD and f/4.5 from the stop are unchanged; all seven glasses resolve.
+
+**Open limitations.** The site's aperture readout derives its wide-open stop radius by real-ray trace (10.59 mm)
+rather than from the paraxially calibrated STO value (10.3061 mm), so it shows an estimated entrance pupil of
+20.65 mm against the paraxial 20.09 mm; this is the viewer's convention for a lens with spherical aberration at the
+stop, not a data error. The r2 rim limit, the inferred stop position and the modeled close-focus state stand as
+recorded above.
