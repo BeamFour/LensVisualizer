@@ -9,12 +9,12 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 ## Summary
 
-- **870** lenses scanned
-- **1915** total code-only elements found
-- **343** elements in this report
-- **130** distinct lens files affected
+- **876** lenses scanned
+- **1920** total code-only elements found
+- **348** elements in this report
+- **131** distinct lens files affected
 - **23** active unreviewed elements have no review-record hit or explicit disposition
-- **189** explicitly unmatched/unknown/proprietary/unidentified elements are self-recording review dispositions
+- **194** explicitly unmatched/unknown/proprietary/unidentified elements are self-recording review dispositions
 - **0** dispositions lack any review record
 
 ## Prioritized Unreviewed Queue
@@ -64,6 +64,7 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 684313 | 3 | 2 | patents/US20150124127A1.pdf | All rows explicitly disposed |
 | 720521 | 3 | 3 | patents/US4444473.pdf<br>patents/US4124276.pdf | All rows have review records |
 | 777297 | 3 | 3 | patents/WO2021199923A1.pdf<br>patents/WO_2025263124_A1.pdf<br>patents/JP2023039817A.pdf | All rows have review records |
+| 841433 | 3 | 2 | patents/JP_S4871634_A.pdf<br>patents/US3771853.pdf | All rows explicitly disposed |
 | 856401 | 3 | 2 | patents/WO2021199923A1.pdf<br>patents/WO_2025263124_A1.pdf | All rows have review records |
 | 863248 | 3 | 1 | patents/JP2023039817A.pdf | All rows have review records |
 | 930240 | 3 | 3 | patents/WO2021200206A1.pdf<br>patents/WO_2025263124_A1.pdf<br>patents/WO_2024247472_A1.pdf | All rows have review records |
@@ -71,6 +72,7 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 514428 | 2 | 1 | patents/JP2016021011A.pdf | All rows have review records |
 | 531557 | 2 | 2 | patents/WO2022071249A1.pdf<br>patents/US8994842.pdf | All rows explicitly disposed |
 | 540473 | 2 | 1 | patents/GB_135853_A.pdf | All rows explicitly disposed |
+| 595356 | 2 | 1 | patents/JP_S4871634_A.pdf | All rows explicitly disposed |
 | 600644 | 2 | 1 | patents/US_4147410_A.pdf | All rows explicitly disposed |
 | 620586 | 2 | 1 | patents/US4303314.pdf | All rows have review records |
 | 621569 | 2 | 1 | patents/GB_135853_A.pdf | All rows explicitly disposed |
@@ -103,11 +105,11 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 830427 | 2 | 1 | patents/JP2015041012A.pdf | All rows explicitly disposed |
 | 840433 | 2 | 2 | patents/JPA 1994235857-000000.pdf<br>patents/US5528428.pdf | All rows have review records |
 | 840434 | 2 | 1 | patents/US5734508.pdf | All rows explicitly disposed |
-| 841433 | 2 | 1 | patents/US3771853.pdf | All rows explicitly disposed |
 | 933209 | 2 | 2 | patents/WO2021199923A1.pdf<br>patents/JP2023039817A.pdf | All rows have review records |
 | 001291 | 1 | 1 | patents/JP2015166834A.pdf | All rows explicitly disposed |
 | 010255 | 1 | 1 | patents/WO_2024247472_A1.pdf | All rows explicitly disposed |
 | 446672 | 1 | 1 | patents/US3771853.pdf | All rows explicitly disposed |
+| 448672 | 1 | 1 | patents/JP_S4871634_A.pdf | All rows explicitly disposed |
 | 449670 | 1 | 1 | patents/GB_1050055_A.pdf | All rows explicitly disposed |
 | 460658 | 1 | 1 | patents/DE_3907928_A1.pdf | All rows explicitly disposed |
 | 479587 | 1 | 1 | patents/US4773745.pdf | All rows explicitly disposed |
@@ -292,6 +294,7 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | 850440 | 1 | 1 | patents/US20180164556A1.pdf | All rows explicitly disposed |
 | 852428 | 1 | 1 | patents/JPA 2021076740-000000.pdf | All rows explicitly disposed |
 | 856323 | 1 | 1 | patents/WO2021200206A1.pdf | All rows explicitly disposed |
+| 861231 | 1 | 1 | patents/JP_S4871634_A.pdf | All rows explicitly disposed |
 | 866450 | 1 | 1 | patents/CN116520542A.pdf | All rows have review records |
 | 868323 | 1 | 1 | patents/WO2024154461A1.pdf | No review-record hit |
 | 874287 | 1 | 1 | patents/US20130314588A1.pdf | All rows explicitly disposed |
@@ -913,6 +916,16 @@ Completion counts are conditional on finding a source-verified catalog identity 
 | Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
 |---|---|---|---|---|---|---|---|
 | L8 (Element 8) | 14 | `744479 — lanthanum flint (catalog unresolved; nd = 1.74443, νd = 47.9)` | 1.74443 / 47.90 | No catalog entry | abbe | patents/US3736049.pdf | Audit-log hit |
+
+### [NIKON NIKKOR-QD·C AUTO 15mm f/5.6](../../src/lens-data/nikon/NikonNikkor15mmf56.data.ts) - JP S48-71634 A
+
+| Element | Surfaces | Code-only annotation | Stored nd/vd | Catalog/Sellmeier status | Dispersion quality | localPatentStatus | reviewRecordStatus |
+|---|---|---|---|---|---|---|---|
+| L6 (Element L6) | 13 | `Unmatched (841433 lanthanum dense flint coordinate; no coordinate-compatible catalog glass)` | 1.84131 / 43.30 | No catalog entry | abbe | patents/JP_S4871634_A.pdf | Explicit disposition in data |
+| L9 (Element L9) | 18 | `Unmatched (595356 flint coordinate; no coordinate-compatible catalog glass)` | 1.59483 / 35.60 | No catalog entry | abbe | patents/JP_S4871634_A.pdf | Explicit disposition in data |
+| L11 (Element L11) | 21 | `Unmatched (595356 flint coordinate; no coordinate-compatible catalog glass)` | 1.59508 / 35.60 | No catalog entry | abbe | patents/JP_S4871634_A.pdf | Explicit disposition in data |
+| L12 (Element L12) | 23 | `Unmatched (861231 dense flint coordinate; no period catalog glass established)` | 1.86142 / 23.10 | No catalog entry | abbe | patents/JP_S4871634_A.pdf | Explicit disposition in data |
+| L13 (Element L13) | 25 | `Unmatched (448672 low-index crown coordinate; no coordinate-compatible catalog glass)` | 1.44772 / 67.20 | No catalog entry | abbe | patents/JP_S4871634_A.pdf | Explicit disposition in data |
 
 ### [NIKON NIKKOR-SW 75mm f/4.5](../../src/lens-data/nikon/NikonNikkorSW75mmf45.data.ts) - JP S53-57028 A
 

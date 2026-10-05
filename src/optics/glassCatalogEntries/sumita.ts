@@ -592,4 +592,14 @@ export const SUMITA_GLASS_ENTRIES: readonly GlassEntry[] = [
     source:
       "SUMITA all-glass Zemax catalog (header 2026-08-21), https://www.sumita-opt.co.jp/download_files/en/data/zemax.agf; accessed 2026-10-03. Vendor formula-1 polynomial for discontinued LLF7.",
   },
+  {
+    name: "LAKN12",
+    vendor: "Sumita",
+    polynomial: [2.94109, -0.01179168, 0.02246613, 0.0003476198, -0.000001763954, 0.000001030437],
+    nd: 1.7335,
+    vd: 51.2,
+    code6: "734512",
+    source:
+      "SUMITA Zemax all-glass catalog 2025-11-07 including discontinued glasses; vendor formula-1 polynomial for discontinued LAKN12.",
+  },
 ];

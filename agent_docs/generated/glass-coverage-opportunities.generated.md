@@ -9,12 +9,12 @@ Regenerate the full glass report set with `npm run generate:glass-reports`.
 
 ## Summary
 
-- **870** lenses scanned (**858** visible)
-- **9067 / 9781** non-air surfaces use strict catalog Sellmeier data (92.7%)
-- **9082 / 9781** non-air surfaces use trusted chromatic data (Sellmeier or measured line indices, 92.9%)
+- **876** lenses scanned (**864** visible)
+- **9121 / 9843** non-air surfaces use strict catalog Sellmeier data (92.7%)
+- **9136 / 9843** non-air surfaces use trusted chromatic data (Sellmeier or measured line indices, 92.8%)
 - **0** mismatch surfaces in Sweep 1 across **0** lens files
 - **0** Sweep 1 surfaces have a matching untracked local patent PDF
-- **343** code-only missing-Sellmeier elements in Sweep 2: **23** active unreviewed, **189** self-recording explicit dispositions, **0** dispositions missing any review record
+- **348** code-only missing-Sellmeier elements in Sweep 2: **23** active unreviewed, **194** self-recording explicit dispositions, **0** dispositions missing any review record
 - **0** unresolved named-token elements in Sweep 2B, producing **0** token occurrences across **0** distinct tokens
 - **21** Tier A proprietary backfill rows in Sweep 3
 
@@ -70,6 +70,7 @@ These lenses are missing trusted chromatic data only on glass elements. One or t
 | [NIKON NIKKOR Z 800mm f/6.3 VR S](../../src/lens-data/nikon/NikonNIKKORZ800mmf63VRS.data.ts) | JP 2023-23323 A | [PDF](../../patents/JP2023023323A.pdf) | 91.7% (22/24) | 91.7% (22/24) | 2 | 6 [glass] (PF optical medium A: `Unmatched (PF optical material; nd=1.529500, vd=36.27)`)<br>7 [glass] (PF optical medium B: `Unmatched (PF optical material; nd=1.549800, vd=50.91)`) | abbe: 2 |
 | [CANON EF-S 18-55mm f/3.5-5.6](../../src/lens-data/canon/CanonEFS1855mmf3556.data.ts) | JP 2005-092056 A | [PDF](../../patents/JP_2005092056_A.pdf) | 90.9% (10/11) | 90.9% (10/11) | 1 | R18 [glass] (Element 10: `Unmatched (nd=1.583060, vd=30.2; coordinate class 583302)`) | abbe: 1 |
 | [CANON EF-S 18-55mm f/3.5-5.6 IS](../../src/lens-data/canon/CanonEFS1855mmf3556IS.data.ts) | US 2007/0058265 A1 | [PDF](../../patents/US20070058265A1.pdf) | 90.9% (10/11) | 90.9% (10/11) | 1 | 18 [glass] (Element 10: `Unmatched (583/302 flint; obsolete HOYA E-F3-class candidate)`) | abbe: 1 |
+| [NIKON NEW NIKKOR 20mm f/4](../../src/lens-data/nikon/NikonNikkor20mmf4.data.ts) | US 3,549,241 A | [PDF](../../patents/US_3549241_A.pdf) | 90.9% (10/11) | 90.9% (10/11) | 1 | 14 [glass] (Element 9: `Unmatched (nd 1.76684 / νd 46.2 lanthanum dense flint; no catalog glass reproduces both coordinates)`) | abbe: 1 |
 | [OLYMPUS OM ZUIKO AUTO-W 21mm f/2](../../src/lens-data/olympus/OlympusZuikoAuto21mmf2.data.ts) | US 4,210,388 | [PDF](../../patents/US4210388.pdf) | 90.9% (10/11) | 90.9% (10/11) | 1 | 12 [glass] (Element 6: `593348 — LF7-class light flint (no exact public catalog match)`) | abbe: 1 |
 | [PENTAX HD D FA 21mm f/2.4 ED Limited DC WR](../../src/lens-data/pentax/PentaxHDDFA21mmf24Limited.data.ts) | JP 2022-117775 A | [PDF](../../patents/JP2022117775A.pdf) | 90.9% (10/11) | 90.9% (10/11) | 1 | 3A [glass] (Element 2: `Unmatched (BAL/SK moldable crown; nearest S-BAL42/M-BACD12-type catalog glasses are about 1.583/59.4)`) | abbe: 1 |
 | [NIKON AF-S NIKKOR 500mm f/5.6E PF ED VR](../../src/lens-data/nikon/NikonAFSNikkor500mmf56EPFEDVR.data.ts) | JP 2018-017857 A | [PDF](../../patents/JP2018017857A.pdf) | 90.5% (19/21) | 90.5% (19/21) | 2 | 7 [glass] (PF bonded material A: `Unmatched (bonded PF material A; patent nd=1.52780, vd=33.41)`)<br>8 [glass] (PF bonded material B: `Unmatched (bonded PF material B; patent nd=1.55710, vd=49.74)`) | abbe: 2 |
@@ -106,6 +107,7 @@ These lenses are missing trusted chromatic data only on glass elements. One or t
 | [LAOWA 65mm f/2.8 2× Ultra Macro APO](../../src/lens-data/laowa/Laowa65mmf28MacroAPO.data.ts) | CN 110161666 A | [PDF](../../patents/CN110161666A.pdf) | 85.7% (12/14) | 85.7% (12/14) | 2 | 4 [glass] (Element 3: `773530 — high-index lanthanum crown (patent nd=1.77250, νd=53.00; no exact public catalog match)`)<br>16 [glass] (Element 10: `Unmatched (patent nd=1.72916, νd=57.67; prior H-LAK52 candidate rejected on dispersion)`) | abbe: 2 |
 | [SONY ZEISS VARIO-SONNAR T* 14.3-71.5mm f/2.8-4.8 (Sony Cyber-shot DSC-R1)](../../src/lens-data/sony/ZeissVarioSonnarT143715mmf2848SonyDCSR1.data.ts) | US 2008/0218875 A1 | [PDF](../../patents/US20080218875A1.pdf) | 85.7% (12/14) | 85.7% (12/14) | 2 | 6 [glass] (G3 composite asphere layer: `Unmatched (composite asphere layer; bulk-glass supplier unresolved)`)<br>10A [glass] (G5 composite asphere layer: `Unmatched (composite asphere layer; bulk-glass supplier unresolved)`) | abbe: 2 |
 | [MAMIYA-SEKOR CS 35mm f/2.8](../../src/lens-data/mamiya/MamiyaSekorCS35mmf28.data.ts) | JP 1978-066222 A | Missing from untracked local patents/ references (JP1978066222A, JP1978066222, 1978066222, JPA1978066222000000) | 83.3% (5/6) | 83.3% (5/6) | 1 | 3 [glass] (Element 2: `Unmatched (nd=1.69480, νd=55.5; nearest public 697555 lanthanum-crown family)`) | abbe: 1 |
+| [NIKON NEW NIKKOR 35mm f/2.8](../../src/lens-data/nikon/NikonNikkor35mmf28.data.ts) | US 3,874,770 A | [PDF](../../patents/US_3874770_A.pdf) | 83.3% (5/6) | 83.3% (5/6) | 1 | 9 [glass] (Element 5: `Unmatched (nd 1.74443, vd 49.4)`) | abbe: 1 |
 | [SCHNEIDER-KREUZNACH APO-SYMMAR 100mm f/5.6](../../src/lens-data/schneider-kreuznach/SchneiderAPOSymmar100mmf56.data.ts) | US 6,028,720 | [PDF](../../patents/US6028720.pdf) | 83.3% (5/6) | 83.3% (5/6) | 1 | 4 [glass] (Element 3: `Unmatched (phosphate crown class, ne=1.5223, ve=69.5; no public catalog match — possible special melt or discontinued glass)`) | abbe: 1 |
 | [SCHNEIDER-KREUZNACH SUPER-SYMMAR XL 110mm f/5.6 ASPHERIC](../../src/lens-data/schneider-kreuznach/SchneiderSuperSymmarXL110mmf56.data.ts) | US 5,870,234 | [PDF](../../patents/US5870234.pdf) | 83.3% (5/6) | 83.3% (5/6) | 1 | 1 [glass] (Element 1: `Unmatched (Schott KF9; patent e-line ne=1.52583, ve=51.25 stored as nd/vd)`) | abbe: 1 |
 | [RUSSAR-21 60mm f/18](../../src/lens-data/unattributed/Russar21.data.ts) | US 2,516,724 A | [PDF](../../patents/US2516724.pdf) | 83.3% (5/6) | 83.3% (5/6) | 1 | 1 [glass] (Element 1: `Unmatched (Lenzos L-67; nd=1.6395, vd=43.3; reference wavelength unstated)`) | abbe: 1 |

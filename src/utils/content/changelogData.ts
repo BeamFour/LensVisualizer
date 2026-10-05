@@ -19,6 +19,11 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-10-05",
+    type: "lens",
+    summary: "Added six Nikon models, from the Nikkor-QD·C Auto 15mm f/5.6 to the Z 70-200mm f/2.8 VR S II",
+  },
+  {
     date: "2026-10-04",
     type: "fix",
     summary: "Fixed the controls dropping below the diagram when a converter is switched with an analysis tab open",
