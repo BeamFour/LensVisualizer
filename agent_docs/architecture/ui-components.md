@@ -44,6 +44,20 @@ modeled group movement is available. Without modeled focus travel, the disabled 
 Shift/tilt sliders expose independent zero-reset actions through the shared
 `SliderResetButton`, which comparison mode's shared sliders reuse.
 
+Patent-positions mode is the SLIDERS / PATENT POSITIONS group drawn by `PositionModeToggle` in `BreadcrumbBar`, ahead
+of the search link and theme toggles. Below the wide breakpoint it collapses to one PATENT on/off button so the
+breadcrumb trail keeps its room. It changes how the page's zoom and
+focus controls behave, so it sits with the page-level switches; do not move it in with the ray toggles in
+`DiagramHeader` or `ControlsBar`. It is single-lens only: the breadcrumb bar omits it while comparing.
+With the mode on, `DiagramControls` hands `SliderControl` a `track` (a `StationStepper`) in place of the zoom and
+focus range inputs, keeping the label, readout, MOTION action and collapsible section. The buttons are the lens's
+source-published stations from `src/optics/publishedStations.ts`, labeled by `patentStations.ts`; a station list
+longer than twelve collapses to previous / next. A zoom step keeps the focus row only when the target station
+tabulates the same one, otherwise focus returns to infinity. The aperture slider is disabled at wide open and loses
+its f-stop shortcuts, an aberration control is disabled at neutral, and shift/tilt stay live. Notes under the
+buttons say what is missing (no certified close-focus row, focus not modeled, a converter mounted, modeled zoom
+stations that are not source rows).
+
 ## Display And Content Components
 
 `ElementInspector` renders its "Compare to sphere" link for aspheric elements only when the optional

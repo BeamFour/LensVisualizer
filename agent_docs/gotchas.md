@@ -31,10 +31,16 @@ Non-obvious constraints and failure modes: one trap per bullet, with the full ru
   station, measuring on the plate-expanded prescription; see `agent_docs/architecture/optics-engine.md`.
 - Entering or leaving compare mode changes route and mounts a fresh viewer initialized from the URL, before the debounced
   URL writer runs. State that must survive goes in the navigation's own query (`agent_docs/adding_url_state.md`).
+- In patent-positions mode `state.sliders` (and the `zoom` / `focus` / `aperture` URL params) may be off-station until
+  the first step. Anything that draws or analyses the single lens must use the resolved `focusT` / `zoomT` /
+  `aberrationT` / `stopdownT` returned by `useLensComputation`, not `state.sliders`.
 - Some zoom patents publish only infinity-focus spacing tables; copying them unchanged into the close-focus slot leaves
   the focus slider visually static. Infer close-focus pairs only for the true focusing gaps, preserve the mechanism
   constraint (a single rigid translator keeps the adjacent-gap sum constant), and document the approximation in the
   file header and `focusDescription`.
+- A zoom with more than three authored stations must declare `publishedStations.zoom`, even when every station is a
+  source row; `__tests__/src/lens-data/publishedStations.test.ts` fails otherwise. A flagged focus keyframe that moves
+  no `var` gap fails validation (`src/lens-data/LENS_DATA_SPEC.md` § Published Stations).
 - The `import.meta.glob` patterns in `src/utils/catalog/lensCatalog.ts` are relative to that file (`../../lens-data/`),
   and analysis files match by relative stem path — naming and placement matter for auto-registration.
 - `scripts/prerender.mjs` validates that every route pattern in `src/routes/routeManifest.tsx` is covered by
