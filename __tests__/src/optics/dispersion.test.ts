@@ -497,8 +497,7 @@ describe("resolveGlass", () => {
 
   it("resolves Hoya patent-class aliases to coefficient-backed rows", () => {
     expect(resolveGlass("TAF1 (HOYA)")?.name).toBe("S-LAH66");
-    expect(resolveGlass("M-NBFD130 (HOYA)")?.name).toBe("NBFD13");
-    expect(resolveGlass("MP-NBFD130 molded high-index flint")?.name).toBe("NBFD13");
+    expect(resolveGlass("MP-NBFD130 molded high-index flint")?.name).toBe("M-NBFD130");
   });
 
   it("resolves Hoya names that once aliased to a neighbouring row to their own curves", () => {
@@ -517,6 +516,21 @@ describe("resolveGlass", () => {
     // TAFD35L has its own vendor curve (PgF 0.5833 against TAFD35's 0.5822).
     expect(resolveCompatibleGlass("TAFD35L (HOYA)", 1.91082, 35.25)?.name).toBe("TAFD35L");
     expect(resolveGlass("911353")?.name).toBe("TAFD35");
+  });
+
+  it("resolves vendor rows that share a product code without moving the bare code", () => {
+    expect(resolveCompatibleGlass("E-FEL2 (HOYA)", 1.54072, 47.2)?.name).toBe("E-FEL2");
+    expect(resolveGlass("541472")?.name).toBe("S-TIL2");
+    expect(resolveCompatibleGlass("E-FD15L (HOYA)", 1.69895, 30.05)?.name).toBe("E-FD15L");
+    expect(resolveGlass("699301")?.name).toBe("S-TIM35");
+    expect(resolveCompatibleGlass("J-LASF03 (Hikari)", 1.8061, 40.97)?.name).toBe("J-LASF03");
+    expect(resolveGlass("806410")?.name).toBe("H-ZLaF52A");
+    // Molding-state row: the base-glass code 658369 does not encode 1.65296 / 36.8.
+    expect(resolveCompatibleGlass("K-PG395-M (SUMITA K-PG395(M))", 1.65296, 36.79)?.name).toBe("K-PG395-M");
+    expect(resolveGlass("658369")).toBeNull();
+    // M-NBFD130 has its own vendor curve (ΔPgF −0.0056 against NBFD13's −0.0078).
+    expect(resolveCompatibleGlass("M-NBFD130 (HOYA)", 1.8061, 40.73)?.name).toBe("M-NBFD130");
+    expect(resolveGlass("806407")?.name).toBe("NBFD13");
   });
 
   it("resolves named Ohara PGM curves before remaining catalog aliases", () => {

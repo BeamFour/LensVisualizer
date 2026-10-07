@@ -19,6 +19,16 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    date: "2026-10-07",
+    type: "improvement",
+    summary: "Standardized display names on 135 lenses: capitals, hyphens and aperture-suffix spacing",
+  },
+  {
+    date: "2026-10-07",
+    type: "lens",
+    summary: "Added Nikon Z 24-70mm f/2.8 S II, Fujifilm XC 50-230mm II, Olympus 25mm f/1.8 and four Sigma primes",
+  },
+  {
     date: "2026-10-06",
     type: "lens",
     summary: "Added four Sigma Art and three Tamron Di III models, from the 14-24mm f/2.8 to the 90mm Macro VXD",
