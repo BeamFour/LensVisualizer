@@ -18,6 +18,7 @@ import {
   sumSurfaceThicknesses,
   zoomIndexToT,
 } from "./internal/lensState.js";
+import { OPTICS_COUNTERS_ENABLED, workCounters } from "./diagnostics/workCounters.js";
 import { buildSurfaceDispersionIndex } from "./dispersion.js";
 import { FLAT_R_THRESHOLD } from "./internal/surfaceMath.js";
 import {
@@ -353,6 +354,7 @@ function hasFoldedOptics(data: LensData): boolean {
  * @throws        if validation finds any issues
  */
 export default function buildLens(authoredData: LensData): RuntimeLens {
+  if (OPTICS_COUNTERS_ENABLED) workCounters.runtimeLensBuilds++;
   const validationErrors = validateLensData(authoredData as Record<string, any>);
   if (validationErrors.length > 0)
     throw new Error(

@@ -3,9 +3,9 @@
  *
  * Everything the capture entry hands to a comparison passes through this module: a tagged JSON encoding that
  * round-trips under `Object.is`, a SHA-256 for content digests, the projections that turn engine results into
- * payloads (build constants, column-wise trace hits, digested trace carriers), and the semantic fingerprint of a
- * prescription. It imports nothing. Engine-derived rules arrive as arguments, so the same file gives the same answer
- * whichever ref's engine it is bundled with.
+ * payloads (build constants, column-wise trace hits, digested trace carriers), the form a record carries the
+ * engine's work counters in, and the semantic fingerprint of a prescription. It imports nothing. Engine-derived
+ * rules arrive as arguments, so the same file gives the same answer whichever ref's engine it is bundled with.
  */
 
 /* ── Tagged JSON encoding ── */
@@ -474,6 +474,47 @@ export function outcomeOf<Value>(compute: () => Value): Outcome<Value> {
       },
     };
   }
+}
+
+/* ── Work counters ── */
+
+/**
+ * A histogram as a record carries it: the count of each bucket that is not zero, by bucket index. The engine's last
+ * bucket takes every larger value, and is written like any other.
+ */
+export type SparseHistogram = { [bucket: string]: number };
+
+/**
+ * The engine's work counters over the capture of one record: each count by name, and each histogram sparsely.
+ *
+ * They travel beside a record's payload and never inside it. An engine that predates the counters has none, and a
+ * comparison of payloads must not notice.
+ */
+export type RecordCounters = { [counter: string]: number | SparseHistogram };
+
+/**
+ * Reduce a work-counter snapshot to what a record carries.
+ *
+ * Every count is kept, a zero included, so a count of zero can be told from a counter the engine does not have. A
+ * histogram has a thousand buckets and one record fills a few of them, so only those are written.
+ *
+ * @param snapshot - the engine's counters, each a number or a histogram with one count per bucket
+ * @returns the same counters, JSON-safe, with each histogram as its non-zero buckets
+ */
+export function sparseCounters(snapshot: Readonly<Record<string, number | readonly number[]>>): RecordCounters {
+  const counters: RecordCounters = {};
+  for (const [name, value] of Object.entries(snapshot)) {
+    if (typeof value === "number") {
+      counters[name] = value;
+      continue;
+    }
+    const histogram: SparseHistogram = {};
+    value.forEach((count, bucket) => {
+      if (count !== 0) histogram[bucket] = count;
+    });
+    counters[name] = histogram;
+  }
+  return counters;
 }
 
 /* ── Build constants ── */

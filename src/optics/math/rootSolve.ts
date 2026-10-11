@@ -6,6 +6,8 @@
  * never crosses an unavailable interval.
  */
 
+import { OPTICS_COUNTERS_ENABLED, workCounters } from "../diagnostics/workCounters.js";
+
 export type ScalarRootEvaluation = number | null | undefined;
 export type ScalarRootSolveStatus =
   | "converged"
@@ -188,6 +190,12 @@ function success(
   evaluations: number,
   bracket: readonly [number, number],
 ): ScalarRootSolveResult {
+  if (OPTICS_COUNTERS_ENABLED) {
+    const histogram = workCounters.rootSolveEvaluationHistogram;
+    workCounters.rootSolveCalls++;
+    workCounters.rootSolveEvaluations += evaluations;
+    histogram[Math.min(evaluations, histogram.length - 1)]++;
+  }
   return {
     status: "converged",
     root: point.x,
@@ -206,5 +214,11 @@ function failure(
   evaluations: number,
   bracket: readonly [number, number] | null,
 ): ScalarRootSolveResult {
+  if (OPTICS_COUNTERS_ENABLED) {
+    const histogram = workCounters.rootSolveEvaluationHistogram;
+    workCounters.rootSolveCalls++;
+    workCounters.rootSolveEvaluations += evaluations;
+    histogram[Math.min(evaluations, histogram.length - 1)]++;
+  }
   return { status, root, residual, iterations, evaluations, bracket };
 }

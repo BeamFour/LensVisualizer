@@ -24,6 +24,7 @@ import { DEFAULT_PHASE_WAVELENGTH_NM } from "../math/diffractivePhase.js";
 import { INTERSECTION_TOLERANCE } from "../constants.js";
 import { planeResidualRoundoff } from "../math/intersectionTolerance.js";
 import { interactRefractiveSurface, rearMediumSurfaceIndex } from "../trace/interactions.js";
+import { OPTICS_COUNTERS_ENABLED, workCounters } from "../diagnostics/workCounters.js";
 import { FLAT_R_THRESHOLD, conicPolySag } from "./surfaceMath.js";
 import {
   intersectSagSurface,
@@ -304,6 +305,7 @@ export function traceExactSurfaceStackVector(
     wavelengthNm = DEFAULT_PHASE_WAVELENGTH_NM,
   }: ExactSurfaceTraceOptions = {},
 ): ExactSurfaceTraceResult {
+  if (OPTICS_COUNTERS_ENABLED) workCounters.fullTracesLegacy++;
   if (shouldUseGeneralizedTrace(lens, stopAt)) {
     return traceGeneralizedSurfaceStackVector(
       lens,
@@ -1283,6 +1285,7 @@ function intersectTiltedMeridionalPlane(
   if (!isFinite(normalLength) || normalLength <= 1e-12) {
     return surfaceIntersectionFailure(surfaceIdx, "invalidRayDirection", null, 0);
   }
+  if (OPTICS_COUNTERS_ENABLED) workCounters.legacyTiltedPlaneIntersections++;
   const normalY = normal.y / normalLength;
   const normalZ = normal.z / normalLength;
   const direction: Vector3 = [
@@ -1316,6 +1319,7 @@ function intersectTiltedMeridionalPlane(
   if (!Number.isFinite(residual) || !(Math.abs(residual) <= effectiveTolerance)) {
     return surfaceIntersectionFailure(surfaceIdx, "noConvergedIntersection", residual, 0);
   }
+  if (OPTICS_COUNTERS_ENABLED && effectiveTolerance > tolerance) workCounters.legacyFloorAssistedAcceptances++;
   return {
     ok: true,
     surfaceIdx,
@@ -1346,6 +1350,7 @@ function intersectImagePlane(
   imagePlane: ResolvedImagePlane | undefined,
 ): ImagePlaneIntersection | null {
   if (!imagePlane) return null;
+  if (OPTICS_COUNTERS_ENABLED) workCounters.legacyImagePlaneIntersections++;
   const normalY = imagePlane.normal.y;
   const normalZ = imagePlane.normal.z;
   const denom = normalY * direction[1] + normalZ * direction[2];

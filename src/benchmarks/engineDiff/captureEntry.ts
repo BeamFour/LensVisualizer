@@ -5,8 +5,9 @@
  * entry exports the bundle's own catalog as serialized prescriptions, and it evaluates serialized prescriptions it is
  * handed: a capture never reads its own catalog, so one ref's data can be run on the other ref's engine. Engine calls
  * go through `seamAdapter.ts`, request definitions come from `requests.ts`, and every result is normalized by
- * `payload.ts` into one record per lens, state and request family. The bundle also carries `compare.ts`, which the
- * driver calls on the records of two captures.
+ * `payload.ts` into one record per lens, state and request family. Where the engine has work counters and the build
+ * turns them on, each record also carries what its capture counted. The bundle also carries `compare.ts`, which
+ * the driver calls on the records of two captures.
  */
 
 import {
@@ -19,8 +20,10 @@ import {
   projectTrace,
   radiusOrFlat,
   semanticFingerprint,
+  sparseCounters,
   type EncodedValue,
   type Outcome,
+  type RecordCounters,
 } from "./payload.js";
 import {
   ANALYSIS_CONTEXT_JOBS,
@@ -249,6 +252,20 @@ export interface PayloadRecord {
   /** The request's variant, on the record of a request that names one. */
   variant?: string;
   payload: Outcome<EncodedValue>;
+  /** What the engine's work counters read over this record's capture; absent where the engine does not count. */
+  counters?: RecordCounters;
+}
+
+/**
+ * The engine's work counters, where this bundle counts: its ref has them, and its build defines the flag on.
+ *
+ * @param seam - the resolved engine seam
+ * @returns the calls that zero and read the counters, or null where a capture counts nothing
+ */
+function workCountersOf(seam: EngineSeam): { reset: () => void; snapshot: () => RecordCounters } | null {
+  const { workCountersEnabled, resetWorkCounters: reset, snapshotWorkCounters: snapshot } = seam;
+  if (workCountersEnabled !== true || !reset || !snapshot) return null;
+  return { reset, snapshot: () => sparseCounters(snapshot()) };
 }
 
 /** The catalog merge, with this engine's defaults: what the composer and the fit predicate expect of a host. */
@@ -263,6 +280,10 @@ function withLensDefaults(seam: EngineSeam, authored: LensData): LensData {
  * memoizes per lens object, and its chief-ray cache is keyed without the field geometry a caller passes, so a lens
  * shared between records could let one record's content depend on which other records were requested, or in what
  * order. A converter pair is composed here, by this bundle's composer on a host with this bundle's defaults.
+ *
+ * Where the engine counts its work, each record carries the counters of its own capture beside its payload. They
+ * are zeroed before the record's lens is built, so compiling the lens and resolving its materials are counted, and
+ * read when the payload is written. A record that threw carries what the engine counted up to the throw.
  *
  * The records of a whole tier run to hundreds of megabytes, so a driver passes one lens's requests at a time and
  * writes each batch out before asking for the next.
@@ -326,17 +347,22 @@ export function captureRecords(catalog: SerializedCatalog, requests: readonly Ca
   };
 
   const work = requests.map(workOf);
+  const counters = workCountersOf(seam);
   return requests.map(({ lens, state, family, variant }, index): PayloadRecord => {
+    counters?.reset();
     const outcome = outcomeOf(work[index]);
     /* Prescription data is encoded without loss. Engine results go through the result encoder, which is made per
      * record so the trace digests of one record's jobs are computed once and then dropped. */
     const encode = family === "composition" || family === "build" ? encodeValue : createResultEncoder();
+    const payload: PayloadRecord["payload"] = outcome.ok ? { ok: true, value: encode(outcome.value) } : outcome;
     return {
       lens: lensId(lens),
       state,
       request: family,
       ...(variant === undefined ? {} : { variant }),
-      payload: outcome.ok ? { ok: true, value: encode(outcome.value) } : outcome,
+      payload,
+      /* Last, and a sibling of the payload: a comparison of payloads never reads it. */
+      ...(counters ? { counters: counters.snapshot() } : {}),
     };
   });
 }

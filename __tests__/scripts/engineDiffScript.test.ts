@@ -2,8 +2,9 @@
  * The engine differential driver: its command line, and runs of the real script.
  *
  * The comparison itself is tested with the harness in `__tests__/src/benchmarks/`. What only a real run shows is
- * the plumbing around it: a base worktree added and removed again, two capture bundles built with no config file,
- * a tier cut down to one shard, and the reports written where the caller asked.
+ * the plumbing around it: a base worktree added and removed again, two capture bundles built with no config file
+ * and with the engine's work counters on, a tier cut down to one shard, and the reports written where the caller
+ * asked.
  */
 
 import { execFileSync } from "node:child_process";
@@ -129,6 +130,7 @@ describe("engine-diff run", () => {
         const output = run.stdout;
 
         expect(output).toContain("engine-diff: passed (tier p, class c0): 1 lenses, 7 records");
+        expect(output).toContain("engine-diff: work counters compared in 7 pairs of records; they rose in 0.");
         expect(readdirSync(join(outDir, "reports")).sort()).toEqual([
           "data-impact.md",
           "failing-records.ndjson.gz",
@@ -149,6 +151,7 @@ describe("engine-diff run", () => {
           lens: string;
           base: { ref: string; commit: string };
           engine: { records: number; recordsDiffering: number; numbers: number };
+          workCounters: { totals: Record<string, { base: number | null; head: number | null }> };
           uncompared: unknown[];
           seam: { base: Record<string, string>; head: Record<string, string> };
           phases: [string, number][];
@@ -161,16 +164,25 @@ describe("engine-diff run", () => {
           lens: "canon-serenar-50f18",
           base: { ref: "HEAD" },
           engine: { records: 7, recordsDiffering: 0 },
+          /* Both bundles were built to count, and Tier P reports a rise where the stage tiers fail on one. */
+          workCounters: { gated: false, records: { base: 7, head: 7, both: 7 }, risingRecords: 0 },
           uncompared: [],
         });
         expect(summary.base.commit).toMatch(/^[0-9a-f]{40}$/);
         expect(summary.engine.numbers).toBeGreaterThan(1e5);
+        /* The bundles really count: one lens built per record, and rays traced, the same on both engines. */
+        const { totals } = summary.workCounters;
+        expect(totals.runtimeLensBuilds).toEqual({ base: 7, head: 7 });
+        expect(totals.fullTracesPreparedSequential.head).toBeGreaterThan(1000);
+        expect(totals.fullTracesPreparedSequential.head).toBe(totals.fullTracesPreparedSequential.base);
         /* Both bundles resolved the engine through the same seam. */
         expect(summary.seam.base).toEqual(summary.seam.head);
         expect(summary.phases.map(([phase]) => phase)).toEqual(
           expect.arrayContaining(["Base worktree", "Capture bundles", "Capture on the base engine", "Total"]),
         );
-        expect(readFileSync(join(outDir, "reports", "summary.md"), "utf8")).toContain("# Engine diff: passed");
+        const markdown = readFileSync(join(outDir, "reports", "summary.md"), "utf8");
+        expect(markdown).toContain("# Engine diff: passed");
+        expect(markdown).toContain("| `runtimeLensBuilds` | 7 | 7 | 0 |");
         expect(readFileSync(join(outDir, "reports", "uncompared.json"), "utf8")).toBe("[]\n");
 
         /* The run names the worktree it added. Another run's may exist at this moment; this one's must be gone. */
@@ -214,6 +226,8 @@ describe("engine-diff run", () => {
         shard,
         lens,
         engine: { records, recordsDiffering: 0 },
+        /* The stage tier holds the work counters to "never rise", and a commit against itself raises none. */
+        workCounters: { gated: true, records: { both: records }, risingRecords: 0 },
       });
       expect(readFileSync(join(outDir, "reports", "summary.md"), "utf8")).toContain(
         `Tier S, class C0, shard 2 of 3, lens \`${lens}\` only.`,

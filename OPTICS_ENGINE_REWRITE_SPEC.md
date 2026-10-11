@@ -906,23 +906,35 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
   - **Change:** add `src/optics/diagnostics/workCounters.ts`, behind a compile-time `__OPTICS_COUNTERS__` define:
     `false` in the app build and in timed benchmark passes, and `true` in the benchmark's counting pass, the
     `engineDiff` build and Vitest.
+    - The module reads the flag once, behind a `typeof` test, and every call site tests that constant. Audit scripts
+      and `scripts/benchmark-mtf.mjs` load the engine under plain Node with no define, where a bare identifier would
+      throw; there the counters are off.
+    - Tooling outside `src/optics/` reads the counters through a new top-level facade, `src/optics/diagnostics.ts`.
+    - The `engineDiff` capture records a counter snapshot beside each record when both the flag and the facade exist
+      at that ref. Counters are never part of the payload comparison. Where both sides carry them, a counter that
+      rises on any record fails a Tier S or Tier F run and is reported in Tier P.
   - **What it counts:**
-    - surface-profile evaluations;
-    - intersections by kind;
+    - surface-profile evaluations, per kernel;
+    - intersections by kind: the four profile kinds per kernel, and image- and sensor-plane landings. A conic is an
+      aspheric profile until S3.P1.T1 gives it a kind of its own;
     - floor-assisted acceptances, exhaustion failures and cap-certificate refusals;
-    - traces by capture;
-    - chief solves and their stop traces;
-    - root-solve evaluations;
+    - traces by capture. Every trace records full hits until S4.P3.T1, so there is one capture value and the split is
+      by tracer: prepared sequential, prepared generalized, legacy;
+    - chief solves and their stop traces, with a per-solve histogram, because the Stage 6 targets are medians; and
+      image-height inversion targets with the chief solves they spend;
+    - root-solve calls and evaluations, with a per-call histogram;
     - prepared-geometry constructions;
-    - lens compilations;
+    - lens compilations: `EngineLens` compiles and `RuntimeLens` builds;
     - material resolutions;
     - sensor-locked solves.
-  - **Files:** the counters module; `vite.config.js` (`define`); call sites in `math/intersection.ts`,
-    `internal/surfaceIntersection.ts`, `field/chiefRay.ts`, `math/rootSolve.ts`, `state/prepareState.ts`,
-    `prescription/normalizeLensData.ts` and `perspective/sensorTarget.ts`.
+  - **Files:** the counters module and its facade; `vite.config.js` (`define`); call sites in `math/intersection.ts`,
+    `math/plane.ts`, `internal/surfaceIntersection.ts`, `internal/exactSurfaceTrace.ts`, `trace/sequentialTrace.ts`,
+    `trace/generalizedTrace.ts`, `field/chiefRay.ts`, `math/rootSolve.ts`, `state/prepareState.ts`,
+    `prescription/normalizeLensData.ts`, `runtimeLens.ts`, `dispersion.ts` and `perspective/sensorTarget.ts`.
   - **Tests:**
     - Counters read zero with the define off.
     - Counts are deterministic for a fixed request.
+    - Exact counts for requests small enough to count by hand.
   - **Verification:** the PR confirms that the production bundle contains no counter code.
   - **Gate:** C0.
 - **S1.P3.T2 Paired benchmarks and memory.**

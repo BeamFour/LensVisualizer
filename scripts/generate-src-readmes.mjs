@@ -86,6 +86,10 @@ const folderRoleOverrides = new Map([
   ["src/optics/aberration", "engine-native aberration analysis primitives and shared aberration types"],
   ["src/optics/analysis", "prepared-state analysis adapters and grouped analysis facades"],
   ["src/optics/chromatic", "chromatic channel, trace, dispersion, and quality helpers"],
+  [
+    "src/optics/diagnostics",
+    "compile-time-gated work counters that benchmarks, harnesses, and tests read to compare engine work",
+  ],
   ["src/optics/diagram", "pure SVG-ready diagram geometry helpers used by React diagram layers"],
   ["src/optics/field", "engine-native field geometry, chief-ray solving, projection, and launch helpers"],
   [

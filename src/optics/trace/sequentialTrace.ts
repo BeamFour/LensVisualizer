@@ -7,6 +7,7 @@
 
 import type { FoldedPathClipEvent } from "../../types/optics.js";
 import { FLAT_R_THRESHOLD } from "../constants.js";
+import { OPTICS_COUNTERS_ENABLED, workCounters } from "../diagnostics/workCounters.js";
 import type { PreparedOpticalState, Ray3, Vec3 } from "../types.js";
 import { evaluateAperture } from "./aperture.js";
 import { pushClipEvent } from "./foldedDiagnostics.js";
@@ -38,6 +39,7 @@ export function traceSequential(
   input: Ray3,
   options: TraceOptions = {},
 ): EngineTraceResult {
+  if (OPTICS_COUNTERS_ENABLED) workCounters.fullTracesPreparedSequential++;
   const direction0 = options.directionNormalized ? input.direction : normalizeTraceDirection(input.direction);
   if (
     !direction0 ||

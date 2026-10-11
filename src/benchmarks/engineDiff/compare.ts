@@ -4,9 +4,10 @@
  * A driver captures the same requests on two engines, and for a lens whose data changed on two prescriptions, and
  * hands the records to a run made here one lens at a time. The run pairs the records, finds what differs, judges
  * each difference by the declared change class and the budget table in `budgets.ts`, and keeps only totals, the
- * largest difference per quantity and a bounded sample of findings, so a whole tier never sits in memory. This
- * module also reads a pull request's declared exceptions, sorts a catalog's changes into format-only and semantic,
- * and writes the reports. It calls no engine and reads no file.
+ * largest difference per quantity and a bounded sample of findings, so a whole tier never sits in memory. Where both
+ * engines counted their work, it also sets the counters of each pair of records side by side. This module also
+ * reads a pull request's declared exceptions, sorts a catalog's changes into format-only and semantic, and writes
+ * the reports. It calls no engine and reads no file.
  */
 
 import {
@@ -22,8 +23,8 @@ import {
   type Quantity,
   type QuantityId,
 } from "./budgets.js";
-import { decodeValue, type EncodedValue, type Outcome } from "./payload.js";
-import { lensId, stateId, type CaptureState, type LensRef, type RequestFamily } from "./requests.js";
+import { decodeValue, type EncodedValue, type Outcome, type RecordCounters, type SparseHistogram } from "./payload.js";
+import { lensId, stateId, type CaptureState, type LensRef, type RequestFamily, type TierId } from "./requests.js";
 
 /* ── Records and differences ── */
 
@@ -35,6 +36,11 @@ export interface ComparableRecord {
   /** Which of the family's requests the record answers, where the request named one. */
   variant?: string;
   payload: Outcome<EncodedValue>;
+  /**
+   * The engine's work counters over the record's capture, from an engine that has them. They are compared by a rule
+   * of their own and are no part of the record two payloads are compared by.
+   */
+  counters?: RecordCounters;
 }
 
 /**
@@ -419,6 +425,69 @@ function countRecord(record: ComparableRecord, counts: PayloadCounts): number {
   return counts.numbers - numbersBefore;
 }
 
+/* ── Work counters ── */
+
+/** One counter's total over a run on each engine; null where that engine's records never name the counter. */
+export interface CounterTotals {
+  base: number | null;
+  head: number | null;
+}
+
+/** The counters that rose in the records of one lens under one request family. */
+export interface CounterRises {
+  lens: string;
+  request: RequestFamily;
+  /** Records of the lens and family in which at least one counter rose. */
+  records: number;
+  /** Each counter that rose: in how many of those records, and its sum over them on each engine. */
+  counters: Record<string, { records: number; base: number; head: number }>;
+}
+
+/** The engines' work counters across the engine comparison of a run. */
+export interface WorkCounterTally {
+  /**
+   * Whether the counters gate a run: in the stage and full tiers a counter that rises fails it, and so does a head
+   * engine whose records carry no counters beside a base engine's that do.
+   */
+  gated: boolean;
+  /** Compared records that carry counters, on each engine, and the pairs of records in which both do. */
+  records: { base: number; head: number; both: number };
+  /** Each counter's total over the records that carry it, in the order the counters were first met. */
+  totals: Record<string, CounterTotals>;
+  /** Each histogram summed over the same records. A histogram is a distribution: it is reported and never judged. */
+  histograms: Record<string, { base: SparseHistogram | null; head: SparseHistogram | null }>;
+  /** Pairs of records in which some counter is higher on the head engine than on the base. */
+  risingRecords: number;
+  /** Lens and request-family groups that hold such a pair. `rises` lists the first of them. */
+  risingGroups: number;
+  rises: CounterRises[];
+}
+
+/**
+ * Median of a histogram whose bucket index is the value counted.
+ *
+ * @param histogram - non-zero buckets by index
+ * @returns the entries and their median, the mean of the two middle entries when there is an even number of them;
+ *   a median of null for a histogram with no entry
+ */
+function histogramMedian(histogram: SparseHistogram): { entries: number; median: number | null } {
+  const buckets = Object.entries(histogram)
+    .map(([bucket, count]) => [Number(bucket), count] as const)
+    .sort((a, b) => a[0] - b[0]);
+  const entries = buckets.reduce((sum, [, count]) => sum + count, 0);
+  if (entries === 0) return { entries, median: null };
+  /** The value of the entry at a rank counted from 1. */
+  const valueAt = (rank: number): number => {
+    let seen = 0;
+    for (const [bucket, count] of buckets) {
+      seen += count;
+      if (seen >= rank) return bucket;
+    }
+    return buckets[buckets.length - 1][0];
+  };
+  return { entries, median: (valueAt(Math.floor((entries + 1) / 2)) + valueAt(Math.ceil((entries + 1) / 2))) / 2 };
+}
+
 /* ── A differential run ── */
 
 /** How a lens's prescription at the head relates to the base's. */
@@ -561,6 +630,8 @@ export interface PairDifferences {
 export interface RunOptions {
   /** The class the engine comparison is judged under. */
   changeClass: ChangeClass;
+  /** The tier the run covers: a work counter that rises fails a run of the stage or full tier. Tier P when left out. */
+  tier?: TierId;
   /** Lens ids the change declares the base engine cannot evaluate. */
   declaredExceptions: readonly string[];
   /** True when the run covers part of a tier, so a declared exception may name a lens it never sees. */
@@ -608,6 +679,8 @@ export interface RunSummary {
    * fails the run in every class.
    */
   thrownOnBothEngines: { records: number; samples: Finding[] };
+  /** What the engines counted of their own work over the compared records, and where the head counted more. */
+  workCounters: WorkCounterTally;
   /** Lenses whose data changed without changing its fingerprint, and how their records compared. */
   formatOnly: ComparisonTally & { lenses: string[] };
   dataImpact: DataImpact[];
@@ -760,6 +833,13 @@ function baseCannotEvaluate(
  * otherwise pass as a comparison. And the engines must permit the same converter pairs for the same prescriptions,
  * under every class but C3.
  *
+ * Work counters are judged apart from all of that. Where both records of a compared pair carry them, a counter that
+ * is higher on the head engine is a rise. A rise fails a run of the stage or full tier in every class, and a run of
+ * Tier P reports it; a fall never fails. The counters never enter a comparison of payloads, so a base engine that
+ * has none compares as it always did, and the head's totals are reported alone. The other way round compares
+ * nothing: a head engine without counters beside a base that has them fails a run of the stage or full tier, and a
+ * run of Tier P reports it.
+ *
  * Above C0 a transition has no way yet to be declared as expected, so each one fails the run. How a pull request
  * lists approved transitions is left to the first step that needs it.
  *
@@ -780,6 +860,14 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
    * was decided there, once, and that answer stands in a run that meets the pair as in one that does not. */
   const setAside = new Map(options.pairs?.uncompared.map(({ lens, reason }) => [lens, reason]));
   const thrown: RunSummary["thrownOnBothEngines"] = { records: 0, samples: [] };
+  const work: Pick<WorkCounterTally, "records" | "totals" | "histograms" | "risingRecords"> = {
+    records: { base: 0, head: 0, both: 0 },
+    totals: {},
+    histograms: {},
+    risingRecords: 0,
+  };
+  /* Every lens and family in which a counter rose. A tier has a few thousand such groups at most. */
+  const rises = new Map<string, CounterRises>();
   /* Lenses that do not build on their head data on either engine, and that the data rules judge for it. */
   const unbuilt = new Set<string>();
   /* Every lens met so far, and the data-impact entry of each that has one: a later part of a lens adds to it. */
@@ -879,6 +967,47 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
     return failing;
   };
 
+  /** Add one compared pair's work counters to the run's totals, and note each counter the head has higher. */
+  const tallyCounters = (base: ComparableRecord, head: ComparableRecord): void => {
+    for (const [side, counters] of [
+      ["base", base.counters],
+      ["head", head.counters],
+    ] as const) {
+      if (!counters) continue;
+      work.records[side]++;
+      for (const [name, value] of Object.entries(counters)) {
+        if (typeof value === "number") {
+          const total = (work.totals[name] ??= { base: null, head: null });
+          total[side] = (total[side] ?? 0) + value;
+          continue;
+        }
+        const sums = (work.histograms[name] ??= { base: null, head: null });
+        const sum = (sums[side] ??= {});
+        for (const [bucket, count] of Object.entries(value)) sum[bucket] = (sum[bucket] ?? 0) + count;
+      }
+    }
+    if (!base.counters || !head.counters) return;
+    work.records.both++;
+    let group: CounterRises | undefined;
+    for (const [name, count] of Object.entries(head.counters)) {
+      const before = base.counters[name];
+      /* A counter that only one engine names has nothing to rise from, and a histogram's buckets move both ways
+       * when a solve gets cheaper: neither is judged. */
+      if (typeof count !== "number" || typeof before !== "number" || count <= before) continue;
+      if (!group) {
+        const key = JSON.stringify([head.lens, head.request]);
+        group = rises.get(key);
+        if (!group) rises.set(key, (group = { lens: head.lens, request: head.request, records: 0, counters: {} }));
+        group.records++;
+        work.risingRecords++;
+      }
+      const rise = (group.counters[name] ??= { records: 0, base: 0, head: 0 });
+      rise.records++;
+      rise.base += before;
+      rise.head += count;
+    }
+  };
+
   const failsEngine = (difference: RawDifference): boolean => {
     if (changeClass === "c0") return true;
     if (changeClass === "c3") return false;
@@ -926,10 +1055,25 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
     }
     const firstPart = !met.has(lens);
     met.add(lens);
+    /* Two texts per record. `compared` is the record without its work counters, and two records are equal by it: a
+     * base engine that predates the counters has none, and identical payloads must still compare equal. `line` is
+     * what a driver writes: the same text with the counters set in as the last member, so that a payload of
+     * several megabytes is serialized once. */
+    const serialize = (records: readonly ComparableRecord[]) =>
+      records.map(({ counters, ...record }) => {
+        const compared = JSON.stringify(record);
+        const line = counters ? `${compared.slice(0, -1)},"counters":${JSON.stringify(counters)}}` : compared;
+        return { compared, line };
+      });
+    const texts = {
+      baseEngine: serialize(baseEngine),
+      headEngine: serialize(headEngine),
+      baseData: serialize(needsBaseData && baseData ? baseData : []),
+    };
     const lines = {
-      baseEngine: baseEngine.map((record) => JSON.stringify(record)),
-      headEngine: headEngine.map((record) => JSON.stringify(record)),
-      baseData: needsBaseData && baseData ? baseData.map((record) => JSON.stringify(record)) : [],
+      baseEngine: texts.baseEngine.map(({ line }) => line),
+      headEngine: texts.headEngine.map(({ line }) => line),
+      baseData: texts.baseData.map(({ line }) => line),
     };
     const failingRecords: string[] = [];
     const keepPair = (comparison: ComparisonName, index: number, baseLine: string) =>
@@ -962,10 +1106,11 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
           if (thrown.samples.length < MAX_SAMPLES) thrown.samples.push(thrownFinding(base, head));
         }
         const failing =
-          lines.baseEngine[index] === lines.headEngine[index]
+          texts.baseEngine[index].compared === texts.headEngine[index].compared
             ? 0
             : tallyDifferences("engine", base, head, engine, failsEngine);
         if (failing > 0 || threwOnBoth) keepPair("engine", index, lines.baseEngine[index]);
+        tallyCounters(base, head);
       });
     }
 
@@ -974,7 +1119,7 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
       headEngine.forEach((head, index) => {
         format.records++;
         format.numbers += numbersAt[index];
-        if (lines.baseData[index] === lines.headEngine[index]) return;
+        if (texts.baseData[index].compared === texts.headEngine[index].compared) return;
         tallyDifferences("format", baseData[index], head, format, () => true);
         keepPair("format", index, lines.baseData[index]);
       });
@@ -987,7 +1132,7 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
       };
       headEngine.forEach((head, index) => {
         tally.records++;
-        if (lines.baseData[index] === lines.headEngine[index]) return;
+        if (texts.baseData[index].compared === texts.headEngine[index].compared) return;
         const base = baseData[index];
         const located: BlockerCounts = { failedStatuses: 0, nonFinite: 0 };
         const blocks = (difference: RawDifference) => {
@@ -1111,6 +1256,26 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
     const thrownNamed = thrown.samples
       .slice(0, MAX_NAMED_IN_FAILURE)
       .map((finding) => `${finding.lens} ${requestLabel(finding)} at ${finding.state}`);
+    /* "Counters never rise for an identical request" is a gate of a stage end, so the tiers a stage runs hold it
+     * and the pull-request tier reports it. */
+    const gated = options.tier === "s" || options.tier === "f";
+    const risen = [...rises.values()];
+    const risenNamed = risen.slice(0, MAX_NAMED_IN_FAILURE).map(({ lens, request, counters }) => {
+      const [name, rise] = Object.entries(counters)[0];
+      return `${lens} ${request}: ${name} ${rise.base} to ${rise.head}`;
+    });
+    const rose =
+      work.risingRecords > 0
+        ? `Work counters: ${several(work.risingRecords, "record")} did more counted work on the head engine than ` +
+          `on the base engine (${risenNamed.join("; ")}${risen.length > risenNamed.length ? "; and more" : ""}).`
+        : null;
+    /* The head is the working tree, built to count. Beside a base that counted, a head without counters means the
+     * rule above compared nothing, so the tiers that hold the gate cannot pass on it. */
+    const uncounted =
+      work.records.base > 0 && work.records.head === 0
+        ? "Work counters: the base engine's records carry them and the head engine's carry none, so no counter " +
+          "was compared."
+        : null;
     const failures = [
       ...(engine.failing > 0
         ? [`Engine drift: ${several(engine.failing, "difference")} not allowed under ${changeClass.toUpperCase()}.`]
@@ -1121,6 +1286,8 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
               `(${thrownNamed.join("; ")}${thrown.records > thrownNamed.length ? "; and more" : ""}).`,
           ]
         : []),
+      ...(rose !== null && gated ? [rose] : []),
+      ...(uncounted !== null && gated ? [uncounted] : []),
       ...(pairDrift.length > 0 && changeClass !== "c3"
         ? [`Converter pairs: the engines permit different pairs for the head prescriptions: ${pairDrift.join("; ")}.`]
         : []),
@@ -1140,13 +1307,17 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
     ];
     /* The plan gates a data change on a failed status, a non-finite value or a lens that no longer builds. A
      * converter that fits nothing any more is none of those, and nothing in the run evaluated it. */
-    const warnings = pairs.lostEveryPair.map(({ kind, key, pairs: lost }) =>
-      kind === "converter"
-        ? `The changed converter ${key} lost every pair it had with the base data and was compared through none: ` +
-          `${lost.join(", ")}.`
-        : `The changed host ${key} lost every converter pair it had with the base data, and none was compared: ` +
-          `${lost.join(", ")}.`,
-    );
+    const warnings = [
+      ...pairs.lostEveryPair.map(({ kind, key, pairs: lost }) =>
+        kind === "converter"
+          ? `The changed converter ${key} lost every pair it had with the base data and was compared through none: ` +
+            `${lost.join(", ")}.`
+          : `The changed host ${key} lost every converter pair it had with the base data, and none was compared: ` +
+            `${lost.join(", ")}.`,
+      ),
+      ...(rose !== null && !gated ? [`${rose} A run of Tier S or Tier F fails on this.`] : []),
+      ...(uncounted !== null && !gated ? [`${uncounted} A run of Tier S or Tier F fails on this.`] : []),
+    ];
     return {
       changeClass,
       passed: failures.length === 0,
@@ -1156,6 +1327,7 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
       counts,
       engine,
       thrownOnBothEngines: thrown,
+      workCounters: { gated, ...work, risingGroups: risen.length, rises: risen.slice(0, MAX_SAMPLES) },
       formatOnly: { ...format, lenses: formatLenses },
       dataImpact,
       pairs,
@@ -1551,8 +1723,90 @@ function tallySection(title: string, tally: ComparisonTally, changeClass: Change
 }
 
 /**
- * Write the summary of a run as Markdown: the verdict, the counts a pull request states, each comparison, the
- * uncompared lenses against the declared exceptions, and wall time per phase.
+ * The work counters of a run: each counter's total on each engine, the histograms, and the lens and request-family
+ * groups in which a counter rose.
+ */
+function workCounterSection(work: WorkCounterTally): string[] {
+  const { records, totals, histograms } = work;
+  const heading = ["## Work counters", ""];
+  if (records.base === 0 && records.head === 0) {
+    return [...heading, "Neither engine's records carry work counters.", ""];
+  }
+  /* A side with no counters has no column: its totals would all read as absent. */
+  const sides = (["base", "head"] as const).filter((side) => records[side] > 0);
+  const titles = { base: "Base engine", head: "Head engine" };
+  const count = (value: number | null) => (value === null ? "absent" : String(value));
+  const signed = (value: number) => (value > 0 ? `+${value}` : String(value));
+  const paired = sides.length === 2;
+  const counterRows = Object.entries(totals).map(([name, total]) => [
+    `\`${name}\``,
+    ...sides.map((side) => count(total[side])),
+    ...(paired ? [total.base === null || total.head === null ? "" : signed(total.head - total.base)] : []),
+  ]);
+  const histogramRows = Object.entries(histograms).map(([name, sums]) => [
+    `\`${name}\``,
+    ...sides.map((side) => {
+      const sum = sums[side];
+      if (sum === null) return "absent";
+      const { entries, median } = histogramMedian(sum);
+      return median === null ? "no entry" : `${entries} entries, median ${median}`;
+    }),
+  ]);
+  const listedRises = work.rises.flatMap(({ lens, request, records: rising, counters }) =>
+    Object.entries(counters).map(([name, rise]) => [
+      lens,
+      request,
+      String(rising),
+      `\`${name}\``,
+      String(rise.base),
+      String(rise.head),
+      signed(rise.head - rise.base),
+    ]),
+  );
+  const riseRows = listedRises.slice(0, MARKDOWN_SAMPLES);
+  const risesLeftOut = riseRows.length < listedRises.length || work.rises.length < work.risingGroups;
+  return [
+    ...heading,
+    paired
+      ? `What each engine counted of its own work while it captured a record, compared in ${records.both} pairs of ` +
+        `records. A counter that is higher on the head engine in any pair is a rise: it fails a run of Tier S or ` +
+        `Tier F in every class, and a run of Tier P reports it. A fall never fails. In this run a rise ` +
+        `${work.gated ? "fails" : "is reported"}, and counters rose in ${work.risingRecords} pairs.`
+      : `The ${sides[0] === "head" ? "base" : "head"} engine's records carry no work counters, so no counter was ` +
+        `compared. These are what the ${sides[0]} engine counted of its own work over ${records[sides[0]]} records.` +
+        /* A base without counters predates them. A head without them was built to count and did not. */
+        (sides[0] === "base"
+          ? ` A head engine without counters beside a base that has them fails a run of Tier S or Tier F, and a ` +
+            `run of Tier P reports it. In this run it ${work.gated ? "fails" : "is reported"}.`
+          : ""),
+    "",
+    ...table(["Counter", ...sides.map((side) => titles[side]), ...(paired ? ["Head minus base"] : [])], counterRows),
+    "",
+    ...(histogramRows.length > 0
+      ? [
+          "A histogram counts solves by the work each one took. It is reported and never judged.",
+          "",
+          ...table(["Histogram", ...sides.map((side) => titles[side])], histogramRows),
+          "",
+        ]
+      : []),
+    ...(riseRows.length > 0
+      ? [
+          `### Counters that rose (${work.risingRecords} pairs of records, in ${work.risingGroups} lens and request groups)`,
+          "",
+          "One row per counter that rose in the records of a lens under one request family, summed over the " +
+            `records in which it rose.${risesLeftOut ? ` The first ${riseRows.length} rows are shown.` : ""}`,
+          "",
+          ...table(["Lens", "Request", "Records", "Counter", "Base", "Head", "Rise"], riseRows),
+          "",
+        ]
+      : []),
+  ];
+}
+
+/**
+ * Write the summary of a run as Markdown: the verdict, the counts a pull request states, each comparison, the work
+ * counters, the uncompared lenses against the declared exceptions, and wall time per phase.
  *
  * @param summary - a finished run
  * @param context - the refs, tier and timings of the run
@@ -1655,6 +1909,7 @@ export function renderSummaryMarkdown(summary: RunSummary, context: RunContext):
           "",
         ]
       : []),
+    ...workCounterSection(summary.workCounters),
     ...(pairLines.some(([, ids]) => ids.length > 0)
       ? [
           "## Converter pairs",

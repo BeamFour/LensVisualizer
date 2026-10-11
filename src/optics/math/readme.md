@@ -21,6 +21,7 @@ flowchart LR
   end
   n_external_src_types["src/types"]
   n_external_src_optics_constants_ts["src/optics/constants.ts"]
+  n_external_src_optics_diagnostics["src/optics/diagnostics"]
   n_external_src_optics_internal["src/optics/internal"]
   n_external_src_optics_spectralLines_ts["src/optics/spectralLines.ts"]
   n_external_src_optics_types_ts["src/optics/types.ts"]
@@ -29,6 +30,9 @@ flowchart LR
   n_src_optics_math_src_optics_math_paraxial_ts --> n_external_src_optics_constants_ts
   n_src_optics_math_src_optics_math_surfaceProfile_ts --> n_external_src_optics_constants_ts
   n_src_optics_math_src_optics_math_vector_ts --> n_external_src_optics_constants_ts
+  n_src_optics_math_src_optics_math_intersection_ts --> n_external_src_optics_diagnostics
+  n_src_optics_math_src_optics_math_plane_ts --> n_external_src_optics_diagnostics
+  n_src_optics_math_src_optics_math_rootSolve_ts --> n_external_src_optics_diagnostics
   n_src_optics_math_src_optics_math_surfaceProfile_ts --> n_external_src_optics_internal
   n_src_optics_math_src_optics_math_diffractivePhase_ts --> n_external_src_optics_spectralLines_ts
   n_src_optics_math_src_optics_math_diffractivePhase_ts --> n_external_src_optics_types_ts
@@ -53,7 +57,7 @@ flowchart LR
 
 - Direct source files: 9
 - Direct subfolders: 0
-- Main outbound areas: same folder (7), src/optics/types.ts (7), src/optics/constants.ts (4), src/types (4), src/optics/internal, src/optics/spectralLines.ts
+- Main outbound areas: same folder (7), src/optics/types.ts (7), src/optics/constants.ts (4), src/types (4), src/optics/diagnostics (3), src/optics/internal, src/optics/spectralLines.ts
 - External consumers: src/components/display, src/optics/analysis, src/optics/field, src/optics/first-order, src/optics/internal, src/optics/perspective, src/optics/prescription, src/optics/runtimeLens.ts, +2 more
 
 ## Files
@@ -61,11 +65,11 @@ flowchart LR
 | File | Role | Imports from | Imported by | Exports |
 | --- | --- | --- | --- | --- |
 | `diffractivePhase.ts` | Diffractive Phase helper module | same folder, src/optics/spectralLines.ts, src/optics/types.ts, src/types | src/optics/trace (3), same folder, src/optics/internal, src/optics/prescription, src/optics/runtimeLens.ts | DEFAULT_PHASE_WAVELENGTH_NM, compileDiffractivePhase, radialPhaseOpticalPath, radialPhaseDerivative, diffractiveWavelengthScale, radialPhaseKick, diffractiveRefractedDirection, diffractiveParaxialPower, +1 more |
-| `intersection.ts` | Intersection helper module | same folder (3), src/optics/constants.ts, src/optics/types.ts | src/optics/trace (2), src/optics/internal | SurfaceIntersectionFailureReason, SurfaceIntersectionOptions, SurfaceIntersectionSuccess, SurfaceIntersectionFailure, SurfaceIntersectionResult, intersectSurfaceProfile, selectAsphericCapHit |
+| `intersection.ts` | Intersection helper module | same folder (3), src/optics/constants.ts, src/optics/diagnostics, src/optics/types.ts | src/optics/trace (2), src/optics/internal | SurfaceIntersectionFailureReason, SurfaceIntersectionOptions, SurfaceIntersectionSuccess, SurfaceIntersectionFailure, SurfaceIntersectionResult, intersectSurfaceProfile, selectAsphericCapHit |
 | `intersectionTolerance.ts` | Intersection Tolerance helper module | src/optics/types.ts | src/optics/internal (2), same folder | sagResidualRoundoff, planeResidualRoundoff |
 | `numerics.ts` | Numerics helper module | none | src/optics/perspective (3), same folder, src/optics/prescription, src/optics/state | isFiniteNumber, clamp, clamp01, lerp, nearlyEqual, normalizeControlT, formatCacheNumber |
 | `paraxial.ts` | Paraxial helper module | same folder, src/optics/constants.ts, src/optics/types.ts, src/types | src/optics/first-order (4), src/optics/field, src/optics/internal, src/optics/perspective | ParaxialSurface, ParaxialState, ParaxialTraceOptions, ParaxialTraceResult, transferParaxialRay2, interactParaxialSurface2, traceParaxialSurfaces2 |
-| `plane.ts` | Plane helper module | same folder, src/optics/types.ts | src/optics/perspective (3), src/optics/trace | RayPlaneIntersection, RayPlaneIntersectionOptions, intersectRayPlane |
-| `rootSolve.ts` | Root Solve helper module | none | src/optics/analysis (2), src/optics/perspective (2) | ScalarRootEvaluation, ScalarRootSolveStatus, ScalarRootSolveOptions, ScalarRootSolveResult, solveScalarRoot |
+| `plane.ts` | Plane helper module | same folder, src/optics/diagnostics, src/optics/types.ts | src/optics/perspective (3), src/optics/trace | RayPlaneIntersection, RayPlaneIntersectionOptions, intersectRayPlane |
+| `rootSolve.ts` | Root Solve helper module | src/optics/diagnostics | src/optics/analysis (2), src/optics/perspective (2) | ScalarRootEvaluation, ScalarRootSolveStatus, ScalarRootSolveOptions, ScalarRootSolveResult, solveScalarRoot |
 | `surfaceProfile.ts` | Surface Profile helper module | src/types (2), same folder, src/optics/constants.ts, src/optics/internal, src/optics/types.ts | src/optics/analysis, src/optics/internal, src/optics/prescription | createSurfaceProfile, createFlatProfile, createSphericalProfile, createAsphericProfile, createTiltedPlaneProfile |
 | `vector.ts` | Vector helper module | src/optics/constants.ts, src/optics/types.ts | src/optics/perspective (11), same folder (4), src/optics/trace (3), src/components/display, src/optics/prescription | vec3, add, subtract, scale, dot, cross, length, normalize, +5 more |

@@ -6,7 +6,8 @@
  * build. Every engine module is therefore reached through an eager `import.meta.glob` with a literal pattern, which
  * yields nothing for a missing file, and every capability the capture needs is resolved by name from an ordered list
  * of candidate exports. A PR that renames or moves a seam export puts the new name first and keeps the old one
- * behind it, so the same adapter resolves at both refs.
+ * behind it, so the same adapter resolves at both refs. A capability that a ref may do without is listed apart and
+ * is left out where no candidate exists.
  */
 
 type EngineModule = Readonly<Record<string, unknown>>;
@@ -23,6 +24,7 @@ const ENGINE_MODULES = {
   chromaticRayFanScaling: import.meta.glob<EngineModule>("../../optics/chromaticRayFanScaling.ts", { eager: true }),
   compat: import.meta.glob<EngineModule>("../../optics/compat.ts", { eager: true }),
   constants: import.meta.glob<EngineModule>("../../optics/constants.ts", { eager: true }),
+  diagnostics: import.meta.glob<EngineModule>("../../optics/diagnostics.ts", { eager: true }),
   layout: import.meta.glob<EngineModule>("../../optics/layout.ts", { eager: true }),
   lensDefaults: import.meta.glob<EngineModule>("../../lens-data/defaults.ts", { eager: true }),
   lensMovement: import.meta.glob<EngineModule>("../../optics/lensMovement.ts", { eager: true }),
@@ -45,6 +47,7 @@ interface EngineModuleTypes {
   chromaticRayFanScaling: typeof import("../../optics/chromaticRayFanScaling.js");
   compat: typeof import("../../optics/compat.js");
   constants: typeof import("../../optics/constants.js");
+  diagnostics: typeof import("../../optics/diagnostics.js");
   layout: typeof import("../../optics/layout.js");
   lensDefaults: typeof import("../../lens-data/defaults.js");
   lensMovement: typeof import("../../optics/lensMovement.js");
@@ -116,15 +119,35 @@ const SEAM_CANDIDATES = {
   computeMtf: [["mtf", "computeMtf"]],
 } as const satisfies Readonly<Record<string, readonly SeamCandidate[]>>;
 
+/*
+ * Capabilities a ref may lack. They resolve as the ones above do, and one with no candidate at a ref is left out
+ * of the seam instead of failing it.
+ *
+ * These are the read side of the engine's work counters. A ref that predates `optics/diagnostics.ts` builds and
+ * captures as it always did, and its records carry no counters.
+ */
+const OPTIONAL_SEAM_CANDIDATES = {
+  workCountersEnabled: [["diagnostics", "OPTICS_COUNTERS_ENABLED"]],
+  resetWorkCounters: [["diagnostics", "resetWorkCounters"]],
+  snapshotWorkCounters: [["diagnostics", "snapshotWorkCounters"]],
+} as const satisfies Readonly<Record<string, readonly SeamCandidate[]>>;
+
 type ExportOf<Candidate> = Candidate extends readonly [infer Module extends keyof EngineModuleTypes, infer Name]
   ? Name extends keyof EngineModuleTypes[Module]
     ? EngineModuleTypes[Module][Name]
     : never
   : never;
 
-/** Every engine capability the capture calls, typed by the export its first candidate names. */
+/**
+ * Every engine capability the capture calls, typed by the export its first candidate names. An optional one is
+ * absent at a ref that has no export for it.
+ */
 export type EngineSeam = {
   readonly [Capability in keyof typeof SEAM_CANDIDATES]: ExportOf<(typeof SEAM_CANDIDATES)[Capability][0]>;
+} & {
+  readonly [Capability in keyof typeof OPTIONAL_SEAM_CANDIDATES]?: ExportOf<
+    (typeof OPTIONAL_SEAM_CANDIDATES)[Capability][0]
+  >;
 };
 
 /* Engine value types the capture handles, taken from the seam so no other file names an engine module. */
@@ -170,16 +193,45 @@ export function resolveCapabilities<Capability extends string>(
   return { exports, sources };
 }
 
-let resolved: { seam: EngineSeam; sources: Record<keyof EngineSeam, string> } | undefined;
+/**
+ * Resolve each optional capability to the first candidate export that exists, and leave out one that has none.
+ *
+ * @param modules - loaded modules by id; an id whose file does not exist at this ref is absent or `undefined`
+ * @param candidates - ordered `[module id, export name]` pairs per capability
+ * @returns the exports that resolved, and the `module.export` each one came from
+ */
+export function resolveOptionalCapabilities<Capability extends string>(
+  modules: Readonly<Record<string, EngineModule | undefined>>,
+  candidates: Readonly<Record<Capability, readonly (readonly [module: string, exportName: string])[]>>,
+): { exports: Partial<Record<Capability, unknown>>; sources: Partial<Record<Capability, string>> } {
+  const exports: Partial<Record<Capability, unknown>> = {};
+  const sources: Partial<Record<Capability, string>> = {};
+  for (const capability of Object.keys(candidates) as Capability[]) {
+    const found = candidates[capability].find(([module, name]) => modules[module]?.[name] !== undefined);
+    if (!found) continue;
+    exports[capability] = modules[found[0]]?.[found[1]];
+    sources[capability] = `${found[0]}.${found[1]}`;
+  }
+  return { exports, sources };
+}
 
-function resolveOnce(): { seam: EngineSeam; sources: Record<keyof EngineSeam, string> } {
+/** Where each capability resolved: every required one, and the optional ones this ref has. */
+type SeamSources = { [Capability in keyof EngineSeam]: string };
+
+let resolved: { seam: EngineSeam; sources: SeamSources } | undefined;
+
+function resolveOnce(): { seam: EngineSeam; sources: SeamSources } {
   if (!resolved) {
     /* Each glob holds at most one module, keyed by its path. */
     const modules = Object.fromEntries(
       Object.entries(ENGINE_MODULES).map(([id, matches]) => [id, Object.values(matches)[0]]),
     );
     const { exports, sources } = resolveCapabilities(modules, SEAM_CANDIDATES);
-    resolved = { seam: exports as EngineSeam, sources };
+    const optional = resolveOptionalCapabilities(modules, OPTIONAL_SEAM_CANDIDATES);
+    resolved = {
+      seam: { ...exports, ...optional.exports } as EngineSeam,
+      sources: { ...sources, ...optional.sources },
+    };
   }
   return resolved;
 }
@@ -191,7 +243,7 @@ function resolveOnce(): { seam: EngineSeam; sources: Record<keyof EngineSeam, st
  * that is missing in one error.
  *
  * @returns the resolved engine exports
- * @throws when any capability has no candidate export at this ref
+ * @throws when any required capability has no candidate export at this ref
  */
 export function resolveSeam(): EngineSeam {
   return resolveOnce().seam;
@@ -200,9 +252,9 @@ export function resolveSeam(): EngineSeam {
 /**
  * Report which export each capability resolved to, for a run log and for telling two refs apart.
  *
- * @returns capability name -> `module.export`
+ * @returns capability name -> `module.export`; an optional capability this ref lacks has no entry
  */
-export function describeSeam(): Record<keyof EngineSeam, string> {
+export function describeSeam(): SeamSources {
   return { ...resolveOnce().sources };
 }
 

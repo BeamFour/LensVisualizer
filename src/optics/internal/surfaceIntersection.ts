@@ -9,6 +9,7 @@ import { selectAsphericCapHit } from "../math/intersection.js";
 import { INTERSECTION_BRACKET_SAMPLES, INTERSECTION_MAX_ITERATIONS, INTERSECTION_TOLERANCE } from "../constants.js";
 import { planeResidualRoundoff, sagResidualRoundoff } from "../math/intersectionTolerance.js";
 import { createAsphericProfile } from "../math/surfaceProfile.js";
+import { OPTICS_COUNTERS_ENABLED, workCounters } from "../diagnostics/workCounters.js";
 import type { AsphericCoefficients } from "../../types/optics.js";
 import { FLAT_R_THRESHOLD, conicPolySag, sagSlopeRaw } from "./surfaceMath.js";
 
@@ -197,8 +198,11 @@ function intersectUnboundedSagSurface(
   const { R } = L.S[surfaceIdx];
   const asph = L.asphByIdx[surfaceIdx];
   if (Math.abs(R) > FLAT_R_THRESHOLD && !asph) {
+    if (OPTICS_COUNTERS_ENABLED) workCounters.legacyFlatIntersections++;
     return intersectFlatSurface(ray.origin, direction, surfaceIdx, vertexZ, minT, maxT, tolerance, refractiveIndex);
   }
+  if (OPTICS_COUNTERS_ENABLED && asph) workCounters.legacyAsphericIntersections++;
+  if (OPTICS_COUNTERS_ENABLED && !asph) workCounters.legacySphericalIntersections++;
 
   const evalAt = (t: number): SurfaceEvaluation => evaluateSurface(ray.origin, direction, surfaceIdx, vertexZ, L, t);
   const bracket = findBracket(evalAt, minT, maxT, tolerance, bracketSamples);
@@ -251,6 +255,7 @@ function intersectUnboundedSagSurface(
     if (newtonT === t) {
       const effectiveTolerance = roundoffTolerance(current);
       if (Math.abs(current.value) <= effectiveTolerance) {
+        if (OPTICS_COUNTERS_ENABLED) workCounters.legacyFloorAssistedAcceptances++;
         return makeSuccess(current, surfaceIdx, L, effectiveTolerance, refractiveIndex, iterations);
       }
     }
@@ -262,6 +267,7 @@ function intersectUnboundedSagSurface(
     if (nextT === t) {
       const effectiveTolerance = roundoffTolerance(current);
       if (Math.abs(current.value) <= effectiveTolerance) {
+        if (OPTICS_COUNTERS_ENABLED) workCounters.legacyFloorAssistedAcceptances++;
         return makeSuccess(current, surfaceIdx, L, effectiveTolerance, refractiveIndex, iterations);
       }
     }
@@ -278,10 +284,12 @@ function intersectUnboundedSagSurface(
   if (isFiniteEvaluation(finalEval) && t - finalEval.value / finalEval.derivative === t) {
     const effectiveTolerance = roundoffTolerance(finalEval);
     if (Math.abs(finalEval.value) <= effectiveTolerance) {
+      if (OPTICS_COUNTERS_ENABLED) workCounters.legacyFloorAssistedAcceptances++;
       return makeSuccess(finalEval, surfaceIdx, L, effectiveTolerance, refractiveIndex, maxIterations);
     }
   }
 
+  if (OPTICS_COUNTERS_ENABLED) workCounters.legacyExhaustionFailures++;
   return failure(
     surfaceIdx,
     "noConvergedIntersection",
@@ -320,6 +328,7 @@ function intersectFlatSurface(
     return failure(surfaceIdx, "noConvergedIntersection", residual, 0);
   }
 
+  if (OPTICS_COUNTERS_ENABLED && effectiveTolerance > tolerance) workCounters.legacyFloorAssistedAcceptances++;
   return {
     ok: true,
     surfaceIdx,
@@ -343,6 +352,8 @@ function evaluateSurface(
   L: SurfaceIntersectionLens,
   t: number,
 ): SurfaceEvaluation {
+  // Every call counts: this evaluator has no out-of-domain return, so each one evaluates sag and slope.
+  if (OPTICS_COUNTERS_ENABLED) workCounters.legacyProfileEvaluations++;
   const x = origin[0] + direction[0] * t;
   const y = origin[1] + direction[1] * t;
   const z = origin[2] + direction[2] * t;

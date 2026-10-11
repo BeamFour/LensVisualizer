@@ -1,5 +1,6 @@
 /** Actual traced-chief inversion for fixed-sensor perspective field targets. */
 
+import { OPTICS_COUNTERS_ENABLED, workCounters } from "../diagnostics/workCounters.js";
 import { solveScalarRoot, type ScalarRootSolveResult, type ScalarRootSolveStatus } from "../math/rootSolve.js";
 import { dot, normalize, subtract } from "../math/vector.js";
 import type { Vec3 } from "../types.js";
@@ -59,6 +60,7 @@ export function solveChiefToSensorPoint(
   seedDirectionLens: Vec3,
   chiefOptions: PerspectiveChiefRayOptions | undefined,
 ): SensorChiefSolve {
+  if (OPTICS_COUNTERS_ENABLED) workCounters.sensorLockedSolves++;
   const seed = idealCoordinatesForDirection(seedDirectionLens, projection);
   if (!seed) return failedSensorChiefSolve("invalid-input", 0, null, null);
 

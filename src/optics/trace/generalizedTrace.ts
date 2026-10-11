@@ -10,6 +10,7 @@ import type {
   FoldedPathClipEvent,
   FoldedPathTraceTermination,
 } from "../../types/optics.js";
+import { OPTICS_COUNTERS_ENABLED, workCounters } from "../diagnostics/workCounters.js";
 import type { CompiledStateSurface, PreparedOpticalState, Ray3, Vec3 } from "../types.js";
 import { evaluateAperture, isInsideActiveAperture } from "./aperture.js";
 import { pushClipEvent, surfaceLabel } from "./foldedDiagnostics.js";
@@ -122,6 +123,7 @@ export function traceGeneralized(
   input: Ray3,
   options: TraceOptions = {},
 ): EngineTraceResult {
+  if (OPTICS_COUNTERS_ENABLED) workCounters.fullTracesPreparedGeneralized++;
   const direction0 = options.directionNormalized ? input.direction : normalizeTraceDirection(input.direction);
   if (
     !direction0 ||

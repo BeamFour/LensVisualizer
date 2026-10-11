@@ -8,6 +8,7 @@
 import { wideOpenStopAtZoom } from "../apertureStop.js";
 
 import type { AberrationVarRange, VarRange } from "../../types/optics.js";
+import { OPTICS_COUNTERS_ENABLED, workCounters } from "../diagnostics/workCounters.js";
 import { clamp, formatCacheNumber, normalizeControlT } from "../math/numerics.js";
 import type { PreparedStateCache } from "./cache.js";
 import type { CompiledStateSurface, EngineLens, Plane3, PreparedOpticalState } from "../types.js";
@@ -61,6 +62,7 @@ export function prepareState(
   const cached = options.cache?.get(cacheKey);
   if (cached) return cached;
 
+  if (OPTICS_COUNTERS_ENABLED) workCounters.preparedStateConstructions++;
   const thicknesses = lens.surfaces.map((surface) =>
     resolvePreparedThickness(
       surface.d,

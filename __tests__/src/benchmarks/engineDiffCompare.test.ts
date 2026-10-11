@@ -1,6 +1,6 @@
 /**
- * Engine differential harness: the budget table, the comparison under each change class, cross-evaluation of data
- * changes, declared exceptions and the reports.
+ * Engine differential harness: the budget table, the comparison under each change class, the work counters,
+ * cross-evaluation of data changes, declared exceptions and the reports.
  *
  * The comparator is fed records captured from this checkout's engine with one perturbation injected at a time, so
  * each test names the drift it must detect. Real catalog lenses appear only as sources of realistic records.
@@ -53,6 +53,7 @@ import {
   tierRequests,
   type CaptureRequest,
   type RequestFamily,
+  type TierId,
 } from "../../../src/benchmarks/engineDiff/requests.js";
 import type { LensDataInput } from "../../../src/types/optics.js";
 import plainTwin from "./engineDiffFixtures/fingerprintTwinPlain.js";
@@ -1044,6 +1045,303 @@ describe("engineDiff drift detection", () => {
   });
 });
 
+/* ── compare.ts: work counters ── */
+
+describe("engineDiff work counters", () => {
+  /** Compare records as one prescription on two engines, in a run of a tier. */
+  const compareIn = (
+    tier: TierId | undefined,
+    changeClass: ChangeClass,
+    head: readonly PayloadRecord[],
+    base: readonly PayloadRecord[] = SERENAR_RECORDS,
+  ): RunSummary => {
+    const run = createDifferentialRun({ changeClass, tier, declaredExceptions: [], restricted: true });
+    run.addLens({ lens: base[0].lens, dataChange: "unchanged", baseEngine: base, headEngine: head });
+    return run.finish();
+  };
+  const countOf = (request: RequestFamily, name: string): number => {
+    const count = SERENAR_RECORDS.find((record) => record.request === request)?.counters?.[name];
+    if (typeof count !== "number") throw new Error(`the ${request} record has no count ${name}`);
+    return count;
+  };
+  /** A copy of the records in which one family's record counted something else under one counter. */
+  const withCount = (
+    request: RequestFamily,
+    name: string,
+    count: number | Record<string, number> | undefined,
+    source: readonly PayloadRecord[] = SERENAR_RECORDS,
+  ): PayloadRecord[] =>
+    source.map((record): PayloadRecord => {
+      if (record.request !== request || !record.counters) return record;
+      const { [name]: _replaced, ...others } = record.counters;
+      return { ...record, counters: count === undefined ? others : { ...others, [name]: count } };
+    });
+  const withoutCounters = (records: readonly PayloadRecord[]): PayloadRecord[] =>
+    records.map(({ counters: _counters, ...record }) => record);
+
+  const EVALUATIONS = "preparedProfileEvaluations";
+  const traced = countOf("traces", EVALUATIONS);
+  const risen = withCount("traces", EVALUATIONS, traced + 3);
+  const rose =
+    `Work counters: 1 record did more counted work on the head engine than on the base engine ` +
+    `(${SERENAR} traces: ${EVALUATIONS} ${traced} to ${traced + 3}).`;
+
+  it("has the counters its perturbations assume, on every record", () => {
+    expect(SERENAR_RECORDS.every((record) => record.counters !== undefined)).toBe(true);
+    expect(traced).toBeGreaterThan(0);
+  });
+
+  it("totals each counter on both engines, and finds no rise between identical captures", () => {
+    const summary = compareIn("s", "c0", recordsOf(SERENAR));
+    expect(summary.passed).toBe(true);
+    expect(summary.workCounters).toMatchObject({
+      gated: true,
+      records: { base: 7, head: 7, both: 7 },
+      risingRecords: 0,
+      risingGroups: 0,
+      rises: [],
+    });
+    const { totals, histograms } = summary.workCounters;
+    /* Every counter of the engine, each summed over the seven records: the counts in the order a record names
+     * them, and the histograms apart. */
+    const names = Object.keys(SERENAR_RECORDS[0].counters ?? {});
+    expect(Object.keys(totals)).toEqual(names.filter((name) => !name.endsWith("Histogram")));
+    expect(Object.keys(histograms)).toEqual(names.filter((name) => name.endsWith("Histogram")));
+    expect(totals.runtimeLensBuilds).toEqual({ base: 7, head: 7 });
+    expect(totals[EVALUATIONS].head).toBe(
+      SERENAR_RECORDS.reduce((sum, record) => sum + Number(record.counters?.[EVALUATIONS]), 0),
+    );
+    for (const total of Object.values(totals)) expect(total.head).toBe(total.base);
+    /* A histogram is summed bucket by bucket: its entries are the solves the scalar counter counted. */
+    const perSolve = histograms.chiefSolveStopTraceHistogram;
+    expect(perSolve.head).toEqual(perSolve.base);
+    expect(Object.values(perSolve.head ?? {}).reduce((sum, count) => sum + count, 0)).toBe(totals.chiefSolves.head);
+  });
+
+  it("keeps the counters out of the comparison of payloads", () => {
+    /* Counters that differ, or that one side lacks, are no difference between two records: under C0 the payloads
+     * alone are bit-identical. */
+    const fewer = withCount("traces", EVALUATIONS, 0);
+    for (const [base, head] of [
+      [SERENAR_RECORDS, risen],
+      [SERENAR_RECORDS, fewer],
+      [withoutCounters(SERENAR_RECORDS), SERENAR_RECORDS],
+      [SERENAR_RECORDS, withoutCounters(SERENAR_RECORDS)],
+    ]) {
+      const summary = compareIn("p", "c0", head, base);
+      expect(summary.passed).toBe(true);
+      expect(summary.engine).toMatchObject({ records: 7, recordsDiffering: 0, numbersDiffering: 0, failing: 0 });
+      expect(summary.counts.headEngine).toEqual(summary.counts.baseEngine);
+    }
+    /* A record is written with its counters, and a pair fails by its payloads alone. */
+    const run = createDifferentialRun({ changeClass: "c0", tier: "s", declaredExceptions: [], restricted: true });
+    const output = run.addLens({
+      lens: SERENAR,
+      dataChange: "unchanged",
+      baseEngine: withoutCounters(SERENAR_RECORDS),
+      headEngine: risen,
+    });
+    expect(output.lines.headEngine.map((line) => JSON.parse(line) as unknown)).toEqual(risen);
+    expect(output.lines.baseEngine.map((line) => JSON.parse(line) as unknown)).toEqual(
+      withoutCounters(SERENAR_RECORDS),
+    );
+    expect(output.lines.baseEngine.some((line) => line.includes('"counters"'))).toBe(false);
+    expect(output.failingRecords).toEqual([]);
+    /* A payload that differs is still found beside counters that differ. */
+    const drifted = withChange("traces", HIT_POINT_Y, (y) => Number(y) + 2e-9, risen);
+    expect(compareIn("p", "c0", drifted).engine).toMatchObject({ recordsDiffering: 1, failing: 1 });
+  });
+
+  it.each(CLASSES)(
+    "fails a counter that rises in the stage and full tiers, and reports it in Tier P, under %s",
+    (changeClass) => {
+      for (const tier of ["s", "f"] as const) {
+        const summary = compareIn(tier, changeClass, risen);
+        expect(summary.passed).toBe(false);
+        expect(summary.failures).toEqual([rose]);
+        expect(summary.warnings).toEqual([]);
+        expect(summary.workCounters).toMatchObject({
+          gated: true,
+          risingRecords: 1,
+          risingGroups: 1,
+          rises: [
+            {
+              lens: SERENAR,
+              request: "traces",
+              records: 1,
+              counters: { [EVALUATIONS]: { records: 1, base: traced, head: traced + 3 } },
+            },
+          ],
+        });
+      }
+      /* Tier P, and a run that names no tier, say the same thing as a warning and pass. */
+      for (const tier of ["p", undefined] as const) {
+        const summary = compareIn(tier, changeClass, risen);
+        expect(summary.passed).toBe(true);
+        expect(summary.failures).toEqual([]);
+        expect(summary.warnings).toEqual([`${rose} A run of Tier S or Tier F fails on this.`]);
+        expect(summary.workCounters).toMatchObject({ gated: false, risingRecords: 1, risingGroups: 1 });
+      }
+    },
+  );
+
+  it("never fails a counter that falls", () => {
+    const fallen = withCount("traces", EVALUATIONS, traced - 1);
+    for (const tier of ["p", "s", "f"] as const) {
+      const summary = compareIn(tier, "c0", fallen);
+      expect(summary).toMatchObject({ passed: true, failures: [], warnings: [] });
+      expect(summary.workCounters).toMatchObject({ risingRecords: 0, rises: [] });
+      const total = summary.workCounters.totals[EVALUATIONS];
+      expect(Number(total.head) - Number(total.base)).toBe(-1);
+    }
+    /* The same pair the other way round is a rise. */
+    expect(compareIn("s", "c0", SERENAR_RECORDS, fallen).passed).toBe(false);
+  });
+
+  it("reports the head's totals alone when the base engine has no counters, and fails nothing", () => {
+    const summary = compareIn("s", "c0", SERENAR_RECORDS, withoutCounters(SERENAR_RECORDS));
+    expect(summary).toMatchObject({ passed: true, failures: [], warnings: [] });
+    expect(summary.workCounters).toMatchObject({
+      records: { base: 0, head: 7, both: 0 },
+      risingRecords: 0,
+      rises: [],
+    });
+    expect(summary.workCounters.totals.runtimeLensBuilds).toEqual({ base: null, head: 7 });
+    expect(Object.values(summary.workCounters.totals).every((total) => total.base === null)).toBe(true);
+    expect(summary.workCounters.histograms.rootSolveEvaluationHistogram.base).toBeNull();
+    const markdown = renderSummaryMarkdown(summary, REPORT_CONTEXT);
+    expect(markdown).toContain("The base engine's records carry no work counters, so no counter was compared.");
+    expect(markdown).toContain("| Counter | Head engine |");
+    expect(markdown).toContain("| `runtimeLensBuilds` | 7 |");
+  });
+
+  it.each(CLASSES)(
+    "fails a head engine without counters beside a base that has them in the stage and full tiers, and reports it " +
+      "in Tier P, under %s",
+    (changeClass) => {
+      const uncounted =
+        "Work counters: the base engine's records carry them and the head engine's carry none, so no counter was " +
+        "compared.";
+      for (const tier of ["s", "f"] as const) {
+        const headless = compareIn(tier, changeClass, withoutCounters(SERENAR_RECORDS));
+        expect(headless.passed).toBe(false);
+        expect(headless.failures).toEqual([uncounted]);
+        expect(headless.warnings).toEqual([]);
+        /* The payloads are equal: the run fails on the gate that was not applied, and on nothing else. */
+        expect(headless.engine).toMatchObject({ records: 7, recordsDiffering: 0, failing: 0 });
+        expect(headless.workCounters).toMatchObject({
+          gated: true,
+          records: { base: 7, head: 0, both: 0 },
+          risingRecords: 0,
+        });
+        const markdown = renderSummaryMarkdown(headless, REPORT_CONTEXT);
+        expect(markdown).toContain("| Counter | Base engine |");
+        expect(markdown).toContain("The head engine's records carry no work counters, so no counter was compared.");
+        expect(markdown).toContain("In this run it fails.");
+      }
+      /* Tier P, and a run that names no tier, say the same thing as a warning and pass. */
+      for (const tier of ["p", undefined] as const) {
+        const headless = compareIn(tier, changeClass, withoutCounters(SERENAR_RECORDS));
+        expect(headless.passed).toBe(true);
+        expect(headless.failures).toEqual([]);
+        expect(headless.warnings).toEqual([`${uncounted} A run of Tier S or Tier F fails on this.`]);
+        expect(headless.workCounters).toMatchObject({ gated: false, records: { base: 7, head: 0, both: 0 } });
+        expect(renderSummaryMarkdown(headless, REPORT_CONTEXT)).toContain("In this run it is reported.");
+      }
+    },
+  );
+
+  it("says so when neither engine has counters, and fails nothing", () => {
+    const neither = compareIn("s", "c0", withoutCounters(SERENAR_RECORDS), withoutCounters(SERENAR_RECORDS));
+    expect(neither).toMatchObject({ passed: true, failures: [], warnings: [] });
+    expect(neither.workCounters).toMatchObject({ records: { base: 0, head: 0, both: 0 }, totals: {}, histograms: {} });
+    expect(renderSummaryMarkdown(neither, REPORT_CONTEXT)).toContain("Neither engine's records carry work counters.");
+  });
+
+  it("judges neither a counter that only one engine names nor a histogram", () => {
+    /* A counter the head engine gained has nothing to rise from, and one it dropped nothing to fall to. */
+    const gained = withCount("traces", "preparedConicIntersections", 40);
+    const dropped = withCount("traces", EVALUATIONS, undefined);
+    for (const head of [gained, dropped]) {
+      expect(compareIn("s", "c0", head)).toMatchObject({ passed: true, workCounters: { risingRecords: 0 } });
+    }
+    const totals = compareIn("s", "c0", gained).workCounters.totals;
+    expect(totals.preparedConicIntersections).toEqual({ base: null, head: 40 });
+    expect(renderSummaryMarkdown(compareIn("s", "c0", gained), REPORT_CONTEXT)).toContain(
+      "| `preparedConicIntersections` | absent | 40 |  |",
+    );
+    /* A solve that got cheaper leaves one bucket and enters another: a bucket that grew is no rise. */
+    const moved = withCount("chiefSolves", "chiefSolveStopTraceHistogram", { 3: 1000 });
+    const summary = compareIn("s", "c0", moved);
+    expect(summary).toMatchObject({ passed: true, workCounters: { risingRecords: 0 } });
+    expect(summary.workCounters.histograms.chiefSolveStopTraceHistogram.head).toMatchObject({ 3: 1000 });
+  });
+
+  it("groups the rises by lens and request family, and lists them in the report", () => {
+    const head = withCount(
+      "mtf",
+      "rootSolveCalls",
+      countOf("mtf", "rootSolveCalls") + 2,
+      withCount("traces", "fullTracesLegacy", countOf("traces", "fullTracesLegacy") + 1, risen),
+    );
+    const summary = compareIn("s", "c1", head);
+    expect(summary.workCounters).toMatchObject({ risingRecords: 2, risingGroups: 2 });
+    expect(summary.workCounters.rises).toEqual([
+      {
+        lens: SERENAR,
+        request: "traces",
+        records: 1,
+        counters: {
+          [EVALUATIONS]: { records: 1, base: traced, head: traced + 3 },
+          fullTracesLegacy: {
+            records: 1,
+            base: countOf("traces", "fullTracesLegacy"),
+            head: countOf("traces", "fullTracesLegacy") + 1,
+          },
+        },
+      },
+      {
+        lens: SERENAR,
+        request: "mtf",
+        records: 1,
+        counters: {
+          rootSolveCalls: {
+            records: 1,
+            base: countOf("mtf", "rootSolveCalls"),
+            head: countOf("mtf", "rootSolveCalls") + 2,
+          },
+        },
+      },
+    ]);
+    expect(summary.failures).toEqual([
+      `Work counters: 2 records did more counted work on the head engine than on the base engine ` +
+        `(${SERENAR} traces: ${EVALUATIONS} ${traced} to ${traced + 3}; ${SERENAR} mtf: rootSolveCalls ` +
+        `${countOf("mtf", "rootSolveCalls")} to ${countOf("mtf", "rootSolveCalls") + 2}).`,
+    ]);
+
+    const markdown = renderSummaryMarkdown(summary, { ...REPORT_CONTEXT, tier: "s" });
+    expect(markdown).toContain("# Engine diff: failed");
+    expect(markdown).toContain("## Work counters");
+    expect(markdown).toContain("compared in 7 pairs of records.");
+    expect(markdown).toContain("In this run a rise fails, and counters rose in 2 pairs.");
+    expect(markdown).toContain("| Counter | Base engine | Head engine | Head minus base |");
+    const evaluations = summary.workCounters.totals[EVALUATIONS];
+    expect(markdown).toContain(`| \`${EVALUATIONS}\` | ${evaluations.base} | ${evaluations.head} | +3 |`);
+    expect(markdown).toContain("| `runtimeLensBuilds` | 7 | 7 | 0 |");
+    expect(markdown).toMatch(
+      /\| `chiefSolveStopTraceHistogram` \| \d+ entries, median [\d.]+ \| \d+ entries, median [\d.]+ \|/,
+    );
+    expect(markdown).toContain("### Counters that rose (2 pairs of records, in 2 lens and request groups)");
+    expect(markdown).toContain(`| ${SERENAR} | traces | 1 | \`${EVALUATIONS}\` | ${traced} | ${traced + 3} | +3 |`);
+    expect(markdown).toContain(`| ${SERENAR} | mtf | 1 | \`rootSolveCalls\` |`);
+    /* In Tier P the same rises are reported, and the report says that this run does not fail on them. */
+    expect(renderSummaryMarkdown(compareIn("p", "c1", head), REPORT_CONTEXT)).toContain(
+      "In this run a rise is reported, and counters rose in 2 pairs.",
+    );
+    expect(JSON.parse(JSON.stringify(summary))).toEqual(summary);
+  });
+});
+
 /* ── compare.ts: data changes and exceptions ── */
 
 function catalogOf(...lenses: LensDataInput[]): SerializedCatalog {
@@ -1481,9 +1779,14 @@ describe("engineDiff cross-evaluation", () => {
       (rays) => [...(rays as object[]), { ...(rays as object[])[1], status: "failed" }],
       plainRecords,
     );
+    /* A counter that rose in records of two parts: its group is the lens and family, whatever part a record is in. */
+    const worked = plainRecords.map((record) =>
+      record.state === null ? record : { ...record, counters: { ...record.counters, runtimeLensBuilds: 2 } },
+    );
     const cases: Record<string, Captures> = {
       identical: { dataChange: "unchanged", baseEngine: plainRecords, headEngine: structuredClone(plainRecords) },
       drift: { dataChange: "unchanged", baseEngine: plainRecords, headEngine: drifted },
+      counted: { dataChange: "unchanged", baseEngine: plainRecords, headEngine: worked },
       uncompared: { dataChange: "unchanged", baseEngine: unevaluated, headEngine: plainRecords },
       formatOnly: { dataChange: "format", baseEngine: plainRecords, headEngine: plainRecords, baseData: drifted },
       semantic: {
@@ -1510,6 +1813,10 @@ describe("engineDiff cross-evaluation", () => {
     expect(Object.values(whole).map(({ summary }) => summary.lenses)).toEqual(Object.keys(cases).map(() => 1));
     expect(whole.identical.summary).toMatchObject({ passed: true, engine: { records: requests.length } });
     expect(whole.drift.summary.engine.failures).toMatchObject([{ request: "chiefSolves", path: "halfFieldDeg" }]);
+    expect(whole.counted.summary.workCounters).toMatchObject({
+      records: { both: requests.length },
+      risingRecords: requests.length - 1,
+    });
     expect(whole.uncompared.summary).toMatchObject({ uncompared: [{ lens: key }], engine: { records: 0 } });
     expect(whole.formatOnly.summary.formatOnly).toMatchObject({ lenses: [key], records: requests.length, failing: 1 });
     expect(whole.semantic.summary.dataImpact).toMatchObject([{ lens: key, change: "semantic", blocking: 0 }]);

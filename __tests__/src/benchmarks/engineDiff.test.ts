@@ -1,12 +1,12 @@
 /**
  * Engine differential harness: the payload encoding and digests, the seam adapter, the request lists of the three
- * tiers and their shards, capture determinism, and the semantic fingerprint.
+ * tiers and their shards, capture determinism, the work counters a record carries, and the semantic fingerprint.
  *
  * Real catalog lenses appear here only as inputs to the harness. The assertions are about the harness (records are
  * reproducible, failures are recorded, fingerprints follow the engine's authority rules), never about a lens.
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   captureRecords,
   exportCatalog,
@@ -30,6 +30,7 @@ import {
   projectBuildConstants,
   semanticFingerprint,
   sha256Hex,
+  sparseCounters,
   stopRadiusAuthority,
   type EncodedValue,
   type FingerprintRules,
@@ -67,11 +68,13 @@ import {
   describeSeam,
   ownCatalogFiles,
   resolveCapabilities,
+  resolveOptionalCapabilities,
   resolveSeam,
 } from "../../../src/benchmarks/engineDiff/seamAdapter.js";
 import { MTF_BENCHMARK_CASES, MTF_FINITE_BENCHMARK_CASE } from "../../../src/benchmarks/mtfCases.js";
 import { BENCHMARK_SCENARIOS, DEFAULT_BENCHMARK_LENS_KEYS } from "../../../src/benchmarks/opticsRenderingBenchmark.js";
 import buildLens from "../../../src/optics/buildLens.js";
+import { OPTICS_COUNTERS_ENABLED, snapshotWorkCounters } from "../../../src/optics/diagnostics.js";
 import { doLayout, traceRay } from "../../../src/optics/optics.js";
 import type { MtfMethod, MtfSpectrum } from "../../../src/types/mtf.js";
 import type { LensData, LensDataInput } from "../../../src/types/optics.js";
@@ -388,6 +391,27 @@ describe("engineDiff result encoder", () => {
       }),
     ).toEqual({ ok: false, error: { name: "NonError", message: "plain text" } });
   });
+
+  it("writes a counter snapshot with every count, and of a histogram only the buckets that are filled", () => {
+    const histogram = new Array<number>(1025).fill(0);
+    histogram[0] = 2;
+    histogram[64] = 5;
+    histogram[1024] = 1;
+    const counters = sparseCounters({
+      chiefSolves: 8,
+      /* A zero stays: it is a count, and tells a counter that read nothing from one the engine does not have. */
+      capCertificateRefusals: 0,
+      chiefSolveStopTraceHistogram: histogram,
+      rootSolveEvaluationHistogram: [0, 0, 0],
+    });
+    expect(counters).toEqual({
+      chiefSolves: 8,
+      capCertificateRefusals: 0,
+      chiefSolveStopTraceHistogram: { 0: 2, 64: 5, 1024: 1 },
+      rootSolveEvaluationHistogram: {},
+    });
+    expect(JSON.parse(JSON.stringify(counters))).toEqual(counters);
+  });
 });
 
 /* ── seamAdapter.ts ── */
@@ -419,12 +443,46 @@ describe("engineDiff seam adapter", () => {
     );
   });
 
+  it("leaves out an optional capability that a ref has no export for, and fails on none", () => {
+    const optional = {
+      workCountersEnabled: [["diagnostics", "OPTICS_COUNTERS_ENABLED"]],
+      snapshotWorkCounters: [
+        ["counters", "snapshot"],
+        ["diagnostics", "snapshotWorkCounters"],
+      ],
+    } as const;
+    /* A ref that predates the module resolves nothing, and its required capabilities resolve as before. */
+    expect(resolveOptionalCapabilities(older, optional)).toEqual({ exports: {}, sources: {} });
+    expect(resolveCapabilities(older, candidates).exports).toEqual({ traceRay: "old trace", buildLens: "build" });
+    /* A flag that is off is an export like any other, and an older name is found behind a newer one. */
+    expect(
+      resolveOptionalCapabilities(
+        { ...older, diagnostics: { OPTICS_COUNTERS_ENABLED: false, snapshotWorkCounters: "snapshot" } },
+        optional,
+      ),
+    ).toEqual({
+      exports: { workCountersEnabled: false, snapshotWorkCounters: "snapshot" },
+      sources: {
+        workCountersEnabled: "diagnostics.OPTICS_COUNTERS_ENABLED",
+        snapshotWorkCounters: "diagnostics.snapshotWorkCounters",
+      },
+    });
+    expect(resolveOptionalCapabilities({ diagnostics: {} }, optional).sources).toEqual({});
+  });
+
   it("resolves every capability against this checkout", () => {
     const seam = resolveSeam();
     const sources = describeSeam();
     expect(Object.keys(sources).sort()).toEqual(Object.keys(seam).sort());
     expect(sources.traceRay).toBe("compat.traceEngineRay2");
     expect(seam.buildLens).toBe(buildLens);
+    /* The read side of the work counters is optional at a ref, and this checkout has it. */
+    expect(sources).toMatchObject({
+      workCountersEnabled: "diagnostics.OPTICS_COUNTERS_ENABLED",
+      resetWorkCounters: "diagnostics.resetWorkCounters",
+      snapshotWorkCounters: "diagnostics.snapshotWorkCounters",
+    });
+    expect(seam.snapshotWorkCounters).toBe(snapshotWorkCounters);
   });
 });
 
@@ -1243,17 +1301,82 @@ describe("engineDiff capture", () => {
       requests.map((request) => [lensId(request.lens), request.state, request.family]),
     );
     for (const record of records) {
-      expect(Object.keys(record)).toEqual(["lens", "state", "request", "payload"]);
+      /* Vitest runs with the work counters on, so each record carries them after its payload. */
+      expect(Object.keys(record)).toEqual(["lens", "state", "request", "payload", "counters"]);
       expect(JSON.parse(JSON.stringify(record))).toEqual(record);
     }
     expect(records.filter((record) => !record.payload.ok)).toEqual([]);
   });
 
   it("captures the same bytes on a second run, and one request at a time in reverse order", () => {
+    /* A record's bytes hold its work counters, so the same request also counts the same work each time. */
     const first = recordDigests(records);
-    expect(recordDigests(captureRecords(CATALOG, requests))).toEqual(first);
+    const again = captureRecords(CATALOG, requests);
+    expect(recordDigests(again)).toEqual(first);
+    expect(again.map((record) => record.counters)).toEqual(records.map((record) => record.counters));
     const reversed = [...requests].reverse().map((request) => captureRecords(CATALOG, [request])[0]);
     expect(recordDigests(reversed.reverse())).toEqual(first);
+  });
+
+  it("carries on each record what the engine counted for that record alone", () => {
+    expect(OPTICS_COUNTERS_ENABLED).toBe(true);
+    const names = Object.keys(snapshotWorkCounters());
+    const histograms = names.filter((name) => name.endsWith("Histogram"));
+    expect(histograms).toHaveLength(2);
+    for (const record of records) {
+      const counters = record.counters ?? {};
+      expect(Object.keys(counters)).toEqual(names);
+      for (const name of names) {
+        const value = counters[name];
+        expect(typeof value === "number").toBe(!histograms.includes(name));
+        /* A histogram is written sparsely: no bucket that holds nothing. */
+        if (typeof value !== "number") expect(Object.values(value).every((count) => count > 0)).toBe(true);
+      }
+    }
+    const countersOf = (lens: string, request: RequestFamily) =>
+      records.find((record) => record.lens === lens && record.request === request)?.counters ?? {};
+    /* The counters are zeroed before a record's lens is built, so every record of the prime counts one build, one
+     * compile and the resolution of its glasses, and none of them the builds of the records before it. */
+    const build = countersOf(SERENAR, "build");
+    expect(build.runtimeLensBuilds).toBe(1);
+    expect(build.materialResolutions).toBeGreaterThan(0);
+    expect(build.fullTracesPreparedSequential).toBe(0);
+    for (const family of ["layout", "traces", "fieldGeometry", "chiefSolves", "analysis", "mtf"] as const) {
+      expect(countersOf(SERENAR, family)).toMatchObject({
+        runtimeLensBuilds: 1,
+        engineLensCompilations: 1,
+        materialResolutions: build.materialResolutions,
+      });
+    }
+    /* What a record asked for is what it counted: 22 rays with full hits, and the solves of five fields. */
+    expect(countersOf(SERENAR, "traces").fullTracesPreparedSequential).toBeGreaterThanOrEqual(22);
+    const solves = countersOf(SERENAR, "chiefSolves");
+    const perSolve = solves.chiefSolveStopTraceHistogram;
+    if (typeof perSolve !== "object") throw new Error("the chief-solve record carries no histogram");
+    expect(solves.chiefSolves).toBeGreaterThanOrEqual(5);
+    /* The sparse histogram still holds every solve, at the number of stop traces it took. */
+    expect(Object.values(perSolve).reduce((sum, count) => sum + count, 0)).toBe(solves.chiefSolves);
+    expect(Object.entries(perSolve).reduce((sum, [traces, count]) => sum + Number(traces) * count, 0)).toBe(
+      solves.chiefSolveStopTraces,
+    );
+  });
+
+  it("captures the same payloads with the work counters off, and then carries none", { timeout: 120_000 }, async () => {
+    /* The flag is read once, when the counters module loads, so the harness and the engine are loaded again
+     * behind it. */
+    vi.stubGlobal("__OPTICS_COUNTERS__", false);
+    vi.resetModules();
+    try {
+      const uncounted = await import("../../../src/benchmarks/engineDiff/captureEntry.js");
+      const plain = uncounted.captureRecords(CATALOG, requests);
+      for (const record of plain) expect(Object.keys(record)).toEqual(["lens", "state", "request", "payload"]);
+      expect(recordDigests(plain)).toEqual(
+        recordDigests(records.map((record) => ({ ...record, counters: undefined }))),
+      );
+    } finally {
+      vi.unstubAllGlobals();
+      vi.resetModules();
+    }
   });
 
   it("keeps full hits column-wise with each hit's residual and effective tolerance", () => {
@@ -1590,7 +1713,7 @@ describe("engineDiff capture", () => {
       const named = captureRecords(CATALOG, requests);
       named.forEach((record, index) => {
         const { id, request } = MTF_VARIANTS[index];
-        expect(Object.keys(record)).toEqual(["lens", "state", "request", "variant", "payload"]);
+        expect(Object.keys(record)).toEqual(["lens", "state", "request", "variant", "payload", "counters"]);
         expect(record).toMatchObject({ lens: SERENAR, request: "mtf", variant: id });
         const mtf = valueOf(record) as { options: object; result: { support: { available: boolean } } };
         expect(mtf.options).toMatchObject({ ...request, fieldFractions: [...request.fieldFractions] });
@@ -1617,6 +1740,8 @@ describe("engineDiff capture", () => {
         ok: false,
         error: { name: "Error", message: expect.stringContaining(broken.key) },
       });
+      /* A record that threw still says what the engine counted up to the throw: the build it started. */
+      expect(record.counters).toMatchObject({ runtimeLensBuilds: 1, engineLensCompilations: 0 });
     }
   });
 

@@ -147,13 +147,17 @@ and bundled there.
 - `captureEntry.ts` is the entry the driver bundles once per revision. It exports that revision's catalog as
   serialized prescriptions (hosts and teleconverters apart, plus the permitted pairs), and it evaluates the serialized
   prescriptions it is handed, so one revision's data can run on the other's engine. It returns one record per
-  request, each `{ lens, state, request, payload }`, with a `variant` as well where the request named one. A
-  computation that throws is recorded as an outcome, never dropped. It answers which pairs its engine's fit predicate
-  permits for a catalog it is handed, and which of some pairs its engine cannot compose and build. It also
-  re-exports the comparison, which the driver calls from the built bundle.
+  request, each `{ lens, state, request, payload }`, with a `variant` as well where the request named one, and with
+  `counters` where the engine counts its work (rule 7 under "What a Run Compares"). A computation that throws is
+  recorded as an outcome, never dropped. It answers which pairs its engine's fit predicate permits for a catalog it
+  is handed, and which of some pairs its engine cannot compose and build. It also re-exports the comparison, which
+  the driver calls from the built bundle.
 - `seamAdapter.ts` is the only file that names engine modules. It reaches each through an eager `import.meta.glob`,
   which yields nothing for a file a revision lacks, and resolves every capability from an ordered list of candidate
-  exports. A change that renames or moves a seam export adds the new name to that list in the same change.
+  exports. A change that renames or moves a seam export adds the new name to that list in the same change. A
+  capability a revision may do without is listed apart, in `OPTIONAL_SEAM_CANDIDATES`, and is left out of the seam
+  where it has no export instead of failing it. The read side of the engine's work counters
+  (`src/optics/diagnostics.ts`) is the one such: a revision that predates it builds and captures as before.
 - `requests.ts` defines a tier as a deterministic list of lens × state × request family, and cuts a list into
   shards. The three tiers are described under "Tiers" below.
 - `payload.ts` holds the encoding (JSON that round-trips under `Object.is`, with tags for -0, NaN, and the
@@ -162,15 +166,16 @@ and bundled there.
   radius at any magnitude, a zero asphere term, a derived stop radius, the sign of zero). A payload that hands
   authored data back, such as the composed prescription of a pair or the `data` of a built lens, is written through
   the same rules, so a respelling the fingerprint ignores does not change a record. An engine back-pointer is skipped
-  by member name and leaves a marker in the payload.
+  by member name and leaves a marker in the payload. It also holds the form a record carries a work-counter snapshot
+  in.
 - `budgets.ts` holds the quantity classes and the table that gives every numeric payload path one of them. A class
   says how two values are compared and how far they may differ under C1. The table's rows are path patterns, and the
   first row that matches decides.
 - `compare.ts` pairs the records of two captures one lens at a time, judges each difference under the declared change
   class, and keeps totals, the largest difference per quantity and a bounded sample of findings. A lens with many
-  records may be handed over in consecutive parts and is reported as one lens. It also sorts a catalog's changes into
-  format-only and semantic, sets the two engines' permitted pairs side by side, reads the declared exceptions, and
-  writes the reports.
+  records may be handed over in consecutive parts and is reported as one lens. It also sets the two engines' work
+  counters side by side, sorts a catalog's changes into format-only and semantic, sets the two engines' permitted
+  pairs side by side, reads the declared exceptions, and writes the reports.
 
 The build record holds every field of the built lens. Each surface of `S` keeps every member the engine holds for it,
 its inner radius, stop placement, interaction and diffractive phase among them, with a flat radius written as the
@@ -273,6 +278,33 @@ A run takes a base ref and the working tree, which is the head. Nothing is skipp
      fits nothing is none of these. A changed host or converter that lost every pair it had with the base data is
      therefore named in a warning, with the pairs it lost: among the failure lines at the top of `summary.md`, and
      on stderr. Nothing in the run evaluated such a converter, and the run does not fail on it.
+7. **Work counters.** The driver builds both capture bundles with `__OPTICS_COUNTERS__` defined `true`, so an engine
+   that has the work counters ("Work Counters" in `agent_docs/architecture/optics-engine.md`) counts while it is
+   captured. A capture brackets each record: it zeroes the counters before the record's lens is built, so compiling
+   the lens and resolving its materials are counted, and reads them once the record's payload is written. A record
+   that threw carries what was counted up to the throw.
+   - The snapshot travels on the record as `counters`, beside `payload` and never inside it. Every count is
+     written, a zero included; a histogram is written as its non-zero buckets, by bucket index.
+   - Counters are no part of a payload comparison. Two records are equal by everything but their counters, so a C0
+     run is bit-identical on payloads alone, and a base engine that predates the counters compares as it always
+     did. Each line of a payload file holds the record with its counters.
+   - Where both records of a compared pair carry counters, a counter that is higher on the head engine is a rise.
+     "Counters never rise for an identical request" is a gate of every stage end (`OPTICS_ENGINE_REWRITE_SPEC.md`,
+     Efficiency, gate 2), so the tiers a stage runs hold it: **in Tier S and Tier F a counter that rises on any
+     record fails the run, in every class, C3 included. In Tier P a rise is reported and does not fail**: it is a
+     warning among the failure lines at the top of `summary.md` and on stderr. A fall never fails.
+   - A counter that only one engine names is reported and not judged: it has nothing to rise from. A histogram is
+     not judged either. A solve that gets cheaper leaves one bucket and enters another, and the counts beside the
+     histogram already hold the work.
+   - `summary.md` has a "Work counters" section, and `summary.json` the same under `workCounters`: each counter's
+     total over the compared records on the base engine and on the head engine, and the difference; each
+     histogram's entries and median; and the counters that rose, grouped by lens and request family.
+   - When only the head engine carries counters, the section gives the head's totals, says that the base has none,
+     and nothing fails: a base that predates the counters has nothing to compare with.
+   - The other way round, the gate was not applied. The head is the working tree, built to count, so **in Tier S
+     and Tier F a head engine whose records carry no counters beside a base engine's that do fails the run, in
+     every class. In Tier P it is a warning**, where a rise is one. This happens when the counters facade is renamed
+     or moved without the seam adapter's optional candidates following it.
 
 ### Change Classes and Budgets
 
@@ -282,7 +314,8 @@ A run takes a base ref and the working tree, which is the head. Nothing is skipp
   a changed array length is a discrete transition; every one is listed and fails the run, because a pull request has
   no way yet to declare one as expected. C2 uses the C1 budgets: the C2 criteria of the quantity table in
   `OPTICS_ENGINE_REWRITE_SPEC.md` carry a solver tolerance through a derivative, which two payloads cannot supply.
-- **C3**: engine drift is reported and does not fail. Rules 2, 4 and 5 above still do.
+- **C3**: engine drift is reported and does not fail. Rules 2, 4 and 5 above still do, and so does rule 7 in Tiers
+  S and F.
 
 The classes in `budgets.ts`:
 
@@ -365,8 +398,9 @@ node scripts/engine-diff.mjs --base optics-rewrite/s1 --tier f --shard 3/32
 Its output goes under `--out`, or under a new directory in the system temp directory that it names when it ends:
 gzip NDJSON payloads in a `payloads` folder, and the small files in a `reports` folder beside it (`summary.json`,
 `summary.md`, `data-impact.md`, `uncompared.json` and the failing record pairs). Nothing it writes is committed. It
-exits non-zero when a comparison fails or when the uncompared lenses differ from the declared exceptions in either
-direction.
+exits non-zero when a comparison fails, when a work counter rises in a run of Tier S or Tier F, when such a run's
+head records carry no counters beside a base's that do, or when the uncompared lenses differ from the declared
+exceptions in either direction.
 
 ### CI
 
@@ -422,6 +456,9 @@ Three files in the tooling suite hold the harness to its contract.
   changed gives another build record, and no analysis or MTF record carries a skip marker. Asking an engine which
   pairs it permits does not throw on a prescription it cannot read, and it names the pairs it cannot build, each by
   the pair's own build record.
+  An optional capability that a revision lacks is left out of the seam and fails nothing. With the counters on, as
+  Vitest runs, every record carries the counters of its own capture, a second capture counts the same, and a record
+  that threw carries them too; with the flag off the same requests give the same payloads and no counters.
   Each tier's list is the same on every build and for any order of the catalog, Tier S holds every request of Tier
   P and Tier F every request of Tier S, a pair that one engine alone permits is still asked, and the shards of every
   tier are disjoint and complete at several shard counts. It also compares what `requests.ts` has to copy with its
@@ -442,9 +479,15 @@ Three files in the tooling suite hold the harness to its contract.
   build is uncompared in a run that meets it and in one that does not, and passes only when declared; the pairs of
   a host that does not build alone are compared; and the pair lists decide as a pair's own build record does. The
   uncompared lenses are held to the declared exceptions in both directions, and a lens handed over in parts is
-  reported as it would be whole.
+  reported as it would be whole. For the work counters: counters that differ, or that one side lacks, are no
+  difference between two records; an injected rise fails under Tiers S and F in every class and is a warning under
+  Tier P; a fall never fails; a base without counters gives the head's totals alone and no failure; a head without
+  counters beside a base that has them fails under Tiers S and F in every class and is a warning under Tier P; a
+  counter only one engine names and a histogram are not judged; and the rises are grouped by lens and request
+  family.
 - `__tests__/scripts/engineDiffScript.test.ts`: the command line, and runs of the real driver against `HEAD`, on one
-  lens of Tier P and on one lens of one shard of Tier S, which are skipped where git cannot add a worktree.
+  lens of Tier P and on one lens of one shard of Tier S, which are skipped where git cannot add a worktree. Both
+  runs must show work counters on both engines, with no rise.
 
 ## Refactor Test Expectations
 
