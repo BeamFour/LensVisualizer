@@ -90,6 +90,9 @@ GitHub Pages is an active mirror/backup.
 - Quality checks run on PRs via `.github/workflows/quality.yml` (lint, format, typecheck, test, npm audit, build)
 - The same workflow's `engine-diff` job compares the optics engine with the PR's merge-base when engine, lens-data or
   harness paths change; see `agent_docs/architecture/testing.md` (Engine Differential Harness)
+- `.github/workflows/engine-diff-stage.yml` runs the harness's larger tiers as a matrix of shards. It is dispatched by
+  hand for a stage gate, and also runs on a push to an `engine-diff-stage/**` branch, which compares the pushed commit
+  with itself; the same section of `agent_docs/architecture/testing.md` says how to start either
 - Build pipeline: `generate-build-metadata.mjs` (routes + metadata) → `vite build` → `prerender.mjs` (SSR static HTML +
   manifest validation) → `generate-sitemap.mjs` → `generate-rss-feeds.mjs` (writes both static RSS feeds from generated
   metadata)

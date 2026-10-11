@@ -2,6 +2,7 @@ export interface EngineDiffOptions {
   base: string;
   tier: string;
   changeClass: string;
+  shard: { index: number; count: number } | null;
   lens: string | null;
   exceptions: string | null;
   out: string | null;

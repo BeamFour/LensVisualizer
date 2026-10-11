@@ -253,8 +253,9 @@ readings are fixed until the canonical prescription replaces it:
      that loses every pair it had, which the report puts first.
 4. **Exceptions.** Some prescriptions cannot be evaluated by the base engine, for example a V2 file before V2 ingest
    (S2.P2.T1) exists in the base. The PR lists each such lens under a `## Engine-diff exceptions` heading in its
-   description, one backticked lens id per bullet, and the CI job passes the description to `--exceptions`. The run
-   fails when the lenses it could not compare differ from that list in either direction.
+   description, one backticked lens id per bullet, and the CI job passes the description to `--exceptions`. A stage
+   run takes the same ids through the workflow's `exceptions` input. The run fails when the lenses it could not
+   compare differ from that list in either direction.
 5. **No silent pass.**
    - A record that fails to capture on both engines fails the run. A job that throws inside an analysis record is a
      discrete outcome, compared like any other.
@@ -339,7 +340,7 @@ How `budgets.ts` applies the table:
 | Every PR | CI (`.github/workflows/quality.yml`) | lint, format, typecheck, `npm run test`, the tooling suite, build and `seo:audit` (all existing) |
 | Engine or lens-data PR: touches `src/optics/**`, `src/types/**`, `src/lens-data/**` other than `*.md`, `src/utils/catalog/**`, `src/utils/featureFlags.ts`, or the harness itself | CI job `engine-diff` (S1.P2.T2) | Tier P against the merge-base under the PR's change class, plus every changed or new lens through every Tier P request |
 | Phase end | The PR that ends the phase | Every test the phase's steps added, run together; the phase exit criteria |
-| Stage end | GitHub Actions: `engine-diff-stage.yml` by `workflow_dispatch`, sharded as a matrix (S1.P2.T3). Timing runs on the maintainer's machine. | Tier S against the current anchor; the full suites; build; the stage's efficiency report; then the tag |
+| Stage end | GitHub Actions: `engine-diff-stage.yml` by `workflow_dispatch`, sharded as a matrix (S1.P2.T3). A PR that adds or changes the workflow pushes its head to `engine-diff-stage/<name>` instead. Timing runs on the maintainer's machine. | Tier S against the current anchor; the full suites; build; the stage's efficiency report; then the tag |
 | Before S8.P2 deletes code | `engine-diff-stage.yml`, sharded | Tier F against the current anchor |
 
 ### Differential harness
@@ -384,10 +385,14 @@ shrinks by documented stratification; its assertions never do.
 | --- | --- | --- | --- |
 | **P** | Every catalog lens, visible and hidden | First and last zoom station, infinity focus, wide open | Build constants; layout; meridional fans on- and off-axis, a skew fan and a chromatic fan, each with terminal points and full hits, and one on-axis fan through the legacy tracer; field geometry; chief solves at 0, 0.5 and 1 of the analysis half-field |
 | | The 15 benchmark lenses plus one representative of each feature: fisheye; folded auto and explicit-order paths; diffractive; bulk absorption; rear plates; a converter pair; PC shift + tilt; finite conjugate; fixed-iris zoom; aberration control. Also every lens whose data changed, and every pair of a changed host or converter | The default state, plus one feature state where the default leaves the feature idle: the moved pose, the finite conjugate, the aberration ring at its end | Every analysis job, perspective jobs included; geometric MTF at a 32-cell grid |
-| **S** | All | Every authored zoom × focus station (about 3,400 states) × {wide open, one stop-down ratio}; aberration endpoints and center for every `aberrationControl` lens; every permitted converter pair at every host station | Everything in Tier P's first row |
-| | A stratified set of about 60 lenses: every projection kind, every folded fixture, every PC lens, every diffractive and absorbing lens, every rear-plate maker, every converter pair, the 10 heaviest benchmark lenses and 10 drawn by a fixed seed | Their authored stations | Every analysis job; MTF at both methods and three spectra on the MTF benchmark cases |
-| **F** | All | Every authored station × {wide open, stopped down} | Every analysis job |
+| **S** | All, and every permitted converter pair | Every authored zoom × focus station (about 3,400 states) × {wide open, one stop-down ratio}; for an `aberrationControl` lens also the ring's other positions, both ends of a centered ring or the far end of a two-position one; a pair at every station of its host | Everything in Tier P's first row |
+| | A stratified set of about 100 lenses: every Tier P analysis lens, one lens per projection kind, every folded lens, every PC lens, every diffractive and absorbing lens, one lens per rear-plate maker, every converter pair, and 10 drawn by a fixed seed | Their authored stations, wide open; a PC lens also in the moved pose | Every analysis job; MTF at both methods and three spectra on the MTF benchmark lenses |
+| **F** | All, and every permitted converter pair | Every authored station × {wide open, stopped down}; a PC lens also in the moved pose | Everything in Tier S, with every analysis job on every lens and pair |
 
+- **Each tier holds the one before it.** Every Tier P request is a Tier S request, and every Tier S request a Tier F
+  request; a test holds both.
+- **Shards** split a tier by lens, never inside one. The stage workflow defaults to 8 shards for Tier S and 32 for
+  Tier F.
 - **Every analysis job** means the analysis-context accessors, centered and perspective; field curvature; the three
   group-movement modes; cardinal elements; aspheric comparison; and the readouts the analysis tabs compute outside the
   context: the chromatic field-focus summary, longitudinal chromatic focus, LoCA bar offsets, aspheric departure and
@@ -884,7 +889,10 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
 - **S1.P2.T3 Stage and full tiers.**
   - **Change:**
     - Tier S and Tier F request lists, with `--shard`;
-    - a `workflow_dispatch` workflow `.github/workflows/engine-diff-stage.yml` that runs the shards as a matrix.
+    - a `workflow_dispatch` workflow `.github/workflows/engine-diff-stage.yml` that runs the shards as a matrix. It
+      also runs on a push to `engine-diff-stage/**`, comparing the pushed commit against itself. GitHub cannot
+      dispatch a workflow whose file is not on the default branch, so that push is how a PR that adds or changes the
+      workflow gets its run before merge.
   - **Tests:** shard partitions are disjoint and complete.
   - **Where it runs:** GitHub Actions for every stage and pre-deletion comparison. Timing never runs there; it stays on
     the maintainer's machine (see [Method](#method)).

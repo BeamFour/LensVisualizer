@@ -38,6 +38,7 @@ import {
   type ComparableRecord,
   type DataChange,
   type Finding,
+  type LensCaptures,
   type RunContext,
   type RunSummary,
 } from "../../../src/benchmarks/engineDiff/compare.js";
@@ -46,6 +47,7 @@ import {
   ANALYSIS_CONTEXT_JOBS,
   DEFAULT_STATE,
   FEATURE_REPRESENTATIVES,
+  MTF_VARIANTS,
   lensId,
   stateId,
   tierRequests,
@@ -122,6 +124,7 @@ const failuresOf = (summary: RunSummary): Partial<Finding>[] =>
 /** What a driver knows about a run and passes to the reports. */
 const REPORT_CONTEXT: RunContext = {
   tier: "p",
+  shard: null,
   base: { ref: "origin/main", commit: "0123456789abcdef" },
   head: { commit: "fedcba9876543210", uncommittedChanges: true },
   lens: SERENAR,
@@ -241,11 +244,12 @@ describe("engineDiff budget table", () => {
     );
   });
 
-  it("gives every numeric leaf of real Tier P records one quantity class", { timeout: 120_000 }, () => {
+  it("gives every numeric leaf of real Tier P and named MTF records one quantity class", { timeout: 120_000 }, () => {
     /* Nine lenses of the analysis row whose records, between them, hold every numeric path the whole of Tier P
      * produces today: every analysis job and MTF, a converter pair's composition, vector launches, folded paths, a
      * finite conjugate, an aberration-control ring and a tilt-shift lens. Each numeric leaf must resolve; a new
-     * payload member fails here until the table says what it is. */
+     * payload member fails here until the table says what it is. The named MTF requests of the stage tier add
+     * what only the diffraction method and a spectrum return. */
     const representatives = [
       SERENAR,
       PAIR_ID,
@@ -290,6 +294,16 @@ describe("engineDiff budget table", () => {
         families.add(record.request);
         if (record.payload.ok) visit(record.payload.value, record.request, []);
       }
+    }
+    const namedMtf = tierRequests("s", requestCatalog(CATALOG)).filter(
+      (request) =>
+        request.variant !== undefined && request.lens.key === SERENAR && request.state?.focusT === DEFAULT_STATE.focusT,
+    );
+    expect(namedMtf.map((request) => request.variant)).toEqual(MTF_VARIANTS.map(({ id }) => id));
+    for (const record of captureRecords(CATALOG, namedMtf)) {
+      const value = (record.payload.ok ? record.payload.value : null) as { result: { fields: object[] } } | null;
+      expect(value?.result.fields.length).toBeGreaterThan(0);
+      visit(value, record.request, []);
     }
 
     expect([...unclassified]).toEqual([]);
@@ -979,6 +993,34 @@ describe("engineDiff drift detection", () => {
   it("refuses captures that do not answer the same requests", () => {
     expect(() => compare("c0", SERENAR_RECORDS.slice(1))).toThrow("do not answer the same requests");
     expect(() => compare("c0", [...SERENAR_RECORDS].reverse())).toThrow("do not answer the same requests");
+    /* Two records of one family at one state are the same request only under the same variant. */
+    const named = (variant: string) =>
+      SERENAR_RECORDS.map((record) => (record.request === "mtf" ? { ...record, variant } : record));
+    expect(() => compare("c0", named("diffraction/cdf"), named("geometric/cdf"))).toThrow(
+      "do not answer the same requests",
+    );
+    expect(() => compare("c0", named("diffraction/cdf"))).toThrow("do not answer the same requests");
+    expect(compare("c0", named("diffraction/cdf"), named("diffraction/cdf")).passed).toBe(true);
+  });
+
+  it("names the variant of a record in its findings and in the report", () => {
+    const base = SERENAR_RECORDS.map((record) =>
+      record.request === "mtf" ? { ...record, variant: "diffraction/cdf" } : record,
+    );
+    const head = withChange("mtf", ["result", "fields", 0, "sagittal", 1], (value) => Number(value) + 1e-3, base);
+    const summary = compare("c1", head, base);
+    expect(summary.engine.failures).toMatchObject([
+      { request: "mtf", variant: "diffraction/cdf", path: "result.fields[0].sagittal[1]", quantity: "mtfModulation" },
+    ]);
+    const markdown = renderSummaryMarkdown(summary, REPORT_CONTEXT);
+    expect(markdown).toContain("| mtf diffraction/cdf | `result.fields[0].sagittal[1]` |");
+    expect(markdown).toContain(`${SERENAR} mtf diffraction/cdf \`result.fields[0].sagittal[1]\``);
+    /* A record without a variant gets no such member: a finding stays what it was. */
+    const plain = compare(
+      "c1",
+      withChange("mtf", ["result", "fields", 0, "sagittal", 1], (value) => Number(value) + 1e-3),
+    );
+    expect(plain.engine.failures[0]).not.toHaveProperty("variant");
   });
 
   it("returns each record as one line of JSON, and both sides of a failing pair", () => {
@@ -1401,6 +1443,88 @@ describe("engineDiff cross-evaluation", () => {
       uncompared: [{ lens: key }],
       thrownOnBothEngines: { records: 0 },
     });
+  });
+
+  it("takes a lens in consecutive parts, and reports what it would for the lens whole", () => {
+    type Captures = Omit<LensCaptures, "lens">;
+    /** One lens through a run, whole or cut after its build constants and again in the middle of its state. */
+    const through = (captures: Captures, cuts: readonly number[]) => {
+      const run = createDifferentialRun({ changeClass: "c1", declaredExceptions: [], restricted: false });
+      const bounds = [0, ...cuts, requests.length];
+      const outputs = bounds.slice(1).map((to, part) => {
+        const from = bounds[part];
+        return run.addLens({
+          lens: key,
+          dataChange: captures.dataChange,
+          baseEngine: captures.baseEngine.slice(from, to),
+          headEngine: captures.headEngine.slice(from, to),
+          baseData: captures.baseData?.slice(from, to) ?? null,
+        });
+      });
+      return {
+        summary: run.finish(),
+        headLines: outputs.flatMap((output) => output.lines.headEngine),
+        baseDataLines: outputs.flatMap((output) => output.lines.baseData),
+        failingRecords: outputs.flatMap((output) => output.failingRecords),
+      };
+    };
+
+    /* Each drift is in a record of the last part, where a part that stood alone would misjudge the lens. */
+    const drifted = withChange("chiefSolves", ["halfFieldDeg"], (value) => Number(value) + 1, plainRecords);
+    const failedRay = withChange("traces", [...RAY, "status"], () => "failed", plainRecords);
+    const thickerRecords = captureRecords(catalogOf(thicker), requests);
+    const unbuilt = captureRecords(catalogOf(unbuildable), requests);
+    /* A failed ray that came with a longer fan: the paired walk does not enter the fan, the record's totals show it. */
+    const longerFan = withChange(
+      "traces",
+      ["onAxis", "rays"],
+      (rays) => [...(rays as object[]), { ...(rays as object[])[1], status: "failed" }],
+      plainRecords,
+    );
+    const cases: Record<string, Captures> = {
+      identical: { dataChange: "unchanged", baseEngine: plainRecords, headEngine: structuredClone(plainRecords) },
+      drift: { dataChange: "unchanged", baseEngine: plainRecords, headEngine: drifted },
+      uncompared: { dataChange: "unchanged", baseEngine: unevaluated, headEngine: plainRecords },
+      formatOnly: { dataChange: "format", baseEngine: plainRecords, headEngine: plainRecords, baseData: drifted },
+      semantic: {
+        dataChange: "semantic",
+        baseEngine: thickerRecords,
+        headEngine: thickerRecords,
+        baseData: plainRecords,
+      },
+      blocked: { dataChange: "semantic", baseEngine: failedRay, headEngine: failedRay, baseData: plainRecords },
+      blockedByCount: { dataChange: "semantic", baseEngine: longerFan, headEngine: longerFan, baseData: plainRecords },
+      added: { dataChange: "new", baseEngine: plainRecords, headEngine: plainRecords },
+      addedUnbuilt: { dataChange: "new", baseEngine: unbuilt, headEngine: unbuilt },
+      /* Whether a lens that builds nowhere is the data rules' to judge is settled by the part with its build record. */
+      unbuiltUnchanged: { dataChange: "unchanged", baseEngine: unbuilt, headEngine: unbuilt },
+      unbuiltChanged: { dataChange: "semantic", baseEngine: unbuilt, headEngine: unbuilt, baseData: plainRecords },
+    };
+    const whole = Object.fromEntries(Object.entries(cases).map(([name, captures]) => [name, through(captures, [])]));
+    for (const [name, captures] of Object.entries(cases)) {
+      expect(through(captures, [1, 3]), name).toEqual(whole[name]);
+      expect(through(captures, [1, 2, 3, 4]), name).toEqual(whole[name]);
+    }
+
+    /* The cases are what they say: one lens each time, judged once. */
+    expect(Object.values(whole).map(({ summary }) => summary.lenses)).toEqual(Object.keys(cases).map(() => 1));
+    expect(whole.identical.summary).toMatchObject({ passed: true, engine: { records: requests.length } });
+    expect(whole.drift.summary.engine.failures).toMatchObject([{ request: "chiefSolves", path: "halfFieldDeg" }]);
+    expect(whole.uncompared.summary).toMatchObject({ uncompared: [{ lens: key }], engine: { records: 0 } });
+    expect(whole.formatOnly.summary.formatOnly).toMatchObject({ lenses: [key], records: requests.length, failing: 1 });
+    expect(whole.semantic.summary.dataImpact).toMatchObject([{ lens: key, change: "semantic", blocking: 0 }]);
+    expect(whole.semantic.summary.dataImpact[0].recordsDiffering).toBeGreaterThan(1);
+    expect(whole.blocked.summary.dataImpact).toMatchObject([{ blocking: 1, blockers: [{ request: "traces" }] }]);
+    expect(whole.blockedByCount.summary.dataImpact).toMatchObject([
+      { blocking: 1, blockers: [{ request: "traces", path: "" }] },
+    ]);
+    expect(whole.unbuiltUnchanged.summary.thrownOnBothEngines.records).toBe(requests.length);
+    expect(whole.unbuiltChanged.summary).toMatchObject({
+      thrownOnBothEngines: { records: 0 },
+      dataImpact: [{ blocking: requests.length }],
+    });
+    expect(whole.added.summary.dataImpact).toMatchObject([{ change: "new", records: requests.length, blocking: 0 }]);
+    expect(whole.addedUnbuilt.summary.dataImpact).toMatchObject([{ change: "new", blocking: 1 }]);
   });
 });
 
@@ -2143,6 +2267,15 @@ describe("engineDiff reports", () => {
     expect(renderDataImpactMarkdown(summary, REPORT_CONTEXT)).toContain("- `engine-diff-leaving`");
     /* The summary is written as JSON beside the Markdown. */
     expect(JSON.parse(JSON.stringify(summary))).toEqual(summary);
+  });
+
+  it("names the shard a run covered, beside its tier", () => {
+    const summary = compare("c0", structuredClone(SERENAR_RECORDS));
+    const sharded: RunContext = { ...REPORT_CONTEXT, tier: "s", shard: { index: 3, count: 8 }, lens: null };
+    expect(renderSummaryMarkdown(summary, sharded)).toContain("Tier S, class C0, shard 3 of 8. Base `012345678`");
+    expect(renderSummaryMarkdown(summary, { ...sharded, lens: SERENAR })).toContain(
+      "Tier S, class C0, shard 3 of 8, lens `canon-serenar-50f18` only.",
+    );
   });
 
   it("says under C2 which of the plan's criteria it does not apply", () => {

@@ -4,7 +4,7 @@
  * Compares what the optics engine returns at a base ref with what it returns in the working tree, for one tier of
  * requests, under a declared change class. It adds a detached git worktree at the base in the system temp
  * directory, copies the working tree's `src/benchmarks/engineDiff/` into it, bundles the capture entry once per
- * side with this checkout's Vite, and then captures and compares one lens at a time:
+ * side with this checkout's Vite, and then captures and compares one lens at a time, a bounded part of it at once:
  *
  * - engine drift: every head prescription on the base engine and on the head engine, under the class;
  * - a format-only data change (the prescription differs, its semantic fingerprint does not): the base and head
@@ -19,13 +19,17 @@
  * engine can, is uncompared instead, and one that only the head's prescriptions permit is compared as a new lens.
  * A record that throws on both engines fails the run in any class.
  *
+ * A tier too long for one run is split with `--shard i/n`: the tier's lenses are dealt into n parts, and the run
+ * covers part i, counted from 1. The parts of a tier share no lens and together hold all of them, so n runs with
+ * the same base, tier and class are one comparison of the tier.
+ *
  * It writes gzip NDJSON payloads under `<out>/payloads/` and the small files under `<out>/reports/`: summary.json,
  * summary.md, data-impact.md, uncompared.json and failing-records.ndjson.gz. Nothing it writes belongs in the
  * repository. The exit code is 0 when the run passes and 1 when it fails or cannot run. Told to stop by SIGINT or
  * SIGTERM, it removes its base worktree and its temporary directories first.
  *
  * Usage:
- *   node scripts/engine-diff.mjs --base <ref> [--tier p] [--class c0|c1|c2|c3] [--lens <id>]
+ *   node scripts/engine-diff.mjs --base <ref> [--tier p|s|f] [--class c0|c1|c2|c3] [--shard i/n] [--lens <id>]
  *     [--exceptions <file>] [--out <dir>]
  */
 
@@ -57,12 +61,14 @@ const HARNESS_DIR = join("src", "benchmarks", "engineDiff");
 const CAPTURE_ENTRY = join(HARNESS_DIR, "captureEntry.ts");
 
 const TIERS = ["p", "s", "f"];
-/* Tiers S and F, and the shards that split them across runners, arrive with their request lists in S1.P2.T3. */
-const DEFINED_TIERS = ["p"];
 const CHANGE_CLASSES = ["c0", "c1", "c2", "c3"];
 /* Failing record pairs go to reports/, which CI uploads; past this much text the rest are counted, not written. */
 const MAX_FAILING_RECORD_BYTES = 32 * 1024 * 1024;
 const PROGRESS_EVERY_LENSES = 100;
+/* A lens is captured, compared and written this many requests at a time. One zoom has 130 authored stations, and
+ * its Tier F records are over a gigabyte of text per side: held whole, on both sides, they do not fit the heap.
+ * An analysis record is several megabytes, so a small part keeps the peak low and costs no time. */
+const MAX_REQUESTS_PER_PART = 8;
 
 export const USAGE =
   "usage: node scripts/engine-diff.mjs --base <ref> [--tier p|s|f] [--class c0|c1|c2|c3] [--shard i/n] " +
@@ -74,9 +80,10 @@ const VALUE_FLAGS = ["base", "tier", "class", "shard", "lens", "exceptions", "ou
  * Parse the command line.
  *
  * @param {readonly string[]} argv - arguments after the script name; a value follows its flag or an "="
- * @returns {{ base: string, tier: string, changeClass: string, lens: string | null, exceptions: string | null,
- *   out: string | null }} the options, with tier "p" and class "c0" when not given
- * @throws when an argument is unknown, a value is missing or invalid, or a tier or shard is not defined yet
+ * @returns {{ base: string, tier: string, changeClass: string, shard: { index: number, count: number } | null,
+ *   lens: string | null, exceptions: string | null, out: string | null }} the options, with tier "p" and class "c0"
+ *   when not given
+ * @throws when an argument is unknown, or a value is missing or invalid
  */
 export function parseArgs(argv) {
   const values = {};
@@ -89,17 +96,17 @@ export function parseArgs(argv) {
     if (value === undefined || value === "") throw new Error(`--${name} needs a value.\n${USAGE}`);
     values[name] = value;
   }
-  const { base, tier = "p", class: changeClass = "c0", shard, lens = null, exceptions = null, out = null } = values;
+  const { base, tier = "p", class: changeClass = "c0", lens = null, exceptions = null, out = null } = values;
   if (!base) throw new Error(`--base <ref> is required.\n${USAGE}`);
   if (!TIERS.includes(tier)) throw new Error(`--tier must be one of ${TIERS.join(", ")}.`);
   if (!CHANGE_CLASSES.includes(changeClass)) throw new Error(`--class must be one of ${CHANGE_CLASSES.join(", ")}.`);
-  if (shard !== undefined) {
-    const [, part, parts] = /^(\d+)\/(\d+)$/.exec(shard) ?? [];
-    if (!(Number(part) >= 1 && Number(part) <= Number(parts))) throw new Error("--shard must be i/n with 1 <= i <= n.");
-    throw new Error("--shard is not defined yet: S1.P2.T3 adds it with tiers s and f.");
+  let shard = null;
+  if (values.shard !== undefined) {
+    const [, index, count] = /^(\d+)\/(\d+)$/.exec(values.shard) ?? [];
+    shard = { index: Number(index), count: Number(count) };
+    if (!(shard.index >= 1 && shard.index <= shard.count)) throw new Error("--shard must be i/n with 1 <= i <= n.");
   }
-  if (!DEFINED_TIERS.includes(tier)) throw new Error(`--tier ${tier} is not defined yet: S1.P2.T3 adds tiers s and f.`);
-  return { base, tier, changeClass, lens, exceptions, out };
+  return { base, tier, changeClass, shard, lens, exceptions, out };
 }
 
 /* ── Git ── */
@@ -307,7 +314,7 @@ function cleanUpOnSignal(cleanUp) {
 
 /* A signal handler runs between turns of the event loop, and a capture is one long synchronous turn that the
  * awaits around it do not end: a write that needs no drain resolves in the same turn. The run therefore yields a
- * turn before each capture, and acts on a signal within the time the capture of one lens takes. */
+ * turn before each capture, and acts on a signal within the time one capture of a few requests takes. */
 const nextTurn = () => new Promise((resolve) => setImmediate(resolve));
 
 /* ── The run ── */
@@ -335,8 +342,10 @@ export async function runEngineDiff(options, log = console.log, warn = console.e
   mkdirSync(reportsDir, { recursive: true });
   const bundlesDir = mkdtempSync(join(os.tmpdir(), "engine-diff-bundles-"));
 
+  const scope = `tier ${options.tier}${options.shard ? ` shard ${options.shard.index}/${options.shard.count}` : ""}`;
   log(
-    `engine-diff: base ${baseCommit.slice(0, 9)} (${options.base}) against the working tree at ${headCommit.slice(0, 9)}`,
+    `engine-diff: ${scope}, base ${baseCommit.slice(0, 9)} (${options.base}) against the working tree at ` +
+      `${headCommit.slice(0, 9)}`,
   );
   for (const path of otherBaseWorktrees()) {
     warn(
@@ -382,7 +391,7 @@ export async function runEngineDiff(options, log = console.log, warn = console.e
       /* The base engine may predate the form a head prescription is written in. Each engine is asked to compose
        * and build every one of those pairs, once. A pair the base engine cannot build and the head engine can is
        * set aside as uncompared and not read as a difference between the two predicates. That is decided here, for
-       * the whole tier, so a narrowed run that never meets the pair lists it as this run does. */
+       * the whole tier, so a narrowed run or a shard that never meets the pair lists it as this run does. */
       const either = [...permitted.headEngine, ...permitted.baseEngine];
       const unbuilt = {
         headEngine: headCapture.unbuiltPairs(head, either),
@@ -397,29 +406,35 @@ export async function runEngineDiff(options, log = console.log, warn = console.e
     });
 
     /* One request list for both engines, from the head's prescriptions and every pair either engine permits for
-     * them: a pair one engine lost is still asked of both, and that engine throws on it. A changed or new lens, and
-     * each pair of a changed or new host or converter, goes through every request of the tier, not only the rows
-     * that cover every lens. */
+     * them: a pair one engine lost is still asked of both, and that engine throws on it. Tier P sends a changed or
+     * new lens, and each pair of a changed or new host or converter, through every request it has. */
     const requestsByLens = new Map();
     const tierRequests = headCapture.tierRequests(options.tier, {
       ...headCapture.requestCatalog({ ...headCatalog, pairs: pairs.requested }),
       changedLensKeys: Object.keys(changes.lenses),
       changedTeleconverterKeys: Object.keys(changes.teleconverters),
     });
-    for (const request of tierRequests) {
+    /* The shard is cut from the whole tier, before any narrowing, so a lens is in the same shard in every run. */
+    const requests = options.shard ? headCapture.shardRequests(tierRequests, options.shard) : tierRequests;
+    for (const request of requests) {
       const id = headCapture.lensId(request.lens);
       if (options.lens !== null && id !== options.lens) continue;
       if (!requestsByLens.has(id)) requestsByLens.set(id, []);
       requestsByLens.get(id).push(request);
     }
     if (requestsByLens.size === 0) {
-      throw new Error(`engine-diff: tier ${options.tier} has no request for the lens "${options.lens}".`);
+      throw new Error(
+        options.lens === null
+          ? `engine-diff: ${scope} has no lens.`
+          : `engine-diff: ${scope} has no request for the lens "${options.lens}".`,
+      );
     }
 
     const run = headCapture.createDifferentialRun({
       changeClass: options.changeClass,
       declaredExceptions: headCapture.parseDeclaredExceptions(declaredText),
-      restricted: options.lens !== null,
+      /* A shard, like a single lens, is part of a tier: a declared exception may be in another part. */
+      restricted: options.lens !== null || options.shard !== null,
       pairs: pairs.differences,
     });
     const payloads = {
@@ -430,42 +445,44 @@ export async function runEngineDiff(options, log = console.log, warn = console.e
     const failingRecords = openGzipLines(join(reportsDir, "failing-records.ndjson.gz"));
     const failingRecordCounts = { written: 0, bytes: 0, omitted: 0 };
 
-    /* One lens at a time, written out before the next is captured: a tier is hundreds of megabytes per side. */
+    /* One lens at a time, in the order of the list, and each part of it written out before the next is captured:
+     * a tier is gigabytes per side. */
     let done = 0;
-    for (const [lens, requests] of requestsByLens) {
+    for (const [lens, lensRequests] of requestsByLens) {
       /* A pair the base's prescriptions do not permit is new: the base data has nothing to set it beside. */
-      const dataChange = headCapture.dataChangeOf(changes, requests[0].lens, pairs.differences.headDataOnly);
-      await nextTurn();
-      const baseEngine = clock.time("Capture on the base engine", () =>
-        baseCapture.captureRecords(headCatalog, requests),
-      );
-      await nextTurn();
-      const headEngine = clock.time("Capture on the head engine", () =>
-        headCapture.captureRecords(headCatalog, requests),
-      );
-      const baseData =
-        dataChange === "format" || dataChange === "semantic"
-          ? clock.time("Capture of base data on the head engine", () =>
-              headCapture.captureRecords(baseCatalog, requests),
-            )
-          : null;
-      const output = clock.time("Comparison", () =>
-        run.addLens({ lens, dataChange, baseEngine, headEngine, baseData }),
-      );
-      await clock.timeAsync("Writing payloads", async () => {
-        await payloads.baseEngine.write(output.lines.baseEngine);
-        await payloads.headEngine.write(output.lines.headEngine);
-        await payloads.baseData.write(output.lines.baseData);
-        for (const line of output.failingRecords) {
-          if (failingRecordCounts.bytes + line.length > MAX_FAILING_RECORD_BYTES) {
-            failingRecordCounts.omitted++;
-            continue;
+      const dataChange = headCapture.dataChangeOf(changes, lensRequests[0].lens, pairs.differences.headDataOnly);
+      for (let start = 0; start < lensRequests.length; start += MAX_REQUESTS_PER_PART) {
+        const part = lensRequests.slice(start, start + MAX_REQUESTS_PER_PART);
+        await nextTurn();
+        const baseEngine = clock.time("Capture on the base engine", () =>
+          baseCapture.captureRecords(headCatalog, part),
+        );
+        await nextTurn();
+        const headEngine = clock.time("Capture on the head engine", () =>
+          headCapture.captureRecords(headCatalog, part),
+        );
+        const baseData =
+          dataChange === "format" || dataChange === "semantic"
+            ? clock.time("Capture of base data on the head engine", () => headCapture.captureRecords(baseCatalog, part))
+            : null;
+        const output = clock.time("Comparison", () =>
+          run.addLens({ lens, dataChange, baseEngine, headEngine, baseData }),
+        );
+        await clock.timeAsync("Writing payloads", async () => {
+          await payloads.baseEngine.write(output.lines.baseEngine);
+          await payloads.headEngine.write(output.lines.headEngine);
+          await payloads.baseData.write(output.lines.baseData);
+          for (const line of output.failingRecords) {
+            if (failingRecordCounts.bytes + line.length > MAX_FAILING_RECORD_BYTES) {
+              failingRecordCounts.omitted++;
+              continue;
+            }
+            failingRecordCounts.written++;
+            failingRecordCounts.bytes += line.length;
+            await failingRecords.write([line]);
           }
-          failingRecordCounts.written++;
-          failingRecordCounts.bytes += line.length;
-          await failingRecords.write([line]);
-        }
-      });
+        });
+      }
       if (++done % PROGRESS_EVERY_LENSES === 0) log(`engine-diff: ${done} of ${requestsByLens.size} lenses`);
     }
     await clock.timeAsync("Writing payloads", async () => {
@@ -475,6 +492,7 @@ export async function runEngineDiff(options, log = console.log, warn = console.e
     const summary = run.finish();
     const context = {
       tier: options.tier,
+      shard: options.shard,
       base: { ref: options.base, commit: baseCommit },
       head: { commit: headCommit, uncommittedChanges },
       lens: options.lens,
@@ -499,7 +517,7 @@ export async function runEngineDiff(options, log = console.log, warn = console.e
 
     const { engine, counts } = summary;
     log(
-      `engine-diff: ${summary.passed ? "passed" : "FAILED"} (tier ${options.tier}, class ${options.changeClass}): ` +
+      `engine-diff: ${summary.passed ? "passed" : "FAILED"} (${scope}, class ${options.changeClass}): ` +
         `${summary.lenses} lenses, ${engine.records} records and ${engine.numbers} numbers compared, ` +
         `${engine.recordsDiffering} records differ; rays ok/clipped/failed ` +
         `${counts.headEngine.rays.ok}/${counts.headEngine.rays.clipped}/${counts.headEngine.rays.failed}.`,

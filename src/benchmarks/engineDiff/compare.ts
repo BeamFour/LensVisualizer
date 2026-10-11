@@ -32,6 +32,8 @@ export interface ComparableRecord {
   lens: string;
   state: CaptureState | null;
   request: RequestFamily;
+  /** Which of the family's requests the record answers, where the request named one. */
+  variant?: string;
   payload: Outcome<EncodedValue>;
 }
 
@@ -77,6 +79,8 @@ export interface Finding {
   /** `stateId` of the record's state. */
   state: string;
   request: RequestFamily;
+  /** The record's variant, when its request named one. */
+  variant?: string;
   /** Path under the record's value, with array indices. */
   path: string;
   kind: DifferenceKind;
@@ -500,6 +504,8 @@ export interface RecordCounts {
   /** `stateId` of the record's state. */
   state: string;
   request: RequestFamily;
+  /** The record's variant, when its request named one. */
+  variant?: string;
   failedStatuses: number;
   /** Non-finite numbers the engine computed; one that hands an authored value back is not counted. */
   nonFinite: number;
@@ -563,7 +569,10 @@ export interface RunOptions {
   pairs?: PairDifferences;
 }
 
-/** The records of one lens, from every capture the lens needs. */
+/**
+ * The records of one lens, from every capture the lens needs. A lens with many records may be handed over in
+ * consecutive parts, each with the same lens and data change; the part with its build constants comes first.
+ */
 export interface LensCaptures {
   /** `lensId` of the lens every record names. */
   lens: string;
@@ -576,7 +585,7 @@ export interface LensCaptures {
   baseData?: readonly ComparableRecord[] | null;
 }
 
-/** What a driver writes for one lens. */
+/** What a driver writes for one lens, or for one part of it. */
 export interface LensOutput {
   /** One line of JSON per record, per capture, in request order. */
   lines: { baseEngine: string[]; headEngine: string[]; baseData: string[] };
@@ -621,10 +630,13 @@ export interface RunSummary {
 
 export interface DifferentialRun {
   /**
-   * Compare one lens's records and fold the result into the run.
+   * Compare one lens's records, or the next part of them, and fold the result into the run.
    *
-   * @param captures - every record captured for the lens
-   * @returns the text a driver writes for the lens
+   * A lens handed over in parts is reported as it would be whole: it counts once, and whether the base engine can
+   * evaluate it is decided by its first part.
+   *
+   * @param captures - the records captured for the lens, or for one part of its requests
+   * @returns the text a driver writes for those records
    * @throws when two captures do not answer the same requests in the same order
    */
   addLens(captures: LensCaptures): LensOutput;
@@ -768,13 +780,18 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
    * was decided there, once, and that answer stands in a run that meets the pair as in one that does not. */
   const setAside = new Map(options.pairs?.uncompared.map(({ lens, reason }) => [lens, reason]));
   const thrown: RunSummary["thrownOnBothEngines"] = { records: 0, samples: [] };
-  let lenses = 0;
+  /* Lenses that do not build on their head data on either engine, and that the data rules judge for it. */
+  const unbuilt = new Set<string>();
+  /* Every lens met so far, and the data-impact entry of each that has one: a later part of a lens adds to it. */
+  const met = new Set<string>();
+  const impacts = new Map<string, { entry: DataImpact; tally: ComparisonTally }>();
 
   const findingOf = (comparison: ComparisonName, record: ComparableRecord, difference: RawDifference): Finding => ({
     comparison,
     lens: record.lens,
     state: stateId(record.state),
     request: record.request,
+    ...(record.variant === undefined ? {} : { variant: record.variant }),
     path: difference.path,
     kind: difference.kind,
     quantity: difference.quantity,
@@ -792,6 +809,7 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
       lens: head.lens,
       state: stateId(head.state),
       request: head.request,
+      ...(head.variant === undefined ? {} : { variant: head.variant }),
       path: "ok",
       kind: "discrete",
       quantity: null,
@@ -869,12 +887,35 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
     return difference.measure !== null && difference.budget !== null && difference.measure > difference.budget;
   };
 
+  /** The data-impact entry of a lens and the tally behind it, opened by the first part of the lens that needs one. */
+  const impactOf = (lens: string, change: DataImpact["change"]) => {
+    let impact = impacts.get(lens);
+    if (!impact) {
+      const entry: DataImpact = {
+        lens,
+        change,
+        records: 0,
+        recordsDiffering: 0,
+        numbersDiffering: 0,
+        transitions: 0,
+        largest: [],
+        blocking: 0,
+        blockers: [],
+      };
+      impact = { entry, tally: emptyTally() };
+      impacts.set(lens, impact);
+      dataImpact.push(entry);
+    }
+    return impact;
+  };
+
   const sameRequests = (a: readonly ComparableRecord[], b: readonly ComparableRecord[]) =>
     a.length === b.length &&
     a.every(
       (record, index) =>
         record.lens === b[index].lens &&
         record.request === b[index].request &&
+        record.variant === b[index].variant &&
         stateId(record.state) === stateId(b[index].state),
     );
 
@@ -883,7 +924,8 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
     if (!sameRequests(baseEngine, headEngine) || (needsBaseData && !(baseData && sameRequests(baseData, headEngine)))) {
       throw new Error(`engineDiff: the captures of ${lens} do not answer the same requests in the same order`);
     }
-    lenses++;
+    const firstPart = !met.has(lens);
+    met.add(lens);
     const lines = {
       baseEngine: baseEngine.map((record) => JSON.stringify(record)),
       headEngine: headEngine.map((record) => JSON.stringify(record)),
@@ -897,23 +939,24 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
     const numbersAt = headEngine.map((record) => countRecord(record, counts.headEngine));
 
     /* Engine drift. The encoded records are compared as text first; only a pair that differs is walked. */
-    const unevaluated = setAside.get(lens) ?? baseCannotEvaluate(baseEngine, headEngine);
-    if (unevaluated !== null) {
-      uncompared.push({ lens, reason: unevaluated });
-    } else {
-      compared.add(lens);
+    if (firstPart) {
+      const unevaluated = setAside.get(lens) ?? baseCannotEvaluate(baseEngine, headEngine);
+      if (unevaluated !== null) uncompared.push({ lens, reason: unevaluated });
+      else compared.add(lens);
       /* A lens that builds on neither engine has nothing but thrown records. The data rules judge it when its data
        * is new, which blocks by not building, or changed from a prescription that built, which blocks by no longer
        * building. With the same data on both sides nothing else would, so its thrown records count below. */
       const build = headEngine.findIndex((record) => record.request === "build");
       const buildsNowhere = build >= 0 && !headEngine[build].payload.ok && !baseEngine[build].payload.ok;
       const builtBefore = needsBaseData && baseData?.[build]?.payload.ok === true;
-      const unbuilt = buildsNowhere && (dataChange === "new" || builtBefore);
+      if (buildsNowhere && (dataChange === "new" || builtBefore)) unbuilt.add(lens);
+    }
+    if (compared.has(lens)) {
       headEngine.forEach((head, index) => {
         engine.records++;
         engine.numbers += numbersAt[index];
         const base = baseEngine[index];
-        const threwOnBoth = !base.payload.ok && !head.payload.ok && !unbuilt;
+        const threwOnBoth = !base.payload.ok && !head.payload.ok && !unbuilt.has(lens);
         if (threwOnBoth) {
           thrown.records++;
           if (thrown.samples.length < MAX_SAMPLES) thrown.samples.push(thrownFinding(base, head));
@@ -927,7 +970,7 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
     }
 
     if (dataChange === "format" && baseData) {
-      formatLenses.push(lens);
+      if (firstPart) formatLenses.push(lens);
       headEngine.forEach((head, index) => {
         format.records++;
         format.numbers += numbersAt[index];
@@ -938,10 +981,9 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
     }
 
     if (dataChange === "semantic" && baseData) {
-      const tally = emptyTally();
-      const blockers: Finding[] = [];
+      const { entry, tally } = impactOf(lens, "semantic");
       const block = (finding: Finding) => {
-        if (blockers.length < MAX_IMPACT_BLOCKERS) blockers.push(finding);
+        if (entry.blockers.length < MAX_IMPACT_BLOCKERS) entry.blockers.push(finding);
       };
       headEngine.forEach((head, index) => {
         tally.records++;
@@ -971,6 +1013,7 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
             lens,
             state: stateId(head.state),
             request: head.request,
+            ...(head.variant === undefined ? {} : { variant: head.variant }),
             path: "",
             kind: count === "nonFinite" ? "nonFinite" : "discrete",
             quantity: null,
@@ -984,19 +1027,14 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
       });
       /* A count or another exact field has no budget to be ranked by, and follows the numbers that do. */
       const pastBudget = (finding: Finding) => (finding.budget ? Math.abs(finding.measure ?? 0) / finding.budget : 0);
-      dataImpact.push({
-        lens,
-        change: "semantic",
-        records: tally.records,
-        recordsDiffering: tally.recordsDiffering,
-        numbersDiffering: tally.numbersDiffering,
-        transitions: tally.transitions,
-        largest: Object.values(tally.quantities)
-          .flatMap((entry) => (entry.largest ? [entry.largest] : []))
-          .sort((a, b) => pastBudget(b) - pastBudget(a)),
-        blocking: tally.failing,
-        blockers,
-      });
+      entry.records = tally.records;
+      entry.recordsDiffering = tally.recordsDiffering;
+      entry.numbersDiffering = tally.numbersDiffering;
+      entry.transitions = tally.transitions;
+      entry.largest = Object.values(tally.quantities)
+        .flatMap((quantity) => (quantity.largest ? [quantity.largest] : []))
+        .sort((a, b) => pastBudget(b) - pastBudget(a));
+      entry.blocking = tally.failing;
     }
 
     if (dataChange === "new") {
@@ -1018,27 +1056,23 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
             budget: null,
           }),
         );
-      dataImpact.push({
-        lens,
-        change: "new",
-        records: headEngine.length,
-        recordsDiffering: 0,
-        numbersDiffering: 0,
-        transitions: 0,
-        largest: [],
-        blocking: blockers.length,
-        blockers,
-        /* What the count rule would set beside the base data's totals. With none to set them beside they are
-         * reported, record by record, and gate nothing. */
-        recordCounts: headEngine.map(
+      const { entry } = impactOf(lens, "new");
+      entry.records += headEngine.length;
+      entry.blocking += blockers.length;
+      entry.blockers.push(...blockers);
+      /* What the count rule would set beside the base data's totals. With none to set them beside they are
+       * reported, record by record, and gate nothing. */
+      (entry.recordCounts ??= []).push(
+        ...headEngine.map(
           (record): RecordCounts => ({
             state: stateId(record.state),
             request: record.request,
+            ...(record.variant === undefined ? {} : { variant: record.variant }),
             ...countBlockers(record),
             ...(record.payload.ok ? {} : { threw: true }),
           }),
         ),
-      });
+      );
     }
 
     return { lines, failingRecords };
@@ -1076,7 +1110,7 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
     ];
     const thrownNamed = thrown.samples
       .slice(0, MAX_NAMED_IN_FAILURE)
-      .map((finding) => `${finding.lens} ${finding.request} at ${finding.state}`);
+      .map((finding) => `${finding.lens} ${requestLabel(finding)} at ${finding.state}`);
     const failures = [
       ...(engine.failing > 0
         ? [`Engine drift: ${several(engine.failing, "difference")} not allowed under ${changeClass.toUpperCase()}.`]
@@ -1118,7 +1152,7 @@ export function createDifferentialRun(options: RunOptions): DifferentialRun {
       passed: failures.length === 0,
       failures,
       warnings,
-      lenses,
+      lenses: met.size,
       counts,
       engine,
       thrownOnBothEngines: thrown,
@@ -1345,7 +1379,9 @@ export interface RunContext {
   tier: string;
   base: { ref: string; commit: string };
   head: { commit: string; uncommittedChanges: boolean };
-  /** The one lens the run was narrowed to, or null for the whole tier. */
+  /** The part of the tier the run covers, or null for all of it. */
+  shard: { index: number; count: number } | null;
+  /** The one lens the run was narrowed to, or null for every lens of the tier or shard. */
   lens: string | null;
   /** Lens and converter keys the head no longer has. */
   removed: readonly string[];
@@ -1375,13 +1411,18 @@ function table(header: readonly string[], rows: readonly (readonly string[])[]):
   ];
 }
 
+/** A record's request as a report names it: the family, and the variant where the request named one. */
+function requestLabel({ request, variant }: Pick<Finding, "request" | "variant">): string {
+  return variant === undefined ? request : `${request} ${variant}`;
+}
+
 function findingRows(findings: readonly Finding[]): string[][] {
   return findings
     .slice(0, MARKDOWN_SAMPLES)
     .map((finding) => [
       finding.lens,
       finding.state,
-      finding.request,
+      requestLabel(finding),
       finding.path === "" ? "(the record)" : `\`${finding.path}\``,
       finding.kind,
       finding.quantity ? QUANTITIES[finding.quantity].title : "",
@@ -1411,7 +1452,7 @@ function solverOutputRows(findings: readonly Finding[]): string[][] {
     return [
       [
         finding.lens,
-        finding.request,
+        requestLabel(finding),
         `\`${finding.path}\``,
         name,
         `${formatMeasure(quantum)} ${quantity.unit}`,
@@ -1433,7 +1474,7 @@ function tallySection(title: string, tally: ComparisonTally, changeClass: Change
       String(entry.differing),
       String(entry.beyondBudget),
       formatMeasure(largest?.measure ?? null),
-      largest ? `${largest.lens} ${largest.request} \`${largest.path}\`` : "",
+      largest ? `${largest.lens} ${requestLabel(largest)} \`${largest.path}\`` : "",
     ];
   });
   const iterationRows = Object.entries(tally.iterationChanges)
@@ -1571,6 +1612,7 @@ export function renderSummaryMarkdown(summary: RunSummary, context: RunContext):
     `# Engine diff: ${summary.passed ? "passed" : "failed"}`,
     "",
     `Tier ${context.tier.toUpperCase()}, class ${summary.changeClass.toUpperCase()}` +
+      `${context.shard ? `, shard ${context.shard.index} of ${context.shard.count}` : ""}` +
       `${context.lens ? `, lens \`${context.lens}\` only` : ""}. Base \`${short(context.base.commit)}\` ` +
       `(\`${context.base.ref}\`), head \`${short(context.head.commit)}\`` +
       `${context.head.uncommittedChanges ? " with uncommitted changes" : ""}.`,
@@ -1682,7 +1724,7 @@ function recordCountSection(counts: readonly RecordCounts[]): string[] {
       ["State", "Request", "Failed statuses", "Computed non-finite numbers"],
       counts.map((record) => [
         record.state,
-        record.request,
+        requestLabel(record),
         record.threw ? "threw" : String(record.failedStatuses),
         record.threw ? "threw" : String(record.nonFinite),
       ]),

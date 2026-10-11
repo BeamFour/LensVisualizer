@@ -1,6 +1,6 @@
 /**
- * Engine differential harness: the payload encoding and digests, the seam adapter, the Tier P request list, capture
- * determinism, and the semantic fingerprint.
+ * Engine differential harness: the payload encoding and digests, the seam adapter, the request lists of the three
+ * tiers and their shards, capture determinism, and the semantic fingerprint.
  *
  * Real catalog lenses appear here only as inputs to the harness. The assertions are about the harness (records are
  * reproducible, failures are recorded, fingerprints follow the engine's authority rules), never about a lens.
@@ -17,6 +17,7 @@ import {
   type PayloadRecord,
   type SerializedCatalog,
 } from "../../../src/benchmarks/engineDiff/captureEntry.js";
+import { comparePermittedPairs } from "../../../src/benchmarks/engineDiff/compare.js";
 import {
   FLAT_RADIUS_MARKER,
   SKIPPED_BACK_POINTER_TAG,
@@ -39,12 +40,28 @@ import {
   CHROMATIC_CHANNELS,
   DEFAULT_STATE,
   FEATURE_REPRESENTATIVES,
+  MOVED_POSE,
+  MTF_BENCHMARK_LENS_KEYS,
+  MTF_METHODS,
+  MTF_REQUEST,
+  MTF_SPECTRA,
+  MTF_VARIANTS,
+  MTF_VARIANT_GRID,
   ON_AXIS_PUPIL_FRACTIONS,
+  SEEDED_DRAW_COUNT,
+  STOPPED_DOWN_T,
   lensId,
+  mtfRequestOf,
+  shardRequests,
+  stageAnalysisLenses,
   stateId,
   tierRequests,
   type CaptureRequest,
+  type CaptureState,
+  type CatalogLens,
+  type RequestCatalog,
   type RequestFamily,
+  type TierId,
 } from "../../../src/benchmarks/engineDiff/requests.js";
 import {
   describeSeam,
@@ -52,15 +69,21 @@ import {
   resolveCapabilities,
   resolveSeam,
 } from "../../../src/benchmarks/engineDiff/seamAdapter.js";
-import { DEFAULT_BENCHMARK_LENS_KEYS } from "../../../src/benchmarks/opticsRenderingBenchmark.js";
+import { MTF_BENCHMARK_CASES, MTF_FINITE_BENCHMARK_CASE } from "../../../src/benchmarks/mtfCases.js";
+import { BENCHMARK_SCENARIOS, DEFAULT_BENCHMARK_LENS_KEYS } from "../../../src/benchmarks/opticsRenderingBenchmark.js";
 import buildLens from "../../../src/optics/buildLens.js";
 import { doLayout, traceRay } from "../../../src/optics/optics.js";
+import type { MtfMethod, MtfSpectrum } from "../../../src/types/mtf.js";
 import type { LensData, LensDataInput } from "../../../src/types/optics.js";
+import { DEFAULT_MTF_PREFERENCES } from "../../../src/utils/state/mtfPreferences.js";
 import plainTwin from "./engineDiffFixtures/fingerprintTwinPlain.js";
 import restyledTwin from "./engineDiffFixtures/fingerprintTwinRestyled.js";
 
 const CATALOG = exportCatalog();
-const TIER_P = tierRequests("p", requestCatalog(CATALOG));
+const REQUEST_CATALOG = requestCatalog(CATALOG);
+const TIER_P = tierRequests("p", REQUEST_CATALOG);
+const TIER_S = tierRequests("s", REQUEST_CATALOG);
+const TIER_F = tierRequests("f", REQUEST_CATALOG);
 
 const SERENAR = "canon-serenar-50f18";
 /** A folded fixture with no image format: every perspective job throws on it, in a few milliseconds. */
@@ -77,6 +100,11 @@ function tierPRequests(ids: readonly string[], families?: readonly RequestFamily
   return TIER_P.filter(
     (request) => ids.includes(lensId(request.lens)) && (!families || families.includes(request.family)),
   );
+}
+
+/** What tells one request of a list from every other. */
+function requestIdentity({ lens, state, family, variant }: CaptureRequest): string {
+  return `${lensId(lens)}|${stateId(state)}|${family}|${variant ?? ""}`;
 }
 
 /** One line per record: what it answers, and a digest of its bytes. Keeps a failure diff readable. */
@@ -730,6 +758,469 @@ describe("engineDiff Tier P requests", () => {
   });
 });
 
+describe("engineDiff request catalog", () => {
+  it("reads each lens's stations, ring and path as the built lens has them", () => {
+    const seam = resolveSeam();
+    const offenders: string[] = [];
+    REQUEST_CATALOG.lenses.forEach((facts, index) => {
+      const lens = seam.buildLens(decodeValue(CATALOG.lenses[index].prescription) as LensData);
+      const ring = lens.aberrationControl;
+      const agrees =
+        facts.key === CATALOG.lenses[index].key &&
+        facts.zoomStations === (lens.zoomPositions?.length ?? 1) &&
+        JSON.stringify(facts.focusPositions) === JSON.stringify(lens.focusPositions) &&
+        facts.aberrationControl === (!ring ? null : ring.centerLabel != null ? "centered" : "two-position") &&
+        facts.folded === lens.isFoldedOptics &&
+        facts.perspectiveControl === (lens.perspectiveControl !== null) &&
+        (facts.projection === null || facts.projection === lens.projection.kind);
+      if (!agrees) offenders.push(facts.key);
+    });
+    expect(offenders).toEqual([]);
+  });
+
+  it("finds every feature the stage tier chooses lenses by somewhere in the catalog", () => {
+    /* A feature no lens carried would leave its stratum empty, and the reader below it untested. */
+    const { lenses } = REQUEST_CATALOG;
+    expect(new Set(lenses.map((lens) => lens.aberrationControl))).toEqual(new Set([null, "centered", "two-position"]));
+    expect(new Set(lenses.map((lens) => lens.projection)).size).toBeGreaterThan(2);
+    expect(new Set(lenses.map((lens) => lens.rearPlateMaker)).size).toBeGreaterThan(2);
+    for (const feature of ["folded", "perspectiveControl", "diffractive", "absorbing"] as const) {
+      const carriers = lenses.filter((lens) => lens[feature]).length;
+      expect(carriers).toBeGreaterThan(0);
+      expect(carriers).toBeLessThan(lenses.length / 10);
+    }
+    expect(lenses.some((lens) => lens.focusPositions.length > 2)).toBe(true);
+    expect(lenses.every((lens) => lens.focusPositions[0] === 0 && lens.focusPositions.at(-1) === 1)).toBe(true);
+  });
+});
+
+describe("engineDiff Tier S and Tier F requests", () => {
+  const stateFamilies: RequestFamily[] = ["layout", "traces", "fieldGeometry", "chiefSolves"];
+  const facts = new Map(REQUEST_CATALOG.lenses.map((lens) => [lens.key, lens]));
+  const pairRefs = CATALOG.pairs.map(({ host, teleconverter }) => ({ key: host, teleconverter }));
+  const stratified = stageAnalysisLenses(REQUEST_CATALOG);
+  const strataOf = new Map(stratified.map(({ lens, strata }) => [lensId(lens), strata]));
+
+  /** Per lens id, the state ids at which a tier asks the given families and nothing else of that set. */
+  function statesAsked(tier: readonly CaptureRequest[], families: readonly RequestFamily[]): Map<string, string[]> {
+    const familiesAt = new Map<string, Map<string, RequestFamily[]>>();
+    for (const request of tier) {
+      if (!families.includes(request.family) || request.variant !== undefined) continue;
+      const states = familiesAt.get(lensId(request.lens)) ?? new Map<string, RequestFamily[]>();
+      familiesAt.set(lensId(request.lens), states);
+      states.set(stateId(request.state), [...(states.get(stateId(request.state)) ?? []), request.family]);
+    }
+    const asked = new Map<string, string[]>();
+    for (const [id, states] of familiesAt) {
+      const complete = [...states.values()].every((found) => JSON.stringify(found) === JSON.stringify(families));
+      asked.set(id, complete ? [...states.keys()] : ["some state lacks a family"]);
+    }
+    return asked;
+  }
+
+  /* The states written out again from the tier table, not through the module's helpers. */
+  const stations = (lens: CatalogLens): CaptureState[] =>
+    Array.from({ length: lens.zoomStations }, (_, index) =>
+      index === 0 ? 0 : index / (lens.zoomStations - 1),
+    ).flatMap((zoomT) => lens.focusPositions.map((focusT) => ({ ...DEFAULT_STATE, zoomT, focusT })));
+  const ringPositions = (lens: CatalogLens) =>
+    lens.aberrationControl === "centered" ? [0, -1, 1] : lens.aberrationControl === "two-position" ? [0, 1] : [0];
+  const firstRowStates = (lens: CatalogLens) =>
+    stations(lens).flatMap((station) =>
+      [0, STOPPED_DOWN_T].flatMap((stopdownT) =>
+        ringPositions(lens).map((aberrationT) => stateId({ ...station, stopdownT, aberrationT })),
+      ),
+    );
+  const analysedStates = (lens: CatalogLens, stopdownTs: readonly number[]) =>
+    stations(lens).flatMap((station) =>
+      stopdownTs.flatMap((stopdownT) => [
+        stateId({ ...station, stopdownT }),
+        ...(lens.perspectiveControl ? [stateId({ ...station, stopdownT, ...MOVED_POSE })] : []),
+      ]),
+    );
+  /** Lens ids whose asked states are not the expected ones, in order. */
+  const mismatches = (asked: Map<string, string[]>, expected: Map<string, string[]>) =>
+    [...new Set([...asked.keys(), ...expected.keys()])].filter(
+      (id) => JSON.stringify(asked.get(id)) !== JSON.stringify(expected.get(id)),
+    );
+  const everyLensAndPair = (statesOf: (lens: CatalogLens) => string[]) =>
+    new Map([
+      ...REQUEST_CATALOG.lenses.map((lens): [string, string[]] => [lens.key, statesOf(lens)]),
+      ...pairRefs.map((pair): [string, string[]] => [lensId(pair), statesOf(facts.get(pair.key)!)]),
+    ]);
+
+  it("are the same lists on every build and for any order of the catalog, grouped by lens, with no duplicates", () => {
+    const rebuilt = requestCatalog(exportCatalog());
+    const reversed: RequestCatalog = {
+      lenses: [...REQUEST_CATALOG.lenses].reverse(),
+      pairs: [...REQUEST_CATALOG.pairs].reverse(),
+    };
+    for (const [tier, list] of [
+      ["s", TIER_S],
+      ["f", TIER_F],
+    ] as const) {
+      expect(tierRequests(tier, rebuilt)).toEqual(list);
+      expect(tierRequests(tier, reversed)).toEqual(list);
+      const ids = list.map((request) => lensId(request.lens));
+      expect(ids).toEqual([...ids].sort());
+      expect(new Set(list.map(requestIdentity)).size).toBe(list.length);
+    }
+  });
+
+  it("ask every lens and every pair, at every authored station wide open and stopped down, for Tier P's first row", () => {
+    const expected = everyLensAndPair(firstRowStates);
+    expect(mismatches(statesAsked(TIER_S, stateFamilies), expected)).toEqual([]);
+    expect(mismatches(statesAsked(TIER_F, stateFamilies), expected)).toEqual([]);
+
+    /* Build constants of every lens; a pair is not a catalog lens, so its composition as well. */
+    const lensLevel = new Map<string, RequestFamily[]>();
+    for (const request of TIER_S) {
+      if (request.state === null) {
+        lensLevel.set(lensId(request.lens), [...(lensLevel.get(lensId(request.lens)) ?? []), request.family]);
+      }
+    }
+    expect(
+      [...lensLevel].filter(([id, found]) => found.join() !== (id.includes("+") ? "composition,build" : "build")),
+    ).toEqual([]);
+    expect(lensLevel.size).toBe(CATALOG.lenses.length + CATALOG.pairs.length);
+
+    /* A prime with no focus table: its two focus ends, each wide open and stopped down. */
+    expect(expected.get(SERENAR)).toEqual(
+      [
+        [0, 0],
+        [0, STOPPED_DOWN_T],
+        [1, 0],
+        [1, STOPPED_DOWN_T],
+      ].map(([focusT, stopdownT]) => stateId({ ...DEFAULT_STATE, focusT, stopdownT })),
+    );
+    /* Every Tier P first-row state is among them: the first and last zoom station at infinity, wide open. */
+    const tierP = statesAsked(TIER_P, stateFamilies);
+    expect(
+      CATALOG.lenses.filter(({ key }) => !tierP.get(key)!.every((state) => expected.get(key)!.includes(state))),
+    ).toEqual([]);
+  });
+
+  it("ask an aberration-control lens at both ends of its ring, and at the center where it has one", () => {
+    const ringStates = (key: string) =>
+      new Set(
+        TIER_S.filter((request) => request.lens.key === key && request.family === "traces").map(
+          (request) => request.state!.aberrationT,
+        ),
+      );
+    const rings = REQUEST_CATALOG.lenses.filter((lens) => lens.aberrationControl !== null);
+    expect(rings.filter((lens) => lens.aberrationControl === "centered").map((lens) => ringStates(lens.key))).toEqual(
+      rings.filter((lens) => lens.aberrationControl === "centered").map(() => new Set([0, -1, 1])),
+    );
+    expect(
+      rings.filter((lens) => lens.aberrationControl === "two-position").map((lens) => ringStates(lens.key)),
+    ).toEqual(rings.filter((lens) => lens.aberrationControl === "two-position").map(() => new Set([0, 1])));
+    expect(ringStates(SERENAR)).toEqual(new Set([0]));
+  });
+
+  it("choose the stage tier's analysis lenses by stratum, from the catalog alone", () => {
+    const chosenFor = (stratum: string) =>
+      stratified
+        .filter(({ strata }) => strata.includes(stratum))
+        .map(({ lens }) => lensId(lens))
+        .sort();
+    const carriers = (carries: (lens: CatalogLens) => boolean) =>
+      REQUEST_CATALOG.lenses.filter(carries).map((lens) => lens.key);
+
+    expect(chosenFor("folded")).toEqual(carriers((lens) => lens.folded));
+    expect(chosenFor("perspective-control")).toEqual(carriers((lens) => lens.perspectiveControl));
+    expect(chosenFor("diffractive")).toEqual(carriers((lens) => lens.diffractive));
+    expect(chosenFor("absorbing")).toEqual(carriers((lens) => lens.absorbing));
+    expect(chosenFor("converter-pair")).toEqual(pairRefs.map(lensId).sort());
+    /* Every lens Tier P analyses: the benchmark set, and each feature's representative under its feature. */
+    expect(chosenFor("benchmark")).toEqual([...BENCHMARK_LENS_KEYS].sort());
+    expect(FEATURE_REPRESENTATIVES.map(({ feature }) => chosenFor(`feature:${feature}`))).toEqual(
+      FEATURE_REPRESENTATIVES.map(({ lens }) => [lensId(lens)]),
+    );
+
+    /* One lens per projection kind and per rear-plate maker: the first in key order that carries it. */
+    for (const [stratum, valueOf] of [
+      ["projection", (lens: CatalogLens) => lens.projection],
+      ["rear-plate-maker", (lens: CatalogLens) => lens.rearPlateMaker],
+    ] as const) {
+      const values = [...new Set(REQUEST_CATALOG.lenses.map(valueOf))].filter((value) => value !== null);
+      expect(values.map((value) => chosenFor(`${stratum}:${value}`))).toEqual(
+        values.map((value) => [REQUEST_CATALOG.lenses.find((lens) => valueOf(lens) === value)!.key]),
+      );
+    }
+
+    /* The seeded draw takes its lenses from those no stratum names, and not simply the first in key order. */
+    const drawn = chosenFor("seeded-draw");
+    expect(drawn).toHaveLength(SEEDED_DRAW_COUNT);
+    expect(drawn.map((id) => strataOf.get(id))).toEqual(drawn.map(() => ["seeded-draw"]));
+    const offered = REQUEST_CATALOG.lenses
+      .map((lens) => lens.key)
+      .filter((key) => !strataOf.has(key) || drawn.includes(key));
+    expect(drawn).not.toEqual(offered.slice(0, SEEDED_DRAW_COUNT));
+    /* A lens outside the draw leaving the catalog, or the catalog arriving in another order, changes nothing. */
+    const undrawn = offered.find((key) => !drawn.includes(key));
+    const without = REQUEST_CATALOG.lenses.filter((lens) => lens.key !== undrawn);
+    expect(without).toHaveLength(REQUEST_CATALOG.lenses.length - 1);
+    expect(stageAnalysisLenses({ lenses: without.reverse(), pairs: REQUEST_CATALOG.pairs })).toEqual(stratified);
+    /* One that was drawn is replaced by one lens, and the other nine stay. */
+    const redrawn = stageAnalysisLenses({
+      lenses: REQUEST_CATALOG.lenses.filter((lens) => lens.key !== drawn[0]),
+      pairs: REQUEST_CATALOG.pairs,
+    }).map(({ lens }) => lensId(lens));
+    expect(redrawn.filter((id) => !strataOf.has(id))).toHaveLength(1);
+    expect(stratified.map(({ lens }) => lensId(lens)).filter((id) => !redrawn.includes(id))).toEqual([drawn[0]]);
+  });
+
+  it("analyse the stratified lenses in Tier S and every lens in Tier F, a perspective-control lens moved as well", () => {
+    /* Tier P's second row is in both tiers, and adds a representative's feature state where no station is one. */
+    const withFeatureStates = (states: Map<string, string[]>) => {
+      for (const { lens, featureState } of FEATURE_REPRESENTATIVES) {
+        const state = stateId({ ...DEFAULT_STATE, ...featureState });
+        const asked = states.get(lensId(lens))!;
+        if (!asked.includes(state)) asked.push(state);
+      }
+      return states;
+    };
+    const analysed = statesAsked(TIER_S, ["analysis"]);
+    const expected = withFeatureStates(
+      new Map(
+        stratified.map(({ lens }): [string, string[]] => [lensId(lens), analysedStates(facts.get(lens.key)!, [0])]),
+      ),
+    );
+    expect(mismatches(analysed, expected)).toEqual([]);
+    /* The ring's far end is such a state: a station has the ring at its corrected setting. */
+    const ring = FEATURE_REPRESENTATIVES.find(({ feature }) => feature === "aberration-control")!;
+    expect(analysed.get(ring.lens.key)).toContain(stateId({ ...DEFAULT_STATE, ...ring.featureState }));
+    expect(analysedStates(facts.get(ring.lens.key)!, [0])).not.toContain(
+      stateId({ ...DEFAULT_STATE, ...ring.featureState }),
+    );
+    expect(analysed.size).toBe(stratified.length);
+    /* The moved pose is Tier P's, and a tilt-shift lens is analysed centered and moved at each station. */
+    const tiltShift = FEATURE_REPRESENTATIVES.find(({ feature }) => feature === "perspective-control")!;
+    expect(tiltShift.featureState).toEqual(MOVED_POSE);
+    expect(analysed.get(tiltShift.lens.key)).toEqual(
+      [0, 1].flatMap((focusT) => [
+        stateId({ ...DEFAULT_STATE, focusT }),
+        stateId({ ...DEFAULT_STATE, focusT, ...MOVED_POSE }),
+      ]),
+    );
+
+    expect(
+      mismatches(
+        statesAsked(TIER_F, ["analysis"]),
+        withFeatureStates(everyLensAndPair((lens) => analysedStates(lens, [0, STOPPED_DOWN_T]))),
+      ),
+    ).toEqual([]);
+  });
+
+  it("ask every named MTF request of the MTF benchmark's lenses, at their authored stations", () => {
+    const mtf = TIER_S.filter((request) => request.family === "mtf" && request.variant !== undefined);
+    expect(new Set(mtf.map((request) => lensId(request.lens)))).toEqual(new Set(MTF_BENCHMARK_LENS_KEYS));
+    const offenders = MTF_BENCHMARK_LENS_KEYS.filter((key) => {
+      const asked = mtf.filter((request) => request.lens.key === key).map((r) => `${stateId(r.state)}|${r.variant}`);
+      const expected = stations(facts.get(key)!).flatMap((state) =>
+        MTF_VARIANTS.map(({ id }) => `${stateId(state)}|${id}`),
+      );
+      return JSON.stringify(asked) !== JSON.stringify(expected);
+    });
+    expect(offenders).toEqual([]);
+    /* The benchmark's own states are among them: the reference state, and close focus for its finite case. */
+    const statesOf = (key: string) => mtf.filter((request) => request.lens.key === key).map((r) => stateId(r.state));
+    expect(statesOf(SERENAR)).toContain(stateId(DEFAULT_STATE));
+    expect(statesOf(MTF_BENCHMARK_LENS_KEYS.at(-1)!)).toContain(stateId({ ...DEFAULT_STATE, focusT: 1 }));
+    /* The family's own request, the small geometric one, is asked where Tier P asks it and nowhere else. */
+    const small = (tier: readonly CaptureRequest[]) =>
+      tier.filter((request) => request.family === "mtf" && request.variant === undefined).map(requestIdentity);
+    expect(small(TIER_S)).toEqual(small(TIER_P));
+    expect(small(TIER_F)).toEqual(small(TIER_P));
+  });
+
+  it("hold every request of Tier S in Tier F, which differs in its analysis row alone", () => {
+    const full = new Set(TIER_F.map(requestIdentity));
+    expect(TIER_S.filter((request) => !full.has(requestIdentity(request)))).toEqual([]);
+    const notAnalysis = (request: CaptureRequest) => request.family !== "analysis";
+    expect(TIER_F.filter(notAnalysis)).toEqual(TIER_S.filter(notAnalysis));
+    expect(TIER_F.length).toBeGreaterThan(TIER_S.length);
+  });
+
+  it("hold every request of Tier P in Tier S, for a changed lens and a changed converter as well", () => {
+    const missingFrom = (larger: readonly CaptureRequest[], smaller: readonly CaptureRequest[]) => {
+      const held = new Set(larger.map(requestIdentity));
+      return smaller.filter((request) => !held.has(requestIdentity(request)));
+    };
+    expect(missingFrom(TIER_S, TIER_P)).toEqual([]);
+    expect(TIER_S.length).toBeGreaterThan(TIER_P.length);
+    /* Every lens Tier P analyses is among the stage tier's analysis lenses, at its stations and not one state. */
+    const analysedIn = (tier: readonly CaptureRequest[]) =>
+      new Set(tier.filter((request) => request.family === "analysis").map((request) => lensId(request.lens)));
+    expect([...analysedIn(TIER_P)].filter((id) => !strataOf.has(id))).toEqual([]);
+    expect(statesAsked(TIER_S, ["analysis"]).get(SERENAR)).toEqual(
+      [0, 1].map((focusT) => stateId({ ...DEFAULT_STATE, focusT })),
+    );
+
+    /* What Tier P asks of changed data, the larger tiers ask too: a lens no row analyses, and a converter's pairs. */
+    const plain = REQUEST_CATALOG.lenses.map((lens) => lens.key).find((key) => !strataOf.has(key))!;
+    const changed: RequestCatalog = {
+      ...REQUEST_CATALOG,
+      changedLensKeys: [plain],
+      changedTeleconverterKeys: [
+        REQUEST_CATALOG.pairs.find((pair) => pair.teleconverter !== PAIR.teleconverter)!.teleconverter,
+      ],
+    };
+    const [p, s, f] = (["p", "s", "f"] as const).map((tier) => tierRequests(tier, changed));
+    expect(p.length).toBeGreaterThan(TIER_P.length);
+    expect(missingFrom(s, p)).toEqual([]);
+    expect(missingFrom(f, s)).toEqual([]);
+    expect(s.filter((request) => request.lens.key === plain && request.family === "analysis")).toHaveLength(1);
+    expect(new Set(s.map(requestIdentity)).size).toBe(s.length);
+  });
+
+  it("ask a pair that only one engine permits, when the list is built from the pairs of both", () => {
+    /* The head engine's predicate drops a pair. From its answer alone the tier would not name the pair at all. */
+    const lost = REQUEST_CATALOG.pairs.find(
+      ({ host, teleconverter }) => lensId({ key: host, teleconverter }) !== PAIR_ID,
+    )!;
+    const kept = REQUEST_CATALOG.pairs.filter((pair) => pair !== lost);
+    const lostId = lensId({ key: lost.host, teleconverter: lost.teleconverter });
+    const fromHeadAlone = tierRequests("s", { ...REQUEST_CATALOG, pairs: kept });
+    expect(fromHeadAlone.filter((request) => lensId(request.lens) === lostId)).toEqual([]);
+    const { requested, differences } = comparePermittedPairs({
+      headEngine: kept,
+      baseEngine: REQUEST_CATALOG.pairs,
+      baseData: kept,
+    });
+    expect(differences.baseEngineOnly).toEqual([lostId]);
+    /* From both answers the list is what it is when the engines agree, the lost pair's every request included. */
+    expect(tierRequests("s", { ...REQUEST_CATALOG, pairs: requested })).toEqual(TIER_S);
+    expect(TIER_S.filter((request) => lensId(request.lens) === lostId).length).toBeGreaterThan(8);
+  });
+
+  it("keep their copies of the benchmark scenario, lens lists and MTF options equal to the sources", () => {
+    const stopped = BENCHMARK_SCENARIOS.find(({ id }) => id === "stopped-close")!;
+    expect(STOPPED_DOWN_T).toBe(stopped.stopdownT);
+    expect(MOVED_POSE).toEqual(stopped.movement);
+
+    /* The MTF benchmark names its cases by file; a tier names lenses by key. */
+    const keyOfFile = new Map(CATALOG.lenses.map((lens) => [lens.file, lens.key]));
+    expect([...MTF_BENCHMARK_LENS_KEYS]).toEqual(
+      [...MTF_BENCHMARK_CASES, MTF_FINITE_BENCHMARK_CASE].map((file) => keyOfFile.get(file)),
+    );
+
+    /* Every member of the engine's two unions must be written here, or this file does not compile. */
+    const methods: Record<MtfMethod, true> = { geometric: true, diffraction: true };
+    const spectra: Record<MtfSpectrum, true> = { reference: true, cdf: true, photopic: true };
+    expect([...MTF_METHODS].sort()).toEqual(Object.keys(methods).sort());
+    expect([...MTF_SPECTRA].sort()).toEqual(Object.keys(spectra).sort());
+    expect(MTF_VARIANT_GRID).toBe(DEFAULT_MTF_PREFERENCES.maxGridSize);
+
+    expect(MTF_VARIANTS.map(({ id }) => id)).toEqual([
+      "geometric/reference",
+      "geometric/cdf",
+      "geometric/photopic",
+      "diffraction/reference",
+      "diffraction/cdf",
+      "diffraction/photopic",
+    ]);
+    for (const { id, request } of MTF_VARIANTS) {
+      const [method, spectrum] = id.split("/");
+      expect(request).toEqual({ ...MTF_REQUEST, method, spectrum, maxGridSize: MTF_VARIANT_GRID });
+      expect(mtfRequestOf(id)).toBe(request);
+    }
+    expect(mtfRequestOf(undefined)).toBe(MTF_REQUEST);
+    expect(() => mtfRequestOf("geometric/x-ray")).toThrow('no MTF variant is named "geometric/x-ray"');
+    expect(() => mtfRequestOf("toString")).toThrow("no MTF variant");
+  });
+
+  it("refuse to build when a lens they name has left the catalog", () => {
+    const { lenses, pairs } = REQUEST_CATALOG;
+    const without = (key: string): RequestCatalog => ({ lenses: lenses.filter((lens) => lens.key !== key), pairs: [] });
+    /* A benchmark lens that is in no other row of the stage tier, and a feature representative. */
+    const benchmark = BENCHMARK_LENS_KEYS[1];
+    expect(MTF_BENCHMARK_LENS_KEYS).not.toContain(benchmark);
+    expect(() => tierRequests("s", without(benchmark))).toThrow(
+      `benchmark or representative lens(es) not in the catalog: ${benchmark}`,
+    );
+    const representative = FEATURE_REPRESENTATIVES[0].lens.key;
+    expect(() => tierRequests("s", { lenses: lenses.filter((lens) => lens.key !== representative), pairs })).toThrow(
+      `benchmark or representative lens(es) not in the catalog: ${representative}`,
+    );
+    /* A lens of the MTF row, and the host of a pair. */
+    expect(MTF_BENCHMARK_LENS_KEYS).toContain(SERENAR);
+    expect(() => tierRequests("s", without(SERENAR))).toThrow(`not in the catalog: ${SERENAR}`);
+    expect(() => tierRequests("f", without(SERENAR))).toThrow(`not in the catalog: ${SERENAR}`);
+    const host = pairs[0].host;
+    expect(() => tierRequests("s", { lenses: lenses.filter((lens) => lens.key !== host), pairs })).toThrow(
+      `not in the catalog: ${host}`,
+    );
+  });
+});
+
+describe("engineDiff shards", () => {
+  const tiers: [TierId, CaptureRequest[]][] = [
+    ["p", TIER_P],
+    ["s", TIER_S],
+    ["f", TIER_F],
+  ];
+  const lensIds = (requests: readonly CaptureRequest[]) => [
+    ...new Set(requests.map((request) => lensId(request.lens))),
+  ];
+
+  it.each(tiers)("splits tier %s into disjoint parts that together are the tier", (_tier, requests) => {
+    const tierIds = lensIds(requests);
+    for (const count of [1, 2, 3, 5, 8, 16, 64]) {
+      const shards = Array.from({ length: count }, (_, index) => shardRequests(requests, { index: index + 1, count }));
+
+      /* Complete and disjoint: every request of the tier is in exactly one shard, and nothing else is in any. */
+      const dealt = shards.flat();
+      expect(dealt).toHaveLength(requests.length);
+      expect(new Set(dealt)).toEqual(new Set(requests));
+
+      /* By lens: no lens id is in two shards, so no lens's records straddle two runs. */
+      const shardIds = shards.map(lensIds);
+      expect(shardIds.flat()).toHaveLength(tierIds.length);
+      expect(new Set(shardIds.flat())).toEqual(new Set(tierIds));
+
+      /* Each shard keeps the tier's order, and the shards hold as many lenses as one another, give or take one. */
+      shards.forEach((shard, index) => {
+        const ids = new Set(shardIds[index]);
+        expect(shard).toEqual(requests.filter((request) => ids.has(lensId(request.lens))));
+      });
+      const sizes = shardIds.map((ids) => ids.length);
+      expect(Math.max(...sizes) - Math.min(...sizes)).toBeLessThanOrEqual(1);
+    }
+  });
+
+  it("deals lens ids out in code-unit order, whatever the order of the list", () => {
+    const sorted = lensIds(TIER_S).sort();
+    const count = 5;
+    const reversed = [...TIER_S].reverse();
+    for (let index = 1; index <= count; index++) {
+      const expected = sorted.filter((_, position) => position % count === index - 1);
+      expect(lensIds(shardRequests(TIER_S, { index, count }))).toEqual(expected);
+      expect(lensIds(shardRequests(reversed, { index, count })).sort()).toEqual(expected);
+    }
+    /* A pair is a lens id of its own, dealt apart from its host. */
+    expect(sorted.filter((id) => id.includes("+"))).toHaveLength(CATALOG.pairs.length);
+  });
+
+  it("leaves a shard empty when there are fewer lenses than shards, and refuses a shard that is not i of n", () => {
+    const one = TIER_P.filter((request) => request.lens.key === SERENAR);
+    expect(shardRequests(one, { index: 1, count: 3 })).toEqual(one);
+    expect(shardRequests(one, { index: 2, count: 3 })).toEqual([]);
+    expect(shardRequests([], { index: 1, count: 1 })).toEqual([]);
+    for (const [index, count] of [
+      [0, 4],
+      [5, 4],
+      [1, 0],
+      [1.5, 4],
+      [1, 2.5],
+      [Number.NaN, 4],
+      [-1, -1],
+    ]) {
+      expect(() => shardRequests(TIER_P, { index, count })).toThrow("is not i/n with 1 <= i <= n");
+    }
+  });
+});
+
 /* ── captureEntry.ts ── */
 
 describe("engineDiff capture", () => {
@@ -1083,6 +1574,38 @@ describe("engineDiff capture", () => {
     expect(Math.max(...mtf.result.fields.map((field) => field.gridSize))).toBeLessThanOrEqual(32);
   });
 
+  it(
+    "answers a named MTF request with its method, spectrum and grid, and names it on the record",
+    { timeout: 120_000 },
+    () => {
+      const requests = TIER_S.filter(
+        (request) =>
+          request.variant !== undefined &&
+          request.lens.key === SERENAR &&
+          stateId(request.state) === stateId(DEFAULT_STATE),
+      );
+      expect(requests.map((request) => [request.family, request.variant])).toEqual(
+        MTF_VARIANTS.map(({ id }) => ["mtf", id]),
+      );
+      const named = captureRecords(CATALOG, requests);
+      named.forEach((record, index) => {
+        const { id, request } = MTF_VARIANTS[index];
+        expect(Object.keys(record)).toEqual(["lens", "state", "request", "variant", "payload"]);
+        expect(record).toMatchObject({ lens: SERENAR, request: "mtf", variant: id });
+        const mtf = valueOf(record) as { options: object; result: { support: { available: boolean } } };
+        expect(mtf.options).toMatchObject({ ...request, fieldFractions: [...request.fieldFractions] });
+        expect(mtf.result).toMatchObject({ method: request.method, support: { available: true } });
+      });
+      /* Six different computations, each repeatable, and none of them the family's own request. */
+      const digests = recordDigests(named.map((record) => ({ ...record, variant: undefined })));
+      expect(new Set(digests).size).toBe(MTF_VARIANTS.length);
+      expect(recordDigests(captureRecords(CATALOG, requests))).toEqual(recordDigests(named));
+      const plain = records.find((record) => record.lens === SERENAR && record.request === "mtf")!;
+      expect(plain).not.toHaveProperty("variant");
+      expect(digests).not.toContain(recordDigests([plain])[0]);
+    },
+  );
+
   it("records a lens that does not build as an outcome", () => {
     const broken = { ...plainTwin, key: "engine-diff-broken", surfaces: plainTwin.surfaces.slice(1) };
     const records = captureRecords(catalogOf(broken), [
@@ -1109,6 +1632,9 @@ describe("engineDiff capture", () => {
     ).toThrow("no teleconverter absent-converter");
     expect(() => captureRecords(catalog, [{ lens, state: null, family: "traces" }])).toThrow("without a lens state");
     expect(() => captureRecords(catalog, [{ lens, state: null, family: "composition" }])).toThrow("not a pair");
+    const named = (family: RequestFamily, variant: string) => [{ lens, state: DEFAULT_STATE, family, variant }];
+    expect(() => captureRecords(catalog, named("mtf", "geometric/x-ray"))).toThrow("no MTF variant is named");
+    expect(() => captureRecords(catalog, named("traces", "geometric/reference"))).toThrow("has no variants");
   });
 });
 

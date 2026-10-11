@@ -527,7 +527,7 @@ const TABLE: readonly TableRow[] = [
     [
       "mtf:result.fields[].{sagittal,tangential}[]",
       "mtf:result.fields[].maxDelta",
-      "mtf:result.diffractionLimit.{sagittal,tangential}[]",
+      "mtf:result.fields[].diffractionLimit.{sagittal,tangential}[]",
       "mtf:result.focus.{designScore,bestScore}",
     ],
   ],

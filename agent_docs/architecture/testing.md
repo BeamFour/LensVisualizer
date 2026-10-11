@@ -146,23 +146,16 @@ and bundled there.
 
 - `captureEntry.ts` is the entry the driver bundles once per revision. It exports that revision's catalog as
   serialized prescriptions (hosts and teleconverters apart, plus the permitted pairs), and it evaluates the serialized
-  prescriptions it is handed, so one revision's data can run on the other's engine. It returns one record per lens,
-  state, and request family, each `{ lens, state, request, payload }`. A computation that throws is recorded as an
-  outcome, never dropped. It answers which pairs its engine's fit predicate permits for a catalog it is handed, and
-  which of some pairs its engine cannot compose and build. It also re-exports the comparison, which the driver calls
-  from the built bundle.
+  prescriptions it is handed, so one revision's data can run on the other's engine. It returns one record per
+  request, each `{ lens, state, request, payload }`, with a `variant` as well where the request named one. A
+  computation that throws is recorded as an outcome, never dropped. It answers which pairs its engine's fit predicate
+  permits for a catalog it is handed, and which of some pairs its engine cannot compose and build. It also
+  re-exports the comparison, which the driver calls from the built bundle.
 - `seamAdapter.ts` is the only file that names engine modules. It reaches each through an eager `import.meta.glob`,
   which yields nothing for a file a revision lacks, and resolves every capability from an ordered list of candidate
   exports. A change that renames or moves a seam export adds the new name to that list in the same change.
-- `requests.ts` defines a tier as a deterministic list of lens × state × request family. Tier P asks every catalog
-  lens, at the first and last zoom station, for build constants, layout, ray fans with full hits, field geometry, and
-  chief-ray solves; and asks the benchmark lenses plus one representative per engine feature for every analysis job
-  and a small geometric MTF. One representative is a converter pair. It is the only pair in the tier, so it is also
-  asked for its composition and for the first row's requests at the default state. A lens named as changed is asked
-  for the analysis jobs and MTF too, so a lens whose data moved goes through every request of the tier. A pair is
-  changed when its host or its converter is: every permitted pair of a changed or new host or converter is asked
-  what the representative pair is. The pairs a tier chooses from are every pair that either engine's fit predicate
-  permits for the head's prescriptions.
+- `requests.ts` defines a tier as a deterministic list of lens × state × request family, and cuts a list into
+  shards. The three tiers are described under "Tiers" below.
 - `payload.ts` holds the encoding (JSON that round-trips under `Object.is`, with tags for -0, NaN, and the
   infinities), the digests that stand in for the per-ray traces and pupil bundles nested in perspective results, and
   the semantic fingerprint: a hash of a prescription after lens defaults and the engine's authority rules (a flat
@@ -174,9 +167,10 @@ and bundled there.
   says how two values are compared and how far they may differ under C1. The table's rows are path patterns, and the
   first row that matches decides.
 - `compare.ts` pairs the records of two captures one lens at a time, judges each difference under the declared change
-  class, and keeps totals, the largest difference per quantity and a bounded sample of findings. It also sorts a
-  catalog's changes into format-only and semantic, sets the two engines' permitted pairs side by side, reads the
-  declared exceptions, and writes the reports.
+  class, and keeps totals, the largest difference per quantity and a bounded sample of findings. A lens with many
+  records may be handed over in consecutive parts and is reported as one lens. It also sorts a catalog's changes into
+  format-only and semantic, sets the two engines' permitted pairs side by side, reads the declared exceptions, and
+  writes the reports.
 
 The build record holds every field of the built lens. Each surface of `S` keeps every member the engine holds for it,
 its inner radius, stop placement, interaction and diffractive phase among them, with a flat radius written as the
@@ -186,6 +180,44 @@ summary, the diagram's LoCA readout with the bars of its inset, and the aspheric
 Three parts of `src/optics/` are outside the harness, and their unit suites cover them: diagram geometry in
 `src/optics/diagram/` (`diagramGeometry.test.ts`, `elementRenderDiagnostics.test.ts`), the lens-movement transform
 (`lensMovement.test.ts`) and the perspective diagram fan (`perspective/diagramFan.test.ts`).
+
+### Tiers
+
+A tier's list is built from the head's prescriptions and handed to both engines. Requests are grouped by lens,
+lenses in code-unit order of their id, and a converter pair is a lens of its own, named `host+converter`. The pairs a
+tier chooses from are every pair that either engine's fit predicate permits for those prescriptions.
+
+- **Tier P**, the pull-request tier. Every catalog lens, hidden ones included, at the first and last zoom station,
+  focused at infinity and wide open, is asked for build constants, layout, ray fans with full hits, field geometry,
+  and chief-ray solves. The benchmark lenses and one representative per engine feature are asked for every analysis
+  job and a small geometric MTF, at the default state and at the state that puts the feature to work. One
+  representative is a converter pair. It is the only pair in the tier, so it is also asked for its composition and
+  for the first row's requests at the default state. A lens named as changed is asked for the analysis jobs and MTF
+  too, so a lens whose data moved goes through every request of the tier. A pair is changed when its host or its
+  converter is: every permitted pair of a changed or new host or converter is asked what the representative pair is.
+- **Tier S**, the stage tier, has three rows of its own and holds Tier P's second row whole. Its first row holds
+  every request of Tier P's first, so every request of Tier P, of a changed lens or pair as well, is a request of
+  Tier S.
+  - Every catalog lens is asked for Tier P's first-row requests at every authored zoom × focus station, wide open
+    and at one stopped-down aperture: the aperture-slider position of the rendering benchmark's stopped scenario. A
+    lens with an aberration-control ring is asked at each end of the ring as well as at its corrected setting. Every
+    permitted converter pair is asked the same at every station of its host, and for its composition.
+  - A stratified part of the catalog is asked for every analysis job at its authored stations, wide open. It holds
+    one lens per declared projection kind, every folded lens, every perspective-control lens, every diffractive and
+    every absorbing lens, one lens per maker among those with rear plates, every converter pair, every lens Tier P
+    analyses (the benchmark lenses and the feature representatives), and ten more drawn by a fixed seed from the
+    lenses none of those names. "One per" is the first in key order. The draw scores each key by a seeded hash and
+    takes the lowest scores, so a lens added to the catalog changes it only by scoring among the lowest itself. A
+    perspective-control lens is analysed centered and in the rendering benchmark's moved pose.
+  - The MTF benchmark's lenses are asked for MTF by each method at each spectrum, refined up to the grid the
+    viewer's MTF tab opens with, at their authored stations. These six requests are the `mtf` family's variants.
+  - Tier P's second row adds what the rows above leave out of it: each representative's feature state, and the
+    small geometric MTF at the states Tier P asks it.
+- **Tier F**, the full tier, is Tier S with its second row widened: every catalog lens and every pair is asked for
+  every analysis job at every authored station, wide open and stopped down.
+
+`shardRequests` cuts a list into `n` parts by lens: the lens ids are put in code-unit order and dealt out in turn, so
+a lens's records never straddle two shards, the shards share no lens, and together they hold the list.
 
 ### What a Run Compares
 
@@ -225,9 +257,9 @@ A run takes a base ref and the working tree, which is the head. Nothing is skipp
      own: a host that does not build alone is an uncompared lens by rule 4 and says nothing of its pairs, and a pair
      that does not build says nothing of its converter's other pairs.
    - A pair set aside is an uncompared lens, and that one answer stands everywhere: in the pair comparison, in a run
-     that meets the pair, and in a narrowed run that does not. It is listed with the uncompared lenses in every run
-     of the tier and held to the declared exceptions as rule 4 holds a lens, so one list of exceptions holds for all
-     of them.
+     that meets the pair, and in a narrowed run or a shard that does not. It is listed with the uncompared lenses in
+     every run of the tier and held to the declared exceptions as rule 4 holds a lens, so one list of exceptions
+     holds for all of them.
    - A pair both engines build and only one predicate permits is still a difference between the engines. The
      engine's composer applies the fit predicate, so a pair that the base engine's predicate refuses is one the base
      engine cannot compose: a pair only the head engine permits is set aside and has to be declared, and a pair
@@ -300,8 +332,8 @@ The classes in `budgets.ts`:
   a "Not budgeted" section that counts the changed digests per record family and names the lenses, and the driver
   prints a warning to stderr. The run does not fail on it.
 
-A number that moves and has no class fails above C0, and a tooling test fails on any numeric path of Tier P that the
-table does not cover.
+A number that moves and has no class fails above C0, and a tooling test fails on any numeric path of Tier P, or of
+the named MTF requests, that the table does not cover.
 
 ### Running It
 
@@ -310,16 +342,25 @@ node scripts/engine-diff.mjs --base "$(git merge-base origin/main HEAD)"
 node scripts/engine-diff.mjs --base origin/main --class c1 --lens canon-serenar-50f18 --out tmp/engine-diff
 ```
 
-`--tier` is `p` and `--class` is `c0` unless given. `--lens` narrows the run to one lens id, and `--exceptions` names a
-file in the form of a pull request description. The driver adds a detached worktree of the base in the system temp
-directory, copies the working tree's harness into it, bundles the capture entry once per side with no config file,
-and removes the worktree when it ends. It needs no `src/generated/` and no `node_modules` in the base.
+`--tier` is `p`, `s` or `f`, and `p` unless given; `--class` is `c0` unless given. `--shard i/n` runs part `i` of the
+tier cut into `n`, counted from 1, so `n` runs with the same base, tier and class are one comparison of the tier.
+`--lens` narrows the run to one lens id, and `--exceptions` names a file in the form of a pull request description. A
+shard, like a single lens, is part of a tier, so a declared exception that the run never meets does not fail it. The
+driver adds a detached worktree of the base in the system temp directory, copies the working tree's harness into it,
+bundles the capture entry once per side with no config file, and removes the worktree when it ends. It needs no
+`src/generated/` and no `node_modules` in the base. It captures, compares and writes one lens at a time, and a few
+requests of a lens at once, so memory does not grow with a tier or with a lens's station count.
 
 On SIGINT or SIGTERM the driver removes its base worktree and its temporary directories before it exits, with the
 status a shell gives a signal (130 or 143). A capture is synchronous, so it acts on the signal when the capture in
 hand returns, which can take some seconds. A driver that is killed outright leaves its worktree registered. The next
 run warns about every registered `engine-diff-base-*` worktree it finds and removes none of them, since another run
 may be using one: remove a stale one with `git worktree remove --force <path>`.
+
+```bash
+node scripts/engine-diff.mjs --base optics-rewrite/s1 --tier s
+node scripts/engine-diff.mjs --base optics-rewrite/s1 --tier f --shard 3/32
+```
 
 Its output goes under `--out`, or under a new directory in the system temp directory that it names when it ends:
 gzip NDJSON payloads in a `payloads` folder, and the small files in a `reports` folder beside it (`summary.json`,
@@ -340,6 +381,37 @@ The change class comes from the pull request's labels, read when the job runs: `
 `engine-diff:c3`, and C0 with none. Two class labels fail the job. A label or description changed after a run takes
 effect when the job is re-run.
 
+Tiers S and F run in `.github/workflows/engine-diff-stage.yml`, which nothing starts by itself. Its `plan` job turns
+a shard count into a list, a matrix of `shard` jobs runs one `--shard i/n` each and uploads its `reports` folder, and
+one `result` job writes the tier, base and outcome to the run summary. A failed shard does not cancel the others. The
+head is the ref the run is started on.
+
+A shard is part of a tier, so it lets a declared exception that it never met pass and lists it in its `summary.json`.
+The `result` job downloads the shards' reports and is green only when every shard passed and every declared
+exception was met by some shard.
+
+- **A stage run** is dispatched by hand, from the Actions tab or with `gh`. Its inputs are the base ref (the current
+  anchor tag or a commit), the tier, the change class, the number of shards, which is 8 for Tier S and 32 for Tier F
+  when left empty, and the declared exceptions: the ids of the lenses the base engine cannot build, separated by
+  spaces, a pair as `host+converter`. Each shard writes them to a file in the form the driver reads.
+
+  ```bash
+  gh workflow run engine-diff-stage.yml --ref <head> -f base=<anchor> -f tier=s -f class=c0
+  gh workflow run engine-diff-stage.yml --ref <head> -f base=<anchor> -f exceptions="<lens id> <host>+<converter>"
+  ```
+
+- **Before the workflow file is on `main`**, or to try a change to it, push the commit to a branch under
+  `engine-diff-stage/`. GitHub dispatches a workflow only once its file is on the default branch, and a push has no
+  such limit. A push run takes every input at its fallback: Tier S under C0, in 8 shards, with no exception
+  declared and the pushed commit as its own base, so it compares that commit with itself and passes only if the
+  engine repeats itself bit for bit. The run is on the pull request's own head commit, so its checks show on the
+  pull request. Delete the branch afterwards.
+
+  ```bash
+  git push origin HEAD:refs/heads/engine-diff-stage/<name>
+  git push origin :refs/heads/engine-diff-stage/<name>
+  ```
+
 ### Tests
 
 Three files in the tooling suite hold the harness to its contract.
@@ -349,25 +421,30 @@ Three files in the tooling suite hold the harness to its contract.
   respelling leaves every Tier P record of a lens unchanged, a member of a built surface that the engine alone
   changed gives another build record, and no analysis or MTF record carries a skip marker. Asking an engine which
   pairs it permits does not throw on a prescription it cannot read, and it names the pairs it cannot build, each by
-  the pair's own build record. It also compares the two lists `requests.ts` has to copy, the benchmark lens set and
-  the analysis-context job names, with their sources.
-- `__tests__/src/benchmarks/engineDiffCompare.test.ts`: every numeric path of Tier P has a class, and no class is
-  looser than the quantity table; identical captures pass in every class; and each drift injected into captured
-  records is detected (a status, an index, a unit error, a sample order, one ulp under C0, twice a budget under C1
-  where half passes). A scalar below 1 that is no length fails at 1e-10 relative, a solve's residual is held to its
-  solve's tolerance and not differenced, a stop residual 1000 times larger on one side of a converged solve fails,
-  a record that throws alike on both engines fails in every class, and a failing solver output is reported in
-  quanta. It also covers cross-evaluation: a data-only change shows no engine difference and an impact report, a
-  format-only change that alters a value fails, a failed status or a non-finite number behind a change of shape
-  blocks, a changed converter is compared through its pairs, and a pair the engines disagree about fails while one
-  the data lost is listed. A pair the data gained passes with failed rays in its records and fails when it does not
-  build, the impact report counts what the records of a new lens or a gained pair hold, and a changed converter
-  that lost every pair is warned of. A pair the base engine cannot compose and build is uncompared in a run that
-  meets it and in one that does not, and passes only when declared; the pairs of a host that does not build alone
-  are compared; and the pair lists decide as a pair's own build record does. The uncompared lenses are held to the
-  declared exceptions in both directions.
-- `__tests__/scripts/engineDiffScript.test.ts`: the command line, and one run of the real driver on one lens against
-  `HEAD`, which is skipped where git cannot add a worktree.
+  the pair's own build record.
+  Each tier's list is the same on every build and for any order of the catalog, Tier S holds every request of Tier
+  P and Tier F every request of Tier S, a pair that one engine alone permits is still asked, and the shards of every
+  tier are disjoint and complete at several shard counts. It also compares what `requests.ts` has to copy with its
+  sources: the benchmark lens set and stopped scenario, the analysis-context job names, the MTF benchmark's lenses,
+  and the MTF methods, spectra and default grid.
+- `__tests__/src/benchmarks/engineDiffCompare.test.ts`: every numeric path of Tier P and of the named MTF requests
+  has a class, and no class is looser than the quantity table; identical captures pass in every class; and each
+  drift injected into captured records is detected (a status, an index, a unit error, a sample order, one ulp under
+  C0, twice a budget under C1 where half passes). A scalar below 1 that is no length fails at 1e-10 relative, a
+  solve's residual is held to its solve's tolerance and not differenced, a stop residual 1000 times larger on one
+  side of a converged solve fails, a record that throws alike on both engines fails in every class, and a failing
+  solver output is reported in quanta. It also covers cross-evaluation: a data-only change shows no engine
+  difference and an impact report, a format-only change that alters a value fails, a failed status or a non-finite
+  number behind a change of shape blocks, a changed converter is compared through its pairs, and a pair the engines
+  disagree about fails while one the data lost is listed. A pair the data gained passes with failed rays in its
+  records and fails when it does not build, the impact report counts what the records of a new lens or a gained
+  pair hold, and a changed converter that lost every pair is warned of. A pair the base engine cannot compose and
+  build is uncompared in a run that meets it and in one that does not, and passes only when declared; the pairs of
+  a host that does not build alone are compared; and the pair lists decide as a pair's own build record does. The
+  uncompared lenses are held to the declared exceptions in both directions, and a lens handed over in parts is
+  reported as it would be whole.
+- `__tests__/scripts/engineDiffScript.test.ts`: the command line, and runs of the real driver against `HEAD`, on one
+  lens of Tier P and on one lens of one shard of Tier S, which are skipped where git cannot add a worktree.
 
 ## Refactor Test Expectations
 

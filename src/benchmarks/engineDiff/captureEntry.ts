@@ -31,15 +31,16 @@ import {
   GROUP_MOVEMENT_MODES,
   LOCA_INSET_BAR_WIDTH_PX,
   LOCA_READOUT_FRACTIONS,
-  MTF_REQUEST,
   OFF_AXIS_FIELD_FRACTION,
   OFF_AXIS_PUPIL_FRACTIONS,
   ON_AXIS_PUPIL_FRACTIONS,
   SKEW_FIELD_FRACTION,
   SKEW_PUPIL_FRACTIONS,
   lensId,
+  mtfRequestOf,
   type CaptureRequest,
   type CaptureState,
+  type CatalogLens,
   type LensRef,
   type RequestCatalog,
   type RequestFamily,
@@ -68,7 +69,7 @@ export {
   renderSummaryMarkdown,
 } from "./compare.js";
 export { decodeValue, encodeValue, sha256Hex } from "./payload.js";
-export { lensId, stateId, tierRequests } from "./requests.js";
+export { lensId, shardRequests, stateId, tierRequests } from "./requests.js";
 export { describeSeam } from "./seamAdapter.js";
 
 /* ── Serialized catalog ── */
@@ -199,14 +200,39 @@ export function fingerprintCatalog(catalog: SerializedCatalog): {
 /**
  * Reduce a serialized catalog to what `tierRequests` needs.
  *
+ * Each fact is read off the authored prescription the way the engine reads it, and none of them through the
+ * engine: a request list is built once, from the head's prescriptions, and handed to both engines.
+ *
  * @param catalog - prescriptions from any ref
- * @returns each lens's zoom station count, and the pairs
+ * @returns each lens's authored stations and the features a tier chooses lenses by, and the pairs
  */
 export function requestCatalog(catalog: SerializedCatalog): RequestCatalog {
   return {
-    lenses: catalog.lenses.map(({ key, prescription }) => {
-      const zoomPositions = (prescription as { zoomPositions?: EncodedValue } | null)?.zoomPositions;
-      return { key, zoomStations: Array.isArray(zoomPositions) ? zoomPositions.length : 1 };
+    lenses: catalog.lenses.map(({ key, prescription }): CatalogLens => {
+      const data = decodeValue(prescription) as Partial<LensData>;
+      const { zoomPositions, focusPositions, aberrationControl } = data;
+      return {
+        key,
+        zoomStations: Array.isArray(zoomPositions) ? zoomPositions.length : 1,
+        /* Fewer than two keyframes is no focus table: the engine interpolates between the slider's ends. */
+        focusPositions: Array.isArray(focusPositions) && focusPositions.length >= 2 ? focusPositions : [0, 1],
+        /* The engine reads a ring as centered by its center label. */
+        aberrationControl: !aberrationControl
+          ? null
+          : aberrationControl.centerLabel != null
+            ? "centered"
+            : "two-position",
+        projection: data.projection?.kind ?? null,
+        folded:
+          data.opticalPath != null ||
+          (data.surfaces ?? []).some(
+            (surface) => surface.interaction != null && surface.interaction.type !== "refract",
+          ),
+        perspectiveControl: data.perspectiveControl != null,
+        diffractive: (data.surfaces ?? []).some((surface) => surface.diffractive != null),
+        absorbing: (data.elements ?? []).some((element) => (element.absorptionCoefficientPerMm ?? 0) > 0),
+        rearPlateMaker: (data.rearPlates?.length ?? 0) > 0 ? (data.maker ?? "") : null,
+      };
     }),
     pairs: catalog.pairs,
   };
@@ -220,6 +246,8 @@ export interface PayloadRecord {
   lens: string;
   state: CaptureState | null;
   request: RequestFamily;
+  /** The request's variant, on the record of a request that names one. */
+  variant?: string;
   payload: Outcome<EncodedValue>;
 }
 
@@ -269,7 +297,12 @@ export function captureRecords(catalog: SerializedCatalog, requests: readonly Ca
     );
 
   /** The engine work of one request. A malformed request throws here, before anything is captured. */
-  const workOf = ({ lens, state, family }: CaptureRequest): (() => unknown) => {
+  const workOf = ({ lens, state, family, variant }: CaptureRequest): (() => unknown) => {
+    /* Only MTF is asked in more than one way; `mtfRequestOf` refuses a name it does not know. */
+    if (family === "mtf") mtfRequestOf(variant);
+    else if (variant !== undefined) {
+      throw new Error(`engineDiff: ${family} was requested of ${lensId(lens)} as "${variant}", and has no variants`);
+    }
     if (family === "composition") {
       const converterKey = lens.teleconverter;
       if (!converterKey) throw new Error(`engineDiff: composition was requested of ${lens.key}, which is not a pair`);
@@ -289,11 +322,11 @@ export function captureRecords(catalog: SerializedCatalog, requests: readonly Ca
     }
     if (!state) throw new Error(`engineDiff: ${family} was requested of ${lensId(lens)} without a lens state`);
     const capture = STATE_FAMILIES[family];
-    return () => capture(seam, buildFresh(lens), state);
+    return () => capture(seam, buildFresh(lens), state, variant);
   };
 
   const work = requests.map(workOf);
-  return requests.map(({ lens, state, family }, index): PayloadRecord => {
+  return requests.map(({ lens, state, family, variant }, index): PayloadRecord => {
     const outcome = outcomeOf(work[index]);
     /* Prescription data is encoded without loss. Engine results go through the result encoder, which is made per
      * record so the trace digests of one record's jobs are computed once and then dropped. */
@@ -302,6 +335,7 @@ export function captureRecords(catalog: SerializedCatalog, requests: readonly Ca
       lens: lensId(lens),
       state,
       request: family,
+      ...(variant === undefined ? {} : { variant }),
       payload: outcome.ok ? { ok: true, value: encode(outcome.value) } : outcome,
     };
   });
@@ -310,7 +344,7 @@ export function captureRecords(catalog: SerializedCatalog, requests: readonly Ca
 /* ── State families ── */
 
 type StateFamily = Exclude<RequestFamily, "composition" | "build">;
-type StateCapture = (seam: EngineSeam, lens: RuntimeLens, state: CaptureState) => unknown;
+type StateCapture = (seam: EngineSeam, lens: RuntimeLens, state: CaptureState, variant?: string) => unknown;
 
 /**
  * Field geometry and aperture at a state, by the viewer's arithmetic: the slider's f-number scales the wide-open
@@ -624,12 +658,12 @@ const captureAnalysis: StateCapture = (seam, lens, state) => {
   };
 };
 
-const captureMtf: StateCapture = (seam, lens, state) => {
+const captureMtf: StateCapture = (seam, lens, state, variant) => {
   const { focusT, zoomT, aberrationT } = state;
   const { stopSemiDiameterMm, pupilSemiDiameterMm } = apertureAtState(seam, lens, state);
   const movement = seam.clampLensMovement(lens, { shiftMm: state.shiftMm, tiltDeg: state.tiltDeg });
   const options = {
-    ...MTF_REQUEST,
+    ...mtfRequestOf(variant),
     pupilSemiDiameterMm,
     stopSemiDiameterMm,
     /* MTF takes no pose. The viewer passes this flag, and a moved lens is reported unavailable instead. */
