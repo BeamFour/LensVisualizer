@@ -31,7 +31,7 @@ Tags: `[policy]` how we work · `[recipe]` steps for one change type · `[archit
 - [architecture] [`architecture/mount-diagrams.md`](architecture/mount-diagrams.md) — mount data, polar geometry renderer, `/mounts` pages, SVG generator
 - [architecture] [`architecture/state-and-utilities.md`](architecture/state-and-utilities.md) — reducer state, preferences, URL sync, themes, utilities
 - [architecture] [`architecture/comparison.md`](architecture/comparison.md) — comparison mode, shared sliders, compare URLs
-- [architecture] [`architecture/testing.md`](architecture/testing.md) — test layout, regression anchors, and the per-lens test retention policy
+- [architecture] [`architecture/testing.md`](architecture/testing.md) — test layout, regression anchors, optics architecture guards, and the per-lens test retention policy
 
 ## Recipes
 

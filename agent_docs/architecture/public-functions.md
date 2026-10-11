@@ -12,6 +12,8 @@ this document only records where to import from and the contracts that are not v
   paths; deeper engine modules are for optics internals and focused tests.
 - Do not import from `src/optics/internal/` unless the work is inside the optics implementation or a targeted optics
   test.
+- The seam guard in `__tests__/src/optics/opticsArchitecture.test.ts` enforces this boundary for `src/`, `scripts/`
+  and `reports/`; see "Architecture Guards" in `agent_docs/architecture/testing.md`.
 - Treat `src/generated/` as read-only build output. Regenerate metadata instead of editing it.
 - Lens data modules are auto-discovered through `import.meta.glob`; do not manually import individual lens files for
   catalog behavior.
@@ -28,7 +30,7 @@ this document only records where to import from and the contracts that are not v
 | `src/optics/fieldGeometry.ts` | Field and chief-ray helpers: `computeFieldGeometryAtState`, `computeAnalysisFieldGeometryAtState`, `entrancePupilAtState`, `solveChiefRay`, image-height inversion | Analysis tabs must use the `computeAnalysisFieldGeometryAtState` variant. Fisheye/ultra-wide launches go through `src/optics/projection.ts` and `solveChiefRay`; never inline `Math.tan(field)`. |
 | `src/optics/diagramGeometry.ts` | `createCoordinateTransforms`, `computeElementShapes`, `computeElementRenderDiagnostics` | The only SVG coordinate/shape entry point for diagram components; keeps UI decoupled from the engine's diagram submodule layout. |
 | `src/optics/compat.ts` | `buildLens2`, `prepareRuntimeState`, `engineLensFromRuntime`, `analysisJobsForState2`, and the `*2` analysis facades | Engine-native facade for prepared-state work (`src/optics/state/prepareState.ts`) and engine tests. App code reaches it only through the barrels above or through `analysisJobsForState2` in analysis tabs. |
-| `src/optics/analysisJobs.ts`, `src/optics/analysis/analysisContext.ts` | Grouped analysis job facades and the memoized per-panel analysis context | The context carries the complete perspective trace context and cache key; active movement is routed without centered-result fallback (`src/optics/analysis/analysisMovementSupport.ts` classifies section availability). |
+| `src/optics/analysis/analysisJobs.ts`, `src/optics/analysis/analysisContext.ts` | Grouped analysis job facades (`analysisJobs2`, `analysisJobsForState2`) and the memoized per-panel analysis context (`createAnalysisComputationContext`) | Both are re-exported by `src/optics/compat.ts`; import them from there. The context carries the complete perspective trace context and cache key; active movement is routed without centered-result fallback (`src/optics/analysis/analysisMovementSupport.ts` classifies section availability). |
 | `src/optics/perspective/index.ts`, `src/optics/perspective/analysis/index.ts` | Perspective pose/trace context, chief solving, field sampling, and the fixed-sensor analysis variants | Failed field-sample requests are retained with explicit statuses rather than dropped. |
 | `src/optics/lensMovement.ts` | Perspective-control clamping and diagram transform adapters | Keep movement here unless explicitly upgrading full moved-optics analysis. |
 | `src/optics/diagnostics.ts` | `OPTICS_COUNTERS_ENABLED`, `snapshotWorkCounters()`, `resetWorkCounters()` | Read side of the engine work counters, for benchmarks, harnesses, and tests. Counters are compiled out of the app and stay zero under plain Node; see "Work Counters" in `agent_docs/architecture/optics-engine.md`. |

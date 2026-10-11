@@ -122,6 +122,46 @@ Existing tests cover:
 - The glass-report helper library (`__tests__/reports/glassScanLib.test.ts`) and the glass-resolution parity sweep
   (`__tests__/src/lens-data/glassResolutionParity.test.ts`); the reports themselves are generated outside the suite (see
   "Reports and Tooling Tests").
+- The structure of `src/optics/` itself: import cycles, the outside-import seam, and module-level caches (see
+  "Architecture Guards").
+
+## Architecture Guards
+
+`__tests__/src/optics/opticsArchitecture.test.ts` scans source text, as `__tests__/docDrift.test.ts` does, and holds
+three guards over `src/optics/`:
+
+- **Import cycles.** The runtime import graph has no strongly connected component larger than one module and no
+  self-import. An edge is a static import, a re-export or an `import()` that carries at least one value; type-only
+  declarations add none.
+- **Seam.** An import into `src/optics/` from the rest of `src/`, from `scripts/` or from `reports/` targets a
+  registered module. Type-only imports count, and so do the path strings that scripts load. Tests are not importers,
+  because they follow the internals they test, and targets under `src/optics/mount/` are skipped.
+- **Caches.** Every module-level `Map`, `WeakMap`, `Set` or `WeakSet` is registered as a constant lookup table, a
+  bounded cache, or a `WeakMap` keyed by its owner whose per-owner value cannot grow without bound.
+
+Each guard's lists are data at the top of the test, and come in two kinds:
+
+- A **legacy list** holds the violations that exist today, and only shrinks. The guard fails for a violation that is
+  not listed and for a listed entry that no longer violates, so a fix and the removal of its entry land together.
+  Never add an entry; fix the code. The cycle guard has only this list.
+- A **registry** holds the modules and containers that meet the rule by design. Add an entry only when it passes the
+  guard's admission rule, which the guard checks:
+  - Seam: a top-level `src/optics/*.ts` file that holds only imports, re-exports, type declarations and aliases of
+    imported bindings. `src/optics/prescription/teleconverterCompatibility.ts` is the one permanent exception, because
+    `scripts/generate-build-metadata.mjs` loads it by path under plain Node; the guard checks that the script still
+    names the path and that the module still imports nothing at runtime.
+  - Caches: a constant is never written by its module; a bounded cache records its owner, key and capacity, and
+    names the module constant that holds the capacity; an owner-keyed `WeakMap` records its owner, its key and what
+    one owner holds.
+
+Moving an entry from a legacy list to its registry counts as a removal. The cache scan reads declarations: a legacy
+entry is stale once its container is gone or is never written, and a legacy `WeakMap` once it no longer shows a `Map`
+or `Set` per owner, in its own declaration or in the module type its record names as `storeType`. A cap shows in no
+declaration, so bounding a legacy cache means moving its entry to the registry by hand, where the recorded capacity
+is checked against the code. Each failure message names the entry and the list to change.
+
+The guards read source text, not a syntax tree. The comment on each scan function in the test lists the forms it does
+not see, such as an `import.meta.glob` pattern for the seam or a container nested in another value for caches.
 
 ## Reports and Tooling Tests
 

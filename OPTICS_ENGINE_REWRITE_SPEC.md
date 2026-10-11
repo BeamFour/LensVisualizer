@@ -429,30 +429,37 @@ The old engine demonstrates compatibility, not physical correctness. These refer
 each with up to two lists:
 
 - **Legacy exceptions** are today's violations. This list is a one-way ratchet: an entry can only be removed, and the
-  test fails when a listed entry no longer violates, so the list cannot go stale. It is empty by S8.
+  test fails when a listed entry no longer violates, so the list cannot go stale. Moving an entry to the registry
+  counts as a removal. It is empty by S8.
 - **The approved registry** holds modules that meet the rule by design. A reviewed PR may add an entry only if it meets
   that guard's admission rule. New barrels and relocated caches enter here, never through the legacy list.
 
 The guards:
 
 - **Import cycles.**
-  - The test builds the runtime import graph of `src/optics/`, excluding `import type`, and computes strongly
-    connected components.
+  - The test builds the runtime import graph of `src/optics/` and computes strongly connected components. An edge is
+    an import, re-export or `import()` that carries at least one value; type-only forms add none.
   - Legacy exceptions start as today's 13 cycle modules.
   - There is no registry: no cycle is ever approved.
 - **Seam.**
-  - Imports into `src/optics/` from anywhere else must target a registered or legacy-listed module.
-  - Registry admission: a top-level `src/optics/*.ts` file reviewed as a barrel or thin facade. Alias barrels due for
-    deletion in S8 leave the registry when they are deleted.
+  - Imports into `src/optics/` from the rest of `src/`, from `scripts/` and from `reports/` must target a registered
+    or legacy-listed module. Type-only imports count, and so do the path strings that scripts load.
+  - Tests are not importers: they follow the internals they test. Targets under `src/optics/mount/` are out of scope.
+  - Registry admission, which the test checks: a top-level `src/optics/*.ts` file that holds only imports, re-exports,
+    type declarations and aliases of imported bindings. Alias barrels due for deletion in S8 leave the registry when
+    they are deleted.
   - Legacy exceptions are today's outside-imported modules that fail admission: deep modules and top-level
     implementation files.
   - `prescription/teleconverterCompatibility.ts` is a permanent registry entry, because plain-Node build metadata
     imports it directly.
 - **Caches.**
-  - Every module-level `Map`, `WeakMap` or `Set` in `src/optics/` must be registered or legacy-listed.
-  - Legacy exceptions are today's unbounded caches.
-  - Registry admission: a record of owner, key and capacity, and either a bounded capacity or a `WeakMap` keyed by its
-    owner object.
+  - Every module-level `Map`, `WeakMap`, `Set` or `WeakSet` in `src/optics/` must be registered or legacy-listed,
+    `mount/` and the glass data included.
+  - Legacy exceptions are today's unbounded caches: the one unbounded `Map`, and each owner-keyed `WeakMap` whose
+    per-owner store has no cap.
+  - Registry admission, one of three kinds: a constant lookup table its module never writes; a bounded cache with a
+    record of owner, key and capacity; or a `WeakMap` keyed by its owner whose per-owner value cannot grow without
+    bound.
 
 ## Efficiency (secondary)
 
@@ -974,7 +981,8 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
     - add `__tests__/src/optics/opticsArchitecture.test.ts` with the cycle, seam and cache guards, their initial
       legacy-exception lists and their registries (today's top-level barrels and bounded or owner-keyed caches);
     - delete the three unimported modules (`src/optics/index.ts`, the root `src/optics/analysisJobs.ts` and
-      `src/optics/analysis/fieldCurvature.ts`).
+      `src/optics/analysis/fieldCurvature.ts`), and repoint `agent_docs/architecture/public-functions.md`, which
+      named the deleted facade.
   - **Gate:** C0.
 - **S1.P4.T2 High-precision fixtures and comparator export.**
   - **Change:**
