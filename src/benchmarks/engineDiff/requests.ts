@@ -53,6 +53,13 @@ export interface RequestCatalog {
   lenses: readonly { key: string; zoomStations: number }[];
   /** Every host and converter the fit predicate allows; a tier chooses which of them it covers. */
   pairs: readonly { host: string; teleconverter: string }[];
+  /**
+   * Lenses whose prescription is new or differs from the one under comparison. A tier may ask more of these than
+   * of the rest; a list built for one catalog alone leaves this out.
+   */
+  changedLensKeys?: readonly string[];
+  /** Teleconverters whose prescription is new or differs. Tier P asks every pair one of them forms. */
+  changedTeleconverterKeys?: readonly string[];
 }
 
 /**
@@ -253,9 +260,11 @@ function tierPStateRow(catalog: RequestCatalog): CaptureRequest[] {
 
 /**
  * Tier P, second row: every analysis job and a small geometric MTF on the benchmark lenses and the feature
- * representatives, each at the default state plus its feature state.
+ * representatives, each at the default state plus its feature state, and on every changed lens at the default
+ * state, so a lens whose data moved goes through every request of the tier. A pair is changed when its host or its
+ * converter is, so every permitted pair of a changed host or converter is in the row as well.
  *
- * The first row covers a representative that is a catalog lens. The converter pair is not a catalog lens, so this
+ * The first row covers a representative that is a catalog lens. A converter pair is not a catalog lens, so this
  * row also asks it for its composition and for the first row's families at the default state.
  */
 function tierPAnalysisRow(catalog: RequestCatalog): CaptureRequest[] {
@@ -267,6 +276,18 @@ function tierPAnalysisRow(catalog: RequestCatalog): CaptureRequest[] {
     ...BENCHMARK_LENS_KEYS.map((key) => ({ feature: "benchmark", lens: { key } })),
     ...FEATURE_REPRESENTATIVES,
   ];
+  const named = new Set(representatives.map(({ lens }) => lensId(lens)));
+  const changedLenses = new Set(catalog.changedLensKeys);
+  const changedConverters = new Set(catalog.changedTeleconverterKeys);
+  for (const key of changedLenses) {
+    if (!named.has(key)) representatives.push({ feature: "changed", lens: { key } });
+  }
+  for (const { host, teleconverter } of catalog.pairs) {
+    const lens: LensRef = { key: host, teleconverter };
+    if ((changedLenses.has(host) || changedConverters.has(teleconverter)) && !named.has(lensId(lens))) {
+      representatives.push({ feature: "changed", lens });
+    }
+  }
   /* A representative that has left the catalog would shrink this row without anyone noticing. */
   const missing = representatives.map(({ lens }) => lensId(lens)).filter((id) => !known.has(id));
   if (missing.length > 0) {

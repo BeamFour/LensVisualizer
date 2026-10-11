@@ -131,24 +131,26 @@ Existing tests cover:
   `import.meta.glob`, so they run under Vitest through `vitest.reports.config.js`: `npm run generate:reports` (all), or
   `generate:glass-reports`, `generate:mirror-reports`, `generate:mount-svgs`, or `npm run generate:reports -- <name>`.
   An invariant a report depends on belongs in the suite as its own test, not as an `expect` inside the generator.
-- **Tooling tests** for manual-only dev tools (the benchmark harness, the engine differential harness, and the
-  audit-script npm entries) are listed in `TOOLING_TESTS` in `vite.config.js` and run with `npm run test:tooling`. CI
-  runs both suites in one job and calls Vitest directly for this one
+- **Tooling tests** for manual-only dev tools (the benchmark harness, the engine differential harness and its driver,
+  and the audit-script npm entries) are listed in `TOOLING_TESTS` in `vite.config.js` and run with
+  `npm run test:tooling`. CI runs both suites in one job and calls Vitest directly for this one
   (`npx vitest run --config vitest.tooling.config.js`), so the metadata `npm run test` just generated is not generated
   again. Add a file there only when it guards a tool that neither the build nor the app uses.
 
 ## Engine Differential Harness
 
-`src/benchmarks/engineDiff/` turns what the optics engine returns into normalized payload records, so that the records
-of two engine revisions can be compared value by value. The app does not import it. The folder is self-contained: its
-files import only each other, so it can be copied into a checkout of another revision and bundled there.
+`src/benchmarks/engineDiff/` turns what the optics engine returns into normalized payload records and compares the
+records of two engine revisions value by value. `scripts/engine-diff.mjs` drives it. The app does not import it. The
+folder is self-contained: its files import only each other, so it can be copied into a checkout of another revision
+and bundled there.
 
-- `captureEntry.ts` is the entry a driver bundles once per revision. It exports that revision's catalog as serialized
-  prescriptions (hosts and teleconverters apart, plus the permitted pairs), and it evaluates the serialized
+- `captureEntry.ts` is the entry the driver bundles once per revision. It exports that revision's catalog as
+  serialized prescriptions (hosts and teleconverters apart, plus the permitted pairs), and it evaluates the serialized
   prescriptions it is handed, so one revision's data can run on the other's engine. It returns one record per lens,
   state, and request family, each `{ lens, state, request, payload }`. A computation that throws is recorded as an
   outcome, never dropped. It answers which pairs its engine's fit predicate permits for a catalog it is handed, and
-  which of some pairs its engine cannot compose and build.
+  which of some pairs its engine cannot compose and build. It also re-exports the comparison, which the driver calls
+  from the built bundle.
 - `seamAdapter.ts` is the only file that names engine modules. It reaches each through an eager `import.meta.glob`,
   which yields nothing for a file a revision lacks, and resolves every capability from an ordered list of candidate
   exports. A change that renames or moves a seam export adds the new name to that list in the same change.
@@ -156,7 +158,11 @@ files import only each other, so it can be copied into a checkout of another rev
   lens, at the first and last zoom station, for build constants, layout, ray fans with full hits, field geometry, and
   chief-ray solves; and asks the benchmark lenses plus one representative per engine feature for every analysis job
   and a small geometric MTF. One representative is a converter pair. It is the only pair in the tier, so it is also
-  asked for its composition and for the first row's requests at the default state.
+  asked for its composition and for the first row's requests at the default state. A lens named as changed is asked
+  for the analysis jobs and MTF too, so a lens whose data moved goes through every request of the tier. A pair is
+  changed when its host or its converter is: every permitted pair of a changed or new host or converter is asked
+  what the representative pair is. The pairs a tier chooses from are every pair that either engine's fit predicate
+  permits for the head's prescriptions.
 - `payload.ts` holds the encoding (JSON that round-trips under `Object.is`, with tags for -0, NaN, and the
   infinities), the digests that stand in for the per-ray traces and pupil bundles nested in perspective results, and
   the semantic fingerprint: a hash of a prescription after lens defaults and the engine's authority rules (a flat
@@ -164,6 +170,13 @@ files import only each other, so it can be copied into a checkout of another rev
   authored data back, such as the composed prescription of a pair or the `data` of a built lens, is written through
   the same rules, so a respelling the fingerprint ignores does not change a record. An engine back-pointer is skipped
   by member name and leaves a marker in the payload.
+- `budgets.ts` holds the quantity classes and the table that gives every numeric payload path one of them. A class
+  says how two values are compared and how far they may differ under C1. The table's rows are path patterns, and the
+  first row that matches decides.
+- `compare.ts` pairs the records of two captures one lens at a time, judges each difference under the declared change
+  class, and keeps totals, the largest difference per quantity and a bounded sample of findings. It also sorts a
+  catalog's changes into format-only and semantic, sets the two engines' permitted pairs side by side, reads the
+  declared exceptions, and writes the reports.
 
 The build record holds every field of the built lens. Each surface of `S` keeps every member the engine holds for it,
 its inner radius, stop placement, interaction and diffractive phase among them, with a flat radius written as the
@@ -174,13 +187,187 @@ Three parts of `src/optics/` are outside the harness, and their unit suites cove
 `src/optics/diagram/` (`diagramGeometry.test.ts`, `elementRenderDiagnostics.test.ts`), the lens-movement transform
 (`lensMovement.test.ts`) and the perspective diagram fan (`perspective/diagramFan.test.ts`).
 
-`__tests__/src/benchmarks/engineDiff.test.ts` runs in the tooling suite. It holds the harness to its contract: a
-capture repeats byte for byte, the encoding loses nothing, the fingerprint's restated stop-radius rule agrees with
-`buildLens` on every catalog lens, a fingerprint-equal respelling leaves every Tier P record of a lens unchanged, a
-member of a built surface that the engine alone changed gives another build record, and no analysis or MTF record
-carries a skip marker. Asking an engine which pairs it permits does not throw on a prescription it cannot read, and
-it names the pairs it cannot build, each by the pair's own build record. It also compares the two lists `requests.ts`
-has to copy, the benchmark lens set and the analysis-context job names, with their sources.
+### What a Run Compares
+
+A run takes a base ref and the working tree, which is the head. Nothing is skipped silently.
+
+1. **Engine drift.** Every head prescription is evaluated on the base engine and on the head engine, and the two
+   sets of records are compared under the change class.
+2. **Format-only data change.** A lens whose serialized prescription differs from the base's while its semantic
+   fingerprint does not: the base and head prescriptions are evaluated on the head engine and must be bit-identical
+   in every class. Prescriptions are compared as evaluated data, so an edit to comments or layout is no change.
+3. **Semantic data change or new lens.** The same pair becomes an impact report, written to `data-impact.md`. It
+   blocks only on a new failed status, a newly non-finite value, or a lens that no longer builds. Failed statuses
+   and non-finite numbers are also counted per record on both sides, and an increase blocks, so one that came in
+   with a longer array or a new member is not missed. The count is per record and net: a failure that appears
+   behind a change of shape while another disappears from the same record leaves the count equal, is not blocked by
+   it, and is left to the reviewed impact report. A record that threw on the base data has nothing to count
+   against, so the count is not applied to it. A non-finite number that hands the prescription back, such as the
+   focal length of a plane element, was authored and is not counted. A new lens has no base data and blocks only by
+   not building. With nothing to count against, the failed statuses and computed non-finite numbers in its records
+   gate nothing: the report gives both counts for each of its records, for review. A teleconverter is no lens of a
+   run: a changed or new one is compared through the pairs it forms, and the report lists it with them.
+4. **Uncompared lenses.** A lens the base engine cannot build is not compared. The uncompared lenses must be exactly
+   the declared exceptions: one bullet per lens, its id in backticks, under a heading `## Engine-diff exceptions` in
+   the pull request description. A converter pair is named `host+converter`.
+5. **Records that throw on both engines.** The harness runs on both sides, so a defect in a capture throws alike on
+   both, and two equal failures would otherwise pass as a comparison. Each such record of a compared lens fails the
+   run in every class. The exception is a lens that builds on neither engine and whose data is new, or changed from
+   a prescription that built: rule 3 blocks that one. A job that throws inside an analysis record, such as a section
+   that is unavailable while the lens is moved, is an outcome of the job and is compared like any other value.
+6. **Converter pairs.** The fit predicate is engine code. Both engines are asked which pairs they permit for the
+   head's prescriptions, and a difference fails the run and names the pairs, under every class but C3, which reports
+   it. Requests are built from the pairs either engine permits, so a pair one engine lost is still asked of both and
+   that engine throws on it.
+   - A pair is set aside from that comparison exactly when the base engine cannot compose and build it from the
+     head's prescriptions while the head engine can. Each engine is asked for the build record of every pair either
+     predicate permits, once, before any lens is captured, and asking never ends the run. The answer is the pair's
+     own: a host that does not build alone is an uncompared lens by rule 4 and says nothing of its pairs, and a pair
+     that does not build says nothing of its converter's other pairs.
+   - A pair set aside is an uncompared lens, and that one answer stands everywhere: in the pair comparison, in a run
+     that meets the pair, and in a narrowed run that does not. It is listed with the uncompared lenses in every run
+     of the tier and held to the declared exceptions as rule 4 holds a lens, so one list of exceptions holds for all
+     of them.
+   - A pair both engines build and only one predicate permits is still a difference between the engines. The
+     engine's composer applies the fit predicate, so a pair that the base engine's predicate refuses is one the base
+     engine cannot compose: a pair only the head engine permits is set aside and has to be declared, and a pair
+     only the base engine permits fails as a pair the head engine lost.
+   - The head engine is asked about the base's prescriptions as well, and a pair the data gained or lost is listed
+     in `data-impact.md`. A pair that only the head's prescriptions permit is compared as a new lens: it has
+     nothing to compare against on the base data, so it blocks only by not building, and the report counts what
+     its records hold as it does for a new lens.
+   - A pair the head's prescriptions no longer permit is not requested and does not block. The plan gates a data
+     change only on a new failed status, a non-finite value or a lens that no longer builds, and a converter that
+     fits nothing is none of these. A changed host or converter that lost every pair it had with the base data is
+     therefore named in a warning, with the pairs it lost: among the failure lines at the top of `summary.md`, and
+     on stderr. Nothing in the run evaluated such a converter, and the run does not fail on it.
+
+### Change Classes and Budgets
+
+- **C0** (the default): every number bit-identical under `Object.is` and every other field equal. The encoded
+  records are compared as text, and only a pair that differs is walked to find where.
+- **C1 and C2**: each number within its class's budget. A status, count, label, sample position, a missing member or
+  a changed array length is a discrete transition; every one is listed and fails the run, because a pull request has
+  no way yet to declare one as expected. C2 uses the C1 budgets: the C2 criteria of the quantity table in
+  `OPTICS_ENGINE_REWRITE_SPEC.md` carry a solver tolerance through a derivative, which two payloads cannot supply.
+- **C3**: engine drift is reported and does not fail. Rules 2, 4 and 5 above still do.
+
+The classes in `budgets.ts`:
+
+- The rows of that quantity table keep its values: unclipped hits and image-plane landings 1e-9 mm, clipped,
+  exterior or diagnostic hits 1e-7 mm, direction cosines 1e-10, first-order scalars 1e-12 relative, chief-ray launch
+  heights 1e-9 mm, field angles from an image height 1e-10°, analysis lengths 1e-8 mm, percentages 1e-8 points, MTF
+  modulation 1e-7.
+- A hit's coordinates, and a ray's terminal values, are budgeted as unclipped only when the clip flag or status
+  beside them says so on both sides. A flag that differs is a transition of its own.
+- A relative budget is `|a − b| ≤ budget · max(|a|, |b|)`, and no less than the class's floor where it has one. A
+  floor is an absolute bound in the field's own unit, for a class whose values may be zero: a first-order length, a
+  layout length and a best-fit radius are never held tighter than 1e-12 mm, and a smooth ratio, which is a fraction,
+  than 1e-10. A class whose fields are no lengths and never near zero has no floor and is plainly relative, so only
+  zero agrees with zero: refractive indices, and the f-numbers, ray-height ratios, Petzval sum and drawing scales. A
+  prescription the engine hands back is plainly relative too: its values have no one unit, and an asphere
+  coefficient is far smaller than any floor of a length.
+- NaN and the infinities are compared with `Object.is` in every class.
+- An intersection residual is not differenced. Each side must lie within the effective tolerance recorded with it,
+  and the effective tolerance itself is exact.
+- What a solve reports of its own convergence is the same kind of contract check: each side must lie within the
+  tolerance the solve accepts a residual under, and the two sides are not differenced.
+  - The posed chief-ray solve's residual is held to 1e-7 mm: `DEFAULT_RESIDUAL_TOLERANCE_MM` in
+    `src/optics/perspective/chiefRay.ts`, which the solve hands to `solveScalarRoot` as its residual tolerance.
+  - The stop residual beside that solve is the same miss measured in the stop plane, larger by one over the cosine
+    of the field angle, and no tolerance of the engine's names it. It is held to a bound of its own, 1e-6 mm on each
+    side: ten times the solve's tolerance, which covers that growth for fields up to 84°. A report gives the field's
+    share of that bound. It also answers through the residual its solve accepted, and fails where that one is
+    outside the solve's tolerance.
+  - The sensor lock's residual, both components of its miss on the sensor and the scalar root's own, is held to
+    1e-5 mm: `SENSOR_LOCK_RESIDUAL_TOLERANCE_MM` in `src/optics/perspective/sensorTarget.ts`.
+  - A solve accepted its residual only where its status says `converged`. One that ended any other way returned
+    the miss of its nearest sample, which is a diagnostic and takes the clipped-hit budget, 1e-7 mm.
+- Slopes are compared as direction cosines.
+- Counts, indices, sample positions, request echoes, count ratios and binned statistics are exact.
+- Layout lengths, refractive indices, the scalars that are no lengths and a prescription handed back take the
+  first-order relative budget. Smooth ratios take 1e-10.
+- The output of a fixed-step bisection or a bracketed search is held to the quantity table's row for its kind: a
+  half-field is a field angle (1e-10°), the MTF best-focus shift an analysis length (1e-8 mm), and the best-fit
+  sphere radius takes the first-order relative budget. Such an output moves by a whole step of its solver when one
+  comparison inside the solver falls the other way. The class records that step, the solver's quantum, for the
+  report alone: when such a field fails, `summary.md` names the solver and its quantum and gives the difference in
+  quanta, so a boundary transition (about a whole quantum) can be told from drift (a small part of one).
+- Solver iteration and evaluation counts are exact under C0. Above it a change is reported as a histogram.
+- A trace nested in an analysis result is in the record as its status, hit count and a hash. Under C0 a changed hash
+  fails. Above C0 it is counted, the status and hit count are still compared, and the numbers inside the trace are
+  not budgeted. A C1 or C2 run in which a digest changed says so where it cannot be missed: `summary.md` opens with
+  a "Not budgeted" section that counts the changed digests per record family and names the lenses, and the driver
+  prints a warning to stderr. The run does not fail on it.
+
+A number that moves and has no class fails above C0, and a tooling test fails on any numeric path of Tier P that the
+table does not cover.
+
+### Running It
+
+```bash
+node scripts/engine-diff.mjs --base "$(git merge-base origin/main HEAD)"
+node scripts/engine-diff.mjs --base origin/main --class c1 --lens canon-serenar-50f18 --out tmp/engine-diff
+```
+
+`--tier` is `p` and `--class` is `c0` unless given. `--lens` narrows the run to one lens id, and `--exceptions` names a
+file in the form of a pull request description. The driver adds a detached worktree of the base in the system temp
+directory, copies the working tree's harness into it, bundles the capture entry once per side with no config file,
+and removes the worktree when it ends. It needs no `src/generated/` and no `node_modules` in the base.
+
+On SIGINT or SIGTERM the driver removes its base worktree and its temporary directories before it exits, with the
+status a shell gives a signal (130 or 143). A capture is synchronous, so it acts on the signal when the capture in
+hand returns, which can take some seconds. A driver that is killed outright leaves its worktree registered. The next
+run warns about every registered `engine-diff-base-*` worktree it finds and removes none of them, since another run
+may be using one: remove a stale one with `git worktree remove --force <path>`.
+
+Its output goes under `--out`, or under a new directory in the system temp directory that it names when it ends:
+gzip NDJSON payloads in a `payloads` folder, and the small files in a `reports` folder beside it (`summary.json`,
+`summary.md`, `data-impact.md`, `uncompared.json` and the failing record pairs). Nothing it writes is committed. It
+exits non-zero when a comparison fails or when the uncompared lenses differ from the declared exceptions in either
+direction.
+
+### CI
+
+The `engine-diff` job in `.github/workflows/quality.yml` runs on pull requests only, and `build` does not wait for it.
+Its first step compares the pull request with its merge-base on `main` and skips the rest unless a path changed
+under `src/optics/`, `src/types/`, `src/utils/catalog/` or `src/lens-data/` (Markdown aside), in
+`src/utils/featureFlags.ts`, which the engine reads a flag from, or in the harness, its driver or its workflows.
+Otherwise it runs Tier P against that merge-base, with the pull request description as the declared exceptions, adds
+`summary.md` to the job summary and uploads the `reports` folder as the `engine-diff-tier-p` artifact.
+
+The change class comes from the pull request's labels, read when the job runs: `engine-diff:c1`, `engine-diff:c2` or
+`engine-diff:c3`, and C0 with none. Two class labels fail the job. A label or description changed after a run takes
+effect when the job is re-run.
+
+### Tests
+
+Three files in the tooling suite hold the harness to its contract.
+
+- `__tests__/src/benchmarks/engineDiff.test.ts`: a capture repeats byte for byte, the encoding loses nothing, the
+  fingerprint's restated stop-radius rule agrees with `buildLens` on every catalog lens, a fingerprint-equal
+  respelling leaves every Tier P record of a lens unchanged, a member of a built surface that the engine alone
+  changed gives another build record, and no analysis or MTF record carries a skip marker. Asking an engine which
+  pairs it permits does not throw on a prescription it cannot read, and it names the pairs it cannot build, each by
+  the pair's own build record. It also compares the two lists `requests.ts` has to copy, the benchmark lens set and
+  the analysis-context job names, with their sources.
+- `__tests__/src/benchmarks/engineDiffCompare.test.ts`: every numeric path of Tier P has a class, and no class is
+  looser than the quantity table; identical captures pass in every class; and each drift injected into captured
+  records is detected (a status, an index, a unit error, a sample order, one ulp under C0, twice a budget under C1
+  where half passes). A scalar below 1 that is no length fails at 1e-10 relative, a solve's residual is held to its
+  solve's tolerance and not differenced, a stop residual 1000 times larger on one side of a converged solve fails,
+  a record that throws alike on both engines fails in every class, and a failing solver output is reported in
+  quanta. It also covers cross-evaluation: a data-only change shows no engine difference and an impact report, a
+  format-only change that alters a value fails, a failed status or a non-finite number behind a change of shape
+  blocks, a changed converter is compared through its pairs, and a pair the engines disagree about fails while one
+  the data lost is listed. A pair the data gained passes with failed rays in its records and fails when it does not
+  build, the impact report counts what the records of a new lens or a gained pair hold, and a changed converter
+  that lost every pair is warned of. A pair the base engine cannot compose and build is uncompared in a run that
+  meets it and in one that does not, and passes only when declared; the pairs of a host that does not build alone
+  are compared; and the pair lists decide as a pair's own build record does. The uncompared lenses are held to the
+  declared exceptions in both directions.
+- `__tests__/scripts/engineDiffScript.test.ts`: the command line, and one run of the real driver on one lens against
+  `HEAD`, which is skipped where git cannot add a worktree.
 
 ## Refactor Test Expectations
 

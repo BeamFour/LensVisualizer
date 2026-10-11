@@ -1,6 +1,6 @@
 # src/benchmarks/engineDiff
 
-This folder engine differential harness: the capture entry, seam adapter, request tiers, and payload normalization used to compare two engine revisions.
+This folder engine differential harness: the capture entry, seam adapter, request tiers, payload normalization, quantity budgets, and comparison of two engine revisions.
 
 Generated `readme.md` and `improvementsuggestions.md` files are intentionally omitted from the per-file inventory so this document stays focused on source relationships.
 
@@ -9,7 +9,9 @@ Generated `readme.md` and `improvementsuggestions.md` files are intentionally om
 ```mermaid
 flowchart LR
   subgraph n_src_benchmarks_engineDiff["src/benchmarks/engineDiff"]
+    n_src_benchmarks_engineDiff_src_benchmarks_engineDiff_budgets_ts["budgets.ts"]
     n_src_benchmarks_engineDiff_src_benchmarks_engineDiff_captureEntry_ts["captureEntry.ts"]
+    n_src_benchmarks_engineDiff_src_benchmarks_engineDiff_compare_ts["compare.ts"]
     n_src_benchmarks_engineDiff_src_benchmarks_engineDiff_payload_ts["payload.ts"]
     n_src_benchmarks_engineDiff_src_benchmarks_engineDiff_requests_ts["requests.ts"]
     n_src_benchmarks_engineDiff_src_benchmarks_engineDiff_seamAdapter_ts["seamAdapter.ts"]
@@ -55,20 +57,26 @@ flowchart LR
   n_src_benchmarks_engineDiff_src_benchmarks_engineDiff_seamAdapter_ts --> n_external_glob_______optics_raySampling_ts
   n_src_benchmarks_engineDiff_src_benchmarks_engineDiff_seamAdapter_ts --> n_external_glob_______optics_rayTrace_ts
   n_src_benchmarks_engineDiff_src_benchmarks_engineDiff_seamAdapter_ts --> n_external_glob_______optics_teleconverter_ts
+  n_src_benchmarks_engineDiff_src_benchmarks_engineDiff_compare_ts --> n_src_benchmarks_engineDiff_src_benchmarks_engineDiff_budgets_ts
+  n_src_benchmarks_engineDiff_src_benchmarks_engineDiff_captureEntry_ts --> n_src_benchmarks_engineDiff_src_benchmarks_engineDiff_compare_ts
+  n_src_benchmarks_engineDiff_src_benchmarks_engineDiff_compare_ts --> n_src_benchmarks_engineDiff_src_benchmarks_engineDiff_payload_ts
+  n_src_benchmarks_engineDiff_src_benchmarks_engineDiff_compare_ts --> n_src_benchmarks_engineDiff_src_benchmarks_engineDiff_requests_ts
 ```
 
 ## Directory Overview
 
-- Direct source files: 4
+- Direct source files: 6
 - Direct subfolders: 0
-- Main outbound areas: src/benchmarks (6), glob:../../lens-data/**/*.data.ts, glob:../../lens-data/**/*.teleconverter.ts, glob:../../lens-data/defaults.ts, glob:../../optics/aperture.ts, glob:../../optics/apertureStop.ts, glob:../../optics/asphericComparison.ts, glob:../../optics/buildLens.ts, +12 more
+- Main outbound areas: src/benchmarks (10), glob:../../lens-data/**/*.data.ts, glob:../../lens-data/**/*.teleconverter.ts, glob:../../lens-data/defaults.ts, glob:../../optics/aperture.ts, glob:../../optics/apertureStop.ts, glob:../../optics/asphericComparison.ts, glob:../../optics/buildLens.ts, +12 more
 - External consumers: none
 
 ## Files
 
 | File | Role | Imports from | Imported by | Exports |
 | --- | --- | --- | --- | --- |
-| `captureEntry.ts` | Capture Entry helper module | src/benchmarks (6) | none | decodeValue, encodeValue, sha256Hex, lensId, stateId, tierRequests, describeSeam, SerializedPrescription, +8 more |
-| `payload.ts` | Payload helper module | none | src/benchmarks | EncodedValue, SKIPPED_BACK_POINTER_TAG, encodeValue, decodeValue, sha256Hex, columnize, projectTrace, createResultEncoder, +10 more |
-| `requests.ts` | Requests helper module | none | src/benchmarks | RequestFamily, CaptureState, LensRef, CaptureRequest, RequestCatalog, lensId, stateId, DEFAULT_STATE, +19 more |
+| `budgets.ts` | Budgets helper module | none | src/benchmarks | ChangeClass, ComparisonKind, QuantityOrigin, Quantity, QUANTITIES, QuantityId, C2_CRITERIA, budgetOf, +6 more |
+| `captureEntry.ts` | Capture Entry helper module | src/benchmarks (7) | none | classifyCatalogChanges, comparePermittedPairs, createDifferentialRun, dataChangeOf, parseDeclaredExceptions, renderDataImpactMarkdown, renderSummaryMarkdown, decodeValue, +15 more |
+| `compare.ts` | Compare helper module | src/benchmarks (3) | src/benchmarks | ComparableRecord, DifferenceKind, ComparisonName, Finding, StatusCounts, PayloadCounts, DataChange, QuantityTally, +20 more |
+| `payload.ts` | Payload helper module | none | src/benchmarks (2) | EncodedValue, SKIPPED_BACK_POINTER_TAG, encodeValue, decodeValue, sha256Hex, columnize, projectTrace, createResultEncoder, +10 more |
+| `requests.ts` | Requests helper module | none | src/benchmarks (2) | RequestFamily, CaptureState, LensRef, CaptureRequest, RequestCatalog, lensId, stateId, DEFAULT_STATE, +19 more |
 | `seamAdapter.ts` | Seam Adapter helper module | glob:../../lens-data/**/*.data.ts, glob:../../lens-data/**/*.teleconverter.ts, glob:../../lens-data/defaults.ts, glob:../../optics/aperture.ts, glob:../../optics/apertureStop.ts, +14 more | src/benchmarks | EngineSeam, RuntimeLens, LensData, TeleconverterData, PreparedState, EngineRay, EngineTraceOptions, EngineTrace, +4 more |

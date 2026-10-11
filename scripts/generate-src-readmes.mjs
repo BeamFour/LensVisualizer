@@ -32,7 +32,7 @@ const folderRoleOverrides = new Map([
   ],
   [
     "src/benchmarks/engineDiff",
-    "engine differential harness: the capture entry, seam adapter, request tiers, and payload normalization used to compare two engine revisions",
+    "engine differential harness: the capture entry, seam adapter, request tiers, payload normalization, quantity budgets, and comparison of two engine revisions",
   ],
   ["src/comparison", "comparison-mode state, shared sliders, URL metadata, and two-lens layout composition"],
   [

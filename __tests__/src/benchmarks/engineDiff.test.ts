@@ -603,6 +603,70 @@ describe("engineDiff Tier P requests", () => {
     );
   });
 
+  it("sends a changed lens through every request of the tier", () => {
+    /* A lens of the first row only, and one the analysis row already carries. */
+    const plain = CATALOG.lenses
+      .map((lens) => lens.key)
+      .find((key) => !familiesAt(key, stateId(DEFAULT_STATE)).includes("analysis"))!;
+    const changed = tierRequests("p", { ...requestCatalog(CATALOG), changedLensKeys: [plain, SERENAR, plain] });
+    const added = changed.filter(
+      (request) => !TIER_P.some((existing) => JSON.stringify(existing) === JSON.stringify(request)),
+    );
+    expect(added).toEqual([
+      { lens: { key: plain }, state: DEFAULT_STATE, family: "analysis" },
+      { lens: { key: plain }, state: DEFAULT_STATE, family: "mtf" },
+    ]);
+    expect(changed).toHaveLength(TIER_P.length + 2);
+    /* Its requests stay together, the first row's ahead of the added ones. */
+    const families = changed.filter((request) => request.lens.key === plain).map((request) => request.family);
+    expect(families.slice(0, 5)).toEqual(["build", ...stateFamilies]);
+    expect(families.slice(-2)).toEqual(["analysis", "mtf"]);
+    expect(() => tierRequests("p", { ...requestCatalog(CATALOG), changedLensKeys: ["engine-diff-absent"] })).toThrow(
+      "engine-diff-absent",
+    );
+  });
+
+  it("sends every pair of a changed converter or host through the tier as well", () => {
+    /** What the tier asks beyond its own list when the given keys are named as changed. */
+    const added = (changed: { changedLensKeys?: string[]; changedTeleconverterKeys?: string[] }) => {
+      const list = tierRequests("p", { ...requestCatalog(CATALOG), ...changed });
+      expect(new Set(list.map((request) => JSON.stringify(request))).size).toBe(list.length);
+      const known = new Set(TIER_P.map((request) => JSON.stringify(request)));
+      return list.filter((request) => !known.has(JSON.stringify(request)));
+    };
+    const idsOf = (requests: readonly CaptureRequest[]) => [...new Set(requests.map(({ lens }) => lensId(lens)))];
+    const pairIds = (pairs: typeof CATALOG.pairs) =>
+      pairs.map(({ host, teleconverter }) => lensId({ key: host, teleconverter })).sort();
+
+    /* A converter other than the representative's: the tier names none of its pairs by itself. */
+    const converter = CATALOG.pairs.find((pair) => pair.teleconverter !== PAIR.teleconverter)!.teleconverter;
+    const formed = CATALOG.pairs.filter((pair) => pair.teleconverter === converter);
+    expect(formed.length).toBeGreaterThan(1);
+    const byConverter = added({ changedTeleconverterKeys: [converter] });
+    /* Each pair is asked what the representative pair is: its composition and every family, at the default state. */
+    const atDefaultState: RequestFamily[] = [...stateFamilies, "analysis", "mtf"];
+    const everything: [typeof DEFAULT_STATE | null, RequestFamily][] = [
+      [null, "composition"],
+      [null, "build"],
+      ...atDefaultState.map((family): [typeof DEFAULT_STATE, RequestFamily] => [DEFAULT_STATE, family]),
+    ];
+    expect(byConverter.map(({ lens, state, family }) => [lensId(lens), state, family])).toEqual(
+      pairIds(formed).flatMap((id) => everything.map(([state, family]) => [id, state, family])),
+    );
+
+    /* A changed host takes its pairs with it. */
+    const { host } = formed[0];
+    expect(idsOf(added({ changedLensKeys: [host] })).sort()).toEqual(
+      [host, ...pairIds(CATALOG.pairs.filter((pair) => pair.host === host))].sort(),
+    );
+    /* The representative pair is in the tier already; its converter adds the other pairs it forms. */
+    expect(idsOf(added({ changedTeleconverterKeys: [PAIR.teleconverter!] })).sort()).toEqual(
+      pairIds(CATALOG.pairs.filter((pair) => pair.teleconverter === PAIR.teleconverter)).filter((id) => id !== PAIR_ID),
+    );
+    /* A converter that forms no pair has nothing to be asked through. */
+    expect(added({ changedTeleconverterKeys: ["engine-diff-absent"] })).toEqual([]);
+  });
+
   it("keeps its copies of the benchmark lens set and the analysis accessors equal to the engine's", () => {
     /* requests.ts can import neither: the capture bundle is built without React and without naming the engine. */
     expect([...BENCHMARK_LENS_KEYS]).toEqual([...DEFAULT_BENCHMARK_LENS_KEYS]);

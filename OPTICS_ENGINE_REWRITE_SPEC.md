@@ -247,11 +247,19 @@ readings are fixed until the canonical prescription replaces it:
    base and head prescriptions are evaluated on the head engine and must be bit-identical.
 3. **Semantic data changes.** For each lens whose fingerprint changed, and each new lens, the run reports the impact:
    base data against head data, both on the head engine.
-   - These block the PR: a new failed status, a non-finite value, or a lens that no longer builds.
-   - Everything else in the impact report is reviewed rather than gated.
+   - These block the PR: a new failed status, a non-finite value, or a lens that no longer builds. A new lens, or a
+     converter pair the base data did not permit, has nothing to compare against and blocks only by not building.
+   - Everything else in the impact report is reviewed rather than gated. That includes a changed host or converter
+     that loses every pair it had, which the report puts first.
 4. **Exceptions.** Some prescriptions cannot be evaluated by the base engine, for example a V2 file before V2 ingest
-   (S2.P2.T1) exists in the base. The PR lists each such lens in an "engine-diff exceptions" section of its
-   description. The run fails when the lenses it could not compare differ from that list in either direction.
+   (S2.P2.T1) exists in the base. The PR lists each such lens under a `## Engine-diff exceptions` heading in its
+   description, one backticked lens id per bullet, and the CI job passes the description to `--exceptions`. The run
+   fails when the lenses it could not compare differ from that list in either direction.
+5. **No silent pass.**
+   - A record that fails to capture on both engines fails the run. A job that throws inside an analysis record is a
+     discrete outcome, compared like any other.
+   - The permitted converter pairs are computed on both engines from the head prescriptions, and a difference fails
+     the run.
 
 **Baselines and anchor moves.**
 
@@ -279,15 +287,18 @@ Every PR declares exactly one change class:
 | **C2** algorithm replacement | A different solver or search with the same or a tighter convergence criterion | Every sample meets its criterion; differences within the C2 budgets; an independent reference shows the error is no worse; discrete transitions explained individually |
 | **C3** intentional behavior change | A bug fix, a data correction or a new capability | Maintainer approval; independent evidence (analytic case, comparator or source); for an engine change, the cumulative comparison before the anchor moves; a changelog entry if users can see it |
 
-- **Default class and labels.** The default class is C0. The CI job reads the class from a PR label, and only the
-  maintainer applies a label above C0.
+- **Default class and labels.** The default class is C0. The CI job reads the class from a PR label
+  (`engine-diff:c1`, `engine-diff:c2` or `engine-diff:c3`; no label means C0) when it runs, so re-running the job
+  picks up a changed label. Only the maintainer applies a label above C0.
 - **Golden values.** Golden and analytic test tolerances are ceilings. Only a C3 PR may change a golden value or loosen
   a tolerance, and it must say why.
 
 ### Quantity budgets
 
-These values are proposed. S1.P2.T2 confirms them against the payload differences that a known C1 perturbation
-produces (reassociating one sum in sag evaluation). Loosening a budget later is itself a C3 change.
+S1.P2.T2 confirmed these values against the payload differences a known C1 perturbation produces: reordering the even
+asphere terms in sag evaluation. Over the whole of Tier P the largest difference in any class was 6.8 times inside its
+budget. That perturbation moves aspheric surfaces only, so layout sums, refractive indices and the first-order ratios
+are unmeasured. Loosening a budget later is itself a C3 change.
 
 | Quantity | C1 budget | C2 budget |
 | --- | --- | --- |
@@ -302,6 +313,23 @@ produces (reassociating one sum in sag evaluation). Loosening a budget later is 
 | MTF modulation | 1e-7 | As above, and never looser than 1e-4 |
 | Statuses, counts, sample positions and order, labels, warnings | exact | exact unless listed one by one |
 
+How `budgets.ts` applies the table:
+
+- **Clipped or not.** A hit takes the unclipped or the clipped budget by its own flags. A flag that differs between the
+  two sides is a discrete transition.
+- **Relative budgets** bound `|a − b|` by the budget times the larger magnitude. Lengths also have an absolute floor of
+  1e-12 mm, so a length at zero has a bound. Ratios such as f-numbers and the Petzval sum have no floor.
+- **Fields the table does not name.** Layout lengths, refractive indices and prescription values the engine hands back
+  take the first-order budget. Slopes are compared as direction cosines. `effectiveTolerance`, count ratios and binned
+  statistics are exact.
+- **Residuals are contract checks,** not differences. A hit's residual is held to the `effectiveTolerance` beside it,
+  and a solver's residual to that solver's own tolerance where the solve converged on both sides.
+- **Step-function outputs.** The result of a bisection or an optimizer takes the same budget as any other field of its
+  kind. When it fails, the report names the solver and gives the difference in solver quanta, so a boundary transition
+  can be told from drift.
+- **Iteration and evaluation counts** are exact under C0, and above it are reported as a histogram of changes.
+- **Non-finite values** compare exactly in every class.
+
 ## Verification
 
 ### Gates by level
@@ -309,7 +337,7 @@ produces (reassociating one sum in sag evaluation). Loosening a budget later is 
 | Level | Where | Required |
 | --- | --- | --- |
 | Every PR | CI (`.github/workflows/quality.yml`) | lint, format, typecheck, `npm run test`, the tooling suite, build and `seo:audit` (all existing) |
-| Engine or lens-data PR: touches `src/optics/**`, `src/types/**`, `src/lens-data/**` or `src/utils/catalog/**` | CI job `engine-diff` (S1.P2.T2) | Tier P against the merge-base under the PR's change class, plus every changed or new lens through every Tier P request |
+| Engine or lens-data PR: touches `src/optics/**`, `src/types/**`, `src/lens-data/**` other than `*.md`, `src/utils/catalog/**`, `src/utils/featureFlags.ts`, or the harness itself | CI job `engine-diff` (S1.P2.T2) | Tier P against the merge-base under the PR's change class, plus every changed or new lens through every Tier P request |
 | Phase end | The PR that ends the phase | Every test the phase's steps added, run together; the phase exit criteria |
 | Stage end | GitHub Actions: `engine-diff-stage.yml` by `workflow_dispatch`, sharded as a matrix (S1.P2.T3). Timing runs on the maintainer's machine. | Tier S against the current anchor; the full suites; build; the stage's efficiency report; then the tag |
 | Before S8.P2 deletes code | `engine-diff-stage.yml`, sharded | Tier F against the current anchor |
@@ -329,7 +357,7 @@ committed. Its own tests (fixtures, budget table and deliberate-drift detection)
 | `compare.ts` | Reports violations, discrete transitions and the largest difference per quantity. |
 
 `scripts/engine-diff.mjs --base <ref> --tier p|s|f --class c0|c1|c2|c3 [--shard i/n] [--lens <key>]
-[--exceptions <file>]` runs in six steps:
+[--exceptions <file>] [--out <dir>]` runs in six steps:
 
 1. Add a git worktree at the base ref, symlinking `node_modules` when `package-lock.json` is unchanged.
 2. Copy the head's `engineDiff/` into the worktree.
@@ -337,8 +365,12 @@ committed. Its own tests (fixtures, budget table and deliberate-drift detection)
    fingerprints.
 4. Build both captures and run the comparisons in
    [Anchors and comparison coverage](#anchors-and-comparison-coverage).
-5. Write NDJSON payloads, the data-impact report and the list of uncompared lenses to a temporary directory.
+5. Write NDJSON payloads, the data-impact report and the list of uncompared lenses to `--out`, or to a temporary
+   directory. The small reports sit in a `reports/` folder of their own, which CI uploads.
 6. Exit non-zero on any violation, or when the uncompared lenses differ from the declared exceptions.
+
+Both captures are built with the head's Vite and no config file, and the capture bundle imports no package, so the
+base worktree needs nothing installed.
 
 ### Corpus tiers
 
@@ -829,7 +861,8 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
     - add the budget table and comparator;
     - add `scripts/engine-diff.mjs`;
     - add an `engine-diff` job to `.github/workflows/quality.yml`. It first checks the changed paths, then runs Tier P
-      against `origin/main`'s merge-base, with the class taken from the PR label.
+      against `origin/main`'s merge-base, with the class taken from the PR label and the exceptions from the PR
+      description.
   - **Tests:**
     - Each of these must fail detection: a status, an index, a unit, a sample order, a coordinate perturbed by 1 ulp
       under C0, and a coordinate perturbed by twice the budget under C1.
@@ -839,6 +872,14 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
     - An undeclared uncompared lens fails, and so does a declared exception that turns out to be comparable.
     - The C1 noise floor is measured by reassociating one sum in sag evaluation, and the budget table is finalized from
       it.
+  - **Left open,** to settle before the first C1 step (S3.P1.T1):
+    - how a nested per-ray trace is judged above C0. Stored as a digest, it is reported and not budgeted, so a change
+      confined to those traces passes a C1 run;
+    - how a PR declares an approved discrete transition. Until then any transition fails a C1 or C2 run;
+    - the C2 budgets. `--class c2` applies the C1 table until the first C2 step adds the propagated criteria;
+    - the pupil constants. They come from real rays launched 1e-4 mm off axis, so a contract-legal 1e-12 mm hit
+      difference moves them by about 1e-8 relative, beyond the first-order budget. The sag perturbation did not
+      show this; closed-form roots may.
   - **Gate:** C0.
 - **S1.P2.T3 Stage and full tiers.**
   - **Change:**

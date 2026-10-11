@@ -68,7 +68,7 @@ flowchart LR
 
 | Folder | Role |
 | --- | --- |
-| [engineDiff/](engineDiff/readme.md) | engine differential harness: the capture entry, seam adapter, request tiers, and payload normalization used to compare two engine revisions |
+| [engineDiff/](engineDiff/readme.md) | engine differential harness: the capture entry, seam adapter, request tiers, payload normalization, quantity budgets, and comparison of two engine revisions |
 
 ## Files
 

@@ -88,6 +88,8 @@ GitHub Pages is an active mirror/backup.
   debugging the build.
 - Base path set to `/` in `vite.config.js` because Cloudflare Pages serves the production site from the domain root
 - Quality checks run on PRs via `.github/workflows/quality.yml` (lint, format, typecheck, test, npm audit, build)
+- The same workflow's `engine-diff` job compares the optics engine with the PR's merge-base when engine, lens-data or
+  harness paths change; see `agent_docs/architecture/testing.md` (Engine Differential Harness)
 - Build pipeline: `generate-build-metadata.mjs` (routes + metadata) → `vite build` → `prerender.mjs` (SSR static HTML +
   manifest validation) → `generate-sitemap.mjs` → `generate-rss-feeds.mjs` (writes both static RSS feeds from generated
   metadata)

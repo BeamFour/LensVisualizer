@@ -5,7 +5,8 @@
  * entry exports the bundle's own catalog as serialized prescriptions, and it evaluates serialized prescriptions it is
  * handed: a capture never reads its own catalog, so one ref's data can be run on the other ref's engine. Engine calls
  * go through `seamAdapter.ts`, request definitions come from `requests.ts`, and every result is normalized by
- * `payload.ts` into one record per lens, state and request family.
+ * `payload.ts` into one record per lens, state and request family. The bundle also carries `compare.ts`, which the
+ * driver calls on the records of two captures.
  */
 
 import {
@@ -57,6 +58,15 @@ import {
 } from "./seamAdapter.js";
 
 /* A driver sees only the built bundle, so everything it calls is exported from here. */
+export {
+  classifyCatalogChanges,
+  comparePermittedPairs,
+  createDifferentialRun,
+  dataChangeOf,
+  parseDeclaredExceptions,
+  renderDataImpactMarkdown,
+  renderSummaryMarkdown,
+} from "./compare.js";
 export { decodeValue, encodeValue, sha256Hex } from "./payload.js";
 export { lensId, stateId, tierRequests } from "./requests.js";
 export { describeSeam } from "./seamAdapter.js";
