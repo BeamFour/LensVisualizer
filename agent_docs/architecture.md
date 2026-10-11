@@ -93,6 +93,7 @@ src/lens-data/            - Auto-registered `*.data.ts` prescriptions, `*.teleco
 src/mounts/               - Mount diagram `*.mount.ts` specs, barrel, schema, and authoring guide
 src/content/              - Auto-registered markdown articles and static content
 src/benchmarks/           - Optics/render benchmark harness (npm run benchmark:optics-rendering)
+  engineDiff/             - Engine differential harness: capture entry, seam adapter, request tiers, payloads
 scripts/                  - Metadata, folder-readme, prerender, sitemap, SEO, and lens-data build helpers
 __tests__/                - Vitest unit/component/script tests
 agent_docs/               - Focused architecture, recipe, policy, queue, and generated-report docs

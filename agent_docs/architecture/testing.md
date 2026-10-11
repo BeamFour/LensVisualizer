@@ -131,11 +131,56 @@ Existing tests cover:
   `import.meta.glob`, so they run under Vitest through `vitest.reports.config.js`: `npm run generate:reports` (all), or
   `generate:glass-reports`, `generate:mirror-reports`, `generate:mount-svgs`, or `npm run generate:reports -- <name>`.
   An invariant a report depends on belongs in the suite as its own test, not as an `expect` inside the generator.
-- **Tooling tests** for manual-only dev tools (the benchmark harness and the audit-script npm entries) are listed in
-  `TOOLING_TESTS` in `vite.config.js` and run with `npm run test:tooling`. CI runs both suites in one job and calls
-  Vitest directly for this one (`npx vitest run --config vitest.tooling.config.js`), so the metadata `npm run test`
-  just generated is not generated again. Add a file there only when it guards a tool that neither the build nor the
-  app uses.
+- **Tooling tests** for manual-only dev tools (the benchmark harness, the engine differential harness, and the
+  audit-script npm entries) are listed in `TOOLING_TESTS` in `vite.config.js` and run with `npm run test:tooling`. CI
+  runs both suites in one job and calls Vitest directly for this one
+  (`npx vitest run --config vitest.tooling.config.js`), so the metadata `npm run test` just generated is not generated
+  again. Add a file there only when it guards a tool that neither the build nor the app uses.
+
+## Engine Differential Harness
+
+`src/benchmarks/engineDiff/` turns what the optics engine returns into normalized payload records, so that the records
+of two engine revisions can be compared value by value. The app does not import it. The folder is self-contained: its
+files import only each other, so it can be copied into a checkout of another revision and bundled there.
+
+- `captureEntry.ts` is the entry a driver bundles once per revision. It exports that revision's catalog as serialized
+  prescriptions (hosts and teleconverters apart, plus the permitted pairs), and it evaluates the serialized
+  prescriptions it is handed, so one revision's data can run on the other's engine. It returns one record per lens,
+  state, and request family, each `{ lens, state, request, payload }`. A computation that throws is recorded as an
+  outcome, never dropped. It answers which pairs its engine's fit predicate permits for a catalog it is handed, and
+  which of some pairs its engine cannot compose and build.
+- `seamAdapter.ts` is the only file that names engine modules. It reaches each through an eager `import.meta.glob`,
+  which yields nothing for a file a revision lacks, and resolves every capability from an ordered list of candidate
+  exports. A change that renames or moves a seam export adds the new name to that list in the same change.
+- `requests.ts` defines a tier as a deterministic list of lens × state × request family. Tier P asks every catalog
+  lens, at the first and last zoom station, for build constants, layout, ray fans with full hits, field geometry, and
+  chief-ray solves; and asks the benchmark lenses plus one representative per engine feature for every analysis job
+  and a small geometric MTF. One representative is a converter pair. It is the only pair in the tier, so it is also
+  asked for its composition and for the first row's requests at the default state.
+- `payload.ts` holds the encoding (JSON that round-trips under `Object.is`, with tags for -0, NaN, and the
+  infinities), the digests that stand in for the per-ray traces and pupil bundles nested in perspective results, and
+  the semantic fingerprint: a hash of a prescription after lens defaults and the engine's authority rules (a flat
+  radius at any magnitude, a zero asphere term, a derived stop radius, the sign of zero). A payload that hands
+  authored data back, such as the composed prescription of a pair or the `data` of a built lens, is written through
+  the same rules, so a respelling the fingerprint ignores does not change a record. An engine back-pointer is skipped
+  by member name and leaves a marker in the payload.
+
+The build record holds every field of the built lens. Each surface of `S` keeps every member the engine holds for it,
+its inner radius, stop placement, interaction and diffractive phase among them, with a flat radius written as the
+fingerprint's marker. The analysis record holds every job of the analysis context and, beside them, the readouts the
+viewer computes outside it, each asked as its component asks: the working f-number, the chromatic tab's field-focus
+summary, the diagram's LoCA readout with the bars of its inset, and the aspheric overlay's departure at a click.
+Three parts of `src/optics/` are outside the harness, and their unit suites cover them: diagram geometry in
+`src/optics/diagram/` (`diagramGeometry.test.ts`, `elementRenderDiagnostics.test.ts`), the lens-movement transform
+(`lensMovement.test.ts`) and the perspective diagram fan (`perspective/diagramFan.test.ts`).
+
+`__tests__/src/benchmarks/engineDiff.test.ts` runs in the tooling suite. It holds the harness to its contract: a
+capture repeats byte for byte, the encoding loses nothing, the fingerprint's restated stop-radius rule agrees with
+`buildLens` on every catalog lens, a fingerprint-equal respelling leaves every Tier P record of a lens unchanged, a
+member of a built surface that the engine alone changed gives another build record, and no analysis or MTF record
+carries a skip marker. Asking an engine which pairs it permits does not throw on a prescription it cannot read, and
+it names the pairs it cannot build, each by the pair's own build record. It also compares the two lists `requests.ts`
+has to copy, the benchmark lens set and the analysis-context job names, with their sources.
 
 ## Refactor Test Expectations
 

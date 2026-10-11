@@ -228,7 +228,16 @@ UI reads, taken after the engine's own authority rules.
   engine ignores.
 
 A V1 file and its V2 conversion therefore share a fingerprint, while any change the engine or UI could observe changes
-it. Before S2.P1.T1, the fingerprint hashes the normalized authored data.
+it.
+
+Before S2.P1.T1, the fingerprint hashes the evaluated prescription after the lens defaults, under the rules above. Three
+readings are fixed until the canonical prescription replaces it:
+
+- An asphere entry whose terms are all zero still counts as present, because the engine builds an aspheric profile for
+  it.
+- `zoomLabels`, `apertureBlades` and `apertureBladeRoundedness` are hashed: conversion preserves them.
+- A default the engine applies inline (`apd: false`, `indexReference: "d"`, an empty `asph`) is not yet equated with
+  its omission, so writing one out counts as a semantic change.
 
 **What a differential run compares.** Nothing is skipped silently.
 
@@ -312,10 +321,10 @@ committed. Its own tests (fixtures, budget table and deliberate-drift detection)
 
 | File | Role |
 | --- | --- |
-| `captureEntry.ts` | Vite SSR entry, built like the rendering benchmark. It calls only the public seam, and evaluates prescriptions supplied as serialized input rather than reading its own catalog. |
-| `seamAdapter.ts` | Detects renamed exports so the same entry runs at both refs. A PR that changes the seam updates this adapter in the same PR. |
+| `captureEntry.ts` | Vite SSR entry, built like the rendering benchmark. It reaches the engine only through `seamAdapter.ts`, and evaluates prescriptions supplied as serialized input rather than reading its own catalog. It also exports its own catalog as serialized prescriptions, for the driver. |
+| `seamAdapter.ts` | Resolves each engine capability from a list of candidate modules and exports, so the same entry runs at both refs when an export is renamed or a module is missing. Today full hit records come only through `compat.ts`, and perspective jobs through `perspective/index.ts`; both are seam-guard legacy entries. A PR that changes the seam updates this adapter in the same PR. |
 | `requests.ts` | Defines the tiers as deterministic lens × state × request lists. |
-| `payload.ts` | Normalizes payloads: numbers unrounded, arrays in authored order, statuses, counts and labels as discrete fields. It also computes each prescription's semantic fingerprint. |
+| `payload.ts` | Normalizes payloads: numbers unrounded, in a tagged encoding that keeps `-0`, `NaN` and the infinities; an `undefined` member treated as absent; arrays in authored order; statuses, counts and labels as discrete fields. A per-ray trace nested inside an analysis result is reduced to its status, hit count and a digest: exact under C0, reported but not budgeted above it. It also computes each prescription's semantic fingerprint. |
 | `budgets.ts` | Holds the quantity table above, keyed by payload path. |
 | `compare.ts` | Reports violations, discrete transitions and the largest difference per quantity. |
 
@@ -341,11 +350,20 @@ shrinks by documented stratification; its assertions never do.
 
 | Tier | Lenses | States | Requests |
 | --- | --- | --- | --- |
-| **P** | All 907, visible and hidden | First and last zoom station, infinity focus, wide open | Build constants; layout; meridional fans on- and off-axis, a skew fan and a chromatic fan, each with terminal points and full hits; field geometry; chief solves at fields 0, 0.5 and 1 |
-| | The 15 benchmark lenses plus 10 feature representatives: fisheye; folded auto and explicit-order paths; diffractive; bulk absorption; rear plates; a converter pair; PC shift + tilt; finite conjugate; fixed-iris zoom; aberration control | Their reference state | Every analysis job, perspective jobs included; geometric MTF at a 32-cell grid |
+| **P** | Every catalog lens, visible and hidden | First and last zoom station, infinity focus, wide open | Build constants; layout; meridional fans on- and off-axis, a skew fan and a chromatic fan, each with terminal points and full hits, and one on-axis fan through the legacy tracer; field geometry; chief solves at 0, 0.5 and 1 of the analysis half-field |
+| | The 15 benchmark lenses plus one representative of each feature: fisheye; folded auto and explicit-order paths; diffractive; bulk absorption; rear plates; a converter pair; PC shift + tilt; finite conjugate; fixed-iris zoom; aberration control. Also every lens whose data changed, and every pair of a changed host or converter | The default state, plus one feature state where the default leaves the feature idle: the moved pose, the finite conjugate, the aberration ring at its end | Every analysis job, perspective jobs included; geometric MTF at a 32-cell grid |
 | **S** | All | Every authored zoom × focus station (about 3,400 states) × {wide open, one stop-down ratio}; aberration endpoints and center for every `aberrationControl` lens; every permitted converter pair at every host station | Everything in Tier P's first row |
 | | A stratified set of about 60 lenses: every projection kind, every folded fixture, every PC lens, every diffractive and absorbing lens, every rear-plate maker, every converter pair, the 10 heaviest benchmark lenses and 10 drawn by a fixed seed | Their authored stations | Every analysis job; MTF at both methods and three spectra on the MTF benchmark cases |
 | **F** | All | Every authored station × {wide open, stopped down} | Every analysis job |
+
+- **Every analysis job** means the analysis-context accessors, centered and perspective; field curvature; the three
+  group-movement modes; cardinal elements; aspheric comparison; and the readouts the analysis tabs compute outside the
+  context: the chromatic field-focus summary, longitudinal chromatic focus, LoCA bar offsets, aspheric departure and
+  the effective f-number. A job that throws is recorded as a discrete outcome.
+- **A converter pair** is serialized as its host and its converter. Each engine composes them itself, so composition
+  drift is visible, and the composed prescription is a payload of its own.
+- **Outside the harness:** diagram geometry (`src/optics/diagram/`), the lens-movement transform and the perspective
+  diagram fan. Their unit suites cover them.
 
 ### Independent references
 
@@ -798,7 +816,8 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
       point and direction, status, clip reason;
     - field geometry and chief solves;
     - every analysis job;
-    - geometric MTF at a small grid.
+    - geometric MTF at a small grid;
+    - a converter pair's composed prescription.
   - **Files:** `src/benchmarks/engineDiff/{captureEntry, seamAdapter, requests, payload}.ts`.
   - **Tests:** `__tests__/src/benchmarks/engineDiff.test.ts` (tooling suite):
     - payload determinism across two runs;

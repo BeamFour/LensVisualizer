@@ -9,6 +9,7 @@ Generated `readme.md` and `improvementsuggestions.md` files are intentionally om
 ```mermaid
 flowchart LR
   subgraph n_src_benchmarks["src/benchmarks"]
+    n_src_benchmarks_src_benchmarks_engineDiff["engineDiff/"]
     n_src_benchmarks_src_benchmarks_benchmarkReport_ts["benchmarkReport.ts"]
     n_src_benchmarks_src_benchmarks_mtfCases_ts["mtfCases.ts"]
     n_src_benchmarks_src_benchmarks_opticsRenderingBenchmark_tsx["opticsRenderingBenchmark.tsx"]
@@ -59,9 +60,15 @@ flowchart LR
 ## Directory Overview
 
 - Direct source files: 3
-- Direct subfolders: 0
+- Direct subfolders: 1
 - Main outbound areas: src/components/display (8), src/components/hooks (4), same folder (2), src/optics/compat.ts (2), src/optics/optics.ts (2), src/types (2), package:react, package:react-dom, +13 more
 - External consumers: none
+
+## Subfolders
+
+| Folder | Role |
+| --- | --- |
+| [engineDiff/](engineDiff/readme.md) | engine differential harness: the capture entry, seam adapter, request tiers, and payload normalization used to compare two engine revisions |
 
 ## Files
 

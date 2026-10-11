@@ -1,0 +1,1283 @@
+/**
+ * Engine differential harness: the payload encoding and digests, the seam adapter, the Tier P request list, capture
+ * determinism, and the semantic fingerprint.
+ *
+ * Real catalog lenses appear here only as inputs to the harness. The assertions are about the harness (records are
+ * reproducible, failures are recorded, fingerprints follow the engine's authority rules), never about a lens.
+ */
+
+import { describe, expect, it } from "vitest";
+import {
+  captureRecords,
+  exportCatalog,
+  fingerprintCatalog,
+  permittedPairs,
+  requestCatalog,
+  unbuiltPairs,
+  type PayloadRecord,
+  type SerializedCatalog,
+} from "../../../src/benchmarks/engineDiff/captureEntry.js";
+import {
+  FLAT_RADIUS_MARKER,
+  SKIPPED_BACK_POINTER_TAG,
+  applyAuthorityRules,
+  columnize,
+  createResultEncoder,
+  decodeValue,
+  encodeValue,
+  outcomeOf,
+  projectBuildConstants,
+  semanticFingerprint,
+  sha256Hex,
+  stopRadiusAuthority,
+  type EncodedValue,
+  type FingerprintRules,
+} from "../../../src/benchmarks/engineDiff/payload.js";
+import {
+  ANALYSIS_CONTEXT_JOBS,
+  BENCHMARK_LENS_KEYS,
+  CHROMATIC_CHANNELS,
+  DEFAULT_STATE,
+  FEATURE_REPRESENTATIVES,
+  ON_AXIS_PUPIL_FRACTIONS,
+  lensId,
+  stateId,
+  tierRequests,
+  type CaptureRequest,
+  type RequestFamily,
+} from "../../../src/benchmarks/engineDiff/requests.js";
+import {
+  describeSeam,
+  ownCatalogFiles,
+  resolveCapabilities,
+  resolveSeam,
+} from "../../../src/benchmarks/engineDiff/seamAdapter.js";
+import { DEFAULT_BENCHMARK_LENS_KEYS } from "../../../src/benchmarks/opticsRenderingBenchmark.js";
+import buildLens from "../../../src/optics/buildLens.js";
+import { doLayout, traceRay } from "../../../src/optics/optics.js";
+import type { LensData, LensDataInput } from "../../../src/types/optics.js";
+import plainTwin from "./engineDiffFixtures/fingerprintTwinPlain.js";
+import restyledTwin from "./engineDiffFixtures/fingerprintTwinRestyled.js";
+
+const CATALOG = exportCatalog();
+const TIER_P = tierRequests("p", requestCatalog(CATALOG));
+
+const SERENAR = "canon-serenar-50f18";
+/** A folded fixture with no image format: every perspective job throws on it, in a few milliseconds. */
+const MAKSUTOV = "reference-maksutov-cassegrain-meniscus";
+/** The one converter pair in Tier P: the analysis row's representative. */
+const PAIR = FEATURE_REPRESENTATIVES.find(({ feature }) => feature === "converter-pair")!.lens;
+const PAIR_ID = lensId(PAIR);
+
+const throughJson = (value: unknown): unknown =>
+  decodeValue(JSON.parse(JSON.stringify(encodeValue(value))) as EncodedValue);
+
+/** Tier P requests of the given lens ids, optionally narrowed to some families. */
+function tierPRequests(ids: readonly string[], families?: readonly RequestFamily[]): CaptureRequest[] {
+  return TIER_P.filter(
+    (request) => ids.includes(lensId(request.lens)) && (!families || families.includes(request.family)),
+  );
+}
+
+/** One line per record: what it answers, and a digest of its bytes. Keeps a failure diff readable. */
+function recordDigests(records: readonly PayloadRecord[]): string[] {
+  return records.map(
+    (record) => `${record.lens} | ${stateId(record.state)} | ${record.request} | ${sha256Hex(JSON.stringify(record))}`,
+  );
+}
+
+function valueOf(record: PayloadRecord): unknown {
+  if (!record.payload.ok) throw new Error(`${record.lens} ${record.request}: ${record.payload.error.message}`);
+  return decodeValue(record.payload.value);
+}
+
+/** Paths in an encoded payload at which the result encoder skipped a back-pointer member. */
+function skippedBackPointers(encoded: unknown, path = "payload", found: string[] = []): string[] {
+  if (encoded === SKIPPED_BACK_POINTER_TAG) found.push(path);
+  else if (encoded !== null && typeof encoded === "object") {
+    for (const [key, member] of Object.entries(encoded)) skippedBackPointers(member, `${path}.${key}`, found);
+  }
+  return found;
+}
+
+function catalogOf(...lenses: LensDataInput[]): SerializedCatalog {
+  return {
+    lenses: lenses.map((lens) => ({ key: lens.key, file: "fixture", prescription: encodeValue(lens) })),
+    teleconverters: [],
+    pairs: [],
+  };
+}
+
+/* ── payload.ts ── */
+
+describe("engineDiff tagged encoding", () => {
+  it("restores every leaf under Object.is after a trip through JSON text", () => {
+    const value = {
+      doubles: [0.1 + 0.2, Number.MIN_VALUE, Number.MAX_VALUE, 2 ** 53 + 2, 1e15, -1e-300, 123456789.12345679],
+      zero: 0,
+      negativeZero: -0,
+      notANumber: Number.NaN,
+      positiveInfinity: Number.POSITIVE_INFINITY,
+      negativeInfinity: Number.NEGATIVE_INFINITY,
+      nothing: null,
+      text: ["", "plain", "$", "$-0", "$$NaN", "$undef", "naïve ±0.5"],
+      holes: [1, undefined, null, 3],
+      nested: { deep: [{ leaf: [-0, [Number.NaN]] }] },
+      flags: [true, false],
+    };
+
+    const decoded = throughJson(value) as typeof value;
+
+    expect(decoded).toStrictEqual(value);
+    /* Spelled out, because the whole test rests on the matcher telling these apart. */
+    expect(Object.is(decoded.negativeZero, -0)).toBe(true);
+    expect(Object.is(decoded.zero, 0)).toBe(true);
+    expect(decoded.notANumber).toBeNaN();
+    expect(decoded.positiveInfinity).toBe(Number.POSITIVE_INFINITY);
+    expect(decoded.negativeInfinity).toBe(Number.NEGATIVE_INFINITY);
+    expect(decoded.nothing).toBeNull();
+    expect(decoded.holes[1]).toBeUndefined();
+    expect(decoded.holes[2]).toBeNull();
+  });
+
+  it("writes finite doubles as plain JSON numbers that parse back to the same bits", () => {
+    /* Fixed xorshift32 seed: arbitrary bit patterns cover subnormals and every exponent, not just round values. */
+    let seed = 0x9e3779b9;
+    const next = () => {
+      seed ^= seed << 13;
+      seed ^= seed >>> 17;
+      seed ^= seed << 5;
+      return seed >>> 0;
+    };
+    const words = new Uint32Array(2);
+    const double = new Float64Array(words.buffer);
+    const mismatches: number[] = [];
+    let finite = 0;
+    for (let i = 0; i < 20000; i++) {
+      words[0] = next();
+      words[1] = next();
+      const value = double[0];
+      if (!Number.isFinite(value)) continue;
+      finite++;
+      const encoded = encodeValue(value);
+      if (typeof encoded !== "number" || !Object.is(throughJson(value), value)) mismatches.push(value);
+    }
+    expect(finite).toBeGreaterThan(19000);
+    expect(mismatches).toEqual([]);
+  });
+
+  it("writes one text for one value, whatever the member order, and drops undefined and function members", () => {
+    const text = JSON.stringify(
+      encodeValue({ b: 1, a: undefined, call: () => 1, d: { z: 1, y: [2, { n: 1, m: 2 }] } }),
+    );
+    expect(text).toBe('{"b":1,"d":{"y":[2,{"m":2,"n":1}],"z":1}}');
+    expect(JSON.stringify(encodeValue({ d: { y: [2, { m: 2, n: 1 }], z: 1 }, b: 1 }))).toBe(text);
+  });
+
+  it("writes typed arrays as arrays and keeps an own __proto__ member", () => {
+    expect(encodeValue(new Float64Array([1, -0, Number.NaN]))).toEqual([1, "$-0", "$NaN"]);
+    const parsed = JSON.parse('{"__proto__":{"x":1},"a":2}') as unknown;
+    expect(JSON.stringify(encodeValue(parsed))).toBe('{"__proto__":{"x":1},"a":2}');
+    expect(Object.keys(throughJson(parsed) as object)).toEqual(["__proto__", "a"]);
+  });
+
+  it("refuses values it cannot represent instead of writing something else", () => {
+    const cyclic: { self?: unknown } = {};
+    cyclic.self = cyclic;
+    expect(() => encodeValue(cyclic)).toThrow(TypeError);
+    expect(() => encodeValue({ entries: new Map([["a", 1]]) })).toThrow(TypeError);
+    expect(() => encodeValue([new Set([1])])).toThrow(TypeError);
+    expect(() => encodeValue({ big: 1n })).toThrow(TypeError);
+    expect(() => encodeValue(Symbol("s"))).toThrow(TypeError);
+    expect(() => decodeValue("$unknown")).toThrow(TypeError);
+  });
+
+  it("writes an object shared by two members at both places", () => {
+    const point = [1, 2, 3];
+    expect(encodeValue({ last: point, terminal: point })).toEqual({ last: [1, 2, 3], terminal: [1, 2, 3] });
+  });
+});
+
+describe("engineDiff SHA-256", () => {
+  it("matches the FIPS 180-4 example digests", () => {
+    expect(sha256Hex("")).toBe("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
+    expect(sha256Hex("abc")).toBe("ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad");
+    expect(sha256Hex("abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq")).toBe(
+      "248d6a61d20638b8e5c026930c3e6039a33ce45964ff2167f6ecedd419db06c1",
+    );
+  });
+
+  it("agrees with WebCrypto across the padding boundaries and on multi-byte text", async () => {
+    const reference = async (bytes: Uint8Array<ArrayBuffer>) =>
+      Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256", bytes)), (byte) =>
+        byte.toString(16).padStart(2, "0"),
+      ).join("");
+    const mismatches: number[] = [];
+    /* 55, 56, 63 and 64 bytes are where the padding gains a block; the long inputs cross many blocks. */
+    for (const length of [...Array.from({ length: 131 }, (_, index) => index), 1000, 65553]) {
+      const bytes = Uint8Array.from({ length }, (_, index) => (index * 131 + length) & 0xff);
+      if (sha256Hex(bytes) !== (await reference(bytes))) mismatches.push(length);
+    }
+    expect(mismatches).toEqual([]);
+    const text = "f/2.8 — 50 mm ±0.5°";
+    expect(sha256Hex(text)).toBe(await reference(new TextEncoder().encode(text)));
+  });
+});
+
+describe("engineDiff result encoder", () => {
+  const hit = (z: number, extra: object = {}) => ({
+    surfaceIndex: 0,
+    point: [0, 1, z],
+    residual: -0,
+    effectiveTolerance: 1e-12,
+    clipped: false,
+    failureReason: null,
+    ...extra,
+  });
+  const trace = (z: number, diagnostics: object = {}, hitExtra: object = {}) => ({
+    status: "ok",
+    hits: [hit(z, hitExtra), hit(z + 1, hitExtra)],
+    terminalPoint: [0, 1, z + 1],
+    diagnostics: { terminationReason: "sequential-return", loopDetected: false, loopKey: null, ...diagnostics },
+  });
+
+  it("marks object back-pointers as skipped, drops computed identity strings, and keeps text that shares a name", () => {
+    const encode = createResultEncoder();
+    const result = { lens: { S: [1, 2] }, state: { z: [0] }, source: "Table 1", cacheKey: "k:0.1:2", value: 1 };
+    const encoded = encode(result);
+    expect(encoded).toEqual({
+      lens: SKIPPED_BACK_POINTER_TAG,
+      state: SKIPPED_BACK_POINTER_TAG,
+      source: "Table 1",
+      value: 1,
+    });
+    expect(skippedBackPointers({ payload: encoded }, "record")).toEqual([
+      "record.payload.lens",
+      "record.payload.state",
+    ]);
+    /* The marker survives JSON and decoding, and a real string of the same text is not mistaken for one. */
+    expect(decodeValue(JSON.parse(JSON.stringify(encoded)) as EncodedValue)).toMatchObject({
+      lens: SKIPPED_BACK_POINTER_TAG,
+    });
+    expect(skippedBackPointers(encode({ note: SKIPPED_BACK_POINTER_TAG }))).toEqual([]);
+    /* The lossless encoding is for prescriptions, which have no back-pointers to skip. */
+    expect(encodeValue(result)).toHaveProperty("lens");
+  });
+
+  it("stores hits column-wise, with an undefined member read as absent", () => {
+    expect(
+      columnize([
+        { a: 1, clipReason: undefined },
+        { a: 2, b: [1, 2] },
+      ]),
+    ).toEqual({
+      count: 2,
+      columns: { a: [1, 2], b: [null, [1, 2]] },
+    });
+  });
+
+  it("replaces each nested trace carrier with its status, hit count and a digest", () => {
+    const encode = createResultEncoder();
+    const ray = trace(5);
+    const posed = { localTrace: ray, cameraTrace: ray, reachedSensor: true };
+    const encoded = encode({
+      usableSampleCount: 1,
+      samples: [
+        {
+          status: "usable",
+          sensorPoint: [0, 1, 2],
+          fieldSample: { status: "usable", chiefTrace: posed, pupilBundle: { samples: [{ trace: posed }] } },
+          rays: [{ sensorPoint: [0, 1, -0], trace: posed }],
+          stopTrace: ray,
+        },
+      ],
+    }) as { samples: Record<string, unknown>[] };
+
+    const digest = (hitCount: number) => ({ status: "ok", hitCount, hash: expect.stringMatching(/^[0-9a-f]{64}$/) });
+    expect(encoded.samples[0]).toEqual({
+      status: "usable",
+      sensorPoint: [0, 1, 2],
+      /* The field sample itself stays readable. Its pupil bundle is one digest that counts the hits of every trace
+       * under it (here one posed trace of two 2-hit traces) and has no status of its own. */
+      fieldSample: { status: "usable", chiefTrace: digest(4), pupilBundle: { ...digest(4), status: null } },
+      rays: [{ sensorPoint: [0, 1, "$-0"], trace: digest(4) }],
+      stopTrace: digest(2),
+    });
+  });
+
+  it("digests a pupil bundle by its content, and only a member that holds one", () => {
+    const encode = createResultEncoder();
+    const bundle = (z: number) => ({ kind: "meridional", samples: [{ weight: 1, trace: trace(z) }] });
+    const hashOf = (value: object) =>
+      (encode({ pupilBundle: value }) as { pupilBundle: { hash: string } }).pupilBundle.hash;
+    expect(hashOf(bundle(5))).toBe(hashOf(bundle(5)));
+    expect(hashOf(bundle(5 * (1 + Number.EPSILON)))).not.toBe(hashOf(bundle(5)));
+    expect(hashOf({ ...bundle(5), kind: "circular" })).not.toBe(hashOf(bundle(5)));
+    /* A sampling request shares the member name and carries no samples; it is written out. */
+    const request = { kind: "meridional", pupilSemiDiameterMm: 4, fractions: [0, 0.5] };
+    expect(encode({ pupilBundle: request, samples: [bundle(5)] })).toEqual({
+      pupilBundle: request,
+      samples: [{ kind: "meridional", samples: [{ weight: 1, trace: expect.objectContaining({ hitCount: 2 }) }] }],
+    });
+  });
+
+  it("digests content, not identity: one changed hit coordinate changes the hash, a loop key does not", () => {
+    const hashOf = (value: object) => (createResultEncoder()(value) as { hash: string }).hash;
+    const base = hashOf(trace(5));
+    expect(hashOf(trace(5))).toBe(base);
+    expect(hashOf(trace(5 * (1 + Number.EPSILON)))).not.toBe(base);
+    expect(hashOf(trace(5, { terminationReason: "clipped" }))).not.toBe(base);
+    expect(hashOf(trace(5, { loopKey: "1:2:3.25" }))).toBe(base);
+    /* The sequential tracer writes `clipReason: undefined` on every hit; the generalized tracer omits the key. */
+    expect(hashOf(trace(5, {}, { clipReason: undefined }))).toBe(base);
+    expect(hashOf(trace(5, {}, { clipReason: "semi-diameter" }))).not.toBe(base);
+  });
+
+  it("records a throw as an outcome with the error's discriminating member", () => {
+    class SectionError extends Error {
+      readonly section = "coma";
+      constructor() {
+        super("unavailable while the lens is moved");
+        this.name = "AnalysisSectionUnavailableError";
+      }
+    }
+    expect(outcomeOf(() => 3)).toEqual({ ok: true, value: 3 });
+    expect(
+      outcomeOf(() => {
+        throw new SectionError();
+      }),
+    ).toEqual({
+      ok: false,
+      error: {
+        name: "AnalysisSectionUnavailableError",
+        message: "unavailable while the lens is moved",
+        section: "coma",
+      },
+    });
+    expect(
+      outcomeOf(() => {
+        throw "plain text";
+      }),
+    ).toEqual({ ok: false, error: { name: "NonError", message: "plain text" } });
+  });
+});
+
+/* ── seamAdapter.ts ── */
+
+describe("engineDiff seam adapter", () => {
+  const candidates = {
+    traceRay: [
+      ["trace", "traceRay"],
+      ["compat", "traceEngineRay2"],
+    ],
+    buildLens: [["buildLens", "default"]],
+  } as const;
+  const older = { compat: { traceEngineRay2: "old trace" }, buildLens: { default: "build" } };
+
+  it("takes the first candidate export that exists", () => {
+    const { exports, sources } = resolveCapabilities({ ...older, trace: { traceRay: "new trace" } }, candidates);
+    expect(exports).toEqual({ traceRay: "new trace", buildLens: "build" });
+    expect(sources).toEqual({ traceRay: "trace.traceRay", buildLens: "buildLens.default" });
+  });
+
+  it("falls back to an older name when the newer module or export is missing at a ref", () => {
+    expect(resolveCapabilities(older, candidates).sources.traceRay).toBe("compat.traceEngineRay2");
+    expect(resolveCapabilities({ ...older, trace: {} }, candidates).sources.traceRay).toBe("compat.traceEngineRay2");
+  });
+
+  it("names every capability it cannot resolve in one error", () => {
+    expect(() => resolveCapabilities({ compat: {} }, candidates)).toThrow(
+      /2 capability\(ies\).*traceRay \(tried trace\.traceRay, compat\.traceEngineRay2\); buildLens \(tried buildLens\.default\)/,
+    );
+  });
+
+  it("resolves every capability against this checkout", () => {
+    const seam = resolveSeam();
+    const sources = describeSeam();
+    expect(Object.keys(sources).sort()).toEqual(Object.keys(seam).sort());
+    expect(sources.traceRay).toBe("compat.traceEngineRay2");
+    expect(seam.buildLens).toBe(buildLens);
+  });
+});
+
+/* ── requests.ts and the catalog export ── */
+
+describe("engineDiff catalog export", () => {
+  const files = ownCatalogFiles();
+
+  it("serializes every lens and teleconverter file, hidden ones included, in key order", () => {
+    expect(CATALOG.lenses).toHaveLength(Object.keys(files.lenses).length);
+    expect(CATALOG.teleconverters).toHaveLength(Object.keys(files.teleconverters).length);
+    expect(CATALOG.teleconverters.length).toBeGreaterThan(0);
+    const keys = CATALOG.lenses.map((lens) => lens.key);
+    expect(keys).toEqual([...keys].sort());
+    expect(CATALOG.lenses.some(({ prescription }) => (decodeValue(prescription) as LensData).visible === false)).toBe(
+      true,
+    );
+  });
+
+  it("round-trips each authored prescription through JSON text, non-finite values included", () => {
+    const offenders: string[] = [];
+    let nonFinite = 0;
+    for (const entry of [...CATALOG.lenses, ...CATALOG.teleconverters]) {
+      const authored = files.lenses[entry.file] ?? files.teleconverters[entry.file];
+      const text = JSON.stringify(entry.prescription);
+      if (text.includes('"$+Inf"') || text.includes('"$NaN"')) nonFinite++;
+      try {
+        /* toEqual, not toStrictEqual: a member authored as `undefined` is written as an absent key by design. */
+        expect(decodeValue(JSON.parse(text) as EncodedValue)).toEqual(authored);
+      } catch {
+        offenders.push(entry.file);
+      }
+    }
+    expect(offenders).toEqual([]);
+    /* Plain JSON would turn these into null; the catalog holds at least one. */
+    expect(nonFinite).toBeGreaterThan(0);
+  });
+
+  it("lists exactly the pairs the fit predicate allows, as host and converter keys", () => {
+    const seam = resolveSeam();
+    const lenses = new Map(CATALOG.lenses.map((lens) => [lens.key, decodeValue(lens.prescription) as LensData]));
+    expect(CATALOG.pairs.length).toBeGreaterThan(0);
+    const expected = CATALOG.lenses.flatMap((host) =>
+      CATALOG.teleconverters
+        .filter(
+          (converter) =>
+            seam.teleconverterCompatibility(
+              { ...seam.lensDefaults, ...lenses.get(host.key) } as LensData,
+              decodeValue(converter.prescription) as Parameters<typeof seam.teleconverterCompatibility>[1],
+            ).ok,
+        )
+        .map((converter) => ({ host: host.key, teleconverter: converter.key })),
+    );
+    expect(CATALOG.pairs).toEqual(expected);
+    /* The same question of a catalog that is handed in: how a driver asks another engine about these prescriptions. */
+    expect(permittedPairs(CATALOG)).toEqual(expected);
+    const { host } = expected[0];
+    const withoutHost = { ...CATALOG, lenses: CATALOG.lenses.filter((lens) => lens.key !== host) };
+    expect(permittedPairs(withoutHost)).toEqual(expected.filter((pair) => pair.host !== host));
+    expect(permittedPairs({ ...CATALOG, teleconverters: [] })).toEqual([]);
+  });
+
+  it("permits no pair of a prescription the engine cannot read, and says which pairs it cannot build", () => {
+    /* An engine may be handed a prescription in a form it predates. The predicate throws on a host with no
+     * surfaces and on a converter with no mounts; neither may end the question. */
+    const idOf = ({ host, teleconverter }: SerializedCatalog["pairs"][number]) => lensId({ key: host, teleconverter });
+    const { host, teleconverter } = CATALOG.pairs[0];
+    const edited = (
+      kind: "lenses" | "teleconverters",
+      key: string,
+      edit: (data: Record<string, unknown>) => unknown,
+    ): SerializedCatalog => ({
+      ...CATALOG,
+      [kind]: CATALOG[kind].map((entry) =>
+        entry.key === key
+          ? { ...entry, prescription: encodeValue(edit(decodeValue(entry.prescription) as never)) }
+          : entry,
+      ),
+    });
+    const unreadable = ({ surfaces: _surfaces, lensMounts: _lensMounts, ...rest }: Record<string, unknown>) => ({
+      ...rest,
+      schema: 2,
+    });
+    const reshaped: SerializedCatalog = {
+      ...edited("lenses", host, unreadable),
+      teleconverters: edited("teleconverters", teleconverter, unreadable).teleconverters,
+    };
+    const lost = (pair: SerializedCatalog["pairs"][number]) =>
+      pair.host === host || pair.teleconverter === teleconverter;
+    expect(permittedPairs(reshaped)).toEqual(CATALOG.pairs.filter((pair) => !lost(pair)));
+
+    /* Each pair is asked for its build record, and the answer is the pair's own: every pair of the unreadable
+     * host and of the unreadable converter, and no other. */
+    expect(unbuiltPairs(CATALOG, CATALOG.pairs)).toEqual({});
+    const unbuilt = unbuiltPairs(reshaped, CATALOG.pairs);
+    expect(Object.keys(unbuilt).sort()).toEqual(CATALOG.pairs.filter(lost).map(idOf).sort());
+    expect(CATALOG.pairs.some((pair) => pair.teleconverter === teleconverter && pair.host !== host)).toBe(true);
+    for (const said of Object.values(unbuilt)) expect(said).toMatch(/^\w*Error: ./);
+    /* It is what a capture records for the pair's build constants, so a run that meets the pair finds the same. */
+    for (const pair of CATALOG.pairs) {
+      const [build] = captureRecords(reshaped, [
+        { lens: { key: pair.host, teleconverter: pair.teleconverter }, state: null, family: "build" },
+      ]);
+      expect(build.payload.ok, idOf(pair)).toBe(!Object.hasOwn(unbuilt, idOf(pair)));
+      if (!build.payload.ok) {
+        expect(`${build.payload.error.name}: ${build.payload.error.message}`).toBe(unbuilt[idOf(pair)]);
+      }
+    }
+    /* Only the pairs asked about are tried, and one named twice is built once. */
+    expect(unbuiltPairs(reshaped, [])).toEqual({});
+    expect(unbuiltPairs(reshaped, [CATALOG.pairs[0], CATALOG.pairs[0]])).toEqual({
+      [idOf(CATALOG.pairs[0])]: unbuilt[idOf(CATALOG.pairs[0])],
+    });
+
+    /* A host that does not build alone says nothing of its pairs. The composer drops a host's sibling
+     * configurations, so a host whose own are in a form the engine cannot read still composes and builds. */
+    const hostAlone = edited("lenses", host, (data) => ({ ...data, opticalConfiguration: "in another form" }));
+    const [alone] = captureRecords(hostAlone, [{ lens: { key: host }, state: null, family: "build" }]);
+    expect(alone.payload.ok).toBe(false);
+    expect(unbuiltPairs(hostAlone, CATALOG.pairs)).toEqual({});
+    /* Nor does one pair that does not build say anything of its converter's other pairs. */
+    const onePair = edited("teleconverters", teleconverter, (data) => ({ ...data, incompatibleLensKeys: [host] }));
+    expect(unbuiltPairs(onePair, CATALOG.pairs)).toEqual({
+      [idOf(CATALOG.pairs[0])]: expect.stringMatching(/^TeleconverterAttachError: .*excluded$/),
+    });
+
+    expect(() => unbuiltPairs(CATALOG, [{ host: "engine-diff-absent", teleconverter }])).toThrow(
+      "the supplied catalog has no lens engine-diff-absent",
+    );
+  });
+});
+
+describe("engineDiff Tier P requests", () => {
+  const zoomKeys = new Set(
+    requestCatalog(CATALOG)
+      .lenses.filter((lens) => lens.zoomStations >= 2)
+      .map((lens) => lens.key),
+  );
+  const familiesByLensState = new Map<string, RequestFamily[]>();
+  for (const request of TIER_P) {
+    const lensState = `${lensId(request.lens)}|${stateId(request.state)}`;
+    familiesByLensState.set(lensState, [...(familiesByLensState.get(lensState) ?? []), request.family]);
+  }
+  const familiesAt = (id: string, state: string) => familiesByLensState.get(`${id}|${state}`) ?? [];
+  const LAST_ZOOM = stateId({ ...DEFAULT_STATE, zoomT: 1 });
+  const stateFamilies: RequestFamily[] = ["layout", "traces", "fieldGeometry", "chiefSolves"];
+
+  it("is the same list on every build, grouped by lens in code-unit order, with no duplicates", () => {
+    expect(tierRequests("p", requestCatalog(exportCatalog()))).toEqual(TIER_P);
+    const ids = TIER_P.map((request) => lensId(request.lens));
+    expect(ids).toEqual([...ids].sort());
+    const identities = TIER_P.map((request) => `${lensId(request.lens)}|${stateId(request.state)}|${request.family}`);
+    expect(new Set(identities).size).toBe(identities.length);
+  });
+
+  it("asks every catalog lens for build constants and the state families at the first and last zoom station", () => {
+    const offenders: string[] = [];
+    for (const { key } of CATALOG.lenses) {
+      const lensLevel = familiesAt(key, stateId(null));
+      const first = familiesAt(key, stateId(DEFAULT_STATE)).filter((family) => stateFamilies.includes(family));
+      const last = familiesAt(key, LAST_ZOOM);
+      const complete =
+        JSON.stringify(lensLevel) === JSON.stringify(["build"]) &&
+        JSON.stringify(first) === JSON.stringify(stateFamilies) &&
+        JSON.stringify(last) === JSON.stringify(zoomKeys.has(key) ? stateFamilies : []);
+      if (!complete) offenders.push(key);
+    }
+    expect(offenders).toEqual([]);
+    expect(zoomKeys.size).toBeGreaterThan(0);
+    expect(zoomKeys.size).toBeLessThan(CATALOG.lenses.length);
+  });
+
+  it("covers one converter pair, in the analysis row, with its composition and the first row's families", () => {
+    const pairIds = TIER_P.filter((request) => request.lens.teleconverter).map((request) => lensId(request.lens));
+    expect([...new Set(pairIds)]).toEqual([PAIR_ID]);
+    /* The catalog permits more pairs than that; the rest are another tier's. */
+    expect(CATALOG.pairs.length).toBeGreaterThan(1);
+    expect(familiesAt(PAIR_ID, stateId(null))).toEqual(["composition", "build"]);
+    expect(familiesAt(PAIR_ID, stateId(DEFAULT_STATE))).toEqual([...stateFamilies, "analysis", "mtf"]);
+    /* Its host is a zoom, and the pair is asked at the default state alone. */
+    expect(zoomKeys.has(PAIR.key)).toBe(true);
+    expect(pairIds).toHaveLength(8);
+  });
+
+  it("asks the benchmark lenses and feature representatives for every analysis job and MTF", () => {
+    const analysed = TIER_P.filter((request) => request.family === "analysis");
+    const representatives = [
+      ...BENCHMARK_LENS_KEYS.map((key) => ({ key })),
+      ...FEATURE_REPRESENTATIVES.map((r) => r.lens),
+    ];
+    expect(representatives).toHaveLength(26);
+    expect(new Set(analysed.map((request) => lensId(request.lens)))).toEqual(new Set(representatives.map(lensId)));
+    /* One default state each, plus the three states that put a feature to work. */
+    expect(analysed).toHaveLength(29);
+    expect(analysed.filter((request) => stateId(request.state) !== stateId(DEFAULT_STATE)).map((r) => r.state)).toEqual(
+      expect.arrayContaining([
+        { ...DEFAULT_STATE, shiftMm: 6, tiltDeg: 4 },
+        { ...DEFAULT_STATE, focusT: 1 },
+        { ...DEFAULT_STATE, aberrationT: 1 },
+      ]),
+    );
+    expect(TIER_P.filter((request) => request.family === "mtf").map((r) => [r.lens, r.state])).toEqual(
+      analysed.map((r) => [r.lens, r.state]),
+    );
+  });
+
+  it("keeps its copies of the benchmark lens set and the analysis accessors equal to the engine's", () => {
+    /* requests.ts can import neither: the capture bundle is built without React and without naming the engine. */
+    expect([...BENCHMARK_LENS_KEYS]).toEqual([...DEFAULT_BENCHMARK_LENS_KEYS]);
+
+    const seam = resolveSeam();
+    const lens = seam.buildLens(
+      decodeValue(CATALOG.lenses.find((entry) => entry.key === SERENAR)!.prescription) as LensData,
+    );
+    const preparedState = seam.prepareState(lens, 0, 0);
+    const context = seam.createAnalysisContext({
+      preparedState,
+      dynamicEFL: seam.eflAtFocus(0, 0, lens),
+      currentEPSD: lens.EP.epSD,
+      currentPhysStopSD: lens.stopPhysSD,
+      perspectiveTraceContext: seam.createPerspectiveTraceContext({
+        preparedState,
+        movement: { shiftMm: 0, tiltDeg: 0 },
+      }),
+    });
+    /* Every `compute*` function of a context that has its perspective half: the centered and the perspective jobs. */
+    const accessors = Object.entries(context)
+      .filter(([name, member]) => name.startsWith("compute") && typeof member === "function")
+      .map(([name]) => name);
+    expect(accessors.sort()).toEqual([...ANALYSIS_CONTEXT_JOBS].sort());
+  });
+
+  it("refuses to build when a representative has left the catalog", () => {
+    const { lenses, pairs } = requestCatalog(CATALOG);
+    expect(() => tierRequests("p", { lenses: lenses.filter((lens) => lens.key !== SERENAR), pairs })).toThrow(SERENAR);
+    expect(() => tierRequests("p", { lenses, pairs: [] })).toThrow(/fujifilm-xf2x-tc-wr/);
+  });
+
+  it("names representatives that still carry their feature", () => {
+    /* A representative whose data loses the feature would keep its row and quietly stop covering it. */
+    const lenses = new Map(CATALOG.lenses.map((lens) => [lens.key, decodeValue(lens.prescription) as LensData]));
+    const carries: Record<string, (data: LensData, state: Partial<typeof DEFAULT_STATE>) => boolean> = {
+      fisheye: (data) => data.projection !== undefined && data.projection.kind !== "rectilinear",
+      "folded-auto-path": (data) => data.opticalPath?.mode === "auto",
+      "folded-explicit-order": (data) => (data.opticalPath?.surfaceOrder?.length ?? 0) > 0,
+      diffractive: (data) => data.surfaces.some((surface) => surface.diffractive),
+      "bulk-absorption": (data) => data.elements.some((element) => element.absorptionCoefficientPerMm),
+      "rear-plates": (data) => (data.rearPlates?.length ?? 0) > 0,
+      "converter-pair": (data) => data.acceptsTeleconverters === true,
+      "perspective-control": (data, state) => {
+        const [minShift, maxShift] = data.perspectiveControl?.shiftRangeMm ?? [0, 0];
+        const [minTilt, maxTilt] = data.perspectiveControl?.tiltRangeDeg ?? [0, 0];
+        const { shiftMm = 0, tiltDeg = 0 } = state;
+        return shiftMm > minShift && shiftMm < maxShift && tiltDeg > minTilt && tiltDeg < maxTilt && tiltDeg !== 0;
+      },
+      "finite-conjugate": (data, state) =>
+        (data.finiteConjugates ?? []).some((conjugate) => conjugate.focusT === state.focusT),
+      "fixed-iris-zoom": (data) => data.zoomApertureModel === "fixed-iris",
+      "aberration-control": (data, state) => data.aberrationControl !== undefined && state.aberrationT !== 0,
+    };
+    const offenders = FEATURE_REPRESENTATIVES.filter(({ feature, lens, featureState }) => {
+      const data = lenses.get(lens.key);
+      return !data || !carries[feature](data, featureState ?? {});
+    }).map(({ feature }) => feature);
+    expect(offenders).toEqual([]);
+    expect(Object.keys(carries).sort()).toEqual(FEATURE_REPRESENTATIVES.map(({ feature }) => feature).sort());
+  });
+});
+
+/* ── captureEntry.ts ── */
+
+describe("engineDiff capture", () => {
+  /* A prime, a zoom, a vector-launched fisheye, an auto-path folded lens and the converter pair. */
+  const stateRowLenses = [
+    SERENAR,
+    "sony-fe-24-70mm-f28-gm-ii",
+    "nikon-fisheye-nikkor-6mm-f28",
+    "carl-zeiss-mirotar-500f45",
+    PAIR_ID,
+  ];
+  const requests = [
+    ...tierPRequests(stateRowLenses, ["composition", "build", "layout", "traces", "fieldGeometry", "chiefSolves"]),
+    ...tierPRequests([SERENAR, MAKSUTOV], ["analysis", "mtf"]),
+  ];
+  const records = captureRecords(CATALOG, requests);
+
+  it("returns one record per request, in order, each a plain JSON object", () => {
+    expect(records.map((record) => [record.lens, record.state, record.request])).toEqual(
+      requests.map((request) => [lensId(request.lens), request.state, request.family]),
+    );
+    for (const record of records) {
+      expect(Object.keys(record)).toEqual(["lens", "state", "request", "payload"]);
+      expect(JSON.parse(JSON.stringify(record))).toEqual(record);
+    }
+    expect(records.filter((record) => !record.payload.ok)).toEqual([]);
+  });
+
+  it("captures the same bytes on a second run, and one request at a time in reverse order", () => {
+    const first = recordDigests(records);
+    expect(recordDigests(captureRecords(CATALOG, requests))).toEqual(first);
+    const reversed = [...requests].reverse().map((request) => captureRecords(CATALOG, [request])[0]);
+    expect(recordDigests(reversed.reverse())).toEqual(first);
+  });
+
+  it("keeps full hits column-wise with each hit's residual and effective tolerance", () => {
+    const traces = valueOf(records.find((record) => record.lens === SERENAR && record.request === "traces")!) as {
+      onAxis: { rays: { status: string; terminalPoint: number[]; imagePoint: number[]; hits: Hits }[] };
+      chromatic: { rays: Record<string, unknown[]> };
+      legacy: { rays: { pts: number[][]; paraxialImageHeight: number }[] };
+    };
+    interface Hits {
+      count: number;
+      columns: Record<string, unknown[]>;
+    }
+    const ray = traces.onAxis.rays[1];
+    expect(ray.status).toBe("ok");
+    expect(ray.hits.count).toBeGreaterThan(2);
+    for (const column of ["surfaceIndex", "point", "normal", "residual", "effectiveTolerance", "clipped"]) {
+      expect(ray.hits.columns[column]).toHaveLength(ray.hits.count);
+    }
+    expect(ray.hits.columns.point.at(-1)).toEqual(ray.terminalPoint);
+    expect(ray.imagePoint).toHaveLength(2);
+    expect(Object.keys(traces.chromatic.rays)).toEqual([...CHROMATIC_CHANNELS].sort());
+    expect(traces.legacy.rays[1].pts.length).toBeGreaterThan(2);
+    expect(Number.isFinite(traces.legacy.rays[1].paraxialImageHeight)).toBe(true);
+  });
+
+  it("launches its full-hit rays exactly as the public slope tracer does", () => {
+    const traces = valueOf(records.find((record) => record.lens === SERENAR && record.request === "traces")!) as {
+      stopSemiDiameterMm: number;
+      pupilSemiDiameterMm: number;
+      onAxis: { rays: { y: number; uy: number }[] };
+    };
+    const lens = buildLens(
+      decodeValue(CATALOG.lenses.find((entry) => entry.key === SERENAR)!.prescription) as LensData,
+    );
+    const zPos = doLayout(0, 0, lens).z;
+    const mismatches = ON_AXIS_PUPIL_FRACTIONS.filter((fraction, index) => {
+      const height = fraction * traces.pupilSemiDiameterMm;
+      const expected = traceRay(height, 0, zPos, 0, 0, traces.stopSemiDiameterMm, true, lens);
+      const captured = traces.onAxis.rays[index];
+      return !Object.is(captured.y, expected.y) || !Object.is(captured.uy, expected.u);
+    });
+    expect(mismatches).toEqual([]);
+  });
+
+  it("composes a pair itself and records the composed prescription by the fingerprint's authority rules", () => {
+    const composition = valueOf(
+      records.find((record) => record.lens === PAIR_ID && record.request === "composition")!,
+    ) as {
+      compatibility: { ok: boolean };
+      prescription: { surfaces: { label: string; R: unknown; sd?: number }[] };
+    };
+    const seam = resolveSeam();
+    const host = decodeValue(CATALOG.lenses.find((entry) => entry.key === PAIR.key)!.prescription) as LensData;
+    const converter = decodeValue(
+      CATALOG.teleconverters.find((entry) => entry.key === PAIR.teleconverter)!.prescription,
+    ) as Parameters<typeof seam.attachTeleconverter>[1];
+    const composed = seam.attachTeleconverter({ ...seam.lensDefaults, ...host }, converter);
+    expect(composition.compatibility.ok).toBe(true);
+    expect(composition.prescription).toEqual(throughJson(applyAuthorityRules(composed, seam.flatRadiusThreshold)));
+    expect(composition.prescription.surfaces.length).toBeGreaterThan(host.surfaces.length);
+    /* The host's flat surfaces and its derived stop radius are in the composed prescription, in normalized form. */
+    const { surfaces } = composition.prescription;
+    expect(surfaces.filter((surface) => surface.R === FLAT_RADIUS_MARKER).length).toBeGreaterThan(0);
+    expect(
+      surfaces.filter((surface) => typeof surface.R === "number" && Math.abs(surface.R) > seam.flatRadiusThreshold),
+    ).toEqual([]);
+    expect(stopRadiusAuthority(composed)).toBe("derived");
+    expect(surfaces.find((surface) => surface.label === "STO")).not.toHaveProperty("sd");
+  });
+
+  it("keeps every field of a built lens in its build record, the copied and defaulted ones included", () => {
+    const seam = resolveSeam();
+    /* A zoom with a close-focus distance per station, an f-stop series of its own, and rear plates. */
+    const lens = seam.buildLens(
+      decodeValue(CATALOG.lenses.find((entry) => entry.key === "fuji-xf-16-55-f28")!.prescription) as LensData,
+    );
+    const recordOf = (built: object) =>
+      JSON.stringify(encodeValue(projectBuildConstants(built, CHROMATIC_CHANNELS, seam.flatRadiusThreshold)));
+    const record = recordOf(lens);
+
+    /* Each of these is a field the engine fills from the prescription or a lens default, or filters. A lens that
+     * differs in one of them alone must give another record. */
+    expect(lens.data.elements.length).toBeGreaterThan(lens.elements.length);
+    const changed: Record<string, unknown> = {
+      maxFstop: lens.maxFstop * 2,
+      fstopSeries: undefined,
+      closeFocusM: lens.closeFocusM * 2,
+      zoomCloseFocusM: lens.zoomCloseFocusM!.map((distance) => distance * 2),
+      focusStep: lens.focusStep * 2,
+      apertureStep: lens.apertureStep * 2,
+      rayFractions: lens.rayFractions.slice(1),
+      offAxisFractions: lens.offAxisFractions.slice(1),
+      offAxisFieldFrac: lens.offAxisFieldFrac / 2,
+      svgW: lens.svgW + 1,
+      gapSagFrac: lens.gapSagFrac / 2,
+      /* The synthetic rear plates no longer filtered out of the drawn elements. */
+      elements: lens.data.elements,
+      focusDescription: `${lens.focusDescription ?? ""}~`,
+      data: { ...lens.data, scFill: lens.data.scFill / 2 },
+    };
+    expect(Object.keys(changed).filter((field) => !(field in lens))).toEqual([]);
+    expect(Object.keys(changed).filter((field) => recordOf({ ...lens, [field]: changed[field] }) === record)).toEqual(
+      [],
+    );
+    /* Nothing of the lens is left out: every field is in the record under its own name, bar the one renamed. */
+    const written = Object.keys(JSON.parse(record) as object);
+    const expected = Object.entries(lens)
+      .filter(([, value]) => value !== undefined)
+      .map(([field]) => (field === "asphByIdx" ? "asphericSurfaceIndexes" : field));
+    expect(written).toEqual(expected.sort());
+
+    /* `data` is written by the fingerprint's rules: a flat radius as its marker, a derived stop radius left out. */
+    const { surfaces } = (JSON.parse(record) as { data: { surfaces: { label: string; R: unknown; sd?: number }[] } })
+      .data;
+    expect(surfaces).toHaveLength(lens.S.length);
+    expect(surfaces.filter((surface) => surface.R === FLAT_RADIUS_MARKER).length).toBeGreaterThan(0);
+    expect(
+      surfaces.filter((surface) => typeof surface.R === "number" && Math.abs(surface.R) > seam.flatRadiusThreshold),
+    ).toEqual([]);
+    expect(stopRadiusAuthority(lens.data)).not.toBe("authored");
+    expect(surfaces.find((surface) => surface.label === "STO")).not.toHaveProperty("sd");
+
+    /* A surface of `S` is the engine's own copy of its prescription surface, and `data` holds the prescription's.
+     * A member the engine alone changed must give another record: the inner radius of an annular mirror, an
+     * interaction, a diffractive phase, the placement of an embedded stop, a curved radius. */
+    type Surface = (typeof lens.S)[number];
+    const built = (key: string) =>
+      seam.buildLens(decodeValue(CATALOG.lenses.find((entry) => entry.key === key)!.prescription) as LensData);
+    const surfaceChanges: [key: string, member: keyof Surface, change: (surface: Surface) => Partial<Surface>][] = [
+      ["carl-zeiss-mirotar-500f45", "innerSd", (surface) => ({ innerSd: surface.innerSd! * 1.01 })],
+      [
+        "carl-zeiss-mirotar-500f45",
+        "interaction",
+        (surface) => ({ interaction: { ...surface.interaction!, type: "refract" } }),
+      ],
+      [
+        "nikon-af-s-nikkor-300mm-f4e-pf-ed-vr",
+        "diffractive",
+        ({ diffractive }) => ({
+          diffractive: {
+            ...diffractive!,
+            terms: diffractive!.terms.map((term) => ({ ...term, coefficient: term.coefficient * (1 + 1e-12) })),
+          },
+        }),
+      ],
+      ["zeiss-hologon-15f8", "stopPlacement", () => ({ stopPlacement: undefined })],
+      ["fuji-xf-16-55-f28", "R", (surface) => ({ R: surface.R * (1 + Number.EPSILON) })],
+    ];
+    const curved = (surface: Surface) => Math.abs(surface.R) <= seam.flatRadiusThreshold;
+    const unmoved = surfaceChanges.filter(([key, member, change]) => {
+      const original = built(key);
+      const index = original.S.findIndex((surface) =>
+        member === "R" ? curved(surface) : surface[member] !== undefined,
+      );
+      expect(index, `${key} has a surface with ${member}`).toBeGreaterThanOrEqual(0);
+      const S = original.S.map((surface, at) => (at === index ? { ...surface, ...change(surface) } : surface));
+      return recordOf({ ...original, S }) === recordOf(original);
+    });
+    expect(unmoved.map(([key, member]) => `${key} ${member}`)).toEqual([]);
+    /* A flat radius is written as its marker, in `S` as in `data`: the engine hands a flat radius back as it was
+     * spelled, and its spellings share a fingerprint. */
+    const flat = lens.S.findIndex((surface) => Math.abs(surface.R) > seam.flatRadiusThreshold);
+    expect(flat).toBeGreaterThanOrEqual(0);
+    const respelled = lens.S.map((surface, at) => (at === flat ? { ...surface, R: -2 * surface.R } : surface));
+    expect(recordOf({ ...lens, S: respelled })).toBe(record);
+    const { S } = JSON.parse(record) as { S: { R: unknown }[] };
+    expect(S[flat].R).toBe(FLAT_RADIUS_MARKER);
+    expect(S.filter((surface) => typeof surface.R === "number")).toHaveLength(lens.S.filter(curved).length);
+  });
+
+  it("runs every analysis job and records a throwing job as an outcome instead of dropping it", () => {
+    type Jobs = Record<string, { ok: boolean; error?: { name: string; message: string } }>;
+    const jobsOf = (lens: string) =>
+      (valueOf(records.find((record) => record.lens === lens && record.request === "analysis")!) as { jobs: Jobs })
+        .jobs;
+    const expectedJobs = [
+      ...ANALYSIS_CONTEXT_JOBS,
+      "computeFieldCurvature",
+      "groupMovement.focus",
+      "groupMovement.zoom",
+      "groupMovement.combined",
+      "cardinalElements",
+      "asphericComparison",
+      "effectiveFNumber",
+      "chromaticFieldFocusSummary",
+      "longitudinalChromaticFocus",
+      "locaBarOffsets",
+    ].sort();
+
+    const serenar = jobsOf(SERENAR);
+    expect(Object.keys(serenar)).toEqual(expectedJobs);
+    expect(Object.values(serenar).filter((job) => !job.ok)).toEqual([]);
+
+    const maksutov = jobsOf(MAKSUTOV);
+    expect(Object.keys(maksutov)).toEqual(expectedJobs);
+    expect(maksutov.computePerspectiveFocusAnalysis).toEqual({
+      ok: false,
+      error: { name: "PerspectiveFieldSamplingError", message: expect.any(String) },
+    });
+    expect(maksutov.computeOpticalSummary.ok).toBe(true);
+  });
+
+  it("records the readouts the viewer computes beside the analysis context", () => {
+    const { jobs } = valueOf(records.find((record) => record.lens === SERENAR && record.request === "analysis")!) as {
+      jobs: Record<string, { ok: boolean; value: unknown }>;
+    };
+    const seam = resolveSeam();
+    const lens = buildLens(
+      decodeValue(CATALOG.lenses.find((entry) => entry.key === SERENAR)!.prescription) as LensData,
+    );
+
+    /* Focused at infinity the working f-number is the marked one. */
+    expect(jobs.effectiveFNumber).toEqual({ ok: true, value: seam.fNumberAtStopdown(0, 0, lens) });
+
+    /* The chromatic tab's summary, of the field-curvature bundle the context returned. */
+    const bundle = jobs.computeFieldCurvatureBundle.value as { chromaticFieldCurvature: object };
+    const summary = jobs.chromaticFieldFocusSummary.value as { fields: { tangential: { spreadMm: number } }[] };
+    expect(summary).toEqual(throughJson(seam.summarizeChromaticFieldFocus(bundle.chromaticFieldCurvature as never)));
+    expect(summary.fields.length).toBeGreaterThan(0);
+    expect(summary.fields[0].tangential.spreadMm).toBeGreaterThan(0);
+
+    /* The diagram's LoCA readout tries its own marginal fractions first, and its inset draws one bar a channel. */
+    const loca = jobs.longitudinalChromaticFocus.value as {
+      marginalFraction: number;
+      channels: string[];
+      spread: { axialIntercepts: Record<string, number> };
+    };
+    expect(loca.channels).toEqual([...CHROMATIC_CHANNELS]);
+    expect(loca.marginalFraction).toBe(0.97);
+    const bars = jobs.locaBarOffsets.value as {
+      barOffsets: Record<string, number>;
+      mag: number;
+      legacy: { barOffsets: Record<string, number> };
+    };
+    expect(Object.keys(bars.barOffsets)).toEqual(Object.keys(loca.spread.axialIntercepts));
+    expect(bars.barOffsets.G).toBe(0);
+    expect(bars.legacy.barOffsets).toEqual(bars.barOffsets);
+    expect(bars.mag).toBeGreaterThan(0);
+  });
+
+  it("reads the aspheric departure at fixed heights, against the base sphere and the best fit", () => {
+    const key = "zeiss-zx1-distagon-35mm-f2";
+    const [record] = captureRecords(CATALOG, tierPRequests([key], ["analysis"]));
+    type Readout = Record<"baseSphere" | "bestFitSphere", { h: number; delta: number }[]>;
+    type Fit = { surfaceIndex: number; readout: Readout; legacy: { readout: Readout } };
+    const fits = (valueOf(record) as { jobs: { asphericComparison: { value: Fit[] } } }).jobs.asphericComparison.value;
+    const lens = buildLens(decodeValue(CATALOG.lenses.find((entry) => entry.key === key)!.prescription) as LensData);
+    expect(fits.length).toBeGreaterThan(0);
+    for (const { surfaceIndex, readout, legacy } of fits) {
+      const { sd } = lens.S[surfaceIndex];
+      const readouts = [
+        readout.baseSphere,
+        readout.bestFitSphere,
+        legacy.readout.baseSphere,
+        legacy.readout.bestFitSphere,
+      ];
+      for (const samples of readouts) {
+        expect(samples.map((sample) => sample.h)).toEqual([0.25, 0.5, 0.75, 1].map((fraction) => fraction * sd));
+      }
+      /* An asphere departs from its own base sphere away from the axis. */
+      expect(readout.baseSphere.at(-1)!.delta).not.toBe(0);
+    }
+    /* A lens with aspheres is where a member named like an engine back-pointer would be skipped; none is. */
+    expect(skippedBackPointers(record.payload)).toEqual([]);
+  });
+
+  it("digests the traces and pupil bundles inside perspective results and keeps a field sample readable", () => {
+    const record = records.find((entry) => entry.lens === SERENAR && entry.request === "analysis")!;
+    const text = JSON.stringify(record);
+    /* Whole, this record is over 100 MB of text; a raw hit list anywhere in it would show as a `hits` array. */
+    expect(text.length).toBeLessThan(8e6);
+    expect(text).not.toContain('"hits":[');
+    expect(text).not.toContain('"cacheKey"');
+    const focus = (valueOf(record) as { jobs: Record<string, { value: { samples: Record<string, unknown>[] } }> }).jobs
+      .computePerspectiveFocusAnalysis.value;
+    const digest = (status: unknown) => ({
+      status,
+      hitCount: expect.any(Number),
+      hash: expect.stringMatching(/^[0-9a-f]{64}$/),
+    });
+    expect(focus.samples[0].sensorPoint).toHaveLength(3);
+    /* The sample's own numbers and both solves are values a budget can be set on; only the rays are digests. */
+    expect(focus.samples[0].fieldSample).toMatchObject({
+      status: "usable",
+      sensorPoint: [expect.any(Number), expect.any(Number), expect.any(Number)],
+      actualSensorIntercept: [expect.any(Number), expect.any(Number), expect.any(Number)],
+      chiefTrace: digest("ok"),
+      chiefSolve: {
+        launchOffsetMm: expect.any(Number),
+        stopResidualMm: expect.any(Number),
+        rootSolve: { status: "converged", iterations: expect.any(Number), evaluations: expect.any(Number) },
+        stopTrace: digest("ok"),
+        chiefTrace: digest("ok"),
+      },
+      sensorSolve: { status: "converged", iterations: expect.any(Number), evaluations: expect.any(Number) },
+      pupilBundle: digest(null),
+    });
+  });
+
+  it("skips no back-pointer in the analysis and MTF records it captured", () => {
+    /* The skip goes by member name. A marker here means an engine result has gained a member under one of those
+     * names, and that it is being left out of the comparison: look at it before accepting the record. */
+    const inspected = records.filter((record) => record.request === "analysis" || record.request === "mtf");
+    expect(inspected.map((record) => record.lens)).toEqual(expect.arrayContaining([SERENAR, MAKSUTOV]));
+    expect(
+      inspected.flatMap((record) => skippedBackPointers(record.payload, `${record.lens} ${record.request}`)),
+    ).toEqual([]);
+  });
+
+  it("requests geometric MTF at the 32-cell grid", () => {
+    const mtf = valueOf(records.find((record) => record.lens === SERENAR && record.request === "mtf")!) as {
+      options: Record<string, unknown>;
+      result: { support: { available: boolean }; fields: { gridSize: number }[] };
+    };
+    expect(mtf.options).toMatchObject({ method: "geometric", spectrum: "reference", focus: "design", maxGridSize: 32 });
+    expect(mtf.result.support.available).toBe(true);
+    expect(mtf.result.fields).toHaveLength(3);
+    expect(Math.max(...mtf.result.fields.map((field) => field.gridSize))).toBeLessThanOrEqual(32);
+  });
+
+  it("records a lens that does not build as an outcome", () => {
+    const broken = { ...plainTwin, key: "engine-diff-broken", surfaces: plainTwin.surfaces.slice(1) };
+    const records = captureRecords(catalogOf(broken), [
+      { lens: { key: broken.key }, state: null, family: "build" },
+      { lens: { key: broken.key }, state: DEFAULT_STATE, family: "traces" },
+    ]);
+    for (const record of records) {
+      expect(record.payload).toEqual({
+        ok: false,
+        error: { name: "Error", message: expect.stringContaining(broken.key) },
+      });
+    }
+  });
+
+  it("refuses a request it cannot carry out, before capturing anything", () => {
+    /* Recorded as outcomes, these would fail alike on both engines and compare equal. */
+    const catalog = catalogOf(plainTwin);
+    const lens = { key: plainTwin.key };
+    expect(() => captureRecords(catalog, [{ lens: { key: SERENAR }, state: null, family: "build" }])).toThrow(
+      `no lens ${SERENAR}`,
+    );
+    expect(() =>
+      captureRecords(catalog, [{ lens: { ...lens, teleconverter: "absent-converter" }, state: null, family: "build" }]),
+    ).toThrow("no teleconverter absent-converter");
+    expect(() => captureRecords(catalog, [{ lens, state: null, family: "traces" }])).toThrow("without a lens state");
+    expect(() => captureRecords(catalog, [{ lens, state: null, family: "composition" }])).toThrow("not a pair");
+  });
+});
+
+/* ── Semantic fingerprint ── */
+
+describe("engineDiff semantic fingerprint", () => {
+  const seam = resolveSeam();
+  const rules: FingerprintRules = { lensDefaults: seam.lensDefaults, flatRadiusThreshold: seam.flatRadiusThreshold };
+  const fingerprint = (lens: object) => semanticFingerprint(lens, rules);
+  /** The plain twin with one edit applied to a private copy. */
+  const edited = (edit: (lens: LensDataInput) => void): LensDataInput => {
+    const copy: LensDataInput = structuredClone(plainTwin);
+    edit(copy);
+    return copy;
+  };
+  const base = fingerprint(plainTwin);
+
+  it("is shared by two files that differ only in comments, layout, key order and written-out defaults", () => {
+    /* The twins really are different objects: other key order, explicit defaults, an `undefined` member. */
+    expect(Object.keys(restyledTwin)).not.toEqual(Object.keys(plainTwin));
+    expect(Object.keys(restyledTwin).length).toBeGreaterThan(Object.keys(plainTwin).length);
+    expect("cemented" in restyledTwin.elements[0]).toBe(true);
+
+    expect(fingerprint(restyledTwin)).toBe(base);
+    expect(fingerprintCatalog(catalogOf(restyledTwin)).lenses[restyledTwin.key]).toBe(base);
+  });
+
+  it("goes with identical payloads: the engine cannot tell the twins apart either", () => {
+    const families: RequestFamily[] = ["layout", "traces", "fieldGeometry", "chiefSolves", "analysis", "mtf"];
+    const twinRequests: CaptureRequest[] = [
+      { lens: { key: plainTwin.key }, state: null, family: "build" },
+      ...families.map((family) => ({ lens: { key: plainTwin.key }, state: DEFAULT_STATE, family })),
+    ];
+    const plain = captureRecords(catalogOf(plainTwin), twinRequests);
+    expect(plain.filter((record) => !record.payload.ok)).toEqual([]);
+    expect(recordDigests(captureRecords(catalogOf(restyledTwin), twinRequests))).toEqual(recordDigests(plain));
+  });
+
+  /**
+   * Capture Tier P records as authored, and again with one lens respelled inside the fingerprint's rules: every flat
+   * radius written -2e15 instead of 1e15, and the authored STO semi-diameter changed on a lens with a derived stop.
+   *
+   * The rules that let two spellings share a fingerprint must hold in the payloads too, or a format-only change fails
+   * on a record that only hands authored data back. The engine does that with a flat radius in two places: the
+   * best-fit radius of a flat-base asphere, and the prescription it composes for a converter pair.
+   */
+  const captureRespelled = (key: string, ids: readonly string[]) => {
+    const entry = CATALOG.lenses.find((lens) => lens.key === key)!;
+    const authored = decodeValue(entry.prescription) as LensData;
+    const respelled = structuredClone(authored);
+    const flat = respelled.surfaces.filter((surface) => Math.abs(surface.R) > seam.flatRadiusThreshold);
+    for (const surface of flat) surface.R = -2e15;
+    respelled.surfaces.find((surface) => surface.label === "STO")!.sd *= 0.97;
+
+    /* The edit is a real one, it reaches flat surfaces other than the stop, and the fingerprint does not see it. */
+    expect(flat.length).toBeGreaterThan(1);
+    expect(authored.surfaces.filter((surface) => surface.R === 1e15)).toHaveLength(flat.length);
+    expect(stopRadiusAuthority({ ...seam.lensDefaults, ...authored })).toBe("derived");
+    expect(fingerprint(respelled)).toBe(fingerprint(authored));
+
+    const respelledCatalog: SerializedCatalog = {
+      ...CATALOG,
+      lenses: CATALOG.lenses.map((lens) =>
+        lens === entry ? { ...entry, prescription: encodeValue(respelled) } : lens,
+      ),
+    };
+    const requests = tierPRequests(ids);
+    const before = captureRecords(CATALOG, requests);
+    expect(before.filter((record) => !record.payload.ok)).toEqual([]);
+    return { before, after: captureRecords(respelledCatalog, requests) };
+  };
+
+  it("keeps every Tier P record of a lens with flat-base aspheres when flat radii and the stop radius are respelled", () => {
+    /* The rear-plates representative, so its Tier P records include the analysis jobs and MTF. */
+    const key = "zeiss-zx1-distagon-35mm-f2";
+    const { before, after } = captureRespelled(key, [key]);
+    expect(before.map((record) => record.request)).toEqual([
+      "build",
+      "layout",
+      "traces",
+      "fieldGeometry",
+      "chiefSolves",
+      "analysis",
+      "mtf",
+    ]);
+    expect(recordDigests(after)).toEqual(recordDigests(before));
+
+    /* Without a flat-base asphere the best-fit radius would be a computed number, and nothing here an echo. */
+    const analysis = valueOf(before.find((record) => record.request === "analysis")!) as {
+      jobs: { asphericComparison: { value: { bestFitRadius: unknown; legacy: { bestFitRadius: unknown } }[] } };
+    };
+    const fits = analysis.jobs.asphericComparison.value;
+    expect(fits.filter((fit) => fit.bestFitRadius === FLAT_RADIUS_MARKER).length).toBeGreaterThan(0);
+    expect(fits.filter((fit) => fit.legacy.bestFitRadius === FLAT_RADIUS_MARKER).length).toBeGreaterThan(0);
+    expect(fits.filter((fit) => typeof fit.bestFitRadius === "number").length).toBeGreaterThan(0);
+  });
+
+  it("keeps every Tier P record of a converter host and of its pair under the same respelling", () => {
+    const { before, after } = captureRespelled(PAIR.key, [PAIR.key, PAIR_ID]);
+    const requestsOf = (id: string) => before.filter((record) => record.lens === id).map((record) => record.request);
+    expect(requestsOf(PAIR.key)).toContain("traces");
+    expect(requestsOf(PAIR_ID)).toEqual([
+      "composition",
+      "build",
+      "layout",
+      "traces",
+      "fieldGeometry",
+      "chiefSolves",
+      "analysis",
+      "mtf",
+    ]);
+    expect(recordDigests(after)).toEqual(recordDigests(before));
+  });
+
+  it("changes with every value in the file, except the two the engine does not read", () => {
+    /* Walk every leaf of the plain twin, change it by the smallest step, and see whether the fingerprint moves. */
+    const unmoved: string[] = [];
+    const visit = (node: unknown, path: (string | number)[]): void => {
+      if (node !== null && typeof node === "object") {
+        for (const [key, child] of Object.entries(node))
+          visit(child, [...path, Array.isArray(node) ? Number(key) : key]);
+        return;
+      }
+      const changed = edited((lens) => {
+        let owner = lens as object as Record<string | number, unknown>;
+        for (const step of path.slice(0, -1)) owner = owner[step] as Record<string | number, unknown>;
+        const leaf = path[path.length - 1];
+        if (typeof node === "number") owner[leaf] = node === 0 ? Number.MIN_VALUE : node * (1 + Number.EPSILON);
+        else if (typeof node === "string") owner[leaf] = `${node}~`;
+        else owner[leaf] = "set";
+      });
+      if (fingerprint(changed) === base) unmoved.push(path.join("."));
+    };
+    visit(plainTwin, []);
+
+    /* The stop radius is derived on this lens, and a flat radius stays flat at any magnitude past the threshold. */
+    expect(unmoved).toEqual(["surfaces.0.R", "surfaces.0.sd"]);
+  });
+
+  it("follows the engine's authority rules for flat radii, zero asphere terms and the sign of zero", () => {
+    expect(fingerprint(edited((lens) => (lens.surfaces[0].R = -2e15)))).toBe(base);
+    expect(fingerprint(edited((lens) => (lens.surfaces[0].R = 1e9)))).not.toBe(base);
+
+    const asph = (lens: LensDataInput) => lens.asph as Record<string, Record<string, number>>;
+    expect(fingerprint(edited((lens) => delete asph(lens)["1A"].A14))).toBe(base);
+    expect(fingerprint(edited((lens) => (asph(lens)["1A"].A16 = 0)))).toBe(base);
+    expect(fingerprint(edited((lens) => (asph(lens)["1A"].A8 = -0)))).toBe(base);
+    expect(fingerprint(edited((lens) => (asph(lens)["1A"].A8 = 1e-14)))).not.toBe(base);
+    /* An entry makes its surface aspheric to the engine and the UI even when every term is zero. */
+    const allZero = edited((lens) => (asph(lens)["2"] = { K: 0, A4: 0, A6: 0, A8: 0, A10: 0, A12: 0, A14: 0 }));
+    expect(fingerprint(allZero)).not.toBe(base);
+    expect(fingerprint(edited((lens) => (asph(lens)["2"] = {})))).toBe(fingerprint(allZero));
+
+    expect(fingerprint(edited((lens) => (lens.surfaces[0].elemId = -0)))).toBe(base);
+    expect(fingerprint(edited((lens) => (lens.subtitle = undefined)))).toBe(
+      fingerprint(edited((lens) => delete lens.subtitle)),
+    );
+  });
+
+  it("keeps a written-out default equal to an omitted one, and tells a changed default apart", () => {
+    expect(fingerprint(edited((lens) => (lens.svgW = 1080)))).toBe(base);
+    expect(fingerprint(edited((lens) => (lens.svgW = 1081)))).not.toBe(base);
+    /* Fields nothing reads yet are still hashed: a converted file must carry them. */
+    expect(fingerprint(edited((lens) => (lens.apertureBlades = 9)))).not.toBe(base);
+    expect(fingerprint(edited((lens) => (lens.apertureBladeRoundedness = 0.5)))).not.toBe(base);
+    expect(fingerprint(edited((lens) => (lens.zoomLabels = ["wide"])))).not.toBe(base);
+    /* `maker: null` records an unconfirmed maker; omission keeps name inference. */
+    expect(fingerprint(edited((lens) => delete lens.maker))).not.toBe(base);
+    /* An infinite focal length is not a missing one; plain JSON would write both as null. */
+    expect(fingerprint(edited((lens) => (lens.elements[0].fl = Number.POSITIVE_INFINITY)))).not.toBe(
+      fingerprint(edited((lens) => (lens.elements[0].fl = null as never))),
+    );
+  });
+
+  it("hashes the STO semi-diameter only where the restated rule says the engine reads it", () => {
+    /** The authority the rule assigns, and whether shrinking the authored STO radius moves the fingerprint. */
+    const readsStopRadius = (setUp: (lens: LensDataInput) => void) => {
+      const lens = edited(setUp);
+      const shrunk = edited((copy) => {
+        setUp(copy);
+        copy.surfaces[0].sd *= 0.9;
+      });
+      return [stopRadiusAuthority(lens), fingerprint(lens) !== fingerprint(shrunk)];
+    };
+    expect(readsStopRadius(() => {})).toEqual(["derived", false]);
+    expect(readsStopRadius((lens) => (lens.zoomStopSemiDiameters = [8, 9]))).toEqual(["schedule", false]);
+    expect(readsStopRadius((lens) => (lens.surfaces[1].interaction = { type: "refract" }))).toEqual(["derived", false]);
+    expect(readsStopRadius((lens) => (lens.surfaces[0].stopPlacement = "inside-element"))).toEqual(["authored", true]);
+    expect(readsStopRadius((lens) => (lens.opticalPath = { mode: "auto" }))).toEqual(["authored", true]);
+    expect(readsStopRadius((lens) => (lens.surfaces[2].interaction = { type: "reflect" }))).toEqual(["authored", true]);
+    /* A folded lens keeps its authored stop even when it also carries a schedule. */
+    expect(
+      readsStopRadius((lens) => {
+        lens.opticalPath = { mode: "auto" };
+        lens.zoomStopSemiDiameters = [8, 9];
+      }),
+    ).toEqual(["authored", true]);
+  });
+
+  it("restates the stop-radius rule as the engine applies it, on every catalog lens", () => {
+    /* `buildLens` exports no predicate for this rule. Shrink each authored STO semi-diameter and compare what the
+     * engine built: the build constants must move exactly when the fingerprint does. */
+    const built = (data: LensData) =>
+      JSON.stringify(
+        outcomeOf(() =>
+          encodeValue(projectBuildConstants(seam.buildLens(data), CHROMATIC_CHANNELS, seam.flatRadiusThreshold)),
+        ),
+      );
+    const offenders: string[] = [];
+    const authorities = { authored: 0, schedule: 0, derived: 0 };
+    for (const { key, prescription } of CATALOG.lenses) {
+      const authored = decodeValue(prescription) as LensData;
+      const shrunk = structuredClone(authored);
+      const stop = shrunk.surfaces.find((surface) => surface.label === "STO");
+      if (!stop) {
+        offenders.push(`${key}: no STO surface`);
+        continue;
+      }
+      stop.sd *= 0.9;
+      const engineReads = built(authored) !== built(shrunk);
+      const fingerprintReads = fingerprint(authored) !== fingerprint(shrunk);
+      authorities[stopRadiusAuthority(authored)]++;
+      if (engineReads !== fingerprintReads)
+        offenders.push(`${key}: engine ${engineReads}, fingerprint ${fingerprintReads}`);
+    }
+    expect(offenders).toEqual([]);
+    /* Each branch of the rule is exercised by the catalog. */
+    expect(Object.values(authorities).every((count) => count > 0)).toBe(true);
+  });
+
+  it("gives every catalog lens and teleconverter its own fingerprint", () => {
+    const { lenses, teleconverters } = fingerprintCatalog(CATALOG);
+    expect(new Set(Object.values(lenses)).size).toBe(CATALOG.lenses.length);
+    expect(new Set(Object.values(teleconverters)).size).toBe(CATALOG.teleconverters.length);
+  });
+});

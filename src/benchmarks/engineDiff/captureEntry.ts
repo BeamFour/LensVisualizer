@@ -1,0 +1,638 @@
+/**
+ * Capture entry of the engine differential harness.
+ *
+ * A driver bundles this file with Vite as an SSR entry, once per ref, and compares what the two bundles return. The
+ * entry exports the bundle's own catalog as serialized prescriptions, and it evaluates serialized prescriptions it is
+ * handed: a capture never reads its own catalog, so one ref's data can be run on the other ref's engine. Engine calls
+ * go through `seamAdapter.ts`, request definitions come from `requests.ts`, and every result is normalized by
+ * `payload.ts` into one record per lens, state and request family.
+ */
+
+import {
+  applyAuthorityRules,
+  createResultEncoder,
+  decodeValue,
+  encodeValue,
+  outcomeOf,
+  projectBuildConstants,
+  projectTrace,
+  radiusOrFlat,
+  semanticFingerprint,
+  type EncodedValue,
+  type Outcome,
+} from "./payload.js";
+import {
+  ANALYSIS_CONTEXT_JOBS,
+  ASPHERIC_READOUT_FRACTIONS,
+  CHIEF_FIELD_FRACTIONS,
+  CHROMATIC_CHANNELS,
+  CHROMATIC_PUPIL_FRACTIONS,
+  GROUP_MOVEMENT_MODES,
+  LOCA_INSET_BAR_WIDTH_PX,
+  LOCA_READOUT_FRACTIONS,
+  MTF_REQUEST,
+  OFF_AXIS_FIELD_FRACTION,
+  OFF_AXIS_PUPIL_FRACTIONS,
+  ON_AXIS_PUPIL_FRACTIONS,
+  SKEW_FIELD_FRACTION,
+  SKEW_PUPIL_FRACTIONS,
+  lensId,
+  type CaptureRequest,
+  type CaptureState,
+  type LensRef,
+  type RequestCatalog,
+  type RequestFamily,
+} from "./requests.js";
+import {
+  ownCatalogFiles,
+  resolveSeam,
+  type EngineRay,
+  type EngineSeam,
+  type EngineTrace,
+  type EngineTraceOptions,
+  type LensData,
+  type PreparedState,
+  type RuntimeLens,
+  type TeleconverterData,
+} from "./seamAdapter.js";
+
+/* A driver sees only the built bundle, so everything it calls is exported from here. */
+export { decodeValue, encodeValue, sha256Hex } from "./payload.js";
+export { lensId, stateId, tierRequests } from "./requests.js";
+export { describeSeam } from "./seamAdapter.js";
+
+/* ── Serialized catalog ── */
+
+/** One authored prescription in the tagged encoding, as its module exports it and before any defaults. */
+export interface SerializedPrescription {
+  key: string;
+  /** Source file relative to `src/lens-data/`; provenance for reports, never an input to a capture. */
+  file: string;
+  prescription: EncodedValue;
+}
+
+/** A catalog as data: hosts and converters apart, plus the pairs the exporting engine's fit predicate allows. */
+export interface SerializedCatalog {
+  lenses: SerializedPrescription[];
+  teleconverters: SerializedPrescription[];
+  pairs: { host: string; teleconverter: string }[];
+}
+
+function serializeFiles(files: Readonly<Record<string, unknown>>, kind: string): SerializedPrescription[] {
+  const byKey = new Map<string, SerializedPrescription>();
+  for (const [file, data] of Object.entries(files)) {
+    const key = (data as { key?: unknown } | null)?.key;
+    if (typeof key !== "string" || key === "") throw new Error(`engineDiff: ${kind} file ${file} exports no key`);
+    const earlier = byKey.get(key);
+    if (earlier) throw new Error(`engineDiff: ${kind} key "${key}" is exported by ${earlier.file} and ${file}`);
+    byKey.set(key, { key, file, prescription: encodeValue(data) });
+  }
+  /* Code-unit order: glob order follows the file system, and a locale collation would follow the machine. */
+  return [...byKey.values()].sort((a, b) => (a.key < b.key ? -1 : 1));
+}
+
+/**
+ * Every host and converter of a serialized catalog that this bundle's fit predicate allows together.
+ *
+ * The predicate is engine code, so the pair list of a catalog is one engine's answer. A driver that compares two
+ * engines asks each of them about the same prescriptions. An engine may be handed a prescription in a form it
+ * predates, and the predicate may throw on it: what an engine cannot read it does not permit, and `unbuiltPairs`
+ * says which pairs it cannot build.
+ *
+ * @param catalog - lens and teleconverter prescriptions from any ref
+ * @returns the permitted pairs in the catalog's order: by host, then by converter
+ */
+export function permittedPairs(
+  catalog: Pick<SerializedCatalog, "lenses" | "teleconverters">,
+): SerializedCatalog["pairs"] {
+  const seam = resolveSeam();
+  const pairs: SerializedCatalog["pairs"] = [];
+  for (const host of catalog.lenses) {
+    const hostData = withLensDefaults(seam, decodeValue(host.prescription) as LensData);
+    for (const converter of catalog.teleconverters) {
+      const converterData = decodeValue(converter.prescription) as TeleconverterData;
+      const fit = outcomeOf(() => seam.teleconverterCompatibility(hostData, converterData));
+      if (fit.ok && fit.value.ok) pairs.push({ host: host.key, teleconverter: converter.key });
+    }
+  }
+  return pairs;
+}
+
+/**
+ * Find the pairs, among those given, that this bundle's engine cannot compose and build.
+ *
+ * Each pair is asked for its build record, as a capture asks for it: the host takes this bundle's defaults, the
+ * composer attaches the converter, and the composed prescription is built. A driver asks both engines about the
+ * head's prescriptions, and a pair the base engine cannot build while the head engine can is an uncompared lens.
+ * The answer is the pair's own. A host that does not build alone says nothing of its pairs, which are composed
+ * from a host with defaults, and a pair that does not build says nothing of its converter's other pairs.
+ *
+ * @param catalog - lens and teleconverter prescriptions from any ref
+ * @param pairs - the pairs to try; one named twice is built once
+ * @returns what the engine said of each pair it could not build, by lens id
+ * @throws when a pair names a lens or converter the catalog does not hold
+ */
+export function unbuiltPairs(catalog: SerializedCatalog, pairs: SerializedCatalog["pairs"]): Record<string, string> {
+  const requests = new Map<string, CaptureRequest>();
+  for (const { host, teleconverter } of pairs) {
+    const lens = { key: host, teleconverter };
+    requests.set(lensId(lens), { lens, state: null, family: "build" });
+  }
+  const unbuilt: Record<string, string> = {};
+  for (const { lens, payload } of captureRecords(catalog, [...requests.values()])) {
+    if (!payload.ok) unbuilt[lens] = `${payload.error.name}: ${payload.error.message}`;
+  }
+  return unbuilt;
+}
+
+/**
+ * Export this bundle's own catalog: every lens (hidden ones included), every teleconverter, and every host and
+ * converter pair this engine permits.
+ *
+ * @returns JSON-safe prescriptions sorted by key, and pairs sorted by host then converter
+ */
+export function exportCatalog(): SerializedCatalog {
+  const files = ownCatalogFiles();
+  const lenses = serializeFiles(files.lenses, "lens");
+  const teleconverters = serializeFiles(files.teleconverters, "teleconverter");
+  return { lenses, teleconverters, pairs: permittedPairs({ lenses, teleconverters }) };
+}
+
+/**
+ * Semantic fingerprints of a serialized catalog under this bundle's engine rules.
+ *
+ * @param catalog - prescriptions from any ref
+ * @returns fingerprint per lens key and per teleconverter key
+ */
+export function fingerprintCatalog(catalog: SerializedCatalog): {
+  lenses: Record<string, string>;
+  teleconverters: Record<string, string>;
+} {
+  const seam = resolveSeam();
+  const fingerprints = (entries: readonly SerializedPrescription[], lensDefaults: object) =>
+    Object.fromEntries(
+      entries.map(({ key, prescription }) => [
+        key,
+        semanticFingerprint(decodeValue(prescription) as object, {
+          lensDefaults,
+          flatRadiusThreshold: seam.flatRadiusThreshold,
+        }),
+      ]),
+    );
+  return {
+    lenses: fingerprints(catalog.lenses, seam.lensDefaults),
+    /* A converter is composed onto a defaulted host and takes no defaults of its own. */
+    teleconverters: fingerprints(catalog.teleconverters, {}),
+  };
+}
+
+/**
+ * Reduce a serialized catalog to what `tierRequests` needs.
+ *
+ * @param catalog - prescriptions from any ref
+ * @returns each lens's zoom station count, and the pairs
+ */
+export function requestCatalog(catalog: SerializedCatalog): RequestCatalog {
+  return {
+    lenses: catalog.lenses.map(({ key, prescription }) => {
+      const zoomPositions = (prescription as { zoomPositions?: EncodedValue } | null)?.zoomPositions;
+      return { key, zoomStations: Array.isArray(zoomPositions) ? zoomPositions.length : 1 };
+    }),
+    pairs: catalog.pairs,
+  };
+}
+
+/* ── Capture ── */
+
+/** One NDJSON-able payload record: what one request family returned for one lens state, or how it failed. */
+export interface PayloadRecord {
+  /** `lensId` of the request's lens. */
+  lens: string;
+  state: CaptureState | null;
+  request: RequestFamily;
+  payload: Outcome<EncodedValue>;
+}
+
+/** The catalog merge, with this engine's defaults: what the composer and the fit predicate expect of a host. */
+function withLensDefaults(seam: EngineSeam, authored: LensData): LensData {
+  return { ...seam.lensDefaults, ...authored };
+}
+
+/**
+ * Capture payload records for a request list.
+ *
+ * Each record is computed on a lens built for that record alone, from a prescription decoded for it. The engine
+ * memoizes per lens object, and its chief-ray cache is keyed without the field geometry a caller passes, so a lens
+ * shared between records could let one record's content depend on which other records were requested, or in what
+ * order. A converter pair is composed here, by this bundle's composer on a host with this bundle's defaults.
+ *
+ * The records of a whole tier run to hundreds of megabytes, so a driver passes one lens's requests at a time and
+ * writes each batch out before asking for the next.
+ *
+ * @param catalog - serialized prescriptions; every lens and converter a request names must be in it
+ * @param requests - what to capture, in the order to return it
+ * @returns one record per request, in request order
+ * @throws when a request names a lens or converter the catalog does not hold
+ */
+export function captureRecords(catalog: SerializedCatalog, requests: readonly CaptureRequest[]): PayloadRecord[] {
+  const seam = resolveSeam();
+  const lenses = new Map(catalog.lenses.map((entry) => [entry.key, entry.prescription]));
+  const teleconverters = new Map(catalog.teleconverters.map((entry) => [entry.key, entry.prescription]));
+  /* Checked before any capture: recorded as an outcome, a missing prescription would fail alike on both engines
+   * and compare equal. */
+  const absent = requests.flatMap(({ lens }) => [
+    ...(lenses.has(lens.key) ? [] : [`lens ${lens.key}`]),
+    ...(!lens.teleconverter || teleconverters.has(lens.teleconverter) ? [] : [`teleconverter ${lens.teleconverter}`]),
+  ]);
+  if (absent.length > 0) {
+    throw new Error(`engineDiff: the supplied catalog has no ${[...new Set(absent)].join(", ")}`);
+  }
+
+  const hostOf = (lens: LensRef) => decodeValue(lenses.get(lens.key) ?? null) as LensData;
+  const converterOf = (key: string) => decodeValue(teleconverters.get(key) ?? null) as TeleconverterData;
+  /* A bare lens goes to `buildLens` as authored, so a change to how the engine applies defaults shows as drift. */
+  const buildFresh = (lens: LensRef): RuntimeLens =>
+    seam.buildLens(
+      lens.teleconverter
+        ? seam.attachTeleconverter(withLensDefaults(seam, hostOf(lens)), converterOf(lens.teleconverter))
+        : hostOf(lens),
+    );
+
+  /** The engine work of one request. A malformed request throws here, before anything is captured. */
+  const workOf = ({ lens, state, family }: CaptureRequest): (() => unknown) => {
+    if (family === "composition") {
+      const converterKey = lens.teleconverter;
+      if (!converterKey) throw new Error(`engineDiff: composition was requested of ${lens.key}, which is not a pair`);
+      return () => {
+        const host = withLensDefaults(seam, hostOf(lens));
+        const converter = converterOf(converterKey);
+        return {
+          compatibility: seam.teleconverterCompatibility(host, converter),
+          /* The composer copies most of the host and the converter through. Written by the fingerprint's rules, the
+           * copy cannot move on a spelling the fingerprint treats as the same prescription. */
+          prescription: applyAuthorityRules(seam.attachTeleconverter(host, converter), seam.flatRadiusThreshold),
+        };
+      };
+    }
+    if (family === "build") {
+      return () => projectBuildConstants(buildFresh(lens), CHROMATIC_CHANNELS, seam.flatRadiusThreshold);
+    }
+    if (!state) throw new Error(`engineDiff: ${family} was requested of ${lensId(lens)} without a lens state`);
+    const capture = STATE_FAMILIES[family];
+    return () => capture(seam, buildFresh(lens), state);
+  };
+
+  const work = requests.map(workOf);
+  return requests.map(({ lens, state, family }, index): PayloadRecord => {
+    const outcome = outcomeOf(work[index]);
+    /* Prescription data is encoded without loss. Engine results go through the result encoder, which is made per
+     * record so the trace digests of one record's jobs are computed once and then dropped. */
+    const encode = family === "composition" || family === "build" ? encodeValue : createResultEncoder();
+    return {
+      lens: lensId(lens),
+      state,
+      request: family,
+      payload: outcome.ok ? { ok: true, value: encode(outcome.value) } : outcome,
+    };
+  });
+}
+
+/* ── State families ── */
+
+type StateFamily = Exclude<RequestFamily, "composition" | "build">;
+type StateCapture = (seam: EngineSeam, lens: RuntimeLens, state: CaptureState) => unknown;
+
+/**
+ * Field geometry and aperture at a state, by the viewer's arithmetic: the slider's f-number scales the wide-open
+ * stop and entrance-pupil semi-diameters alike.
+ */
+function apertureAtState(seam: EngineSeam, lens: RuntimeLens, state: CaptureState) {
+  const { focusT, zoomT, aberrationT, stopdownT } = state;
+  const fieldGeometry = seam.computeAnalysisFieldGeometryAtState(focusT, zoomT, lens, aberrationT);
+  const wideOpenFNumber = seam.fopenAtZoom(zoomT, lens);
+  const fNumber = seam.fNumberAtStopdown(stopdownT, zoomT, lens);
+  const wideOpenStopSemiDiameterMm = seam.wideOpenStopAtZoom(zoomT, lens);
+  const wideOpenPupil = seam.entrancePupilAtState(
+    wideOpenStopSemiDiameterMm,
+    focusT,
+    zoomT,
+    lens,
+    fieldGeometry,
+    aberrationT,
+  );
+  return {
+    fieldGeometry,
+    wideOpenPupil,
+    fNumber,
+    stopSemiDiameterMm: (wideOpenStopSemiDiameterMm * wideOpenFNumber) / fNumber,
+    pupilSemiDiameterMm: (wideOpenPupil.epSD * wideOpenFNumber) / fNumber,
+  };
+}
+
+const captureLayout: StateCapture = (seam, lens, { focusT, zoomT, aberrationT }) => {
+  const prepared = seam.prepareState(lens, focusT, zoomT, aberrationT);
+  return {
+    ...seam.doLayout(focusT, zoomT, lens, aberrationT),
+    totalTrack: prepared.totalTrack,
+    imagePlane: prepared.imagePlane,
+    /* The state's own radii: the stop follows the zoom schedule here, which the build constants do not show. */
+    surfaceSemiDiameters: prepared.surfaces.map((surface) => surface.sd),
+    /* The RuntimeLens layout that the older analysis modules still call. */
+    legacy: seam.legacyDoLayout(focusT, zoomT, lens, aberrationT),
+  };
+};
+
+const captureFieldGeometry: StateCapture = (seam, lens, state) => {
+  const { focusT, zoomT, aberrationT } = state;
+  const raw = seam.computeFieldGeometryAtState(focusT, zoomT, lens, aberrationT);
+  const { fieldGeometry, wideOpenPupil, stopSemiDiameterMm, pupilSemiDiameterMm } = apertureAtState(seam, lens, state);
+  return { raw, analysis: fieldGeometry, wideOpenPupil, stopSemiDiameterMm, pupilSemiDiameterMm };
+};
+
+const captureChiefSolves: StateCapture = (seam, lens, { focusT, zoomT, aberrationT }) => {
+  const fieldGeometry = seam.computeAnalysisFieldGeometryAtState(focusT, zoomT, lens, aberrationT);
+  return {
+    halfFieldDeg: fieldGeometry.halfFieldDeg,
+    solves: CHIEF_FIELD_FRACTIONS.map((fieldFraction) => {
+      const fieldAngleDeg = fieldFraction * fieldGeometry.halfFieldDeg;
+      const solve = seam.solveChiefRay(fieldAngleDeg, focusT, zoomT, lens, fieldGeometry, aberrationT);
+      return { fieldFraction, fieldAngleDeg, ...solve };
+    }),
+  };
+};
+
+/**
+ * Where a completed ray meets the image plane, as `[x, y]` in mm.
+ *
+ * A generalized (folded) trace ends on the image plane. A sequential trace ends on the last surface's vertex plane,
+ * and the engine's callers carry it across the last gap with `skewImagePlaneIntercept`; so does this.
+ */
+function imagePoint(seam: EngineSeam, prepared: PreparedState, trace: EngineTrace): readonly number[] | null {
+  if (trace.status !== "ok") return null;
+  if (trace.reachedImagePlane) return [trace.terminalPoint[0], trace.terminalPoint[1]];
+  if (trace.diagnostics.terminationReason !== "sequential-return") return null;
+  const landing = seam.skewImagePlaneIntercept(
+    trace.x,
+    trace.y,
+    trace.ux,
+    trace.uy,
+    prepared.z[trace.returnVertexIndex],
+    prepared.imgZ,
+  );
+  return landing ? [landing.x, landing.y] : null;
+}
+
+const captureTraces: StateCapture = (seam, lens, state) => {
+  const { focusT, zoomT, aberrationT } = state;
+  const prepared = seam.prepareState(lens, focusT, zoomT, aberrationT);
+  const { fieldGeometry, stopSemiDiameterMm, pupilSemiDiameterMm } = apertureAtState(seam, lens, state);
+
+  /* The public slope tracers launch one ray lead ahead of the first vertex, in the lens frame, with these options.
+   * Launched the same way, the full-hit tracer follows the same rays bit for bit and returns their hits as well. */
+  const launchZ = prepared.z[0] - lens.rayLead;
+  const slopeRay = (x0: number, y0: number, ux: number, uy: number): EngineRay => ({
+    origin: [x0 - ux * lens.rayLead, y0 - uy * lens.rayLead, launchZ],
+    direction: [ux, uy, 1],
+  });
+  const options: EngineTraceOptions = {
+    checkSemiDiameter: true,
+    stopSemiDiameter: stopSemiDiameterMm,
+    ghost: true,
+    stopOnClip: true,
+  };
+  const trace = (ray: EngineRay, extra: Partial<EngineTraceOptions> = {}) => {
+    const result = seam.traceRay(prepared, ray, { ...options, ...extra });
+    return { ...projectTrace(result), imagePoint: imagePoint(seam, prepared, result) };
+  };
+
+  /** A fan about the chief ray solved at a fraction of the analysis half-field, offset in or across the meridian. */
+  const fanAboutChief = (fieldFraction: number, pupilFractions: readonly number[], sagittal: boolean) => {
+    const fieldAngleDeg = fieldFraction * fieldGeometry.halfFieldDeg;
+    const chief = seam.solveChiefRay(fieldAngleDeg, focusT, zoomT, lens, fieldGeometry, aberrationT);
+    const { vectorLaunch } = chief;
+    return {
+      fieldFraction,
+      fieldAngleDeg,
+      launchSurface: chief.launchSurface,
+      pupilFractions,
+      rays: pupilFractions.map((fraction) => {
+        const offsetMm = fraction * pupilSemiDiameterMm;
+        if (!vectorLaunch) {
+          return trace(
+            sagittal
+              ? slopeRay(offsetMm, chief.yLaunch, 0, chief.uField)
+              : slopeRay(0, chief.yLaunch + offsetMm, 0, chief.uField),
+          );
+        }
+        /* Fisheye and near-90° fields have no finite slope; they launch from the bounding sphere along a vector. */
+        const ray = seam.offsetVectorFieldRay(vectorLaunch, sagittal ? offsetMm : 0, sagittal ? 0 : offsetMm);
+        return trace(
+          { origin: ray.origin, direction: ray.direction },
+          { directionNormalized: false, launchBoundT: ray.launchBoundT },
+        );
+      }),
+    };
+  };
+
+  const lensFrameZ = seam.doLayout(focusT, zoomT, lens, aberrationT).z;
+  return {
+    stopSemiDiameterMm,
+    pupilSemiDiameterMm,
+    onAxis: {
+      pupilFractions: ON_AXIS_PUPIL_FRACTIONS,
+      rays: ON_AXIS_PUPIL_FRACTIONS.map((fraction) => trace(slopeRay(0, fraction * pupilSemiDiameterMm, 0, 0))),
+    },
+    offAxis: fanAboutChief(OFF_AXIS_FIELD_FRACTION, OFF_AXIS_PUPIL_FRACTIONS, false),
+    skew: fanAboutChief(SKEW_FIELD_FRACTION, SKEW_PUPIL_FRACTIONS, true),
+    chromatic: {
+      pupilFractions: CHROMATIC_PUPIL_FRACTIONS,
+      rays: Object.fromEntries(
+        CHROMATIC_CHANNELS.map((channel) => {
+          const channelOptions = {
+            indexAtSurface: seam.channelIndexResolver(prepared, channel),
+            wavelengthNm: seam.channelWavelengthNm[channel],
+          };
+          return [
+            channel,
+            CHROMATIC_PUPIL_FRACTIONS.map((fraction) =>
+              trace(slopeRay(0, fraction * pupilSemiDiameterMm, 0, 0), channelOptions),
+            ),
+          ];
+        }),
+      ),
+    },
+    /* The on-axis fan again through the RuntimeLens stack tracer, which exposes no hit records: its drawn points
+     * are the hit coordinates. Without this the older tracer would be visible only through build constants and
+     * whichever analyses still call it. */
+    legacy: {
+      pupilFractions: ON_AXIS_PUPIL_FRACTIONS,
+      rays: ON_AXIS_PUPIL_FRACTIONS.map((fraction) => {
+        const heightMm = fraction * pupilSemiDiameterMm;
+        return {
+          ...seam.legacyTraceRay(heightMm, 0, lensFrameZ, focusT, zoomT, stopSemiDiameterMm, true, lens, aberrationT),
+          /* A paraxial landing means something on a sequential refracting path only. */
+          paraxialImageHeight: lens.isFoldedOptics
+            ? undefined
+            : seam.legacyTraceToImage(heightMm, 0, focusT, zoomT, lens, aberrationT),
+        };
+      }),
+    },
+  };
+};
+
+/**
+ * Best-fit sphere, departure profile and click readout of every aspheric surface, from the prepared-state profiles
+ * and again from the surface math the overlay uses.
+ */
+function asphericComparison(seam: EngineSeam, lens: RuntimeLens) {
+  return Object.entries(lens.asphByIdx).map(([key, coefficients]) => {
+    const surfaceIndex = Number(key);
+    const { R, sd } = lens.S[surfaceIndex];
+    const bestFitRadius = seam.computeBestFitSphereR(R, coefficients, sd);
+    const legacyBestFitRadius = seam.legacyComputeBestFitSphereR(R, coefficients, sd);
+    /* The overlay reads the departure at the height of a click, against the base sphere or the best fit, whichever
+     * it is showing. The heights here are fixed fractions of the semi-diameter. */
+    const readout = (departureAt: EngineSeam["computeAsphericDeparture"], fitRadius: number) => {
+      const against = (sphereRadius: number) =>
+        ASPHERIC_READOUT_FRACTIONS.map((fraction) => {
+          const h = fraction * sd;
+          return { h, delta: departureAt(h, sphereRadius, R, coefficients) };
+        });
+      return { baseSphere: against(R), bestFitSphere: against(fitRadius) };
+    };
+    /* A flat-base asphere gets its authored radius back as the best fit, at whatever magnitude and sign the file
+     * spells flat with. The departure is computed from the number; the record says only that the fit is flat. */
+    return {
+      surfaceIndex,
+      bestFitRadius: radiusOrFlat(bestFitRadius, seam.flatRadiusThreshold),
+      departure: seam.computeDepartureProfile(bestFitRadius, R, coefficients, sd),
+      readout: readout(seam.computeAsphericDeparture, bestFitRadius),
+      legacy: {
+        bestFitRadius: radiusOrFlat(legacyBestFitRadius, seam.flatRadiusThreshold),
+        departure: seam.legacyComputeDepartureProfile(legacyBestFitRadius, R, coefficients, sd),
+        readout: readout(seam.legacyComputeAsphericDeparture, legacyBestFitRadius),
+      },
+    };
+  });
+}
+
+/**
+ * The marginal fractions the diagram's LoCA readout tries, outermost first: its own fixed ones, then the heights of
+ * the lens's drawn ray fan that an obstruction leaves open.
+ */
+function locaReadoutFractions(seam: EngineSeam, lens: RuntimeLens, pupilSemiDiameterMm: number): number[] {
+  const fractions: number[] = [...LOCA_READOUT_FRACTIONS];
+  const drawn = seam.obstructionAwareRayFractionsForDensity(lens, lens.rayFractions, "normal", pupilSemiDiameterMm);
+  for (const fraction of drawn) {
+    const height = Math.abs(fraction);
+    if (height > 1e-12 && !fractions.some((value) => Math.abs(value - height) < 1e-12)) fractions.push(height);
+  }
+  return fractions.sort((a, b) => b - a);
+}
+
+const captureAnalysis: StateCapture = (seam, lens, state) => {
+  const { focusT, zoomT, aberrationT } = state;
+  const { fieldGeometry, fNumber, stopSemiDiameterMm, pupilSemiDiameterMm } = apertureAtState(seam, lens, state);
+  const prepared = seam.prepareState(lens, focusT, zoomT, aberrationT);
+  const dynamicEFL = seam.eflAtFocus(focusT, zoomT, lens, aberrationT);
+  /* As the viewer does: surface positions are anchored to the reference state's image plane, and the requested
+   * movement is clamped to the lens's own ranges, before the lens is posed. */
+  const camera = seam.anchorLayoutToCamera(seam.doLayout(0, 0, lens), seam.doLayout(focusT, zoomT, lens, aberrationT));
+  const movement = seam.clampLensMovement(lens, { shiftMm: state.shiftMm, tiltDeg: state.tiltDeg });
+  const perspectiveTraceContext = seam.createPerspectiveTraceContext({
+    preparedState: prepared,
+    cameraZPos: camera.z,
+    movement: { shiftMm: movement.shiftMm, tiltDeg: movement.tiltDeg },
+    tiltPivot: movement.config?.tiltPivot,
+  });
+  const context = seam.createAnalysisContext({
+    preparedState: prepared,
+    dynamicEFL,
+    currentEPSD: pupilSemiDiameterMm,
+    currentPhysStopSD: stopSemiDiameterMm,
+    fieldGeometry,
+    analysisQuality: "settled",
+    perspectiveTraceContext,
+  });
+
+  /* Jobs run in this order on one context, as the drawer's sections share one. A job that throws (a centered
+   * section while the lens is moved, a perspective job on a lens with no image format) is an outcome of its own. */
+  const jobs: Record<string, Outcome<unknown>> = {};
+  for (const job of ANALYSIS_CONTEXT_JOBS) jobs[job] = outcomeOf(() => context[job]());
+  /* The single field-curvature job has no context accessor; the state registry is its only entry. */
+  jobs.computeFieldCurvature = outcomeOf(() =>
+    seam.analysisJobsForState.computeFieldCurvature(
+      prepared,
+      pupilSemiDiameterMm,
+      stopSemiDiameterMm,
+      false,
+      fieldGeometry,
+    ),
+  );
+  for (const mode of GROUP_MOVEMENT_MODES) {
+    jobs[`groupMovement.${mode}`] = outcomeOf(() => seam.computeGroupMovementProfileForState(prepared, mode));
+  }
+  jobs.cardinalElements = outcomeOf(() =>
+    seam.computeCardinalElementsAtState(lens, focusT, zoomT, camera.z, camera.imgZ, aberrationT),
+  );
+  jobs.asphericComparison = outcomeOf(() => asphericComparison(seam, lens));
+
+  /* Readouts the viewer computes beside the context, each called as the component that shows it calls it: the
+   * working f-number of the header, the chromatic tab's summary of the field-curvature bundle, and the diagram's
+   * LoCA readout with the bars of its inset. */
+  jobs.effectiveFNumber = outcomeOf(() => seam.effectiveFNumber(fNumber, focusT, zoomT, lens, aberrationT));
+  jobs.chromaticFieldFocusSummary = outcomeOf(() =>
+    seam.summarizeChromaticFieldFocus(context.computeFieldCurvatureBundle().chromaticFieldCurvature),
+  );
+  const loca = outcomeOf(() =>
+    seam.computeLongitudinalChromaticFocus(
+      lens,
+      camera.z,
+      focusT,
+      zoomT,
+      pupilSemiDiameterMm,
+      stopSemiDiameterMm,
+      aberrationT,
+      { channels: CHROMATIC_CHANNELS, longitudinalFractions: locaReadoutFractions(seam, lens, pupilSemiDiameterMm) },
+    ),
+  );
+  jobs.longitudinalChromaticFocus = loca;
+  jobs.locaBarOffsets = outcomeOf(() => {
+    const crossings = loca.ok ? loca.value?.spread.axialIntercepts : undefined;
+    if (!crossings) return null;
+    /* The inset measures from the G line's crossing, or from the middle of the crossings it has. */
+    const z = Object.values(crossings);
+    const reference = crossings.G ?? (z.length > 0 ? (Math.min(...z) + Math.max(...z)) / 2 : camera.imgZ);
+    /* The inset itself calls the older module, which is `legacy` here; the bars are drawn at the lens's own scale. */
+    const bars = [crossings, reference, LOCA_INSET_BAR_WIDTH_PX, lens.SC] as const;
+    return { ...seam.computeLocaBarOffsets(...bars), legacy: seam.legacyComputeLocaBarOffsets(...bars) };
+  });
+
+  return {
+    inputs: { dynamicEFL, fieldGeometry, stopSemiDiameterMm, pupilSemiDiameterMm, movementActive: movement.active },
+    jobs,
+  };
+};
+
+const captureMtf: StateCapture = (seam, lens, state) => {
+  const { focusT, zoomT, aberrationT } = state;
+  const { stopSemiDiameterMm, pupilSemiDiameterMm } = apertureAtState(seam, lens, state);
+  const movement = seam.clampLensMovement(lens, { shiftMm: state.shiftMm, tiltDeg: state.tiltDeg });
+  const options = {
+    ...MTF_REQUEST,
+    pupilSemiDiameterMm,
+    stopSemiDiameterMm,
+    /* MTF takes no pose. The viewer passes this flag, and a moved lens is reported unavailable instead. */
+    movementActive: movement.active,
+  };
+  return { options, result: seam.computeMtf(seam.prepareState(lens, focusT, zoomT, aberrationT), options) };
+};
+
+const STATE_FAMILIES: Record<StateFamily, StateCapture> = {
+  layout: captureLayout,
+  traces: captureTraces,
+  fieldGeometry: captureFieldGeometry,
+  chiefSolves: captureChiefSolves,
+  analysis: captureAnalysis,
+  mtf: captureMtf,
+};
