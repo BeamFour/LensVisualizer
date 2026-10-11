@@ -131,43 +131,17 @@ Serenar 50mm f/1.8 show 5.3 and 5.0 evaluations per intersection, so the pattern
 
 ## Baseline and accuracy contract
 
-- **#774 merges on its own, ahead of the program,** as soon as its CI is green on current `main`, so it does not go
-  stale against the daily lens PRs.
-- **R0** is the parent of #774's merge commit, `d49857ae`. **A0** is the Stage 1 PR's merge commit, tagged
-  `optics-rewrite/s1`; it contains #774.
+- **#774 merged on its own, ahead of the program,** as `79899f4d`.
+- **R0** is its parent, `d49857ae`. **A0** is the Stage 1 PR's merge commit, tagged `optics-rewrite/s1`; it contains
+  #774.
 - Every differential comparison and speed measurement uses A0 or a later anchor (see
   [Anchors and comparison coverage](#anchors-and-comparison-coverage)). R0 is measured once, in S1.P1.T1, only to
   size the contract's own cost.
-- #774 documents the contract in `agent_docs/architecture/optics-engine.md` (Exact Surface Trace) and
-  `agent_docs/decisions.md` (2026-10-08). Until it merges, this section owns the contract; S1.P1.T1 shrinks it to a
-  pointer.
-
-The intersection contract, from #774:
-
-1. **Residual target and iteration cap.** Every curved solve targets a raw residual of
-   `INTERSECTION_TOLERANCE = 1e-12` mm within `INTERSECTION_MAX_ITERATIONS = 72`.
-   - An explicit caller tolerance or iteration budget keeps its meaning.
-   - Running out of iterations is a failure. The old tenfold acceptance fallback does not return.
-2. **Residual definitions.**
-   - Sag profiles: `z_ray − (vertexZ + sag(r))`.
-   - Planes, including tilted ones: the signed normal distance `n · (p − p0)`, never divided by `n_z`.
-   - Analytic hits validate their residual after any bound clamping. This covers planes today, and the spheres and
-     conics added in Stage 3.
-3. **Raw target first.** The operand-based roundoff envelope (`sagResidualRoundoff`, `planeResidualRoundoff`:
-   `16·ε·max(1, Σ|operands|)`) may relax acceptance in only two cases:
-   - a Newton correction cannot change the floating-point ray parameter;
-   - a safeguarded bracket midpoint rounds onto an endpoint.
-
-   For aspheres, the envelope uses the absolute-term slope bound. A missing or non-finite bound never authorizes
-   success. Every success reports the bound it met in `effectiveTolerance`.
-4. **Cap selection.**
-   - The first root inside `r ≤ sd`, in ray order, wins over an exterior continuation root.
-   - A ray with no cap root keeps its exterior hit, so clipping still reports the first clip.
-   - The search keeps the conic-domain checks, stays forward-only, and respects the requested parametric bounds.
-   - Clear-aperture clipping keeps its own semantic tolerance, `max(1e-9, |sd|·1e-12)` mm.
-   - Slope-certificate margins are proofs, not acceptance limits, and never widen the search.
-5. **Closed form gets no exemption.** A closed-form root is accepted under the same residual definition and rule as an
-   iterative one.
+- **The intersection contract** is #774's, and its documentation owns it: `agent_docs/architecture/optics-engine.md`
+  (Exact Surface Trace) and `agent_docs/decisions.md` (2026-10-08). It covers the `1e-12` mm raw residual target and
+  the 72-iteration cap, the residual definitions, the raw-target-first roundoff envelope, and cap selection.
+- **Closed form gets no exemption.** A closed-form root, which Stage 3 adds for spheres and conics, is accepted under
+  the same residual definition and rule as an iterative one (S3.P2.T1).
 
 #774 reported these costs, which this program carries as known debt:
 
@@ -1230,7 +1204,8 @@ Each step is its own PR after S2.P5 and blocks nothing else.
   - **Change:** with one kernel left, a Newton correction of a few ulps whose residual is inside the envelope counts
     as a stall, and a fixed point the envelope rejects fails at once. `INTERSECTION_MAX_ITERATIONS` then drops to the
     smallest value the fixtures need. The acceptance bound does not change: the raw target first, then
-    `max(tolerance, envelope)` only at a stall. Contract item 3 gains the third stall case in the same PR.
+    `max(tolerance, envelope)` only at a stall. The documented contract's raw-target-first rule gains the third stall
+    case in the same PR.
   - **Tests:** the rim root in `intersectionContract.test.ts` converges without bisecting to adjacent floats; an
     unusable slope bound fails on the iteration it stalls.
   - **Gate:** C2.
