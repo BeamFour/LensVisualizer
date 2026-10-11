@@ -133,7 +133,8 @@ Serenar 50mm f/1.8 show 5.3 and 5.0 evaluations per intersection, so the pattern
 
 - **#774 merges on its own, ahead of the program,** as soon as its CI is green on current `main`, so it does not go
   stale against the daily lens PRs.
-- **R0** is the parent of #774's merge commit. **A0** is S1.P1.T1's merge commit, which contains #774.
+- **R0** is the parent of #774's merge commit, `d49857ae`. **A0** is the Stage 1 PR's merge commit, tagged
+  `optics-rewrite/s1`; it contains #774.
 - Every differential comparison and speed measurement uses A0 or a later anchor (see
   [Anchors and comparison coverage](#anchors-and-comparison-coverage)). R0 is measured once, in S1.P1.T1, only to
   size the contract's own cost.
@@ -222,6 +223,9 @@ All work merges to `main` through ordinary squash-merged PRs. This is trunk-base
     (unchanged semantic fingerprint), such as the S2.P5 conversion batches, carry no engine code.
   - Steps within a phase merge in order. Phases run in parallel only where [Stage dependencies](#stage-dependencies)
     allow.
+  - **Stage 1 is the exception.** It is one PR with one commit per step, in plan order, because every step is C0
+    tooling and the harness it adds verifies the PR itself. Each commit message starts with its step ID, and each
+    commit passes the checks on its own. Later stages stay one step per PR.
 - **Checkpoints.**
   - The PR that ends a phase or stage carries that gate's results in its description.
   - When a stage gate passes, the stage's last merge commit is tagged `optics-rewrite/s<N>`.
@@ -804,10 +808,10 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
   - **Change:** shrink [Baseline and accuracy contract](#baseline-and-accuracy-contract) to a pointer at the documented
     contract, keeping the #774 debt list and the Stage 3 requirement.
   - **Records:** the R0 and A0 benchmark medians from one machine; the PC-Nikkor 19mm medians at both.
-    - Paired mode arrives in S1.P3.T2, so this step alternates the two commits by hand (AB/BA) with
+    - They are measured with S1.P3.T2's paired mode (`--base d49857ae`) on the Stage 1 PR's final head, with
       `--iterations=15 --warmups=2`, the sample counts under [Method](#method).
     - The PC-Nikkor entry in the #774 debt list is restated from these medians.
-  - **Gate:** C0, documentation only; its merge commit is anchor A0.
+  - **Gate:** C0, documentation only.
 
 **Phase 1.2 — Differential harness**
 
@@ -850,13 +854,16 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
   - **Tests:** shard partitions are disjoint and complete.
   - **Where it runs:** GitHub Actions for every stage and pre-deletion comparison. Timing never runs there; it stays on
     the maintainer's machine (see [Method](#method)).
-  - **Gate:** C0. Run A0 against A0 to prove determinism, and record each tier's runtime in the PR.
+  - **Gate:** C0. Record each tier's runtime in the PR. Before the Stage 1 PR merges, two runs must pass:
+    - Tier P against the merge-base, through the PR's own `engine-diff` job, bit-identical;
+    - Tier S, the PR head against itself, identical. This proves determinism.
 
 **Phase 1.3 — Measurement**
 
 - **S1.P3.T1 Structural counters.**
   - **Change:** add `src/optics/diagnostics/workCounters.ts`, behind a compile-time `__OPTICS_COUNTERS__` define:
-    `false` in the app build, and `true` in the benchmark, `engineDiff` and Vitest builds.
+    `false` in the app build and in timed benchmark passes, and `true` in the benchmark's counting pass, the
+    `engineDiff` build and Vitest.
   - **What it counts:**
     - surface-profile evaluations;
     - intersections by kind;
@@ -878,9 +885,13 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
   - **Gate:** C0.
 - **S1.P3.T2 Paired benchmarks and memory.**
   - **Change:**
-    - `--base <ref>` paired mode, using a worktree as `engine-diff.mjs` does;
+    - `--base <ref>` paired mode, using a worktree as `engine-diff.mjs` does. It runs the head's benchmark entry on
+      both sides, as `engine-diff.mjs` does with its capture entry;
     - AB/BA alternation;
-    - raw samples, bootstrap confidence intervals and counters in the run JSON;
+    - raw samples and bootstrap confidence intervals in the run JSON;
+    - counters in the run JSON, from a separate untimed pass. Timed passes build with `__OPTICS_COUNTERS__` off,
+      because counter overhead would skew R0 against A0 and every later "at or below R0" check. When the base predates
+      the counters, only the head side is counted;
     - the heavy-scenario set;
     - a `--memory` scripted session (lens switches and control sweeps) that reports retained heap.
   - **Files:**
@@ -911,8 +922,9 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
   - **Tests:** today's kernel meets the contract on every fixture. Any failure is filed as a C3 finding, not hidden.
   - **Gate:** C0.
 
-**Stage 1 gate:** Tier S, A0 against A0, is identical; the benchmark baseline is recorded; the guards pass. Tag
-`optics-rewrite/s1`.
+**Stage 1 gate:** before merge, Tier P against the merge-base is bit-identical through the PR's own `engine-diff` job,
+and Tier S, the PR head against itself, is identical; the benchmark baseline is recorded; the guards pass. After merge,
+the maintainer tags the merge commit `optics-rewrite/s1`.
 
 ### Stage 2 — Canonical prescription and lens data V2
 
