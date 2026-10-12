@@ -145,11 +145,34 @@ Serenar 50mm f/1.8 show 5.3 and 5.0 evaluations per intersection, so the pattern
 
 #774 reported these costs, which this program carries as known debt:
 
-- PC-Nikkor 19mm default analysis +91.88%, cause unresolved. This was measured on linux/x64, and its follow-up pairs
-  disagreed (−5.60% isolated, +10.19% replayed); S1.P1.T1 restates it from the maintainer's machine;
+- PC-Nikkor 19mm default analysis +3.5% in the Stage 1 baseline below: 123.84 ms at R0, 128.22 ms at the Stage 1
+  head. #774 itself reported +91.88% on linux/x64, with follow-up pairs that disagreed (−5.60% isolated, +10.19%
+  replayed); the baseline does not reproduce that figure;
 - the analysis category +8.31%;
 - +0.291 Newton steps per curved hit;
 - eight accepted Mirotar success→clipped transitions.
+
+**The Stage 1 baseline** (S1.P1.T1) is the paired run of R0 against the Stage 1 PR's head `459e6d01`, on 2026-10-12.
+
+- Machine: Apple M4 Pro, 14 cores, darwin/arm64; Node v24.15.0, V8 13.6.233.17-node.48.
+- Samples: 15 after 2 warmups per case, in two processes, 8 pairs with R0's bundle loaded first and 7 with the
+  head's.
+- Between R0 and that head the engine differs by #774, by the glass catalog entries #776 and #777 added, and by the
+  three unimported modules S1.P4.T1 deleted. The PR's commits after `459e6d01` change documents and records only.
+
+| PC-Nikkor 19mm analysis | Run | R0 median (ms) | Head median (ms) | Head / R0 | 95% interval |
+| --- | --- | ---: | ---: | ---: | --- |
+| default | whole matrix | 123.84 | 128.22 | 1.035 | 1.030 to 1.054 |
+| stopped-close | whole matrix | 2167.17 | 2191.57 | 1.011 | 0.989 to 1.024 |
+| default | heavy set | 126.91 | 133.89 | 1.055 | 1.038 to 1.082 |
+| stopped-close | heavy set | 2145.59 | 2215.67 | 1.033 | 1.024 to 1.045 |
+
+- **The stored R0 median is 123.84 ms,** from the whole-matrix run, which is the command S1.P1.T1 names. With the 3%
+  tolerance of gate 3 the limit is 127.56 ms.
+- A heavy-set median is comparable only with another heavy-set run, whose cells run on the caches the cells before
+  them left (`agent_docs/benchmarks/README.md`).
+- Retained heap at the end of the memory session: 32.11 MB at R0, 32.50 MB at the head, a ratio of 1.012.
+- The three records are in `agent_docs/benchmarks/paired/`, named `2026-10-12T16-*-base-d49857ae-head-459e6d01*`.
 
 Stage 3 must bring PC-Nikkor 19mm default analysis back to at or below its stored R0 median, within the tolerance
 of [Efficiency](#efficiency-secondary) gate 3.
