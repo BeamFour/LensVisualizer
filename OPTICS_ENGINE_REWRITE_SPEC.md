@@ -465,6 +465,7 @@ These apply at every stage end, and failing one blocks the stage.
    - its median grows by more than 1 ms.
 2. **Counters never rise.** Structural counters (S1.P3.T1) never increase for an identical request.
 3. **Memory.** Retained heap after the scripted session (Node, `--expose-gc`; S1.P3.T2) stays within 5% of the anchor.
+   The session runs in a child process per side, and the gate reads the absolute retained heap.
 4. **#774 debt.** From Stage 3 on, PC-Nikkor 19mm default analysis is at or below its R0 median.
 
 ### Targets
@@ -484,12 +485,15 @@ requirement that must block is written as a test in its step, or as one of the g
 
 ### Method
 
-- Same machine and Node version on both sides, alternating AB/BA order.
+- Same machine and Node version on both sides. Paired mode loads both engines in one process and samples each case in
+  pairs, alternating which side runs first.
 - At least 2 warmups and 9 measured samples per case, or 15 samples for cases above 100 ms.
-- Raw samples are kept in the run JSON. Bootstrap uses 10,000 resamples with a fixed seed.
+- Raw samples are kept in the run JSON. The statistic for a case is median(head) / median(base). Its interval is a
+  percentile bootstrap over pair indices, with 10,000 resamples and a fixed seed.
 - Timing gates run on the maintainer's machine. CI checks counters only.
 - Results report completed work (successful, clipped and failed counts; field statuses; grid sizes; convergence), so a
-  quick rejection is never mistaken for a speedup.
+  quick rejection is never mistaken for a speedup. Paired mode compares completed work between the sides and sets a
+  case with unequal work aside from the regression verdict.
 - These never count as speedups: reducing samples, lowering grid caps, returning unsupported results fast, or changing
   a physical model.
 - A browser interaction harness (drag and settle times) is deferred: it would only report, and the Node benchmarks and
@@ -946,8 +950,14 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
     - counters in the run JSON, from a separate untimed pass. Timed passes build with `__OPTICS_COUNTERS__` off,
       because counter overhead would skew R0 against A0 and every later "at or below R0" check. When the base predates
       the counters, only the head side is counted;
-    - the heavy-scenario set;
-    - a `--memory` scripted session (lens switches and control sweeps) that reports retained heap.
+    - the heavy-scenario set, selected with `--heavy`: seven existing cells. They are PC-Nikkor 19mm at default,
+      stopped-close and interactive-drag; TS-E 50mm at stopped-close and interactive-drag; and FE 24-70mm GM II and
+      GF 20-35mm at default;
+    - a `--memory` scripted session (lens switches and control sweeps) that reports retained heap, absolute and as
+      growth;
+    - paired, subset and memory records written to `agent_docs/benchmarks/paired/`, not to `runs/`, where they would
+      skew the trend report and trigger pruning;
+    - in `scripts/benchmark-mtf.mjs`: `--iterations`, `--warmups`, every sample reported, and `--base`.
   - **Files:**
     - `scripts/benchmark-optics-rendering.mjs`
     - `src/benchmarks/opticsRenderingBenchmark.tsx`

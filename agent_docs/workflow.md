@@ -45,7 +45,7 @@ npm run audit:field-coverage        # traced analysis half-field vs format corne
 npm run audit:image-circle          # semi-diameters that cannot cover their own image circle
 npm run audit:patent-figure         # measure a patent cross-section against a lens data file
 npm run audit:surface               # aspheric domain scan + validator with trial semi-diameters
-npm run benchmark:optics-rendering  # On-demand optics/render benchmark (not part of build or test)
+npm run benchmark:optics-rendering  # On-demand optics/render benchmark; --base <ref> pairs it with a base ref (not part of build or test)
 npm run typecheck
 npm run lint
 npm run lint:fix

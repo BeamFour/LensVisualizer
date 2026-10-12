@@ -6,6 +6,7 @@ import { configDefaults, defineConfig } from "vitest/config";
 export const TOOLING_TESTS = [
   "__tests__/src/benchmarks/**/*.test.ts",
   "__tests__/scripts/auditImageCircle.test.ts",
+  "__tests__/scripts/benchmarkMtfScript.test.ts",
   "__tests__/scripts/benchmarkOpticsRenderingScript.test.ts",
   "__tests__/scripts/engineDiffScript.test.ts",
 ];

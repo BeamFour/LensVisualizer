@@ -38,7 +38,6 @@
  *     [--exceptions <file>] [--out <dir>]
  */
 
-import { execFileSync } from "node:child_process";
 import { once } from "node:events";
 import {
   appendFileSync,
@@ -60,8 +59,19 @@ import { pipeline } from "node:stream/promises";
 import { pathToFileURL } from "node:url";
 import { createGzip } from "node:zlib";
 import { build } from "vite";
+import {
+  addBaseWorktree,
+  cleanUpOnSignal,
+  git as gitIn,
+  lockfileUnchangedSince,
+  otherBaseWorktrees,
+  resolveBaseCommit,
+} from "./base-worktree.mjs";
 
 const ROOT = join(import.meta.dirname, "..");
+/* The name that prefixes this tool's messages, and the temp-directory prefix that marks its base worktrees. */
+const LABEL = "engine-diff";
+const BASE_WORKTREE_PREFIX = "engine-diff-base-";
 const HARNESS_DIR = join("src", "benchmarks", "engineDiff");
 const CAPTURE_ENTRY = join(HARNESS_DIR, "captureEntry.ts");
 
@@ -117,87 +127,28 @@ export function parseArgs(argv) {
 /* ── Git ── */
 
 function git(args) {
-  return execFileSync("git", args, { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
-}
-
-/** Resolve the base to a commit: the ref as given, then the same name on origin (a CI checkout has no local main). */
-function resolveBaseCommit(ref) {
-  for (const candidate of [ref, `origin/${ref}`]) {
-    try {
-      return git(["rev-parse", "--verify", "--quiet", "--end-of-options", `${candidate}^{commit}`]);
-    } catch {
-      /* Not a commit under this name; try the next. */
-    }
-  }
-  throw new Error(`engine-diff: cannot resolve the base ref "${ref}" (tried ${ref} and origin/${ref}).`);
-}
-
-function lockfileUnchangedSince(commit) {
-  try {
-    git(["diff", "--quiet", commit, "--", "package-lock.json"]);
-    return true;
-  } catch {
-    return false;
-  }
+  return gitIn(ROOT, args);
 }
 
 /**
- * Base worktrees of other runs that git still has registered: left behind by a run that was killed outright, or in
- * use by a run going on now. This run only reports them. Which of the two one is, only a person can tell.
- *
- * @returns {string[]} their paths
- */
-function otherBaseWorktrees() {
-  return git(["worktree", "list", "--porcelain"])
-    .split("\n")
-    .filter((line) => line.startsWith("worktree "))
-    .map((line) => line.slice("worktree ".length))
-    .filter((path) => /[\\/]engine-diff-base-[^\\/]+[\\/]tree$/.test(path));
-}
-
-/**
- * Check the base out as a detached worktree outside the repository, where no linter, test run or `git status`
- * of this checkout sees it, and put the working tree's harness in it.
+ * Put the working tree's harness in a new base worktree.
  *
  * @param {string} commit - the base commit
- * @returns {{ worktree: string, remove: () => void }} the worktree's path and its cleanup
+ * @returns {(worktree: string) => void} what `addBaseWorktree` runs on the worktree it made
  */
-function addBaseWorktree(commit) {
-  /* Resolved, because the temp directory is a symlink on macOS and git records the real path. */
-  const parent = realpathSync(mkdtempSync(join(os.tmpdir(), "engine-diff-base-")));
-  const worktree = join(parent, "tree");
-  try {
-    git(["worktree", "add", "--detach", worktree, commit]);
-  } catch (error) {
-    rmSync(parent, { recursive: true, force: true });
-    const detail = String(error?.stderr ?? error?.message ?? error).trim();
-    throw new Error(`engine-diff: git worktree add failed: ${detail}`, { cause: error });
-  }
-  const remove = () => {
-    try {
-      /* --force, because the copied harness is untracked there. Only this worktree: never prune the others. */
-      git(["worktree", "remove", "--force", worktree]);
-    } catch (error) {
-      console.error(`engine-diff: could not remove the worktree ${worktree}: ${error?.message ?? error}`);
-    }
-    rmSync(parent, { recursive: true, force: true });
-  };
-  try {
+function prepareBaseWorktree(commit) {
+  return (worktree) => {
     /* The capture graph imports no package, so the base builds without node_modules either way. They are linked
      * when the lockfile is unchanged, so that anything resolved from the base tree finds the dependencies that
      * tree was written against. */
     const nodeModules = join(ROOT, "node_modules");
-    if (existsSync(nodeModules) && lockfileUnchangedSince(commit)) {
+    if (existsSync(nodeModules) && lockfileUnchangedSince(ROOT, commit)) {
       symlinkSync(realpathSync(nodeModules), join(worktree, "node_modules"), "dir");
     }
     /* The base may predate the harness or hold an older one; both engines run the working tree's. */
     rmSync(join(worktree, HARNESS_DIR), { recursive: true, force: true });
     cpSync(join(ROOT, HARNESS_DIR), join(worktree, HARNESS_DIR), { recursive: true });
-  } catch (error) {
-    remove();
-    throw error;
-  }
-  return { worktree, remove };
+  };
 }
 
 /* ── Capture bundles ── */
@@ -295,28 +246,6 @@ function createPhaseClock() {
 
 /* ── Interruption ── */
 
-/**
- * Clean up when the process is told to stop, as a run cleans up when it ends.
- *
- * @param {() => void} cleanUp - removes what the run made outside its output directory
- * @returns {() => void} takes the handlers off again
- */
-function cleanUpOnSignal(cleanUp) {
-  const handlers = ["SIGINT", "SIGTERM"].map((signal) => {
-    const handler = () => {
-      console.error(`engine-diff: ${signal} received, removing the base worktree and temporary directories.`);
-      cleanUp();
-      /* The status a shell reports for a process a signal ended: 128 plus the signal's number. */
-      process.exit(128 + os.constants.signals[signal]);
-    };
-    process.once(signal, handler);
-    return [signal, handler];
-  });
-  return () => {
-    for (const [signal, handler] of handlers) process.removeListener(signal, handler);
-  };
-}
-
 /* A signal handler runs between turns of the event loop, and a capture is one long synchronous turn that the
  * awaits around it do not end: a write that needs no drain resolves in the same turn. The run therefore yields a
  * turn before each capture, and acts on a signal within the time one capture of a few requests takes. */
@@ -335,7 +264,7 @@ const nextTurn = () => new Promise((resolve) => setImmediate(resolve));
 export async function runEngineDiff(options, log = console.log, warn = console.error) {
   const started = performance.now();
   const clock = createPhaseClock();
-  const baseCommit = resolveBaseCommit(options.base);
+  const baseCommit = resolveBaseCommit(ROOT, options.base, LABEL);
   const headCommit = git(["rev-parse", "HEAD"]);
   const uncommittedChanges = git(["status", "--porcelain"]) !== "";
   const declaredText = options.exceptions ? readFileSync(resolve(options.exceptions), "utf8") : "";
@@ -352,7 +281,7 @@ export async function runEngineDiff(options, log = console.log, warn = console.e
     `engine-diff: ${scope}, base ${baseCommit.slice(0, 9)} (${options.base}) against the working tree at ` +
       `${headCommit.slice(0, 9)}`,
   );
-  for (const path of otherBaseWorktrees()) {
+  for (const path of otherBaseWorktrees(ROOT, BASE_WORKTREE_PREFIX)) {
     warn(
       `engine-diff: warning: the base worktree of another run is registered at ${path}. If no run is using it, ` +
         `remove it with: git worktree remove --force ${path}`,
@@ -363,13 +292,21 @@ export async function runEngineDiff(options, log = console.log, warn = console.e
     base?.remove();
     rmSync(bundlesDir, { recursive: true, force: true });
   };
-  const forgetSignals = cleanUpOnSignal(() => {
+  const forgetSignals = cleanUpOnSignal(LABEL, () => {
     cleanUp();
     /* An output directory the run made for itself holds half a run, and nothing has named it yet. */
     if (!options.out) rmSync(outDir, { recursive: true, force: true });
   });
   try {
-    base = clock.time("Base worktree", () => addBaseWorktree(baseCommit));
+    base = clock.time("Base worktree", () =>
+      addBaseWorktree({
+        root: ROOT,
+        commit: baseCommit,
+        label: LABEL,
+        prefix: BASE_WORKTREE_PREFIX,
+        prepare: prepareBaseWorktree(baseCommit),
+      }),
+    );
     log(`engine-diff: base worktree ${base.worktree}`);
     const [headCapture, baseCapture] = await clock.timeAsync("Capture bundles", async () => [
       await loadCapture(ROOT, join(bundlesDir, "head")),

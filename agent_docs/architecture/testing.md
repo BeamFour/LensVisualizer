@@ -527,3 +527,9 @@ npm run benchmark:optics-rendering
 Use `npm run benchmark:optics-rendering -- --dry-run` when changing benchmark code and you only need to validate module
 loading, schema construction, and default lens keys. Use `--report-only` after changing report formatting so the
 Markdown report is regenerated from existing run JSON without creating another benchmark record.
+
+To compare two refs, run it paired: `npm run benchmark:optics-rendering -- --base <ref>`, with `--heavy` for the
+seven-cell subset or `--memory` for the retained-heap session. A paired run of a ref against itself
+(`--base HEAD --heavy` on a clean tree) checks the harness after a change to it: no case may be flagged unequal work
+or listed as work not verified, and the two sides' counters must be equal. `agent_docs/benchmarks/README.md`
+describes the modes, the statistics, what the work comparison checks and where the records go.

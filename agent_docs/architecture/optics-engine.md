@@ -658,9 +658,16 @@ helper instead of reimplementing the criteria.
 ## Performance And Rollback
 
 Focused benchmarks live under `agent_docs/benchmarks/` and run manually with `npm run benchmark:optics-rendering`. Each
-real run writes one permanent JSON record under `agent_docs/benchmarks/runs/`, and
-`agent_docs/benchmarks/benchmark-report.md` summarizes the latest records. The benchmark covers lens building,
-current-state layout, ray tracing, generic analysis work, static SVG rendering, and aberration-panel data/rendering.
+plain run writes one JSON record under `agent_docs/benchmarks/runs/`, and `agent_docs/benchmarks/benchmark-report.md`
+summarizes the latest records. The benchmark covers lens building, current-state layout, ray tracing, generic analysis
+work, static SVG rendering, and aberration-panel data/rendering.
+
+`--base <ref>` compares the working tree with a base ref in one run: the same benchmark entry is bundled against both
+engines, every case is sampled on both in alternating order, and the record carries each case's raw samples, the ratio
+of medians with a bootstrap interval, what each side completed, and the work counters. `--heavy` runs a seven-cell
+subset and `--memory` a scripted session that reports retained heap. These records go to a `paired/` folder beside
+`runs/`, which the trend report does not read. `agent_docs/benchmarks/README.md` has the commands, the statistics and
+the output policy.
 
 The engine-migration baseline is kept in `agent_docs/records/optics-2-stage-05-performance.md`. There is no in-tree
 old-vs-new engine selector or `*Legacy.ts` fallback: performance work profiles the current `src/optics` engine
@@ -714,6 +721,11 @@ depend on which caches are warm, so compare runs that start from freshly built l
 The engine differential harness is one such reader: its capture bundles are built with the flag on, and each payload
 record carries the counters of its own capture. Rule 7 under "What a Run Compares" in
 `agent_docs/architecture/testing.md` says how a run judges them.
+
+The rendering benchmark is another. The bundles it times are built with the flag off, so counting costs a timed sample
+nothing. A paired or heavy run builds a second bundle per side with the flag on and calls every case once in it, untimed;
+each case's entry carries the counters of that one call. Its entry reaches this facade through a glob, so a base that
+predates the counters still builds, and then only the head is counted.
 
 ## Cardinal Elements
 
