@@ -12,9 +12,7 @@
 
 type EngineModule = Readonly<Record<string, unknown>>;
 
-/* One glob per module, so a candidate below can only name a module that is listed here. Three modules stay off the
- * list because nothing in the app imports them, which puts them outside the seam: `optics/index.ts`, the root
- * `optics/analysisJobs.ts` and `optics/analysis/fieldCurvature.ts`. */
+/* One glob per module, so a candidate below can only name a module that is listed here. */
 const ENGINE_MODULES = {
   aperture: import.meta.glob<EngineModule>("../../optics/aperture.ts", { eager: true }),
   apertureStop: import.meta.glob<EngineModule>("../../optics/apertureStop.ts", { eager: true }),
