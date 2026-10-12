@@ -51,7 +51,7 @@ Tags: `[policy]` how we work · `[recipe]` steps for one change type · `[archit
 
 ## Queues (open work only)
 
-- [queue] [`../OPTICS_ENGINE_REWRITE_SPEC.md`](../OPTICS_ENGINE_REWRITE_SPEC.md) — staged restructure of the optics engine and the V2 lens-data format on the `engine-next` integration branch: maintainability first, the #774 accuracy contract, merge-base differential gates, and a step-level plan
+- [queue] [`../OPTICS_ENGINE_REWRITE_SPEC.md`](../OPTICS_ENGINE_REWRITE_SPEC.md) — staged restructure of the optics engine and the V2 lens-data format, integrated on `engine-next` through Stage 5: maintainability first, the #774 accuracy contract, merge-base differential gates, and a step-level plan
 - [queue] [`../FEATURE_ADDITION_PLAN.md`](../FEATURE_ADDITION_PLAN.md) — planned features; owns the per-item template and the "already shipped" list
 - [queue] [`../EFFICIENCY_IMPROVEMENT_PLAN.md`](../EFFICIENCY_IMPROVEMENT_PLAN.md) — open cleanup and performance items with verification gates
 - [queue] [`../TRACE_MODEL_IMPROVEMENT_PLAN.md`](../TRACE_MODEL_IMPROVEMENT_PLAN.md) — trace-model status, deferred items, suggested next work
