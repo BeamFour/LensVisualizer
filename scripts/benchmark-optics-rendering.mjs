@@ -155,7 +155,9 @@ function gitValue(args) {
 }
 
 function gitInfo() {
-  const status = gitValue(["status", "--porcelain"]);
+  // A paired run leaves its record untracked under paired/, and the next run of a baseline would read that as a
+  // dirty tree, so those records are left out of the check.
+  const status = gitValue(["status", "--porcelain", "--", ".", ":(exclude)agent_docs/benchmarks/paired"]);
   const commit = gitValue(["rev-parse", "HEAD"]);
   return {
     branch: gitValue(["rev-parse", "--abbrev-ref", "HEAD"]),

@@ -85,7 +85,7 @@ jobs:
           if git diff --quiet "$base" HEAD -- \
             src/optics src/types src/utils/catalog src/utils/featureFlags.ts \
             src/lens-data ':(exclude,glob)src/lens-data/**/*.md' \
-            src/benchmarks/engineDiff scripts/engine-diff.mjs \
+            src/benchmarks/engineDiff scripts/engine-diff.mjs scripts/base-worktree.mjs \
             .github/workflows/quality.yml .github/workflows/engine-diff-stage.yml; then
             echo "run=false" >> "$GITHUB_OUTPUT"
             echo "No engine, lens-data or harness path changed; engine-diff did not run." >> "$GITHUB_STEP_SUMMARY"
