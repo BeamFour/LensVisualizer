@@ -1651,8 +1651,9 @@ gone.
     - the records under `agent_docs/benchmarks/paired/` that came from paired runs, and the paired sections of
       `agent_docs/benchmarks/README.md`.
 
-    The plain benchmark run stays as it was before the program. The heavy set and the memory session stay in their
-    single-commit form. The architecture guards and the high-precision fixtures stay.
+    The plain benchmark run stays, with its record and trend report as they were before the program and its timed
+    pass in a child process, as `scripts/benchmark-child.mjs` explains. The heavy set and the memory session stay in
+    their single-commit form. The architecture guards and the high-precision fixtures stay.
   - **Delete:** this plan and its `agent_docs/README.md` entry, as the documentation policy requires.
 
 **Stage 8 gate:** every outcome M1–M9 holds. Tag `optics-rewrite/s8`.
