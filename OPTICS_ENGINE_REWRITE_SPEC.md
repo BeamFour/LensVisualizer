@@ -3,7 +3,7 @@
 Restructure the lens optics engine and the authored lens-data format so the engine is easier to understand, change and
 verify. Adopt the tighter intersection-accuracy contract from
 [PR #774](https://github.com/ronbuening/LensVisualizer/pull/774) everywhere, and take the speed gains the restructure
-makes available. Stage 1 lands with the PR that carries this revision of the plan; Stages 2 to 8 are future work.
+makes available. Stage 1 has merged to `engine-next`; Stages 2 to 8 are future work.
 
 Priorities, in order: **maintainability**, then **accuracy** (the contract below), then **speed**. When they conflict,
 the higher priority wins and the PR description records the trade-off.
@@ -135,8 +135,8 @@ Serenar 50mm f/1.8 show 5.3 and 5.0 evaluations per intersection, so the pattern
 - **R0** is its parent, `d49857ae`. **A0** is the Stage 1 PR's merge commit on `engine-next`, tagged
   `optics-rewrite/s1`; it contains #774.
 - Every differential comparison and speed measurement uses A0 or a later anchor (see
-  [Anchors and comparison coverage](#anchors-and-comparison-coverage)). R0 is measured once, in S1.P1.T1, only to
-  size the contract's own cost.
+  [Anchors and comparison coverage](#anchors-and-comparison-coverage)), or the promotion merge commit for the
+  Stage 2 gate alone. R0 is measured once, in S1.P1.T1, only to size the contract's own cost.
 - **The intersection contract** is #774's, and its documentation owns it: `agent_docs/architecture/optics-engine.md`
   (Exact Surface Trace) and `agent_docs/decisions.md` (2026-10-08). It covers the `1e-12` mm raw residual target and
   the 72-iteration cap, the residual definitions, the raw-target-first roundoff envelope, and cap selection.
@@ -230,12 +230,16 @@ into `main` once, after the Stage 5 gate, and Stages 6 to 8 then merge to `main`
   the anchor only under the rule in [Anchors and comparison coverage](#anchors-and-comparison-coverage).
 - **Promotion.** After the Stage 5 gate, `engine-next` merges into `main` as a merge commit, never a squash, so the
   anchor tags stay reachable from `main`. The promotion PR carries:
-  - Tier F of `engine-next` against `main`, under the loosest change class merged;
+  - Tier F of `engine-next` against `main`, under the loosest change class merged. It runs on the head that is
+    promoted, after a last merge of `main` into `engine-next`. A change `main` takes after that is covered by the
+    promotion PR's own `engine-diff` job, which runs on the merge result;
   - the benchmark and memory comparison against `main`;
   - a check of the branch's preview deployment;
   - the changelog entries for what users will see.
 
-  `engine-next` is deleted once it has merged.
+  Promotion needs Phases 2.1 to 2.3 merged, so that the promoted engine reads both formats. The promotion merge
+  commit is tagged `optics-rewrite/promotion`: the Stage 2 gate compares against it. `engine-next` is deleted once it
+  has merged.
 - **One step per PR.**
   - Title: `S<stage>.P<phase>.T<step> <behavior>`.
   - The body states the change class (C0–C3), the gate tier and anchor used, payload and status counts, every
@@ -250,7 +254,9 @@ into `main` once, after the Stage 5 gate, and Stages 6 to 8 then merge to `main`
     built in that PR and withdrawn from it: Stage 1 has seven steps, and their IDs are unchanged.
 - **Checkpoints.**
   - The PR that ends a phase or stage carries that gate's results in its description.
-  - When a stage gate passes, the stage's last merge commit is tagged `optics-rewrite/s<N>`.
+  - When a stage gate passes, the commit the gate ran on is tagged `optics-rewrite/s<N>`. From Stage 2 on that is a
+    commit of the branch the program merges to, never a PR's head. Stage 1's gate ran before merge, and its merge
+    commit carries the tag.
   - No empty commits and no custom gate runner: CI on the PR's head commit is the per-step gate.
 - **Docs move with the code.** Each step rewrites, in the same PR, the architecture text it makes stale, and
   supersedes any decision it overturns. For example, S4.P2.T4 rewrites the two-tracer description in "Exact Surface
@@ -262,8 +268,9 @@ into `main` once, after the Stage 5 gate, and Stages 6 to 8 then merge to `main`
 
 ### Anchors and comparison coverage
 
-An anchor is a commit of the branch the program merges to, `engine-next` through Stage 5 and `main` after it, whose
-**engine** the stage gates compare against. Anchors track engine revisions only; lens data never moves one.
+An anchor is a commit of the branch the program merges to, `engine-next` until promotion and `main` after it, whose
+**engine** the stage gates compare against. Anchors track engine revisions only. Lens data never moves one, except
+that the catalog conversion moves it once (see "Baselines and anchor moves" below).
 
 **Semantic fingerprint.** Each prescription has a semantic fingerprint: a hash of every canonical value the engine or
 UI reads, taken after the engine's own authority rules.
@@ -314,13 +321,28 @@ readings are fixed until the canonical prescription replaces it:
 
 - Per-PR gates compare against the PR's merge-base.
 - Stage gates compare against the current anchor, catching drift that accumulates across steps that each passed
-  alone. Each quantity uses the loosest budget among the change classes merged since the anchor.
+  alone. Each quantity uses the loosest budget among the change classes merged since the anchor. The Stage 2 gate is
+  the one exception: its base is the promotion merge commit (below).
 - A data correction (a C3 on lens data) never moves the anchor. Cross-evaluation keeps comparing its new prescription
   on the anchor's engine.
 - An engine C3 moves the anchor only after a cumulative comparison against the previous anchor passes: Tier S, every
   head prescription on both engines. That comparison may show nothing outside the cumulative budgets except the
   differences declared and approved for that change. The PR records the declared differences and the result, and its
   merge commit becomes the new anchor.
+- **The catalog conversion moves the anchor once.** A base has to build the head's catalog, and no commit older than
+  V2 ingest (S2.P2.T1) reads a V2 file. Against an older anchor, every converted lens would be a declared exception
+  and a stage gate would compare no engine output.
+  - The commit of `main` on which the Stage 2 gate passes becomes the anchor and is tagged `optics-rewrite/s2`. It is
+    the commit that closes the migration (S2.P5.T9), or a later one if the gate needed a fix.
+  - The Stage 6, 7 and 8 gates compare against it, so the migration closes before the Stage 6 gate.
+  - The comparison from the anchor before it is carried in three parts: the Stage 5 gate and the promotion's Tier F,
+    both on the V1 catalog, and the Stage 2 gate, which compares the new anchor with the promotion merge commit.
+  - Budgets accumulate from the new anchor. A Stage 6 step that merges before it is judged in the Stage 2 gate under
+    its class and is part of the new anchor, so the Stage 6 gate covers only the steps after it.
+  - No engine C3 merges between promotion and the new anchor: its cumulative comparison would need the old anchor,
+    which cannot build a converted lens.
+  - The efficiency gates move with the anchor. From the Stage 6 gate on, gates 1 and 2 are judged against
+    `optics-rewrite/s2`, and each stage's report also gives the product of the paired ratios back to A0.
 
 ## Numerical contract
 
@@ -391,7 +413,7 @@ How `budgets.ts` applies the table:
 | Engine or lens-data PR: touches `src/optics/**`, `src/types/**`, `src/lens-data/**` other than `*.md`, `src/utils/catalog/**`, `src/utils/featureFlags.ts`, or the harness itself | CI job `engine-diff` (S1.P2.T2) | Tier P against the merge-base under the PR's change class, plus every changed or new lens through every Tier P request |
 | Phase end | The PR that ends the phase | Every test the phase's steps added, run together; the phase exit criteria |
 | Weekly merge of `main` into `engine-next` | The merge PR's CI, then a run of the driver | The merge PR's own `engine-diff` job under its declared class; then Tier P of `engine-next` against `main`, recorded in that PR |
-| Stage end | GitHub Actions: `engine-diff-stage.yml` by `workflow_dispatch`, sharded as a matrix (S1.P2.T3). Dispatch needs the workflow file on `main`, so a stub of it lands there before the Stage 2 gate; a run on `engine-next` then uses that branch's version. A push to `engine-diff-stage/<name>` runs Tier S of the pushed commit against itself, which is what the Stage 1 gate and a PR that changes the workflow need. Timing runs on the maintainer's machine. | Tier S against the current anchor; the full suites; build; the stage's efficiency report; then the tag |
+| Stage end | GitHub Actions: `engine-diff-stage.yml` by `workflow_dispatch`, sharded as a matrix (S1.P2.T3). Dispatch needs the workflow file on `main`, so a stub of it lands there before the first stage gate after Stage 1; a run on `engine-next` then uses that branch's version. A push to `engine-diff-stage/<name>` runs Tier S of the pushed commit against itself, which is what the Stage 1 gate and a PR that changes the workflow need. Timing runs on the maintainer's machine. | Tier S against the current anchor (the Stage 2 gate: against the promotion merge commit); the full suites; build; the stage's efficiency report; then the tag |
 | Promotion, after the Stage 5 gate | `engine-diff-stage.yml`, sharded; timing on the maintainer's machine | Tier F of `engine-next` against `main`; the benchmark and memory comparison; the preview deployment; then the merge commit |
 | Before S8.P2 deletes code | `engine-diff-stage.yml`, sharded | Tier F against the current anchor |
 
@@ -520,7 +542,8 @@ The guards:
 
 ### Gates
 
-These apply at every stage end, and failing one blocks the stage.
+These apply at every stage end, and failing one blocks the stage. The Stage 2 gate reads them against the promotion
+merge commit, not the anchor.
 
 1. **No case regresses.** A benchmark case regresses when, against the anchor, both of these hold:
    - the lower bound of the 95% bootstrap confidence interval of its paired median ratio exceeds 1.05;
@@ -549,7 +572,7 @@ counts are measured at the stage end with a throwaway instrumented build, which 
 | 6 | Median evaluations per `solveScalarRoot` call ≤ 12, against ~86 today on the same profile (40 across the Tier P capture) | It scans from the low end of each interval, not outward from the seed, then bisects up to 30 times |
 | 6 | Image-height inversion uses ≤ 6 chief solves per target, against up to 40 bisection steps today | `solveFieldAngleForImageHeightLookup2` bisects a smooth monotone function it has already tabulated |
 | 6 | Each unique sensor point is solved at most once per perspective context | Five perspective analyses solve the same sensor points independently, and vignetting does so twice |
-| 8 | PC-Nikkor 19mm stopped-close analysis ≥ 2× faster than A0 | Sensor-locked sampling was 78% of that profile |
+| 8 | PC-Nikkor 19mm stopped-close analysis ≥ 2× faster than A0, read as the product of the paired ratios back to A0 | Sensor-locked sampling was 78% of that profile |
 
 ### Method
 
@@ -893,12 +916,15 @@ flowchart LR
   S2 --> S5[S5 compiled lens + prepared geometry]
   S4 --> S5
   S5 --> S6[S6 fields + solvers]
+  S2 -. migration closes before the S6 gate .-> S6
   S6 --> S7[S7 analyses on requests]
   S7 --> S8[S8 seam, consumers, close]
 ```
 
 Stage 2 and Stages 3–4 touch disjoint modules and can run in parallel. Stage 5 needs both S2.P1 and S4; it does not
-need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
+need the S2.P5 catalog migration. Promotion needs Phases 2.1 to 2.3. Phase 2.6 needs S2.P5 and blocks nothing.
+Phase 2.5 closes, and the Stage 2 gate passes, before the Stage 6 gate: the commit that gate passes on is the anchor
+the Stage 6 gate compares against.
 
 Phases 2.1 to 2.3 run on `engine-next`. Phases 2.5 and 2.6 run on `main` after promotion, so the catalog is V1 on
 both branches for as long as there are two. Phase 2.4 is documents only: it is written on a branch of its own, off
@@ -1111,16 +1137,46 @@ the maintainer tags the merge commit `optics-rewrite/s1`.
   - **Gate:** C0.
 - **S2.P2.T2 Tooling reads both versions.**
   - **Change:** identity extraction moves from regexes to a shared AST reader, and every lens-data reader accepts V2.
+    - **The differential harness is one of those readers,** in two places in
+      `src/benchmarks/engineDiff/captureEntry.ts`. `requestCatalog` builds its request lists from V1 field names, and
+      would treat a V2 zoom as one station. The converter-pair paths (`permittedPairs`, composition and the fresh
+      build) spread V1 defaults over the authored host and hand it to the compatibility predicate, which reads
+      top-level V1 fields. On a V2 host both engines would permit no pair, which a run reports as a warning, so
+      every pair would leave the comparison without failing it.
+    - **The organizer's import rewrite** knows only `types/optics.js`. It also has to file a root-level V2 file, whose
+      types come from `src/types/lensDataV2.ts`.
+  - **Page dates do not move with the conversion.** A lens or teleconverter page's modified date (`lastModified`,
+    `lastModifiedAt` and `lastModifiedCommit` in the build metadata, the JSON-LD `dateModified` and the sitemap's
+    `lastmod`) is the date of the newest commit that touched its data file or its analysis sidecar. Converting a file
+    changes nothing a reader can see, so freshness skips the format-only conversion commits and takes the newest
+    commit before them.
+    - **Recognized by subject.** A commit whose subject begins with a conversion step's ID and a space is skipped:
+      `S2.P5.T1` to `S2.P5.T9`, and `S2.P6.T1`. A squash merge takes its subject from the PR title and appends
+      ` (#NNN)`. Every commit on such a PR's branch begins with the step ID too, so the PR's own build sees the same
+      dates.
+    - **Or by id.** A committed list of commit ids covers what a subject cannot: a batch merged under another
+      title, a revert, a rollback with `--to-version 1`, a fix-up.
+    - **Where.** The skip is applied where `scripts/build-metadata-lib.mjs` reads a file's git dates, to the modified
+      date only. `publishedOn` stays the oldest commit, and a file whose every commit is skipped keeps that commit's
+      date.
   - **Files:**
     - `scripts/lens-data-lib.mjs`
+    - `scripts/build-metadata-lib.mjs`
     - `scripts/generate-build-metadata.mjs`
     - `scripts/organize-lens-data.mjs`
     - `scripts/audit-dpgf.mjs`
     - `scripts/extract-dpgf.mjs`
     - `scripts/audit-mtf-dispersion.mjs`
     - `reports/glassScanLib.ts`
-  - **Tests:** `__tests__/scripts/`. A V2 fixture and its V1 twin produce byte-identical generated metadata and
-    summaries.
+    - `src/benchmarks/engineDiff/captureEntry.ts`
+    - `src/optics/prescription/teleconverterCompatibility.ts`
+  - **Tests:** `__tests__/scripts/`.
+    - A V2 fixture and its V1 twin produce byte-identical generated metadata and summaries.
+    - Page dates: a file whose newest commit is a conversion commit keeps the date of the commit before it; a later
+      content commit moves it; the ` (#NNN)` suffix; a step ID in mid-subject does not match; a listed id; a history
+      of conversion commits only; a teleconverter file; a newer analysis sidecar; the published-date clamp.
+    - The harness derives the same request list and the same permitted pairs from a V2 fixture set and from its V1
+      twin. The set has a three-station zoom, three focus keyframes and a host with a converter.
   - **Gate:** C0.
 
 **Phase 2.3 — Converter**
@@ -1221,14 +1277,27 @@ This phase runs on `main`, after `engine-next` has been promoted.
     - A calibration note becomes "radius derived from the design f-number".
     - A figure reading stays as text, for example "Fig. 2 draws ≈ 8.4 mm".
     - An authored value found to come from a printed table becomes a station schedule on a zoom; on a prime it follows
-      the prime rule in [Stop radius](#stop-radius).
-  - **In-flight V1 PRs:** they keep working, because V1 is still ingested. Their authors run the converter before
-    merge.
+      the prime rule in [Stop radius](#stop-radius). This one is open: see the last bullet of this step.
+  - **In-flight V1 PRs:** until S2.P5.T9 a V1 file keeps working, because V1 is still ingested, and its author runs
+    the converter before merge once the file's maker has been converted. After S2.P5.T9 the PR's checks fail until
+    the file is V2.
+    - A new V1 file is converted by `npm run organize:lens-data` after `main` is merged into the PR.
+    - A PR that edits a lens a batch has already converted takes `main`'s V2 file and applies its own edit there.
+      Converting its V1 copy instead would lose the batch's hand resolutions, the restored zeros among them, and no
+      gate would notice, because a restored zero does not change the fingerprint.
+  - **Tests that read a catalog file's authored fields** are changed in the batch that converts the file, to read the
+    V2 shape or to go through the catalog.
   - **Zero asphere terms:** the conversion report lists the zero terms it dropped, by surface. The batch PR restores, as
     an explicit `0`, any zero that the lens's audit log or analysis relies on.
-  - **Rollback:** `--to-version 1` on the batch, or a revert.
+  - **Rollback:** `--to-version 1` on the batch, or a revert, until S2.P5.T9. After it the schema test and the
+    organizer hold the catalog at V2.
+  - **Open, for the maintainer to settle before S2.P5.T1:** a flagged stop value that turns out to come from a printed
+    table "becomes a station schedule" above. That changes the stop-radius authority and so the semantic fingerprint,
+    which a C0 format-only batch cannot do. The likely rule is that the batch only reports it and a C3 data PR
+    follows.
 - **S2.P5.T9 Close the migration and convert on arrival.**
   - **Change:**
+    - first convert, under the batch gate, any V1 file that reached `main` after its maker's batch;
     - add `__tests__/src/lens-data/schemaVersion.test.ts`, which requires every catalog file to be V2;
     - the organizer converts any V1 lens or converter file it finds, as described in
       [Ingest, conversion and comments](#ingest-conversion-and-comments), and `generate-build-metadata.mjs` stops on
@@ -1239,6 +1308,7 @@ This phase runs on `main`, after `engine-next` has been promoted.
     the two docs.
   - **Tests:** `__tests__/scripts/lensDataScripts.test.ts`:
     - a V1 file at the `src/lens-data/` root is converted and filed under its maker;
+    - a V1 file already under a maker folder is converted in place;
     - a V1 file the converter refuses is left byte-identical, and the organizer exits non-zero naming the refusal;
     - a V2 catalog is left untouched;
     - the metadata generator stops on a V1 file without writing it.
@@ -1300,6 +1370,37 @@ Each step is its own PR after S2.P5 and blocks nothing else.
     catalog files drop `focalLengthMm`. `specs`, element `type`, `cemented` tags and `subtitle` stay authored: they are
     curated text, or serve a different purpose from what they resemble.
   - **Gate:** C3 on what the UI shows, with the report as evidence and a changelog entry.
+
+**Stage 2 gate:** it is taken on `main` after promotion, on the commit that closes the migration (S2.P5.T9) or a
+later one, and before the Stage 6 gate. A stage run takes a branch's head, so the gate runs through a temporary ref at
+that commit, or on a later commit of `main`. Its base is the promotion merge commit, `optics-rewrite/promotion`.
+
+- `schemaVersion.test.ts` holds, so every catalog file is V2.
+- Tier S against the promotion merge commit, under the loosest class merged between the two: C0 unless a Stage 6 step
+  has merged.
+  - That base reads both formats, so nothing is a declared exception.
+  - Every lens and pair is listed as a format-only change, except those a content PR added or changed since the
+    promotion. The gate record pairs each lens in the data-impact report with the content commit that changed it. The
+    green check alone shows neither.
+  - Every lens is a changed lens in this run, so every analysis job runs on every lens. The shard count is set from
+    one timed shard, and is more than the default 8.
+- For every lens no content commit has touched since the promotion, its entry in `lens-summaries.json` and its
+  freshness dates and commits equal the promotion merge commit's. `publicationOrder` is left out, because one new lens
+  shifts it for every older one. The gate record gives the command used.
+- The full suites and build.
+- Efficiency gates 1 and 2 against the promotion merge commit, and gate 3 read from the same paired run.
+  - The differing-prescription warnings are expected: each side bundles its own catalog, in its own format.
+  - The memory figure includes the loaded catalog, so the record gives each side's lens count and the growth figure
+    beside the absolute one.
+
+The commit the gate passes on is then tagged `optics-rewrite/s2` and becomes the anchor
+(see [Anchors and comparison coverage](#anchors-and-comparison-coverage)).
+
+- Phases 2.1 to 2.3 are covered before promotion: by their own steps, by the Stage 5 gate for those merged before it,
+  and by the promotion's Tier F.
+- Phase 2.4 merges before S2.P5.T9, which edits a recipe that Phase 2.4 rewrites.
+- Phase 2.6 is outside this gate. Its steps are gated one by one, fall under the next stage gate, and land before
+  S8.P2.T3 deletes the harness that S2.P6.T1's format-only check needs.
 
 ### Stage 3 — Geometry and intersection kernel
 
@@ -1493,8 +1594,8 @@ Each step is its own PR after S2.P5 and blocks nothing else.
 `src/optics/internal/` is gone (its last files leave in S5.P1.T1 and S5.P1.T3); the cycle guard's legacy list has
 shrunk.
 
-**Promotion:** once the Stage 5 gate has passed, `engine-next` merges into `main` under the rule in
-[Integration model](#integration-model). Stages 6 to 8, and Phases 2.5 and 2.6, follow on `main`.
+**Promotion:** once the Stage 5 gate has passed and Phases 2.1 to 2.3 have merged, `engine-next` merges into `main`
+under the rule in [Integration model](#integration-model). Stages 6 to 8, and Phases 2.4 to 2.6, follow on `main`.
 
 ### Stage 6 — Fields, chief rays and solvers
 
@@ -1634,7 +1735,8 @@ gone.
   - **Record in `agent_docs/decisions.md`:**
     - the prime stop-radius rule from [Stop radius](#stop-radius), and that dropped authored stop radii are not to
       return;
-    - that the converter and the organizer's conversion on arrival are permanent, while the app reads only V2.
+    - that the converter and the organizer's conversion on arrival are permanent, while the app reads only V2;
+    - that page freshness skips the format-only conversion commits, and how they are recognized.
   - **Regenerate:** `src/**/readme.md`.
   - **Update:** `CLAUDE.md` and `AGENTS.md` where names changed.
   - **Delete the differential harness:**
@@ -1699,7 +1801,7 @@ The maintainer settled these on 2026-10-09. Each is recorded where it applies; t
 | 13 | Single-lens corpus rules move into the validator, two of them once their exception lists are empty; rules that compare files stay tests | S2.P6.T2 |
 | 14 | The app reads only V2 after S8; the converter is permanent and runs on arrival and on demand | [Ingest, conversion and comments](#ingest-conversion-and-comments); S2.P5.T9; S8.P2.T2 |
 
-The maintainer settled these on 2026-10-11 and 2026-10-12, during Stage 1:
+The maintainer settled these on 2026-10-11 and 2026-10-12, during Stage 1 and on the day it merged:
 
 | # | Decision | Where |
 | --- | --- | --- |
@@ -1713,15 +1815,29 @@ The maintainer settled these on 2026-10-11 and 2026-10-12, during Stage 1:
 | 24 | A budget class is required only above C0, and a paired run installs a base's dependencies when its lockfile differs | [Quantity budgets](#quantity-budgets); [Method](#method) |
 | 19 | A commit that adds or changes the stage workflow gets its Tier S run through a push to `engine-diff-stage/**` | S1.P2.T3 |
 | 20 | The Planar generator is a re-derivation, and the comparator export waits for Stage 3 | S1.P4.T2; [Independent references](#independent-references) |
+| 25 | The commit that closes the catalog migration becomes the anchor for Stages 6 to 8, tagged `optics-rewrite/s2` | [Anchors and comparison coverage](#anchors-and-comparison-coverage) |
+| 26 | The conversion does not move a lens page's modified date | S2.P2.T2 |
 
 Left to evidence gathered during the program: the final barrel list (S8.P1.T1), the two focus-infinity thresholds
 (S5.P2.T2) and the items S1.P2.T2 leaves open.
 
+Open for the maintainer, none of them needed before promotion:
+
+- Whether a Stage 6 step may merge between promotion and the new anchor. The plan allows it and states what follows
+  (Anchors and comparison coverage). Holding Stage 6 until the Stage 2 gate has passed would let that gate run under
+  C0 and move the anchor on an unchanged engine.
+- A printed-table stop value in a format-only batch (S2.P5).
+- S2.P6.T5 drops `focalLengthMm` from nearly every catalog file. As written it moves nearly every page's modified
+  date, soon after the conversion was kept from doing so.
+- The Stage 2 gate's items other than the anchor move, which the maintainer has seen only in outline.
+
 ## Rollback
 
-- Every step reverts on its own, and anchors show which outputs a revert changes.
+- Every step reverts on its own, except a catalog batch after S2.P5.T9, and anchors show which outputs a revert
+  changes.
 - Until promotion, `main` runs the engine it had before the program. Not promoting `engine-next` rolls back
   everything on it.
-- Until S8.P2.T2, catalog batches also revert with `convert-lens-data --to-version 1`. After it, the app reads only
-  V2, and a revert of S8.P2.T2 restores V1 ingest.
+- Until S2.P5.T9, a catalog batch also reverts with `convert-lens-data --to-version 1`. From S2.P5.T9 the schema test
+  and the organizer hold the catalog at V2, so a batch goes back only after S2.P5.T9 is reverted. From S8.P2.T2 the
+  app reads only V2, and a revert of S8.P2.T2 restores V1 ingest.
 - There is no in-tree old engine to fall back to. A failing step is fixed or reverted, never routed around.
