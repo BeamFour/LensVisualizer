@@ -106,6 +106,30 @@ Existing tests cover:
   chief-ray, and folded-fixture values for reference designs, plus Schott datasheet anchors for N-BK7/SF6 in
   `dispersion.test.ts`. These complement the finite/unclipped catalog smoke test — if a pin moves, absolute trace or
   catalog behavior changed; investigate before re-pinning.
+- High-precision intersection fixtures (`intersectionFixtures.test.ts`): both intersection solvers are held to the
+  documented contract on sphere, conic and asphere roots computed outside the engine, for the exact float64 inputs the
+  solvers receive. `__tests__/src/optics/fixtures/generateIntersectionFixtures.ts` holds the case table and writes
+  `__tests__/src/optics/fixtures/intersectionFixtures.json` with 60 decimals, on the BigInt fixed-point arithmetic in
+  `__tests__/src/optics/fixtures/fixedPoint.ts`. After editing the table, regenerate by running the generator through
+  the import hook (`node --import ./scripts/ts-js-specifier-hook-register.mjs <generator path>`); the test fails while
+  the committed file is stale. Every float64 the generator writes comes from correctly rounded IEEE 754 operations, not
+  from `Math.hypot` or another function the language leaves to the JavaScript runtime, so the file regenerates to the
+  same bytes on any machine. A fixture the solvers fail stays in the file and is listed in the test's expected-findings
+  table, which asserts the failure until the engine change that fixes it removes the entry.
+- Planar pupil re-derivation (`planarPupilReference.test.ts`): the five Zeiss Planar build constants pinned in
+  `mirrorOptics.test.ts` (half field, tracing half field, entrance- and exit-pupil position, exit-pupil semi-diameter)
+  are held to values re-derived at 50 and 80 decimals by
+  `__tests__/src/optics/fixtures/generatePlanarPupilReference.ts`, which writes
+  `__tests__/src/optics/fixtures/planarPupilReference.json`; regenerate it through the import hook, like the
+  intersection fixtures. This is a re-derivation written after the pins were set. It is not the high-precision evidence
+  cited when they were set, which was never committed. The half-field pins are endpoints of a 40-step float64
+  bisection, so the file holds the exact angle the bisection closes on and the generator exports the exact
+  pass-or-clip decision for any field angle; the test replays the bisection on the engine's tracer and requires every
+  decision to match the exact one. The engine's float64 trace agrees with the exact clearance only to about 2e-13 mm,
+  so the test also holds every step's clearance above 1e-12 mm; when that check fails, a prescription change has put a
+  bisection step where float64 and exact arithmetic may decide differently. The generator evaluates tangents and
+  arctangents as fixed-point series, because the last bit of `Math.tan` and `Math.atan` can differ between CPU
+  architectures and the committed file must not depend on the machine that wrote it.
 - Mirror/folded optics fixtures: first-surface reflection, annular clipping/rendering, second-surface repeated hit order,
   automatic Newtonian path resolution, side/front/back image-plane termination, second-surface coating accents, folded
   analysis guardrails, off-axis chief-ray/image-plane accuracy, meridional symmetry, and analytic focal/back-focus

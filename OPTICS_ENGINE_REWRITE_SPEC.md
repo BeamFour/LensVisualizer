@@ -414,9 +414,9 @@ The old engine demonstrates compatibility, not physical correctness. These refer
 
   Each fixture is committed beside the script that generated it.
 - **Comparator report.**
-  - `scripts/export-comparator-cases.mjs` exports a fixed lens set (canonical prescriptions, launch rays and per-surface
-    hits) in the format LensVisualizerRayTraceComparator defines
-    ([issue #771](https://github.com/ronbuening/LensVisualizer/issues/771)).
+  - [LensVisualizerRayTraceComparator](https://github.com/ronbuening/LensVisualizerRayTraceComparator) defines the
+    case format (its contract v1) and exports LensVisualizer cases itself, by importing this repository's source.
+    Stage 1 therefore ships no export script. Stage 3 decides whether this repository needs one.
   - From Stage 3, each stage PR reports the comparison.
   - Like MTF chart agreement, it is a report and never a test threshold.
 - **When a reference shows the old engine was wrong.** Either fix it in a separate C3 PR with an analytic test, which
@@ -984,14 +984,19 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
       `src/optics/analysis/fieldCurvature.ts`), and repoint `agent_docs/architecture/public-functions.md`, which
       named the deleted facade.
   - **Gate:** C0.
-- **S1.P4.T2 High-precision fixtures and comparator export.**
+- **S1.P4.T2 High-precision fixtures.**
   - **Change:**
-    - add fixtures of sphere, conic and asphere roots at 50 or more digits, with their generator script, under
-      `__tests__/src/optics/fixtures/`;
-    - commit the 50/80-digit generator behind the five Planar pupil expectations #774 updated in
-      `mirrorOptics.test.ts`, whose evidence is outside the repository today;
-    - add `scripts/export-comparator-cases.mjs`.
-  - **Tests:** today's kernel meets the contract on every fixture. Any failure is filed as a C3 finding, not hidden.
+    - add fixtures of sphere, conic and asphere roots at 50 or more digits, with their generator, under
+      `__tests__/src/optics/fixtures/`. The generator is dependency-free TypeScript on BigInt fixed-point arithmetic,
+      so lint and typecheck cover it. It computes each root for the exact float64 inputs the solvers receive;
+    - commit a 50/80-digit re-derivation of the five Planar pupil expectations #774 updated in `mirrorOptics.test.ts`.
+      The original evidence is outside the repository and was not recovered, so this is a re-derivation and says so.
+  - **Tests:** today's kernel meets the contract on every fixture, in both solvers.
+    - The contract bounds the residual, not the position: `|residual| ≤ effectiveTolerance`, and the root agrees with
+      the reference to within `effectiveTolerance / |f′|` plus float64 rounding. A flat 1e-12 mm position bound would
+      fail; the worst measured point error is 1.7e-12 mm.
+    - A fixture the kernel fails stays in the set, in an expected-findings table that asserts it still fails, and is
+      filed as a C3 finding, not hidden.
   - **Gate:** C0.
 
 **Stage 1 gate:** before merge, Tier P against the merge-base is bit-identical through the PR's own `engine-diff` job,
