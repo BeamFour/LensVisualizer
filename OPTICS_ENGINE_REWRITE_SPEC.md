@@ -3,7 +3,7 @@
 Restructure the lens optics engine and the authored lens-data format so the engine is easier to understand, change and
 verify. Adopt the tighter intersection-accuracy contract from
 [PR #774](https://github.com/ronbuening/LensVisualizer/pull/774) everywhere, and take the speed gains the restructure
-makes available. This is a plan for future work; nothing below has shipped.
+makes available. Stage 1 lands with the PR that carries this revision of the plan; Stages 2 to 8 are future work.
 
 Priorities, in order: **maintainability**, then **accuracy** (the contract below), then **speed**. When they conflict,
 the higher priority wins and the PR description records the trade-off.
@@ -16,13 +16,13 @@ wherever one can be written, and by review otherwise.
 | # | Outcome | Checked by |
 | --- | --- | --- |
 | M1 | One authored lens-data format (V2), with one spec and one template. The app reads only V2. V1 files are read only by the permanent converter, which the organizer runs on any V1 file it finds and which also runs on demand. | Corpus guard: every catalog file is V2; converter and organizer suites; seam guard keeps the V1 mapping out of the app |
-| M2 | Lens data is ingested once into a canonical prescription, then compiled once into the engine's lens model. Materials are resolved once, and nothing in the engine clones lens data or points back to the UI view. | Structural counters (S1.P3.T1); architecture guards (S1.P4.T1) |
+| M2 | Lens data is ingested once into a canonical prescription, then compiled once into the engine's lens model. Materials are resolved once, and nothing in the engine clones lens data or points back to the UI view. | The compiler's own tests (S5.P1.T1); architecture guards (S1.P4.T1) |
 | M3 | One surface-geometry module and one intersection/trace stack. `src/optics/internal/` and the legacy tracers in `rayTrace.ts` are deleted. | Architecture guards |
 | M4 | No runtime import cycles inside `src/optics/`. | Import-cycle guard (S1.P4.T1) |
 | M5 | One owner for prepared geometry, with one bounded cache. Every other cache has a named owner, key and capacity. | Cache guard (S1.P4.T1) |
 | M6 | Analyses take one explicit request object. There are no `(L, zPos, focusT, zoomT, aberrationT, geometry?)` parameter lists and no `*ForState2` adapters. | Seam guard; review |
 | M7 | No `*2` names and no `compat.ts`. Code outside `src/optics/` imports only the public seam (top-level `src/optics/*.ts`). | Seam guard (S1.P4.T1) |
-| M8 | The accuracy contract holds on every intersection path. | Analytic suite; differential gates |
+| M8 | The accuracy contract holds on every intersection path. | Analytic suite and high-precision fixtures; differential gates while the program runs |
 | M9 | The architecture docs, `public-functions.md`, lens-data spec and recipes describe the new structure, and this plan is deleted. | `docDrift.test.ts`; review |
 
 Speed is a secondary goal. Its gates and targets are under [Efficiency](#efficiency-secondary).
@@ -131,52 +131,51 @@ Serenar 50mm f/1.8 show 5.3 and 5.0 evaluations per intersection, so the pattern
 
 ## Baseline and accuracy contract
 
-- **#774 merges on its own, ahead of the program,** as soon as its CI is green on current `main`, so it does not go
-  stale against the daily lens PRs.
-- **R0** is the parent of #774's merge commit. **A0** is S1.P1.T1's merge commit, which contains #774.
+- **#774 merged on its own, ahead of the program,** as `79899f4d`.
+- **R0** is its parent, `d49857ae`. **A0** is the Stage 1 PR's merge commit on `engine-next`, tagged
+  `optics-rewrite/s1`; it contains #774.
 - Every differential comparison and speed measurement uses A0 or a later anchor (see
   [Anchors and comparison coverage](#anchors-and-comparison-coverage)). R0 is measured once, in S1.P1.T1, only to
   size the contract's own cost.
-- #774 documents the contract in `agent_docs/architecture/optics-engine.md` (Exact Surface Trace) and
-  `agent_docs/decisions.md` (2026-10-08). Until it merges, this section owns the contract; S1.P1.T1 shrinks it to a
-  pointer.
-
-The intersection contract, from #774:
-
-1. **Residual target and iteration cap.** Every curved solve targets a raw residual of
-   `INTERSECTION_TOLERANCE = 1e-12` mm within `INTERSECTION_MAX_ITERATIONS = 72`.
-   - An explicit caller tolerance or iteration budget keeps its meaning.
-   - Running out of iterations is a failure. The old tenfold acceptance fallback does not return.
-2. **Residual definitions.**
-   - Sag profiles: `z_ray − (vertexZ + sag(r))`.
-   - Planes, including tilted ones: the signed normal distance `n · (p − p0)`, never divided by `n_z`.
-   - Analytic hits validate their residual after any bound clamping. This covers planes today, and the spheres and
-     conics added in Stage 3.
-3. **Raw target first.** The operand-based roundoff envelope (`sagResidualRoundoff`, `planeResidualRoundoff`:
-   `16·ε·max(1, Σ|operands|)`) may relax acceptance in only two cases:
-   - a Newton correction cannot change the floating-point ray parameter;
-   - a safeguarded bracket midpoint rounds onto an endpoint.
-
-   For aspheres, the envelope uses the absolute-term slope bound. A missing or non-finite bound never authorizes
-   success. Every success reports the bound it met in `effectiveTolerance`.
-4. **Cap selection.**
-   - The first root inside `r ≤ sd`, in ray order, wins over an exterior continuation root.
-   - A ray with no cap root keeps its exterior hit, so clipping still reports the first clip.
-   - The search keeps the conic-domain checks, stays forward-only, and respects the requested parametric bounds.
-   - Clear-aperture clipping keeps its own semantic tolerance, `max(1e-9, |sd|·1e-12)` mm.
-   - Slope-certificate margins are proofs, not acceptance limits, and never widen the search.
-5. **Closed form gets no exemption.** A closed-form root is accepted under the same residual definition and rule as an
-   iterative one.
+- **The intersection contract** is #774's, and its documentation owns it: `agent_docs/architecture/optics-engine.md`
+  (Exact Surface Trace) and `agent_docs/decisions.md` (2026-10-08). It covers the `1e-12` mm raw residual target and
+  the 72-iteration cap, the residual definitions, the raw-target-first roundoff envelope, and cap selection.
+- **Closed form gets no exemption.** A closed-form root, which Stage 3 adds for spheres and conics, is accepted under
+  the same residual definition and rule as an iterative one (S3.P2.T1).
 
 #774 reported these costs, which this program carries as known debt:
 
-- PC-Nikkor 19mm default analysis +91.88%, cause unresolved. This was measured on linux/x64, and its follow-up pairs
-  disagreed (−5.60% isolated, +10.19% replayed); S1.P1.T1 restates it from the maintainer's machine;
+- PC-Nikkor 19mm default analysis +3.5% in the Stage 1 baseline below: 123.84 ms at R0, 128.22 ms at the Stage 1
+  head. #774 itself reported +91.88% on linux/x64, with follow-up pairs that disagreed (−5.60% isolated, +10.19%
+  replayed); the baseline does not reproduce that figure;
 - the analysis category +8.31%;
 - +0.291 Newton steps per curved hit;
 - eight accepted Mirotar success→clipped transitions.
 
-Stage 3 must bring PC-Nikkor 19mm default analysis back to at or below its R0 median.
+**The Stage 1 baseline** (S1.P1.T1) is the paired run of R0 against the Stage 1 PR's head `459e6d01`, on 2026-10-12.
+
+- Machine: Apple M4 Pro, 14 cores, darwin/arm64; Node v24.15.0, V8 13.6.233.17-node.48.
+- Samples: 15 after 2 warmups per case, in two processes, 8 pairs with R0's bundle loaded first and 7 with the
+  head's.
+- Between R0 and that head the engine differs by #774, by the glass catalog entries #776 and #777 added, and by the
+  three unimported modules S1.P4.T1 deleted. The PR's commits after `459e6d01` change documents and records only.
+
+| PC-Nikkor 19mm analysis | Run | R0 median (ms) | Head median (ms) | Head / R0 | 95% interval |
+| --- | --- | ---: | ---: | ---: | --- |
+| default | whole matrix | 123.84 | 128.22 | 1.035 | 1.030 to 1.054 |
+| stopped-close | whole matrix | 2167.17 | 2191.57 | 1.011 | 0.989 to 1.024 |
+| default | heavy set | 126.91 | 133.89 | 1.055 | 1.038 to 1.082 |
+| stopped-close | heavy set | 2145.59 | 2215.67 | 1.033 | 1.024 to 1.045 |
+
+- **The stored R0 median is 123.84 ms,** from the whole-matrix run, which is the command S1.P1.T1 names. With the 3%
+  tolerance of gate 3 the limit is 127.56 ms.
+- A heavy-set median is comparable only with another heavy-set run, whose cells run on the caches the cells before
+  them left (`agent_docs/benchmarks/README.md`).
+- Retained heap at the end of the memory session: 32.11 MB at R0, 32.50 MB at the head, a ratio of 1.012.
+- The three records are in `agent_docs/benchmarks/paired/`, named `2026-10-12T16-*-base-d49857ae-head-459e6d01*`.
+
+Stage 3 must bring PC-Nikkor 19mm default analysis back to at or below its stored R0 median, within the tolerance
+of [Efficiency](#efficiency-secondary) gate 3.
 
 A review of #774 before it merged found these, which Stage 3 closes:
 
@@ -188,32 +187,55 @@ A review of #774 before it merged found these, which Stage 3 closes:
   unbounded solve fails, so a numerical failure outside the cap can hide a root inside it (S3.P2.T1).
 - **Certificate gate.** The asphere uniqueness certificate is refused when coordinate roundoff exceeds the residual
   tolerance. At 1e-12 mm that is an operand sum of 281 mm (281 m at 1e-9), and beyond it each in-cap hit pays the
-  ordered 24-sample scan: 6 → 25 profile evaluations on one measured ray. Catalog incidence is unmeasured; S1.P3.T1
-  counts it and S3.P2.T2 fixes it.
+  ordered 24-sample scan: 6 → 25 profile evaluations on one measured ray. Stage 1 counted 927 refusals in one Tier
+  P capture of 5,847 records, and S3.P2.T2 fixes it.
 - **Legacy hits beyond |R|** are floor-assisted without being roundoff-limited, up to about 1e-8 mm. They are
   exterior and always clipped, and they go when the legacy solver delegates (S3.P2.T3).
 - **`intersectRayPlane`,** which lands rays on the image and sensor planes, does not validate its residual (S3.P2.T1).
 
+The Stage 1 fixtures added one more, which Stage 3 also closes:
+
+- **Grazing chord** ([#779](https://github.com/ronbuening/LensVisualizer/issues/779)). A ray whose chord through a
+  sphere is shorter than one step of the 24-sample bracket scan is reported as a miss by both solvers. Closed-form
+  roots close it for spheres and conics (S3.P2.T1), and for the legacy solver when it delegates (S3.P2.T3). A short
+  chord on a polynomial asphere still depends on the scan, and S3.P2.T2 checks it.
+
 ## Integration model
 
-All work merges to `main` through ordinary squash-merged PRs. This is trunk-based development with
+Stages 1 to 5 merge to an integration branch, `engine-next`, through ordinary squash-merged PRs. `engine-next` merges
+into `main` once, after the Stage 5 gate, and Stages 6 to 8 then merge to `main`. On either branch this is
 [branch by abstraction](https://martinfowler.com/bliki/BranchByAbstraction.html): there is one engine at every commit.
 
 - **Replacing something too large for one step.** Put the new implementation behind the existing function, move the
   callers over in later steps, then delete the old implementation in the phase's last step.
   - There is no parallel candidate package, no engine selector and no `traceMode`.
-  - A step leaves `main` releasable. Production uses the restructured code as soon as the step merges, and each step
-    can be reverted on its own.
-- **Why not a long-lived branch.**
-  - `main` takes lens and audit PRs almost daily, and engine features every few days.
-  - An alternative-main branch would need continuous merges into a moving `src/optics/`.
-  - It would defer review to one promotion PR. The optics-2 migration ended as
-    [#518](https://github.com/ronbuening/LensVisualizer/pull/518), a 193-file PR.
-  - It would need two engines in order to compare them. Trunk development compares every PR against its true
-    merge-base instead.
-- **Other engine work during the program** lands in the one engine and passes the same gates. An intentional engine
-  behavior change moves the anchor only under the rule in
-  [Anchors and comparison coverage](#anchors-and-comparison-coverage).
+  - A step leaves its branch releasable, and each step can be reverted on its own.
+- **Why an integration branch through Stage 5.**
+  - Production stays on the engine it has until Stages 1 to 5 are verified together. No intermediate C1 or C2
+    change reaches users, and the program can be paused or dropped at no cost to `main`.
+  - `main` takes lens and audit PRs almost daily. They do not run the harness, and a harness failure cannot block
+    one.
+  - The branch's engine can be compared with `main`'s at any time, which measures drift against production itself.
+  - The branch ends at Stage 5 because Stages 1 to 5 are internal to the engine. Stages 7 and 8 rewrite the analysis
+    hooks and about a hundred importing files, which would collide with UI work on `main`.
+- **What keeps the branch from becoming one large unreviewed change.** The optics-2 migration ended as
+  [#518](https://github.com/ronbuening/LensVisualizer/pull/518), a 193-file PR.
+  - Steps stay one PR each, into `engine-next`, under the same gates.
+  - `main` is merged into `engine-next` weekly, as a merge commit, through a PR whose own `engine-diff` job checks
+    the merge. Tier P of `engine-next` against `main` is then run, and its result recorded in that PR.
+  - The catalog stays V1 on both branches until promotion: Phases 2.5 and 2.6 run on `main` afterwards. A lens
+    audit on `main` therefore never conflicts with a converted file.
+- **Every engine change goes to `engine-next`** while the branch lives, whether or not it is a step of this plan, and
+  passes the same gates as a step. `main` takes lens data, content and UI. An intentional engine behavior change moves
+  the anchor only under the rule in [Anchors and comparison coverage](#anchors-and-comparison-coverage).
+- **Promotion.** After the Stage 5 gate, `engine-next` merges into `main` as a merge commit, never a squash, so the
+  anchor tags stay reachable from `main`. The promotion PR carries:
+  - Tier F of `engine-next` against `main`, under the loosest change class merged;
+  - the benchmark and memory comparison against `main`;
+  - a check of the branch's preview deployment;
+  - the changelog entries for what users will see.
+
+  `engine-next` is deleted once it has merged.
 - **One step per PR.**
   - Title: `S<stage>.P<phase>.T<step> <behavior>`.
   - The body states the change class (C0–C3), the gate tier and anchor used, payload and status counts, every
@@ -222,6 +244,10 @@ All work merges to `main` through ordinary squash-merged PRs. This is trunk-base
     (unchanged semantic fingerprint), such as the S2.P5 conversion batches, carry no engine code.
   - Steps within a phase merge in order. Phases run in parallel only where [Stage dependencies](#stage-dependencies)
     allow.
+  - **Stage 1 is the exception.** It is one PR with one commit per step, in plan order, because every step is C0
+    tooling and the harness it adds verifies the PR itself. Each commit message starts with its step ID, and each
+    commit passes the checks on its own. Later stages stay one step per PR. S1.P3.T1, structural work counters, was
+    built in that PR and withdrawn from it: Stage 1 has seven steps, and their IDs are unchanged.
 - **Checkpoints.**
   - The PR that ends a phase or stage carries that gate's results in its description.
   - When a stage gate passes, the stage's last merge commit is tagged `optics-rewrite/s<N>`.
@@ -236,8 +262,8 @@ All work merges to `main` through ordinary squash-merged PRs. This is trunk-base
 
 ### Anchors and comparison coverage
 
-An anchor is a `main` commit whose **engine** the stage gates compare against. Anchors track engine revisions only;
-lens data never moves one.
+An anchor is a commit of the branch the program merges to, `engine-next` through Stage 5 and `main` after it, whose
+**engine** the stage gates compare against. Anchors track engine revisions only; lens data never moves one.
 
 **Semantic fingerprint.** Each prescription has a semantic fingerprint: a hash of every canonical value the engine or
 UI reads, taken after the engine's own authority rules.
@@ -250,7 +276,16 @@ UI reads, taken after the engine's own authority rules.
   engine ignores.
 
 A V1 file and its V2 conversion therefore share a fingerprint, while any change the engine or UI could observe changes
-it. Before S2.P1.T1, the fingerprint hashes the normalized authored data.
+it.
+
+Before S2.P1.T1, the fingerprint hashes the evaluated prescription after the lens defaults, under the rules above. Three
+readings are fixed until the canonical prescription replaces it:
+
+- An asphere entry whose terms are all zero still counts as present, because the engine builds an aspheric profile for
+  it.
+- `zoomLabels`, `apertureBlades` and `apertureBladeRoundedness` are hashed: conversion preserves them.
+- A default the engine applies inline (`apd: false`, `indexReference: "d"`, an empty `asph`) is not yet equated with
+  its omission, so writing one out counts as a semantic change.
 
 **What a differential run compares.** Nothing is skipped silently.
 
@@ -260,11 +295,20 @@ it. Before S2.P1.T1, the fingerprint hashes the normalized authored data.
    base and head prescriptions are evaluated on the head engine and must be bit-identical.
 3. **Semantic data changes.** For each lens whose fingerprint changed, and each new lens, the run reports the impact:
    base data against head data, both on the head engine.
-   - These block the PR: a new failed status, a non-finite value, or a lens that no longer builds.
-   - Everything else in the impact report is reviewed rather than gated.
+   - These block the PR: a new failed status, a non-finite value, or a lens that no longer builds. A new lens, or a
+     converter pair the base data did not permit, has nothing to compare against and blocks only by not building.
+   - Everything else in the impact report is reviewed rather than gated. That includes a changed host or converter
+     that loses every pair it had, which the report puts first.
 4. **Exceptions.** Some prescriptions cannot be evaluated by the base engine, for example a V2 file before V2 ingest
-   (S2.P2.T1) exists in the base. The PR lists each such lens in an "engine-diff exceptions" section of its
-   description. The run fails when the lenses it could not compare differ from that list in either direction.
+   (S2.P2.T1) exists in the base. The PR lists each such lens under a `## Engine-diff exceptions` heading in its
+   description, one backticked lens id per bullet, and the CI job passes the description to `--exceptions`. A stage
+   run takes the same ids through the workflow's `exceptions` input. The run fails when the lenses it could not
+   compare differ from that list in either direction.
+5. **No silent pass.**
+   - A record that fails to capture on both engines fails the run. A job that throws inside an analysis record is a
+     discrete outcome, compared like any other.
+   - The permitted converter pairs are computed on both engines from the head prescriptions, and a difference fails
+     the run.
 
 **Baselines and anchor moves.**
 
@@ -292,15 +336,18 @@ Every PR declares exactly one change class:
 | **C2** algorithm replacement | A different solver or search with the same or a tighter convergence criterion | Every sample meets its criterion; differences within the C2 budgets; an independent reference shows the error is no worse; discrete transitions explained individually |
 | **C3** intentional behavior change | A bug fix, a data correction or a new capability | Maintainer approval; independent evidence (analytic case, comparator or source); for an engine change, the cumulative comparison before the anchor moves; a changelog entry if users can see it |
 
-- **Default class and labels.** The default class is C0. The CI job reads the class from a PR label, and only the
-  maintainer applies a label above C0.
+- **Default class and labels.** The default class is C0. The CI job reads the class from a PR label
+  (`engine-diff:c1`, `engine-diff:c2` or `engine-diff:c3`; no label means C0) when it runs, so re-running the job
+  picks up a changed label. Only the maintainer applies a label above C0.
 - **Golden values.** Golden and analytic test tolerances are ceilings. Only a C3 PR may change a golden value or loosen
   a tolerance, and it must say why.
 
 ### Quantity budgets
 
-These values are proposed. S1.P2.T2 confirms them against the payload differences that a known C1 perturbation
-produces (reassociating one sum in sag evaluation). Loosening a budget later is itself a C3 change.
+S1.P2.T2 confirmed these values against the payload differences a known C1 perturbation produces: reordering the even
+asphere terms in sag evaluation. Over the whole of Tier P the largest difference in any class was 6.8 times inside its
+budget. That perturbation moves aspheric surfaces only, so layout sums, refractive indices and the first-order ratios
+are unmeasured. Loosening a budget later is itself a C3 change.
 
 | Quantity | C1 budget | C2 budget |
 | --- | --- | --- |
@@ -315,6 +362,25 @@ produces (reassociating one sum in sag evaluation). Loosening a budget later is 
 | MTF modulation | 1e-7 | As above, and never looser than 1e-4 |
 | Statuses, counts, sample positions and order, labels, warnings | exact | exact unless listed one by one |
 
+How `budgets.ts` applies the table:
+
+- **Clipped or not.** A hit takes the unclipped or the clipped budget by its own flags. A flag that differs between the
+  two sides is a discrete transition.
+- **Relative budgets** bound `|a − b|` by the budget times the larger magnitude. Lengths also have an absolute floor of
+  1e-12 mm, so a length at zero has a bound. Ratios such as f-numbers and the Petzval sum have no floor.
+- **Fields the table does not name.** Layout lengths, refractive indices and prescription values the engine hands back
+  take the first-order budget. Slopes are compared as direction cosines. `effectiveTolerance`, count ratios and binned
+  statistics are exact.
+- **Residuals are contract checks,** not differences. A hit's residual is held to the `effectiveTolerance` beside it,
+  and a solver's residual to that solver's own tolerance where the solve converged on both sides.
+- **Step-function outputs.** The result of a bisection or an optimizer takes the same budget as any other field of its
+  kind. When it fails, the report names the solver and gives the difference in solver quanta, so a boundary transition
+  can be told from drift.
+- **Iteration and evaluation counts** are exact under C0, and above it are reported as a histogram of changes.
+- **Non-finite values** compare exactly in every class.
+- **A class is required only above C0.** Under C0 every number is compared bit for bit, classed or not. Under C1 or
+  C2, a number that moves and has no class fails the run and names its path.
+
 ## Verification
 
 ### Gates by level
@@ -322,9 +388,11 @@ produces (reassociating one sum in sag evaluation). Loosening a budget later is 
 | Level | Where | Required |
 | --- | --- | --- |
 | Every PR | CI (`.github/workflows/quality.yml`) | lint, format, typecheck, `npm run test`, the tooling suite, build and `seo:audit` (all existing) |
-| Engine or lens-data PR: touches `src/optics/**`, `src/types/**`, `src/lens-data/**` or `src/utils/catalog/**` | CI job `engine-diff` (S1.P2.T2) | Tier P against the merge-base under the PR's change class, plus every changed or new lens through every Tier P request |
+| Engine or lens-data PR: touches `src/optics/**`, `src/types/**`, `src/lens-data/**` other than `*.md`, `src/utils/catalog/**`, `src/utils/featureFlags.ts`, or the harness itself | CI job `engine-diff` (S1.P2.T2) | Tier P against the merge-base under the PR's change class, plus every changed or new lens through every Tier P request |
 | Phase end | The PR that ends the phase | Every test the phase's steps added, run together; the phase exit criteria |
-| Stage end | GitHub Actions: `engine-diff-stage.yml` by `workflow_dispatch`, sharded as a matrix (S1.P2.T3). Timing runs on the maintainer's machine. | Tier S against the current anchor; the full suites; build; the stage's efficiency report; then the tag |
+| Weekly merge of `main` into `engine-next` | The merge PR's CI, then a run of the driver | The merge PR's own `engine-diff` job under its declared class; then Tier P of `engine-next` against `main`, recorded in that PR |
+| Stage end | GitHub Actions: `engine-diff-stage.yml` by `workflow_dispatch`, sharded as a matrix (S1.P2.T3). Dispatch needs the workflow file on `main`, so a stub of it lands there before the Stage 2 gate; a run on `engine-next` then uses that branch's version. A push to `engine-diff-stage/<name>` runs Tier S of the pushed commit against itself, which is what the Stage 1 gate and a PR that changes the workflow need. Timing runs on the maintainer's machine. | Tier S against the current anchor; the full suites; build; the stage's efficiency report; then the tag |
+| Promotion, after the Stage 5 gate | `engine-diff-stage.yml`, sharded; timing on the maintainer's machine | Tier F of `engine-next` against `main`; the benchmark and memory comparison; the preview deployment; then the merge commit |
 | Before S8.P2 deletes code | `engine-diff-stage.yml`, sharded | Tier F against the current anchor |
 
 ### Differential harness
@@ -332,17 +400,20 @@ produces (reassociating one sum in sag evaluation). Loosening a budget later is 
 The harness lives in `src/benchmarks/engineDiff/` and is driven by `scripts/engine-diff.mjs`. Nothing it produces is
 committed. Its own tests (fixtures, budget table and deliberate-drift detection) run in the tooling suite.
 
+It is program tooling. It exists to prove each step of this plan, and S8.P2.T3 deletes it once the final verification
+has passed: after the program, engine changes are not compared between two commits.
+
 | File | Role |
 | --- | --- |
-| `captureEntry.ts` | Vite SSR entry, built like the rendering benchmark. It calls only the public seam, and evaluates prescriptions supplied as serialized input rather than reading its own catalog. |
-| `seamAdapter.ts` | Detects renamed exports so the same entry runs at both refs. A PR that changes the seam updates this adapter in the same PR. |
+| `captureEntry.ts` | Vite SSR entry, built like the rendering benchmark. It reaches the engine only through `seamAdapter.ts`, and evaluates prescriptions supplied as serialized input rather than reading its own catalog. It also exports its own catalog as serialized prescriptions, for the driver. |
+| `seamAdapter.ts` | Resolves each engine capability from a list of candidate modules and exports, so the same entry runs at both refs when an export is renamed or a module is missing. Today full hit records come only through `compat.ts`, and perspective jobs through `perspective/index.ts`; both are seam-guard legacy entries. A PR that changes the seam updates this adapter in the same PR. |
 | `requests.ts` | Defines the tiers as deterministic lens × state × request lists. |
-| `payload.ts` | Normalizes payloads: numbers unrounded, arrays in authored order, statuses, counts and labels as discrete fields. It also computes each prescription's semantic fingerprint. |
+| `payload.ts` | Normalizes payloads: numbers unrounded, in a tagged encoding that keeps `-0`, `NaN` and the infinities; an `undefined` member treated as absent; arrays in authored order; statuses, counts and labels as discrete fields. A per-ray trace nested inside an analysis result is reduced to its status, hit count and a digest: exact under C0, reported but not budgeted above it. It also computes each prescription's semantic fingerprint. |
 | `budgets.ts` | Holds the quantity table above, keyed by payload path. |
 | `compare.ts` | Reports violations, discrete transitions and the largest difference per quantity. |
 
-`scripts/engine-diff.mjs --base <ref> --tier p|s|f --class c0|c1|c2|c3 [--shard i/n] [--lens <key>]
-[--exceptions <file>]` runs in six steps:
+`scripts/engine-diff.mjs --base <ref> [--tier p|s|f] [--class c0|c1|c2|c3] [--shard i/n] [--lens <id>]
+[--exceptions <file>] [--out <dir>]` runs in six steps, by default Tier P under C0:
 
 1. Add a git worktree at the base ref, symlinking `node_modules` when `package-lock.json` is unchanged.
 2. Copy the head's `engineDiff/` into the worktree.
@@ -350,8 +421,12 @@ committed. Its own tests (fixtures, budget table and deliberate-drift detection)
    fingerprints.
 4. Build both captures and run the comparisons in
    [Anchors and comparison coverage](#anchors-and-comparison-coverage).
-5. Write NDJSON payloads, the data-impact report and the list of uncompared lenses to a temporary directory.
+5. Write NDJSON payloads, the data-impact report and the list of uncompared lenses to `--out`, or to a temporary
+   directory. The small reports sit in a `reports/` folder of their own, which CI uploads.
 6. Exit non-zero on any violation, or when the uncompared lenses differ from the declared exceptions.
+
+Both captures are built with the head's Vite and no config file, and the capture bundle imports no package, so the
+base worktree needs nothing installed.
 
 ### Corpus tiers
 
@@ -363,11 +438,24 @@ shrinks by documented stratification; its assertions never do.
 
 | Tier | Lenses | States | Requests |
 | --- | --- | --- | --- |
-| **P** | All 907, visible and hidden | First and last zoom station, infinity focus, wide open | Build constants; layout; meridional fans on- and off-axis, a skew fan and a chromatic fan, each with terminal points and full hits; field geometry; chief solves at fields 0, 0.5 and 1 |
-| | The 15 benchmark lenses plus 10 feature representatives: fisheye; folded auto and explicit-order paths; diffractive; bulk absorption; rear plates; a converter pair; PC shift + tilt; finite conjugate; fixed-iris zoom; aberration control | Their reference state | Every analysis job, perspective jobs included; geometric MTF at a 32-cell grid |
-| **S** | All | Every authored zoom × focus station (about 3,400 states) × {wide open, one stop-down ratio}; aberration endpoints and center for every `aberrationControl` lens; every permitted converter pair at every host station | Everything in Tier P's first row |
-| | A stratified set of about 60 lenses: every projection kind, every folded fixture, every PC lens, every diffractive and absorbing lens, every rear-plate maker, every converter pair, the 10 heaviest benchmark lenses and 10 drawn by a fixed seed | Their authored stations | Every analysis job; MTF at both methods and three spectra on the MTF benchmark cases |
-| **F** | All | Every authored station × {wide open, stopped down} | Every analysis job |
+| **P** | Every catalog lens, visible and hidden | First and last zoom station, infinity focus, wide open | Build constants; layout; meridional fans on- and off-axis, a skew fan and a chromatic fan, each with terminal points and full hits, and one on-axis fan through the legacy tracer; field geometry; chief solves at 0, 0.5 and 1 of the analysis half-field |
+| | The 15 benchmark lenses plus one representative of each feature: fisheye; folded auto and explicit-order paths; diffractive; bulk absorption; rear plates; a converter pair; PC shift + tilt; finite conjugate; fixed-iris zoom; aberration control. Also every lens whose data changed, and every pair of a changed host or converter | The default state, plus one feature state where the default leaves the feature idle: the moved pose, the finite conjugate, the aberration ring at its end | Every analysis job, perspective jobs included; geometric MTF at a 32-cell grid |
+| **S** | All, and every permitted converter pair | Every authored zoom × focus station (about 3,400 states) × {wide open, one stop-down ratio}; for an `aberrationControl` lens also the ring's other positions, both ends of a centered ring or the far end of a two-position one; a pair at every station of its host | Everything in Tier P's first row |
+| | A stratified set of about 100 lenses: every Tier P analysis lens, one lens per projection kind, every folded lens, every PC lens, every diffractive and absorbing lens, one lens per rear-plate maker, every converter pair, and 10 drawn by a fixed seed | Their authored stations, wide open; a PC lens also in the moved pose | Every analysis job; MTF at both methods and three spectra on the MTF benchmark lenses |
+| **F** | All, and every permitted converter pair | Every authored station × {wide open, stopped down}; a PC lens also in the moved pose | Everything in Tier S, with every analysis job on every lens and pair |
+
+- **Each tier holds the one before it.** Every Tier P request is a Tier S request, and every Tier S request a Tier F
+  request; a test holds both.
+- **Shards** split a tier by lens, never inside one. The stage workflow defaults to 8 shards for Tier S and 32 for
+  Tier F.
+- **Every analysis job** means the analysis-context accessors, centered and perspective; field curvature; the three
+  group-movement modes; cardinal elements; aspheric comparison; and the readouts the analysis tabs compute outside the
+  context: the chromatic field-focus summary, longitudinal chromatic focus, LoCA bar offsets, aspheric departure and
+  the effective f-number. A job that throws is recorded as a discrete outcome.
+- **A converter pair** is serialized as its host and its converter. Each engine composes them itself, so composition
+  drift is visible, and the composed prescription is a payload of its own.
+- **Outside the harness:** diagram geometry (`src/optics/diagram/`), the lens-movement transform and the perspective
+  diagram fan. Their unit suites cover them.
 
 ### Independent references
 
@@ -381,9 +469,9 @@ The old engine demonstrates compatibility, not physical correctness. These refer
 
   Each fixture is committed beside the script that generated it.
 - **Comparator report.**
-  - `scripts/export-comparator-cases.mjs` exports a fixed lens set (canonical prescriptions, launch rays and per-surface
-    hits) in the format LensVisualizerRayTraceComparator defines
-    ([issue #771](https://github.com/ronbuening/LensVisualizer/issues/771)).
+  - [LensVisualizerRayTraceComparator](https://github.com/ronbuening/LensVisualizerRayTraceComparator) defines the
+    case format (its contract v1) and exports LensVisualizer cases itself, by importing this repository's source.
+    Stage 1 therefore ships no export script. Stage 3 decides whether this repository needs one.
   - From Stage 3, each stage PR reports the comparison.
   - Like MTF chart agreement, it is a report and never a test threshold.
 - **When a reference shows the old engine was wrong.** Either fix it in a separate C3 PR with an analytic test, which
@@ -396,30 +484,37 @@ The old engine demonstrates compatibility, not physical correctness. These refer
 each with up to two lists:
 
 - **Legacy exceptions** are today's violations. This list is a one-way ratchet: an entry can only be removed, and the
-  test fails when a listed entry no longer violates, so the list cannot go stale. It is empty by S8.
+  test fails when a listed entry no longer violates, so the list cannot go stale. Moving an entry to the registry
+  counts as a removal. It is empty by S8.
 - **The approved registry** holds modules that meet the rule by design. A reviewed PR may add an entry only if it meets
   that guard's admission rule. New barrels and relocated caches enter here, never through the legacy list.
 
 The guards:
 
 - **Import cycles.**
-  - The test builds the runtime import graph of `src/optics/`, excluding `import type`, and computes strongly
-    connected components.
+  - The test builds the runtime import graph of `src/optics/` and computes strongly connected components. An edge is
+    an import, re-export or `import()` that carries at least one value; type-only forms add none.
   - Legacy exceptions start as today's 13 cycle modules.
   - There is no registry: no cycle is ever approved.
 - **Seam.**
-  - Imports into `src/optics/` from anywhere else must target a registered or legacy-listed module.
-  - Registry admission: a top-level `src/optics/*.ts` file reviewed as a barrel or thin facade. Alias barrels due for
-    deletion in S8 leave the registry when they are deleted.
+  - Imports into `src/optics/` from the rest of `src/`, from `scripts/` and from `reports/` must target a registered
+    or legacy-listed module. Type-only imports count, and so do the path strings that scripts load.
+  - Tests are not importers: they follow the internals they test. Targets under `src/optics/mount/` are out of scope.
+  - Registry admission, which the test checks: a top-level `src/optics/*.ts` file that holds only imports, re-exports,
+    type declarations and aliases of imported bindings. Alias barrels due for deletion in S8 leave the registry when
+    they are deleted.
   - Legacy exceptions are today's outside-imported modules that fail admission: deep modules and top-level
     implementation files.
   - `prescription/teleconverterCompatibility.ts` is a permanent registry entry, because plain-Node build metadata
     imports it directly.
 - **Caches.**
-  - Every module-level `Map`, `WeakMap` or `Set` in `src/optics/` must be registered or legacy-listed.
-  - Legacy exceptions are today's unbounded caches.
-  - Registry admission: a record of owner, key and capacity, and either a bounded capacity or a `WeakMap` keyed by its
-    owner object.
+  - Every module-level `Map`, `WeakMap`, `Set` or `WeakSet` in `src/optics/` must be registered or legacy-listed,
+    `mount/` and the glass data included.
+  - Legacy exceptions are today's unbounded caches: the one unbounded `Map`, and each owner-keyed `WeakMap` whose
+    per-owner store has no cap.
+  - Registry admission, one of three kinds: a constant lookup table its module never writes; a bounded cache with a
+    record of owner, key and capacity; or a `WeakMap` keyed by its owner whose per-owner value cannot grow without
+    bound.
 
 ## Efficiency (secondary)
 
@@ -430,37 +525,50 @@ These apply at every stage end, and failing one blocks the stage.
 1. **No case regresses.** A benchmark case regresses when, against the anchor, both of these hold:
    - the lower bound of the 95% bootstrap confidence interval of its paired median ratio exceeds 1.05;
    - its median grows by more than 1 ms.
-2. **Counters never rise.** Structural counters (S1.P3.T1) never increase for an identical request.
-3. **Memory.** Retained heap after the scripted session (Node, `--expose-gc`; S1.P3.T2) stays within 5% of the anchor.
-4. **#774 debt.** From Stage 3 on, PC-Nikkor 19mm default analysis is at or below its R0 median.
+2. **Memory.** Retained heap after the scripted session (Node, `--expose-gc`; S1.P3.T2) stays within 5% of the anchor.
+   The session runs in a child process per side, and the gate reads the absolute retained heap.
+3. **#774 debt.** From Stage 3 on, PC-Nikkor 19mm default analysis is at or below its stored R0 median, within a
+   tolerance of 3%.
+   - The R0 median is the one the Stage 1 baseline recorded, with its machine, Node version and sample counts. R0 is
+     not measured again: later stages delete names the benchmark entry needs to build against it.
+   - The head's median comes from a paired run against the current anchor, on the same machine.
+   - The tolerance covers the method's own offset. Two copies of one engine, compared at 15 samples, differed by up
+     to 2.7% on a case of 20 ms or more.
 
 ### Targets
 
 Targets are reported at stage ends and never block. A miss becomes an item in `EFFICIENCY_IMPROVEMENT_PLAN.md`. Any
-requirement that must block is written as a test in its step, or as one of the gates above.
+requirement that must block is written as a test in its step, or as one of the gates above. The targets that are
+counts are measured at the stage end with a throwaway instrumented build, which is not committed.
 
 | Stage | Target | Basis |
 | --- | --- | --- |
 | 3 | Mean surface-profile evaluations per sphere or conic intersection, closed-form and fallback combined, close to 2 (5.0–7.8 today); the fallback rate is reported with its reasons | Sag and slope evaluation took 32–42% of self time. The per-success limit is a test in S3.P2.T1, not a target. |
 | 3 | Analysis category median ≥ 25% lower than A0 across the benchmark matrix | Same profiles |
-| 6 | Median stop traces per centered chief solve ≤ 8, against ~64 today | `computeChiefRaySolve2` scans up to 96 samples per expansion, then bisects to a 1e-7 mm stop residual, on a function that is nearly linear in launch height |
-| 6 | Median evaluations per `solveScalarRoot` call ≤ 12, against ~86 today | It scans from the low end of each interval, not outward from the seed, then bisects up to 30 times |
+| 6 | Median stop traces per centered chief solve ≤ 8, against ~64 today on the PC-Nikkor 19mm profile (27 across the Tier P capture) | `computeChiefRaySolve2` scans up to 96 samples per expansion, then bisects to a 1e-7 mm stop residual, on a function that is nearly linear in launch height |
+| 6 | Median evaluations per `solveScalarRoot` call ≤ 12, against ~86 today on the same profile (40 across the Tier P capture) | It scans from the low end of each interval, not outward from the seed, then bisects up to 30 times |
 | 6 | Image-height inversion uses ≤ 6 chief solves per target, against up to 40 bisection steps today | `solveFieldAngleForImageHeightLookup2` bisects a smooth monotone function it has already tabulated |
 | 6 | Each unique sensor point is solved at most once per perspective context | Five perspective analyses solve the same sensor points independently, and vignetting does so twice |
 | 8 | PC-Nikkor 19mm stopped-close analysis ≥ 2× faster than A0 | Sensor-locked sampling was 78% of that profile |
 
 ### Method
 
-- Same machine and Node version on both sides, alternating AB/BA order.
+- Same machine and Node version on both sides. Paired mode times in two child processes. Each holds both engines and
+  samples every case in pairs, alternating which side runs first; the two processes load the engines in opposite
+  orders, and their pairs are pooled.
 - At least 2 warmups and 9 measured samples per case, or 15 samples for cases above 100 ms.
-- Raw samples are kept in the run JSON. Bootstrap uses 10,000 resamples with a fixed seed.
-- Timing gates run on the maintainer's machine. CI checks counters only.
+- Raw samples are kept in the run JSON. The statistic for a case is median(head) / median(base). Its interval is a
+  percentile bootstrap over pair indices, with 10,000 resamples and a fixed seed.
+- Timing gates run on the maintainer's machine, never in CI.
+- A base whose `package-lock.json` differs from the head's gets its own installed dependencies, so a dependency bump
+  does not end comparisons against an older anchor.
 - Results report completed work (successful, clipped and failed counts; field statuses; grid sizes; convergence), so a
-  quick rejection is never mistaken for a speedup.
+  quick rejection is never mistaken for a speedup. Paired mode compares completed work between the sides and sets a
+  case with unequal work aside from the regression verdict.
 - These never count as speedups: reducing samples, lowering grid caps, returning unsupported results fast, or changing
   a physical model.
-- A browser interaction harness (drag and settle times) is deferred: it would only report, and the Node benchmarks and
-  counters cover every gate. Add it if interactive feel regresses.
+- A browser interaction harness (drag and settle times) is deferred: it would only report, and the Node benchmarks
+  cover every gate. Add it if interactive feel regresses.
 
 ## Target architecture
 
@@ -502,7 +610,7 @@ flowchart LR
   `teleconverter.ts`, `optics.ts`, `fieldGeometry.ts`, `projection.ts`, `analysis.ts`, `mtf.ts`, `perspective.ts`,
   `diagramGeometry.ts`, `chromatic.ts`, `glassCatalog.ts`, `publishedStations.ts`, `validation.ts`, `geometry.ts`,
   `types.ts` and `lensDataConversion.ts`. The last exposes the V1 mapping and the canonical printers to the converter;
-  the seam guard admits only `scripts/lens-data-convert/`, the organizer and their tests as its importers.
+  the seam guard admits only `scripts/lens-data-convert/` and the organizer as its importers.
 
 | Directory | Contents |
 | --- | --- |
@@ -517,7 +625,7 @@ flowchart LR
 | `perspective/` | Pose; frames; sensor targeting; trace context; field sampling; diagram fans; `analysis/` |
 | `analysis/` | Request and context; jobs; sampling policy; `aberration/`; distortion; vignetting; pupils; bokeh; chromatic; aspheric comparison; group movement; summary; `mtf/` |
 | `diagram/` | Coordinate transforms; element shapes; outlines; render diagnostics; folded-path labels |
-| `diagnostics/` | Work counters; chief-ray status counts |
+| `diagnostics/` | Chief-ray status counts |
 | `mount/` | Unchanged; outside this program |
 
 ### Module fates
@@ -792,6 +900,11 @@ flowchart LR
 Stage 2 and Stages 3–4 touch disjoint modules and can run in parallel. Stage 5 needs both S2.P1 and S4; it does not
 need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
 
+Phases 2.1 to 2.3 run on `engine-next`. Phases 2.5 and 2.6 run on `main` after promotion, so the catalog is V1 on
+both branches for as long as there are two. Phase 2.4 is documents only: it is written on a branch of its own, off
+the critical path, and merges to `main` after promotion, beside Phase 2.5. `main` cannot read a V2 file before
+promotion, so the V2 authoring documents must not reach it earlier.
+
 ### Stage 1 — Contract, evidence and guards
 
 **Phase 1.1 — Contract and anchors**
@@ -799,15 +912,15 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
 - **S1.P1.T1 Record the baseline.**
   - **Precondition:** #774 has merged on its own (see
     [Baseline and accuracy contract](#baseline-and-accuracy-contract)), with its separately reviewed Vivitar stop
-    correction, its suites, and the five Planar expectations it updates with their high-precision evidence.
-    `exactTraceGoldenValues.test.ts` is otherwise unchanged.
+    correction, its suites, and the five Planar expectations it updates. Their high-precision evidence was not
+    committed; S1.P4.T2 adds a re-derivation. `exactTraceGoldenValues.test.ts` is otherwise unchanged.
   - **Change:** shrink [Baseline and accuracy contract](#baseline-and-accuracy-contract) to a pointer at the documented
     contract, keeping the #774 debt list and the Stage 3 requirement.
   - **Records:** the R0 and A0 benchmark medians from one machine; the PC-Nikkor 19mm medians at both.
-    - Paired mode arrives in S1.P3.T2, so this step alternates the two commits by hand (AB/BA) with
+    - They are measured with S1.P3.T2's paired mode (`--base d49857ae`) on the Stage 1 PR's final head, with
       `--iterations=15 --warmups=2`, the sample counts under [Method](#method).
     - The PC-Nikkor entry in the #774 debt list is restated from these medians.
-  - **Gate:** C0, documentation only; its merge commit is anchor A0.
+  - **Gate:** C0, documentation only.
 
 **Phase 1.2 — Differential harness**
 
@@ -820,7 +933,8 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
       point and direction, status, clip reason;
     - field geometry and chief solves;
     - every analysis job;
-    - geometric MTF at a small grid.
+    - geometric MTF at a small grid;
+    - a converter pair's composed prescription.
   - **Files:** `src/benchmarks/engineDiff/{captureEntry, seamAdapter, requests, payload}.ts`.
   - **Tests:** `__tests__/src/benchmarks/engineDiff.test.ts` (tooling suite):
     - payload determinism across two runs;
@@ -832,7 +946,8 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
     - add the budget table and comparator;
     - add `scripts/engine-diff.mjs`;
     - add an `engine-diff` job to `.github/workflows/quality.yml`. It first checks the changed paths, then runs Tier P
-      against `origin/main`'s merge-base, with the class taken from the PR label.
+      against the PR's merge-base with its base branch, with the class taken from the PR label and the exceptions
+      from the PR description.
   - **Tests:**
     - Each of these must fail detection: a status, an index, a unit, a sample order, a coordinate perturbed by 1 ulp
       under C0, and a coordinate perturbed by twice the budget under C1.
@@ -840,54 +955,62 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
     - Cross-evaluation: a data-only change yields no engine difference and a data-impact report.
     - A format-only change that alters a value fails.
     - An undeclared uncompared lens fails, and so does a declared exception that turns out to be comparable.
-    - The C1 noise floor is measured by reassociating one sum in sag evaluation, and the budget table is finalized from
-      it.
+    - The C1 noise floor was measured once, by reordering the even asphere terms in sag evaluation, and the budget
+      table finalized from it. The perturbation is not committed.
+  - **Left open.** Each item is settled in the step named, the first that needs it:
+    - **S3.P1.T1, the first C1 step.**
+      - How a nested per-ray trace is judged above C0. Stored as a digest, it is reported and not budgeted, so a
+        change confined to those traces passes a C1 run.
+      - How a PR declares an approved discrete transition. Until then any transition fails a C1 or C2 run.
+      - The pupil constants. They come from real rays launched 1e-4 mm off axis, so a contract-legal 1e-12 mm hit
+        difference moves them by about 1e-8 relative, beyond the first-order budget. The sag perturbation did not
+        show this; closed-form roots may.
+    - **S3.P2.T4, the first C2 step.** The C2 budgets. `--class c2` applies the C1 table until this step adds the
+      propagated criteria.
+    - **The first engine C3.** The cumulative comparison of the anchor rule. `--class c3` reports engine differences
+      and does not fail on them, so "nothing outside the cumulative budgets except the declared differences" is not
+      yet a gate.
   - **Gate:** C0.
 - **S1.P2.T3 Stage and full tiers.**
   - **Change:**
     - Tier S and Tier F request lists, with `--shard`;
-    - a `workflow_dispatch` workflow `.github/workflows/engine-diff-stage.yml` that runs the shards as a matrix.
+    - a `workflow_dispatch` workflow `.github/workflows/engine-diff-stage.yml` that runs the shards as a matrix. It
+      also runs on a push to `engine-diff-stage/**`, comparing the pushed commit against itself. GitHub cannot
+      dispatch a workflow whose file is not on the default branch, so that push is how a PR that adds or changes the
+      workflow gets its run before merge.
   - **Tests:** shard partitions are disjoint and complete.
   - **Where it runs:** GitHub Actions for every stage and pre-deletion comparison. Timing never runs there; it stays on
     the maintainer's machine (see [Method](#method)).
-  - **Gate:** C0. Run A0 against A0 to prove determinism, and record each tier's runtime in the PR.
+  - **Gate:** C0. Record each tier's runtime in the PR. Before the Stage 1 PR merges, two runs must pass:
+    - Tier P against the merge-base, through the PR's own `engine-diff` job, bit-identical;
+    - Tier S, the PR head against itself, identical. This proves determinism.
 
 **Phase 1.3 — Measurement**
 
-- **S1.P3.T1 Structural counters.**
-  - **Change:** add `src/optics/diagnostics/workCounters.ts`, behind a compile-time `__OPTICS_COUNTERS__` define:
-    `false` in the app build, and `true` in the benchmark, `engineDiff` and Vitest builds.
-  - **What it counts:**
-    - surface-profile evaluations;
-    - intersections by kind;
-    - floor-assisted acceptances, exhaustion failures and cap-certificate refusals;
-    - traces by capture;
-    - chief solves and their stop traces;
-    - root-solve evaluations;
-    - prepared-geometry constructions;
-    - lens compilations;
-    - material resolutions;
-    - sensor-locked solves.
-  - **Files:** the counters module; `vite.config.js` (`define`); call sites in `math/intersection.ts`,
-    `internal/surfaceIntersection.ts`, `field/chiefRay.ts`, `math/rootSolve.ts`, `state/prepareState.ts`,
-    `prescription/normalizeLensData.ts` and `perspective/sensorTarget.ts`.
-  - **Tests:**
-    - Counters read zero with the define off.
-    - Counts are deterministic for a fixed request.
-  - **Verification:** the PR confirms that the production bundle contains no counter code.
-  - **Gate:** C0.
 - **S1.P3.T2 Paired benchmarks and memory.**
   - **Change:**
-    - `--base <ref>` paired mode, using a worktree as `engine-diff.mjs` does;
+    - `--base <ref>` paired mode, using a worktree as `engine-diff.mjs` does. It runs the head's benchmark entry on
+      both sides, as `engine-diff.mjs` does with its capture entry;
     - AB/BA alternation;
-    - raw samples, bootstrap confidence intervals and counters in the run JSON;
-    - the heavy-scenario set;
-    - a `--memory` scripted session (lens switches and control sweeps) that reports retained heap.
+    - raw samples and bootstrap confidence intervals in the run JSON;
+    - completed-work tallies in the run JSON, from a separate untimed pass;
+    - the heavy-scenario set, selected with `--heavy`: seven existing cells. They are PC-Nikkor 19mm at default,
+      stopped-close and interactive-drag; TS-E 50mm at stopped-close and interactive-drag; and FE 24-70mm GM II and
+      GF 20-35mm at default;
+    - a `--memory` scripted session (lens switches and control sweeps) that reports retained heap, absolute and as
+      growth;
+    - paired, subset and memory records written to `agent_docs/benchmarks/paired/`, not to `runs/`, where they would
+      skew the trend report and trigger pruning;
+    - in `scripts/benchmark-mtf.mjs`: `--iterations`, `--warmups`, every sample reported, and `--base`.
   - **Files:**
     - `scripts/benchmark-optics-rendering.mjs`
     - `src/benchmarks/opticsRenderingBenchmark.tsx`
     - `src/benchmarks/benchmarkReport.ts`
     - `scripts/benchmark-mtf.mjs`
+    - `scripts/base-worktree.mjs`: the base-worktree lifecycle, moved out of `scripts/engine-diff.mjs` so both
+      drivers share it
+    - `scripts/benchmark-child.mjs`: the child process each measured pass runs in, so a bundler build never shares a
+      process with a timed engine
     - `agent_docs/benchmarks/README.md`
   - **Tests:** bootstrap with a fixed seed; unequal-work detection; schema of the run JSON.
   - **Gate:** C0.
@@ -899,20 +1022,28 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
     - add `__tests__/src/optics/opticsArchitecture.test.ts` with the cycle, seam and cache guards, their initial
       legacy-exception lists and their registries (today's top-level barrels and bounded or owner-keyed caches);
     - delete the three unimported modules (`src/optics/index.ts`, the root `src/optics/analysisJobs.ts` and
-      `src/optics/analysis/fieldCurvature.ts`).
+      `src/optics/analysis/fieldCurvature.ts`), and repoint `agent_docs/architecture/public-functions.md`, which
+      named the deleted facade.
   - **Gate:** C0.
-- **S1.P4.T2 High-precision fixtures and comparator export.**
+- **S1.P4.T2 High-precision fixtures.**
   - **Change:**
-    - add fixtures of sphere, conic and asphere roots at 50 or more digits, with their generator script, under
-      `__tests__/src/optics/fixtures/`;
-    - commit the 50/80-digit generator behind the five Planar pupil expectations #774 updated in
-      `mirrorOptics.test.ts`, whose evidence is outside the repository today;
-    - add `scripts/export-comparator-cases.mjs`.
-  - **Tests:** today's kernel meets the contract on every fixture. Any failure is filed as a C3 finding, not hidden.
+    - add fixtures of sphere, conic and asphere roots at 50 or more digits, with their generator, under
+      `__tests__/src/optics/fixtures/`. The generator is dependency-free TypeScript on BigInt fixed-point arithmetic,
+      so lint and typecheck cover it. It computes each root for the exact float64 inputs the solvers receive;
+    - commit a 50/80-digit re-derivation of the five Planar pupil expectations #774 updated in `mirrorOptics.test.ts`.
+      The original evidence is outside the repository and was not recovered, so this is a re-derivation and says so.
+  - **Tests:** today's kernel meets the contract on every fixture but one, in both solvers. `sphere-grazing-chord`
+    fails in both and is filed as #779.
+    - The contract bounds the residual, not the position: `|residual| ≤ effectiveTolerance`, and the root agrees with
+      the reference to within `effectiveTolerance / |f′|` plus float64 rounding. A flat 1e-12 mm position bound would
+      fail; the worst measured point error is 1.7e-12 mm.
+    - A fixture the kernel fails stays in the set, in an expected-findings table that asserts it still fails, and is
+      filed as a C3 finding, not hidden.
   - **Gate:** C0.
 
-**Stage 1 gate:** Tier S, A0 against A0, is identical; the benchmark baseline is recorded; the guards pass. Tag
-`optics-rewrite/s1`.
+**Stage 1 gate:** before merge, Tier P against the merge-base is bit-identical through the PR's own `engine-diff` job,
+and Tier S, the PR head against itself, is identical; the benchmark baseline is recorded; the guards pass. After merge,
+the maintainer tags the merge commit `optics-rewrite/s1`.
 
 ### Stage 2 — Canonical prescription and lens data V2
 
@@ -924,7 +1055,9 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
     - `ingestV1`;
     - schema defaults with provenance, which replace the spread of `src/lens-data/defaults.ts` and stop it importing
       an engine internal;
-    - the canonical → V1 `LensData` view the current engine consumes.
+    - the canonical → V1 `LensData` view the current engine consumes;
+    - the harness's semantic fingerprint (`src/benchmarks/engineDiff/payload.ts`), moved onto the canonical semantic
+      projection, so that a V1 file and its V2 conversion share one. The S2.P5 format-only gate depends on it.
 
     No caller changes yet.
   - **Files:** `src/optics/prescription/{canonical, ingestV1, defaults, toLensData}.ts`. `src/lens-data/defaults.ts` is
@@ -1033,6 +1166,9 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
 
 **Phase 2.4 — Authoring documents**
 
+This phase merges to `main` after promotion. Corrections to the V1 spec that do not depend on V2, such as the
+spec–code contradictions below, may go to `main` at any time as ordinary documentation PRs.
+
 - **S2.P4.T1 V2 lens-data spec and templates.** Rewrite `src/lens-data/LENS_DATA_SPEC.md` in authoring order:
   1. quick start;
   2. file shape;
@@ -1072,6 +1208,8 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
   - the `LensData` field names in `CLAUDE.md` and `AGENTS.md` (byte copies)
 
 **Phase 2.5 — Catalog migration**
+
+This phase runs on `main`, after `engine-next` has been promoted.
 
 - **S2.P5.T1–T8 Convert by maker batches.**
   - **Batches:** eight PRs, one per alphabetical group of maker directories under `src/lens-data/`. Each runs
@@ -1196,9 +1334,9 @@ Each step is its own PR after S2.P5 and blocks nothing else.
     - tangent, grazing, steep-rim and backward rays;
     - a plane at zero gap behind a curved surface, reached by an oblique ray;
     - cap and exterior roots;
-    - every closed-form success uses at most 2 profile evaluations;
-    - every fallback is counted under its own counter, with its reason (failed validation, near tangency or domain
-      edge), takes the unchanged iterative path with its normal budget, and meets the contract.
+    - every closed-form success uses at most 2 profile evaluations, counted by a profile the test wraps;
+    - every fallback reports its reason on the result (failed validation, near tangency or domain edge), takes the
+      unchanged iterative path with its normal budget, and meets the contract.
   - **Gate:** C1.
 - **S3.P2.T2 Conic-seeded asphere solve.**
   - **Change:** Newton starts from the base-conic root. The bracket scan runs only when the seed fails certification,
@@ -1212,13 +1350,16 @@ Each step is its own PR after S2.P5 and blocks nothing else.
     deleted.
   - **Tests:** both arms of `__tests__/src/optics/intersectionContract.test.ts` pass unchanged, and so does
     `__tests__/src/optics/internal/surfaceIntersection.test.ts` except its captured exterior-clip case. That case
-    asserts a legacy hit on the clamped continuation beyond the conic domain, which the kernel rejects.
+    asserts a legacy hit on the clamped continuation beyond the conic domain, which the kernel rejects. The legacy
+    arm of `__tests__/src/optics/intersectionFixtures.test.ts` follows the kernel: its expected-findings entries and
+    its beyond-the-domain fixture change with it.
   - **Gate:** C1. The legacy hits beyond |R| that become domain rejections are listed as declared transitions.
 - **S3.P2.T4 Roundoff-limited roots without bracket collapse.**
   - **Change:** with one kernel left, a Newton correction of a few ulps whose residual is inside the envelope counts
     as a stall, and a fixed point the envelope rejects fails at once. `INTERSECTION_MAX_ITERATIONS` then drops to the
     smallest value the fixtures need. The acceptance bound does not change: the raw target first, then
-    `max(tolerance, envelope)` only at a stall. Contract item 3 gains the third stall case in the same PR.
+    `max(tolerance, envelope)` only at a stall. The documented contract's raw-target-first rule gains the third stall
+    case in the same PR.
   - **Tests:** the rim root in `intersectionContract.test.ts` converges without bisecting to adjacent floats; an
     unusable slope bound fails on the iteration it stalls.
   - **Gate:** C2.
@@ -1228,7 +1369,7 @@ Each step is its own PR after S2.P5 and blocks nothing else.
 - the analytic suite;
 - Tier S, C1/C2 against the anchor;
 - the Stage 3 targets are reported: mean evaluations per intersection and the fallback rate;
-- PC-Nikkor 19mm default analysis is at or below R0;
+- PC-Nikkor 19mm default analysis is at or below its stored R0 median, within the tolerance of efficiency gate 3;
 - the comparator report.
 
 ### Stage 4 — One trace stack
@@ -1258,15 +1399,17 @@ Each step is its own PR after S2.P5 and blocks nothing else.
     - delete `internal/exactSurfaceTrace.ts`, `internal/surfaceIntersection.ts`, `internal/traceSurfaces.ts`, and the
       `rayTrace.ts` tracers and `traceToImage`;
     - move the pupil samplers to `analysis/sampling.ts`;
-    - port `__tests__/src/optics/internal/*`, `mirrorOptics.test.ts` and `exactSurfaceTraceVector.test.ts` to the
-      production stack, and drop the legacy arm of `intersectionContract.test.ts`;
+    - port `__tests__/src/optics/internal/*`, `mirrorOptics.test.ts`, `exactSurfaceTraceVector.test.ts`,
+      and `planarPupilReference.test.ts` to the production stack, and drop the
+      legacy arms of `intersectionContract.test.ts` and `intersectionFixtures.test.ts`;
     - supersede decision 2026-08-04 (the two tracer stacks) in `agent_docs/decisions.md`, and rewrite "Exact Surface
       Trace" in `agent_docs/architecture/optics-engine.md` to describe the one remaining tracer.
   - **Gate:** C0.
 - **S4.P3.T1 Capture policy.**
   - **Change:** `trace/capture.ts` chooses terminal-only, hits, or diagnostics before the loop. A terminal-only trace
     allocates no hit array and no diagnostics, but keeps enough to classify a failure as physical or numerical.
-  - **Tests:** identical trajectories and statuses across capture modes; allocation counters.
+  - **Tests:** identical trajectories and statuses across capture modes; a terminal-only trace returns no hit array
+    and no diagnostics.
   - **Gate:** C0.
 - **S4.P3.T2 Per-ray adapter overhead.**
   - **Change:** `trace/rayAdapters.ts` stops resolving state per call and stops spreading options per ray.
@@ -1291,7 +1434,7 @@ Each step is its own PR after S2.P5 and blocks nothing else.
     - It replaces `internal/lensState.ts`, the `prescription/` compilers and `normalizeLensData.ts`.
     - `EngineLens` is renamed `CompiledLens`.
   - **Tests:**
-    - Counters show one compilation and one material resolution per identity.
+    - One compilation and one material resolution per identity, shown by spying on the compiler and the resolver.
     - The `vi.mock` of `internal/lensState.js` in `__tests__/src/optics/validateLensData.test.ts` moves to the
       compiler.
   - **Gate:** C0.
@@ -1346,9 +1489,12 @@ Each step is its own PR after S2.P5 and blocks nothing else.
     `src/types/`.
   - **Gate:** C0.
 
-**Stage 5 gate:** Tier S against the anchor; counters show one compile and one material resolution per identity;
+**Stage 5 gate:** Tier S against the anchor; S5.P1.T1's tests show one compile and one material resolution per identity;
 `src/optics/internal/` is gone (its last files leave in S5.P1.T1 and S5.P1.T3); the cycle guard's legacy list has
 shrunk.
+
+**Promotion:** once the Stage 5 gate has passed, `engine-next` merges into `main` under the rule in
+[Integration model](#integration-model). Stages 6 to 8, and Phases 2.5 and 2.6, follow on `main`.
 
 ### Stage 6 — Fields, chief rays and solvers
 
@@ -1385,7 +1531,7 @@ shrunk.
     `perspective/fieldGeometry.ts`.
   - **Gate:** C0.
 
-**Stage 6 gate:** Tier S against the anchor under each step's class; the counter targets are reported.
+**Stage 6 gate:** Tier S against the anchor under each step's class; the Stage 6 targets are reported.
 
 ### Stage 7 — Analyses on request objects
 
@@ -1443,7 +1589,8 @@ gone.
     - delete `compat.ts` and the alias barrels;
     - update the 103 importing files, the 7 scripts that load by path, and the tests.
 
-    The seam guard's legacy list is now empty, and its registry holds exactly the final barrels.
+    The seam guard's legacy list is now empty. Its registry holds the final barrels and the permanent
+    `prescription/teleconverterCompatibility.ts` entry.
   - **Gate:** C0.
 - **S8.P1.T2 Retire `RuntimeLens.data`.**
   - **Change:**
@@ -1473,8 +1620,9 @@ gone.
     - Lens-data readers in `scripts/` and `reports/` drop V1, except the organizer's detection and the converter.
   - **Kept permanently:** the converter, its V1 reader and printer, the organizer's conversion on arrival, and the V1/V2
     fixture pairs from S2.P2.T1 as the converter's regression suite.
-  - **Tests:** the seam guard admits only the converter, the organizer and their tests as importers of
-    `lensDataConversion.ts`; a V1 file passed to `buildLens` fails with the convert command.
+  - **Tests:** the seam guard gains a rule per importer and admits only the converter and the organizer as
+    importers of `lensDataConversion.ts` (tests are not importers under the guard); a V1 file passed to `buildLens`
+    fails with the convert command.
   - **Gate:** C0; every catalog file is already V2.
 - **S8.P2.T3 Documentation and close.**
   - **Rewrite:**
@@ -1489,6 +1637,22 @@ gone.
     - that the converter and the organizer's conversion on arrival are permanent, while the app reads only V2.
   - **Regenerate:** `src/**/readme.md`.
   - **Update:** `CLAUDE.md` and `AGENTS.md` where names changed.
+  - **Delete the differential harness:**
+    - `src/benchmarks/engineDiff/`, `scripts/engine-diff.mjs` and its typings;
+    - the `engine-diff` job in `.github/workflows/quality.yml`, and `.github/workflows/engine-diff-stage.yml`;
+    - its tests, their tooling-suite entries, and the harness sections of the docs;
+    - the harness from the refactor gate in `agent_docs/decisions.md` (2026-08-04), which goes back to the golden
+      values, the full suite and the report byte-diffs.
+
+  - **Delete the paired benchmark mode,** which compares timings at two commits as the harness compares outputs:
+    - `--base` in `scripts/benchmark-optics-rendering.mjs` and `scripts/benchmark-mtf.mjs`, with the pairing
+      statistics and the unequal-work comparison in `src/benchmarks/benchmarkReport.ts`;
+    - `scripts/base-worktree.mjs`, which nothing uses once the harness and paired mode are gone;
+    - the records under `agent_docs/benchmarks/paired/` that came from paired runs, and the paired sections of
+      `agent_docs/benchmarks/README.md`.
+
+    The plain benchmark run stays as it was before the program. The heavy set and the memory session stay in their
+    single-commit form. The architecture guards and the high-precision fixtures stay.
   - **Delete:** this plan and its `agent_docs/README.md` entry, as the documentation policy requires.
 
 **Stage 8 gate:** every outcome M1–M9 holds. Tag `optics-rewrite/s8`.
@@ -1503,7 +1667,7 @@ gone.
 | 2026-08-04: single homes (`normalizeRuntimeLens` cache; `traceSurfaces` wraps `math/paraxial`) | Update the homes; keep `interactRefractiveSurface`, `normalLinePgF`, `abbeLineIndices`, `decodeCode6` | S5.P1.T1 |
 | 2026-08-04: validation centralized in `validateLensData.ts` | Update to `prescription/validate/` | S5.P1.T3 |
 | 2026-08-05: on folded systems `RuntimeLens.EFL` comes from metadata, not tracing | Preserve: `first-order/lensConstants.ts` keeps both branches | S5.P1.T2 |
-| 2026-08-04: behavior-preserving refactor gate | Extend with the differential harness; golden, full-test and report byte-diff checks remain | S1.P2 |
+| 2026-08-04: behavior-preserving refactor gate | Extend with the differential harness while the program runs; golden, full-test and report byte-diff checks remain. The harness leaves the gate when it is deleted | S1.P2; S8.P2.T3 |
 | 2026-10-07: MTF core verified; do not rebuild | Preserve: only its inputs change | S7.P4.T1 |
 | 2026-10-07: retired diffraction estimators; field targets on the authored plane | Preserve | — |
 | 2026-10-05: `publishedStations` is the only station provenance; not normalized onto `RuntimeLens` | Preserve: the data moves onto V2 station records but is still read only by `publishedStations.ts` | S2, S8.P1.T2 |
@@ -1534,12 +1698,29 @@ The maintainer settled these on 2026-10-09. Each is recorded where it applies; t
 | 13 | Single-lens corpus rules move into the validator, two of them once their exception lists are empty; rules that compare files stay tests | S2.P6.T2 |
 | 14 | The app reads only V2 after S8; the converter is permanent and runs on arrival and on demand | [Ingest, conversion and comments](#ingest-conversion-and-comments); S2.P5.T9; S8.P2.T2 |
 
+The maintainer settled these on 2026-10-11 and 2026-10-12, during Stage 1:
+
+| # | Decision | Where |
+| --- | --- | --- |
+| 15 | Stages 1 to 5 land on an integration branch, `engine-next`, promoted to `main` after the Stage 5 gate | [Integration model](#integration-model) |
+| 16 | `main` merges into `engine-next` weekly, and Tier P of the branch against `main` is recorded each time | [Integration model](#integration-model); [Gates by level](#gates-by-level) |
+| 17 | The catalog conversion and its follow-ups wait until after promotion, and the V2 authoring documents land on `main` with them | [Stage dependencies](#stage-dependencies); S2.P4; S2.P5 |
+| 18 | The differential harness and the paired benchmark mode are deleted at the close | S8.P2.T3 |
+| 21 | The work counters are withdrawn from Stage 1 and from the program; count-based targets are measured with a throwaway instrumented build | [Efficiency](#efficiency-secondary) |
+| 22 | Every engine change goes to `engine-next` while the branch lives | [Integration model](#integration-model) |
+| 23 | The #774 debt gate reads the stored R0 median with a 3% tolerance | [Efficiency](#efficiency-secondary), gate 3 |
+| 24 | A budget class is required only above C0, and a paired run installs a base's dependencies when its lockfile differs | [Quantity budgets](#quantity-budgets); [Method](#method) |
+| 19 | A commit that adds or changes the stage workflow gets its Tier S run through a push to `engine-diff-stage/**` | S1.P2.T3 |
+| 20 | The Planar generator is a re-derivation, and the comparator export waits for Stage 3 | S1.P4.T2; [Independent references](#independent-references) |
+
 Left to evidence gathered during the program: the final barrel list (S8.P1.T1), the two focus-infinity thresholds
-(S5.P2.T2), the quantity budgets (S1.P2.T2) and Tier P's lens coverage (S1.P2.T3).
+(S5.P2.T2) and the items S1.P2.T2 leaves open.
 
 ## Rollback
 
 - Every step reverts on its own, and anchors show which outputs a revert changes.
+- Until promotion, `main` runs the engine it had before the program. Not promoting `engine-next` rolls back
+  everything on it.
 - Until S8.P2.T2, catalog batches also revert with `convert-lens-data --to-version 1`. After it, the app reads only
   V2, and a revert of S8.P2.T2 restores V1 ingest.
 - There is no in-tree old engine to fall back to. A failing step is fixed or reverted, never routed around.

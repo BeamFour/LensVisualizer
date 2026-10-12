@@ -1,0 +1,146 @@
+name: Engine Diff Stage
+
+# Tier S or Tier F of the engine differential harness (agent_docs/architecture/testing.md), one shard per runner.
+# It is started by hand for a stage gate. A push to an engine-diff-stage/** branch starts it too, with every input
+# at its fallback: Tier S of the pushed commit against itself. GitHub dispatches a workflow only once its file is on
+# the default branch, so that push is how a pull request that adds or changes this file gets its run before merging.
+on:
+  workflow_dispatch:
+    inputs:
+      base:
+        description: "Base ref: the current anchor tag or a commit, for example optics-rewrite/s1"
+        required: true
+        type: string
+      tier:
+        description: "Corpus tier"
+        required: true
+        type: choice
+        options: [s, f]
+        default: s
+      class:
+        description: "Loosest change class merged since the base"
+        required: true
+        type: choice
+        options: [c0, c1, c2, c3]
+        default: c0
+      shards:
+        description: "Number of shards, 1 to 64. Empty: 8 for tier s, 32 for tier f"
+        required: false
+        type: string
+      exceptions:
+        description: "Lens ids the base engine cannot build, separated by spaces. A pair is host+converter"
+        required: false
+        type: string
+  push:
+    branches: ["engine-diff-stage/**"]
+
+permissions:
+  contents: read
+
+# What a person typed reaches a shell only as an environment variable, never as text in a script.
+env:
+  BASE: ${{ inputs.base || github.sha }}
+  TIER: ${{ inputs.tier || 's' }}
+  CHANGE_CLASS: ${{ inputs.class || 'c0' }}
+  # Empty on a push: a commit compared with itself has no lens that its base cannot build.
+  EXCEPTIONS: ${{ inputs.exceptions }}
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      count: ${{ steps.shards.outputs.count }}
+      shards: ${{ steps.shards.outputs.shards }}
+    steps:
+      - id: shards
+        env:
+          SHARDS: ${{ inputs.shards }}
+        run: |
+          case "$TIER" in
+            s) default=8 ;;
+            f) default=32 ;;
+            *) echo "::error::tier must be s or f"; exit 1 ;;
+          esac
+          count="${SHARDS:-$default}"
+          case "$count" in *[!0-9]*|???*) echo "::error::shards must be a whole number from 1 to 64"; exit 1 ;; esac
+          count="$((10#$count))"
+          if [ "$count" -lt 1 ] || [ "$count" -gt 64 ]; then echo "::error::shards must be 1 to 64"; exit 1; fi
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          echo "shards=[$(seq 1 "$count" | paste -sd, -)]" >> "$GITHUB_OUTPUT"
+
+  shard:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJSON(needs.plan.outputs.shards) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.15.0"
+          cache: npm
+      - run: npm ci
+      # The driver reads declared exceptions in the form of a pull request description: one bullet per lens id
+      # under the heading. Globbing is off, so an id is only ever a word of the input.
+      - env:
+          SHARD: ${{ matrix.shard }}/${{ needs.plan.outputs.count }}
+        run: |
+          set -f
+          {
+            echo "## Engine-diff exceptions"
+            for id in $EXCEPTIONS; do printf -- '- `%s`\n' "$id"; done
+          } > "$RUNNER_TEMP/engine-diff-exceptions.md"
+          node scripts/engine-diff.mjs --base "$BASE" --tier "$TIER" --class "$CHANGE_CLASS" --shard "$SHARD" \
+            --exceptions "$RUNNER_TEMP/engine-diff-exceptions.md" --out "$RUNNER_TEMP/engine-diff"
+      # Only the reports: the payloads beside them are gigabytes across a tier.
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine-diff-tier-${{ env.TIER }}-shard-${{ matrix.shard }}-of-${{ needs.plan.outputs.count }}
+          path: ${{ runner.temp }}/engine-diff/reports
+          if-no-files-found: ignore
+          retention-days: 14
+
+  # One check that is green only when every shard passed and every declared exception was met by some shard.
+  result:
+    needs: [plan, shard]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      # Each shard's reports, in a directory named after its artifact. A shard that never ran has none.
+      - uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          pattern: engine-diff-tier-*-shard-*
+          path: shards
+      # A shard is part of a tier, so it passes a declared exception that it never met, and lists it in its summary
+      # as unknown. One that every shard lists was met by none: it names no lens of the tier.
+      - env:
+          RESULT: ${{ needs.shard.result }}
+          COUNT: ${{ needs.plan.outputs.count }}
+        run: |
+          mkdir -p shards
+          summaries="$(find shards -name summary.json | wc -l | tr -d ' ')"
+          unmet=""
+          if [ "$summaries" = "$COUNT" ]; then
+            unmet="$(find shards -name summary.json -exec cat {} + | jq -rs --argjson count "$COUNT" \
+              '[.[].exceptions.unknown[]] | group_by(.) | map(select(length == $count) | .[0]) | join(" ")')"
+          fi
+          {
+            echo "## Engine diff stage: $RESULT"
+            echo
+            echo "Tier $TIER against \`$BASE\` under $CHANGE_CLASS, head \`$GITHUB_SHA\`, in ${COUNT:-no} shards."
+            echo
+            echo "Declared exceptions: ${EXCEPTIONS:-none}."
+            if [ -n "$unmet" ]; then echo; echo "Declared and met by no shard: $unmet."; fi
+            if [ "$summaries" != "$COUNT" ]; then echo; echo "Summaries of $summaries of ${COUNT:-no} shards."; fi
+          } >> "$GITHUB_STEP_SUMMARY"
+          [ "$RESULT" = "success" ] || exit 1
+          [ -z "$unmet" ] || exit 1
+          # With exceptions declared, a summary that is missing leaves one of them unchecked.
+          [ -z "$EXCEPTIONS" ] || [ "$summaries" = "$COUNT" ]

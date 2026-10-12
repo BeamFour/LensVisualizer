@@ -9,7 +9,7 @@ Generated `readme.md` and `improvementsuggestions.md` files are intentionally om
 ```mermaid
 flowchart LR
   subgraph n_src_optics_analysis["src/optics/analysis"]
-    n_src_optics_analysis_TypeScript_modules["TypeScript modules (31)"]
+    n_src_optics_analysis_TypeScript_modules["TypeScript modules (30)"]
   end
   n_external_src_optics_types_ts["src/optics/types.ts"]
   n_external_src_types["src/types"]
@@ -57,18 +57,18 @@ flowchart LR
 
 ## Directory Overview
 
-- Direct source files: 31
+- Direct source files: 30
 - Direct subfolders: 0
-- Main outbound areas: same folder (52), src/optics/types.ts (21), src/types (19), src/optics/perspective (10), src/optics/chromatic (9), src/optics/optics.ts (8), src/optics/trace (8), src/optics/field (5), +14 more
-- External consumers: src/benchmarks, src/components/layout, src/optics/aberration, src/optics/analysisJobs.ts, src/optics/compat.ts, src/optics/distortionAnalysis.ts, src/optics/mtf.ts, src/optics/vignetteAnalysis.ts
+- Main outbound areas: same folder (51), src/optics/types.ts (21), src/types (19), src/optics/perspective (10), src/optics/chromatic (9), src/optics/optics.ts (8), src/optics/trace (8), src/optics/field (5), +14 more
+- External consumers: src/benchmarks, src/components/layout, src/optics/aberration, src/optics/compat.ts, src/optics/distortionAnalysis.ts, src/optics/mtf.ts, src/optics/vignetteAnalysis.ts
 
 ## Files
 
 | File | Role | Imports from | Imported by | Exports |
 | --- | --- | --- | --- | --- |
-| `aberrations.ts` | Aberrations helper module | same folder (2), src/optics/aberrationAnalysis.ts, src/optics/optics.ts, src/optics/types.ts, src/types | same folder (2), src/optics/compat.ts | computeSphericalAberrationForState2, computeSAProfileForState2, computeSphericalAberrationBlurCharacterForState2, computeFieldCurvatureForState2, computeFieldCurvatureBundleForState2, computeComaAnalysisForState2, computeSAProfile2, computeSphericalAberration2, +8 more |
+| `aberrations.ts` | Aberrations helper module | same folder (2), src/optics/aberrationAnalysis.ts, src/optics/optics.ts, src/optics/types.ts, src/types | same folder, src/optics/compat.ts | computeSphericalAberrationForState2, computeSAProfileForState2, computeSphericalAberrationBlurCharacterForState2, computeFieldCurvatureForState2, computeFieldCurvatureBundleForState2, computeComaAnalysisForState2, computeSAProfile2, computeSphericalAberration2, +8 more |
 | `analysisContext.ts` | Analysis Context helper module | same folder (5), src/optics/chromatic (2), src/optics/optics.ts, src/optics/perspective, src/optics/types.ts | src/optics/compat.ts | AnalysisComputationContextParams, AnalysisComputationContext, createAnalysisComputationContext |
-| `analysisJobs.ts` | Analysis Jobs helper module | same folder (8), src/optics/chromatic, src/optics/optics.ts, src/optics/types.ts, src/types | same folder, src/optics/analysisJobs.ts, src/optics/compat.ts | analysisJobs2, analysisJobsForState2 |
+| `analysisJobs.ts` | Analysis Jobs helper module | same folder (8), src/optics/chromatic, src/optics/optics.ts, src/optics/types.ts, src/types | same folder, src/optics/compat.ts | analysisJobs2, analysisJobsForState2 |
 | `analysisMovementSupport.ts` | Analysis Movement Support helper module | src/optics/perspective | same folder, src/optics/compat.ts | AnalysisSectionId, AnalysisSectionMode, AnalysisSectionAvailability, AnalysisSectionUnavailableError, analysisSectionAvailability, assertAnalysisSectionAvailable, assertCenteredAnalysisSectionAvailable |
 | `analysisQuality.ts` | Analysis Quality helper module | none | same folder (7), src/optics/aberration (4), src/benchmarks, src/components/layout, src/optics/distortionAnalysis.ts, +1 more | AnalysisQuality, AnalysisSamplingOptions, INTERACTIVE_ANALYSIS_SAMPLING, analysisSamplingForQuality |
 | `asphericComparison.ts` | Aspheric Comparison helper module | src/optics/constants.ts, src/optics/math, src/types | src/optics/compat.ts | DepartureSample2, computeAsphericDeparture2, computeDepartureProfile2, computeBestFitSphereR2, peakAbsDeparture2, rmsDeparture2, nearestSurfaceForClick2 |
@@ -76,7 +76,6 @@ flowchart LR
 | `chromatic.ts` | Chromatic helper module | src/optics/chromatic (4), src/optics/aberration (2), same folder, src/optics/field, src/optics/layout.ts, +5 more | same folder, src/optics/compat.ts | ChromaticAnalysisOptions, ChromaticAnalysisResult, LateralColorChannelSample, LateralColorCurveResult, LateralColorFieldSample, LongitudinalChromaticFocusResult, LongitudinalChromaticFocusSample, ChromaticRayFanAnalysisOptions2, +11 more |
 | `chromaticRayFanScaling.ts` | Chromatic Ray Fan Scaling helper module | src/types | src/optics/compat.ts | REFERENCE_LOCA_MM_2, ChromaticBarResult2, computeLocaBarOffsets2 |
 | `distortion.ts` | Distortion helper module | same folder (2), src/optics/distortionAnalysis.ts, src/optics/optics.ts, src/optics/types.ts, src/types | same folder, src/optics/compat.ts | computeDistortionCurveForState2, computeDistortionFieldGridForState2, computeDistortionCurve2, computeDistortionFieldGrid2 |
-| `fieldCurvature.ts` | Field Curvature helper module | same folder | none | computeFieldCurvature2, computeFieldCurvatureBundleForState2, computeFieldCurvatureForState2 |
 | `groupMovement.ts` | Group Movement helper module | src/types (2), src/optics/groupMovement.ts, src/optics/types.ts | src/optics/compat.ts | computeGroupMovementProfileForState2, computeGroupMovementProfile2, firstAvailableGroupMovementMode2, getGroupMovementAvailability2, inferLensMovementGroups2, isGroupMovementModeAvailable2 |
 | `mtf.ts` | Mtf helper module | same folder (9), src/optics/types.ts, src/types | src/optics/mtf.ts | MtfJobCache, emptyMtfField, MtfUnresolvedFlux, assessUnresolvedFlux, MtfGridOutcome, refineMtfField, resolveMtfGeometry, computeMtfSteps, +1 more |
 | `mtfAperture.ts` | Mtf Aperture helper module | same folder (2), src/optics/trace, src/optics/types.ts, src/types | same folder | resolveMtfAperture |

@@ -17,6 +17,7 @@ declare module "node:fs" {
   export function readFileSync(path: string | URL): Uint8Array;
   export function readFileSync(path: string, encoding: string): string;
   export function readdirSync(path: string): string[];
+  export function realpathSync(path: string): string;
   export function rmSync(path: string, options?: { recursive?: boolean; force?: boolean }): void;
   export function statSync(path: string): { isDirectory(): boolean };
   export function writeFileSync(path: string, data: string, encoding?: string): void;
@@ -33,6 +34,7 @@ declare module "node:path" {
 }
 
 declare module "node:process" {
+  export const argv: string[];
   export const env: Record<string, string | undefined>;
 }
 

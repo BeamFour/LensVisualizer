@@ -900,6 +900,7 @@ describe("mirror optics support", () => {
     expect(L.B).toBeCloseTo(16.79046967193117, 12);
     // Independently checked with 50/80-digit analytic sphere intersections and Snell refraction.
     // The field value is the conservative endpoint of the existing clipping bisection.
+    // planarPupilReference.test.ts reads these five pins and holds them to a re-derivation committed with it.
     expect(L.halfField).toBeCloseTo(25.814319501447216, 12);
     expect(L.tracingHalfField).toBeCloseTo(25.814319501447216, 12);
     expect(L.epZRelStop).toBeCloseTo(4.204818317951311, 12);
