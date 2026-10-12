@@ -1,4 +1,5 @@
-import { mkdtempSync, readdirSync, rmSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -96,5 +97,61 @@ describe("benchmark optics rendering command line", () => {
     expect(() => parseArgs(["--report-only", "--heavy"])).toThrow("--report-only rebuilds the trend report");
     expect(() => parseArgs(["--memory", "--iterations=3"])).toThrow("--memory runs the memory session alone");
     expect(() => parseArgs(["--memory", "--dry-run"])).toThrow("--memory runs the memory session alone");
+  });
+});
+
+describe("benchmark child pass", () => {
+  /* A stand-in for a built bundle: its entry function reports one cell and returns the options it was given, the
+   * progress hook as its type. */
+  const BUNDLE = `export async function runOpticsRenderingBenchmark(options) {
+  await options.onCell?.({ lensKey: "lens", scenarioId: "default", index: 0, count: 1 });
+  return { ...options, onCell: typeof options.onCell };
+}
+`;
+  const options = { createdAt: "2026-01-01T00:00:00.000Z", iterations: 2, label: "a progress label" };
+
+  /**
+   * Run `scripts/benchmark-child.mjs` on the stand-in bundle.
+   *
+   * @param pass - the pass to run
+   * @returns what the pass wrote to its result file
+   */
+  function childResult(pass: string): unknown {
+    const dir = mkdtempSync(join(tmpdir(), "benchmark-child-"));
+    try {
+      const bundlePath = join(dir, "bundle.mjs");
+      const resultPath = join(dir, "result.json");
+      writeFileSync(bundlePath, BUNDLE, "utf8");
+      execFileSync(
+        "node",
+        [
+          "scripts/benchmark-child.mjs",
+          pass,
+          JSON.stringify({ bundleUrl: `file://${bundlePath}`, options }),
+          resultPath,
+        ],
+        { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] },
+      );
+      return JSON.parse(readFileSync(resultPath, "utf8"));
+    } finally {
+      rmSync(dir, { recursive: true, force: true });
+    }
+  }
+
+  it("times a plain run on one bundle and keeps no samples, as a record under runs/ has none", () => {
+    expect(childResult("plain")).toEqual({ createdAt: options.createdAt, iterations: 2, onCell: "function" });
+  });
+
+  it("keeps the samples of a paired or heavy run's timed pass", () => {
+    expect(childResult("timed")).toEqual({
+      createdAt: options.createdAt,
+      iterations: 2,
+      keepSamples: true,
+      onCell: "function",
+    });
+  });
+
+  it("refuses a pass it does not know", () => {
+    expect(() => childResult("profile")).toThrow("Unknown benchmark pass: profile");
   });
 });

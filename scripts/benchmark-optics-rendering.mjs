@@ -21,10 +21,10 @@
  * place of the whole matrix. `--memory` runs the scripted memory session and no timed pass: one child process per
  * side, started with `--expose-gc`.
  *
- * Every pass of such a run is measured by `scripts/benchmark-child.mjs`, in a process that has imported prebuilt
- * bundles and built nothing; that file says why. A paired, heavy or memory run writes its record under
- * `agent_docs/benchmarks/paired/`, where nothing is pruned and the trend report does not look, and prints a
- * Markdown summary to stdout. Progress goes to stderr.
+ * Every pass of every run, a plain run's timed pass included, is measured by `scripts/benchmark-child.mjs`, in a
+ * process that has imported prebuilt bundles and built nothing; that file says why. A paired, heavy or memory run
+ * writes its record under `agent_docs/benchmarks/paired/`, where nothing is pruned and the trend report does not
+ * look, and prints a Markdown summary to stdout. Progress goes to stderr.
  *
  * Usage:
  *   node scripts/benchmark-optics-rendering.mjs [--iterations=N] [--warmups=N] [--base <ref>] [--heavy]
@@ -272,7 +272,7 @@ function prepareBaseWorktree(worktree, commit) {
 /**
  * Run one pass in a child process and return what it wrote.
  *
- * @param {"timed" | "untimed" | "memory"} pass - what `benchmark-child.mjs` is to run
+ * @param {"plain" | "timed" | "untimed" | "memory"} pass - what `benchmark-child.mjs` is to run
  * @param {object} request - the bundle to import, and the pass's options
  * @param {string} resultPath - a file for the child's result
  * @param {{ current: import("node:child_process").ChildProcess | null }} running - holds the child while it runs,
@@ -281,17 +281,17 @@ function prepareBaseWorktree(worktree, commit) {
  * @throws when the child exits with a failure
  */
 async function runChildPass(pass, request, resultPath, running) {
-  const child = spawn(
-    process.execPath,
-    [...(pass === "memory" ? ["--expose-gc"] : []), CHILD_SCRIPT, pass, JSON.stringify(request), resultPath],
-    {
-      cwd: ROOT,
-      /* React picks its production build by this, as it does in a plain run, where the build in the measuring
-       * process has set it. Anything the child prints goes to stderr: stdout is the summary's. */
-      env: { ...process.env, NODE_ENV: "production" },
-      stdio: ["ignore", process.stderr, "inherit"],
-    },
-  );
+  /* A memory session collects on demand. A plain run's pass takes the flags this process was started with, as it
+   * did while it ran here: under `--expose-gc` it collects between samples, and `environmentInfo` reads the
+   * record's heap mode from this process. */
+  const nodeFlags = pass === "memory" ? ["--expose-gc"] : pass === "plain" ? process.execArgv : [];
+  const child = spawn(process.execPath, [...nodeFlags, CHILD_SCRIPT, pass, JSON.stringify(request), resultPath], {
+    cwd: ROOT,
+    /* React picks its production build by this. A build sets it in the process it runs in, and a child builds
+     * nothing. Anything the child prints goes to stderr: stdout is the summary's. */
+    env: { ...process.env, NODE_ENV: "production" },
+    stdio: ["ignore", process.stderr, "inherit"],
+  });
   running.current = child;
   try {
     const [code, signal] = await new Promise((resolve, reject) => {
@@ -309,9 +309,19 @@ async function runChildPass(pass, request, resultPath, running) {
 
 /* ── Runs ── */
 
-/** The whole matrix on the working tree: one record under `runs/`, and the trend report rebuilt from them. */
-async function runPlain(args, createdAt, outDir) {
-  const benchmarkModule = await import(await buildBundle(ROOT, outDir));
+/**
+ * The whole matrix on the working tree: one record under `runs/`, and the trend report rebuilt from them.
+ *
+ * @param {ReturnType<typeof parseArgs>} args - the parsed command line
+ * @param {string} createdAt - the run's timestamp
+ * @param {string} tempDir - a directory for the bundle and the timed pass's result
+ * @param {{ current: import("node:child_process").ChildProcess | null }} running - the child pass under way
+ */
+async function runPlain(args, createdAt, tempDir, running) {
+  const bundleUrl = await buildBundle(ROOT, join(tempDir, "head"));
+  /* This process measures nothing, so it may load the bundle: to validate a dry run, and for the functions that
+   * name a record and build the report. */
+  const benchmarkModule = await import(bundleUrl);
   if (args.reportOnly) {
     const removedRunPaths = pruneOldBenchmarkRunFiles(RUNS_DIR);
     const records = readRunRecords();
@@ -325,19 +335,20 @@ async function runPlain(args, createdAt, outDir) {
     return;
   }
 
-  const record = await benchmarkModule.runOpticsRenderingBenchmark({
+  const options = {
     createdAt,
     git: gitInfo(),
     environment: environmentInfo(),
-    dryRun: args.dryRun,
     iterations: args.iterations,
     warmups: args.warmups,
-  });
-
+  };
   if (args.dryRun) {
-    console.log(`Benchmark dry run succeeded for ${record.config.lensKeys.length} lenses.`);
+    const dryRun = await benchmarkModule.runOpticsRenderingBenchmark({ ...options, dryRun: true });
+    console.log(`Benchmark dry run succeeded for ${dryRun.config.lensKeys.length} lenses.`);
     return;
   }
+
+  const record = await runChildPass("plain", { bundleUrl, options }, join(tempDir, "plain.json"), running);
 
   mkdirSync(RUNS_DIR, { recursive: true });
   const runFileName = benchmarkModule.formatRunFileName(record.createdAt, record.git.shortCommit);
@@ -453,18 +464,14 @@ async function main() {
     baseTree?.remove();
     rmSync(tempDir, { recursive: true, force: true });
   };
-  if (args.base === null && !args.heavy && !args.memory) {
-    try {
-      await runPlain(args, createdAt, tempDir);
-    } finally {
-      cleanUp();
-    }
-    return;
-  }
-
-  /* A base worktree is registered in the repository, so a run that is told to stop must still remove it. */
+  /* A run that is told to stop must still stop the pass under way and remove its base worktree, which is
+   * registered in the repository. */
   const forgetSignals = cleanUpOnSignal(LABEL, cleanUp);
   try {
+    if (args.base === null && !args.heavy && !args.memory) {
+      await runPlain(args, createdAt, tempDir, running);
+      return;
+    }
     let base = null;
     if (args.base !== null) {
       const commit = resolveBaseCommit(ROOT, args.base, LABEL);

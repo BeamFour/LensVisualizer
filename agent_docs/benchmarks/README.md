@@ -33,7 +33,8 @@ An argument the runner does not know is an error. `--report-only` takes none of 
 and validates the lenses on each, so it shows whether the working tree's benchmark entry still builds against a base.
 
 A run with none of `--base`, `--heavy` and `--memory` is a plain run: the whole matrix on the working tree, one record
-under `runs/`, and the trend report rebuilt.
+under `runs/`, and the trend report rebuilt. Its timed pass runs in a child process, as every measured pass does (see
+[Paired Runs](#paired-runs)), started with the Node flags the runner was given.
 
 ## Paired Runs
 
@@ -74,8 +75,9 @@ The process that ran the builds is not measured in. V8 keeps one root map for ev
 count, and it holds at most 1,536 transitions. A Vite build leaves about a thousand on the root that four-property
 literals share, one per lazily imported chunk, and a second build of a tree at another path fills it. The engine's own
 four-property results, first created after that, become dictionary-mode objects and `evaluateAperture` deoptimizes in a
-loop, which slows the heavy cases on both sides. A plain run still builds and measures in one process, as it always has:
-one build leaves that root at about 1,190 of 1,536, and each lazily imported `*.analysis.md` adds one.
+loop, which slows the heavy cases on both sides. A plain run's timed pass runs there for the same reason: one build
+leaves that root at about 1,190 of 1,536 and each lazily imported `*.analysis.md` adds one, so a plain run that measured
+beside its build would reach the same loop as the catalog grows.
 
 ### Statistic and Verdicts
 
@@ -211,6 +213,9 @@ agent_docs/benchmarks/runs/<timestamp>-<short-sha>.json
 
 When the run directory contains 15 or more JSON records, the runner removes the oldest records until 14 remain. Dry runs
 do not write or prune files.
+
+Records written before 2026-10-12 were timed in the process that built the bundle, and later ones in a child process. A
+step in the trend between the two is the change of process, not a change of the engine.
 
 The human-readable report is regenerated from the newest 10 run records:
 
