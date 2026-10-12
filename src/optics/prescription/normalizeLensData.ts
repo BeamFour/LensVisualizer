@@ -20,7 +20,6 @@ import type {
   StopSpec,
   VariableSpec,
 } from "../types.js";
-import { OPTICS_COUNTERS_ENABLED, workCounters } from "../diagnostics/workCounters.js";
 import { createSurfaceProfile } from "../math/surfaceProfile.js";
 import { compileDiffractivePhase } from "../math/diffractivePhase.js";
 import { compileAspheres } from "./aspheres.js";
@@ -76,7 +75,6 @@ const ENGINE_LENS_BY_RUNTIME = new WeakMap<RuntimeLens, EngineLens>();
 export function normalizeRuntimeLens(runtime: RuntimeLens): EngineLens {
   const cached = ENGINE_LENS_BY_RUNTIME.get(runtime);
   if (cached) return cached;
-  if (OPTICS_COUNTERS_ENABLED) workCounters.engineLensCompilations++;
   const engineLens = normalizeRuntimeLensUncached(runtime);
   ENGINE_LENS_BY_RUNTIME.set(runtime, engineLens);
   return engineLens;

@@ -9,7 +9,6 @@ import { wideOpenStopAtZoom } from "../apertureStop.js";
 
 import type { ParaxialTraceResult, RayTraceResult, RuntimeLens } from "../../types/optics.js";
 import { resolveImageFormatMetadata } from "../../utils/catalog/lensTaxonomy.js";
-import { OPTICS_COUNTERS_ENABLED, workCounters } from "../diagnostics/workCounters.js";
 import { normalizeRuntimeLens } from "../prescription/normalizeLensData.js";
 import { prepareState } from "../state/prepareState.js";
 import type { Plane3, PreparedOpticalState, Ray3, Vec3 } from "../types.js";
@@ -430,11 +429,9 @@ function solveChiefRayFromSeed2(
     return null;
   const launch = projectionLaunchSlopeForField2(L, fieldAngleDeg);
   if (launch.status === "out-of-domain" || !(Math.abs(seed.uField) > 0)) return null;
-  if (OPTICS_COUNTERS_ENABLED) workCounters.seededChiefSolves++;
   const uField = launch.uField;
   const stopIndex = state.lens.stop.surfaceIndex;
   const heightAtStop = (yLaunch: number): number | null => {
-    if (OPTICS_COUNTERS_ENABLED) workCounters.seededChiefSolveStopTraces++;
     const result = traceStateSurfacesReal2(state, yLaunch, uField, { stopAt: stopIndex });
     return Number.isFinite(result.y) ? result.y : null;
   };
@@ -642,7 +639,6 @@ export function solveChiefRayBoundingSphere2(
   };
 
   const heightAtStop = (yEP: number): number | null => {
-    if (OPTICS_COUNTERS_ENABLED) workCounters.chiefSolveStopTraces++;
     const origin: Vec3 = [baseOrigin[0], baseOrigin[1] + yEP * perpY, baseOrigin[2] + yEP * perpZ];
     const ray: Ray3 = { origin, direction };
     if (L.isFoldedOptics) {
@@ -861,7 +857,6 @@ export function solveFieldAngleForImageHeightAccurate2(
   if (!Number.isFinite(targetImageHeight) || Math.abs(targetImageHeight) < 1e-12) return 0;
   const geom = geometry ?? computeFieldGeometryAtState2(focusT, zoomT, L, aberrationT);
   if (!Number.isFinite(geom.halfFieldDeg) || geom.halfFieldDeg <= 0) return null;
-  if (OPTICS_COUNTERS_ENABLED) workCounters.imageHeightInversionTargets++;
   const target = -Math.abs(targetImageHeight);
   const imageHeightAt = (deg: number) => chiefRayImageHeightAccurate2(deg, zPos, focusT, zoomT, L, geom, aberrationT);
   const bracketSegments = Math.max(Math.ceil(geom.halfFieldDeg), 20);
@@ -869,7 +864,6 @@ export function solveFieldAngleForImageHeightAccurate2(
   const segmentHeights: number[] = [];
   for (let i = 0; i <= bracketSegments; i++) {
     const angleDeg = (i / bracketSegments) * geom.halfFieldDeg;
-    if (OPTICS_COUNTERS_ENABLED) workCounters.imageHeightInversionChiefSolves++;
     const height = imageHeightAt(angleDeg);
     if (!Number.isFinite(height)) continue;
     segmentAngles.push(angleDeg);
@@ -894,7 +888,6 @@ export function solveFieldAngleForImageHeightAccurate2(
   let loHeight = segmentHeights[lo];
   for (let i = 0; i < 40; i++) {
     const mid = (loAngle + hiAngle) / 2;
-    if (OPTICS_COUNTERS_ENABLED) workCounters.imageHeightInversionChiefSolves++;
     const yMid = imageHeightAt(mid);
     if (!Number.isFinite(yMid)) return null;
     if (Math.abs(yMid - target) < 1e-4) return mid;
@@ -964,7 +957,6 @@ function buildAccurateFieldHeightLookup2(
 
   for (let i = 0; i <= bracketSegments; i++) {
     const angleDeg = (i / bracketSegments) * geometry.halfFieldDeg;
-    if (OPTICS_COUNTERS_ENABLED) workCounters.imageHeightInversionChiefSolves++;
     const height = imageHeightAt(angleDeg);
     if (!Number.isFinite(height)) continue;
     segmentAngles.push(angleDeg);
@@ -981,7 +973,6 @@ function solveFieldAngleForImageHeightLookup2(
   const trivial = solveTrivialImageHeightTarget2(targetImageHeight);
   if (trivial !== null) return trivial;
 
-  if (OPTICS_COUNTERS_ENABLED) workCounters.imageHeightInversionTargets++;
   const target = -Math.abs(targetImageHeight);
   let lo = -1;
   let hi = -1;
@@ -1001,7 +992,6 @@ function solveFieldAngleForImageHeightLookup2(
   let loHeight = lookup.segmentHeights[lo];
   for (let i = 0; i < 40; i++) {
     const mid = (loAngle + hiAngle) / 2;
-    if (OPTICS_COUNTERS_ENABLED) workCounters.imageHeightInversionChiefSolves++;
     const yMid = lookup.imageHeightAt(mid);
     if (!Number.isFinite(yMid)) return null;
     if (Math.abs(yMid - target) < 1e-4) return mid;
@@ -1138,29 +1128,7 @@ function foldedCentralObstructionFraction2(L: RuntimeLens, entrancePupilSemiDiam
   return blockedRadius / entrancePupilSemiDiameter;
 }
 
-/**
- * Run one full chief-ray solve. With work counters compiled in, also record how many stop traces that solve spent:
- * the solver has many exits, so the tally is a difference taken around it instead of a statement at each one.
- */
 function computeChiefRaySolve2(
-  fieldAngleDeg: number,
-  focusT: number,
-  zoomT: number,
-  L: RuntimeLens,
-  geometry: FieldGeometryState2 | undefined,
-  aberrationT: number,
-): ChiefRaySolveResult2 {
-  const stopTracesBefore = OPTICS_COUNTERS_ENABLED ? workCounters.chiefSolveStopTraces : 0;
-  const result = computeChiefRaySolveUncounted(fieldAngleDeg, focusT, zoomT, L, geometry, aberrationT);
-  if (OPTICS_COUNTERS_ENABLED) {
-    const histogram = workCounters.chiefSolveStopTraceHistogram;
-    workCounters.chiefSolves++;
-    histogram[Math.min(workCounters.chiefSolveStopTraces - stopTracesBefore, histogram.length - 1)]++;
-  }
-  return result;
-}
-
-function computeChiefRaySolveUncounted(
   fieldAngleDeg: number,
   focusT: number,
   zoomT: number,
@@ -1187,7 +1155,6 @@ function computeChiefRaySolveUncounted(
   const state = prepareState(normalizeRuntimeLens(L), focusT, zoomT, aberrationT);
   const stopIndex = state.lens.stop.surfaceIndex;
   const heightAtStop = (yLaunch: number): number | null => {
-    if (OPTICS_COUNTERS_ENABLED) workCounters.chiefSolveStopTraces++;
     const result = traceStateSurfacesReal2(state, yLaunch, uField, { stopAt: stopIndex });
     return Number.isFinite(result.y) ? result.y : null;
   };

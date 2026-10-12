@@ -9,7 +9,7 @@
  *
  * A paired run bundles this same file a second time in a worktree of a base ref, so one
  * entry drives two engines. The file therefore names nothing that an older `src/` may
- * lack: the engine's work counters, which a base can predate, are reached through a glob.
+ * lack.
  */
 
 import React from "react";
@@ -17,7 +17,6 @@ import { renderToStaticMarkup } from "react-dom/server";
 import {
   BENCHMARK_SCHEMA_VERSION,
   DEFAULT_BENCHMARK_ITERATIONS,
-  compactCounters,
   compareMemorySessions,
   digestCompletedWork,
   hashText,
@@ -27,7 +26,6 @@ import {
   type AberrationPanelScenarioResults,
   type BenchmarkBaseSide,
   type BenchmarkCellRef,
-  type BenchmarkCounters,
   type BenchmarkEntry,
   type BenchmarkRunRecord,
   type BenchmarkScenarioConfigSnapshot,
@@ -125,13 +123,6 @@ declare const process:
       memoryUsage?: () => { heapUsed: number; arrayBuffers?: number };
     }
   | undefined;
-
-/* The read side of the engine's work counters, where this tree has it. A static import would fail the bundle in a
- * base worktree whose engine predates `src/optics/diagnostics.ts`; a glob that matches nothing is an empty object.
- * The type query is erased before bundling, so it names the module at no ref. */
-const WORK_COUNTERS: typeof import("../optics/diagnostics.js") | undefined = Object.values(
-  import.meta.glob<typeof import("../optics/diagnostics.js")>("../optics/diagnostics.ts", { eager: true }),
-)[0];
 
 /**
  * Representative lens set for performance tracking.
@@ -308,7 +299,7 @@ export interface BenchmarkCase {
   run: () => BenchmarkOutput;
   /**
    * Untimed work that tallies what the results of `run` do not show. The untimed pass calls it after the case's one
-   * call and after reading the case's counters, so engine work it does of its own is in no count.
+   * call.
    */
   inspect?: () => void;
   /** The case's place in the cell's results, filled when the case has been sampled. */
@@ -515,28 +506,18 @@ function inSideOrder<Base, Head>(
 }
 
 /**
- * Runs every case once, untimed, for what a timing cannot show: what each case completed, and how much work the
- * engine did for it.
+ * Runs every case once, untimed, for what a timing cannot show: what each case completed.
  *
- * A driver runs this in a bundle built with the engine's work counters on, apart from the bundles it times, so
- * counting costs the timed samples nothing. Where the tree has no counters, or the bundle was built with them
- * off, the pass still tallies each case's completed work and reports no counter names. The counters are zeroed
- * after a case's setup and read after its one call, so a count depends on the order of the cases and on nothing
- * else: every case here runs on the caches the cases before it left. A case's inspection runs after its counters
- * are read, and what it traces is counted for no case.
+ * A driver runs this in a process of its own, on the bundle it times, so tallying costs the timed samples nothing.
  *
  * @param options - the lenses or cells to run, as for the timed run
- * @returns the tallies and counters of every case, by case id
+ * @returns the tallies of every case, by case id
  */
 export async function runUntimedBenchmarkPass(
   options: Pick<OpticsRenderingBenchmarkOptions, "lensKeys" | "cells" | "onCell">,
 ): Promise<UntimedBenchmarkPass> {
   const selection = selectBenchmarkCells(options);
-  const counters = WORK_COUNTERS?.OPTICS_COUNTERS_ENABLED === true ? WORK_COUNTERS : null;
-  const pass: UntimedBenchmarkPass = {
-    counterNames: counters ? Object.keys(counters.snapshotWorkCounters()) : null,
-    cases: {},
-  };
+  const pass: UntimedBenchmarkPass = { cases: {} };
   let cellIndex = 0;
   for (const lensKey of selection.lensKeys) {
     const lens = prepareBenchmarkLens(lensKey);
@@ -547,23 +528,16 @@ export async function runUntimedBenchmarkPass(
       cellIndex++;
       for (const benchmarkCase of lens.prepareCell(scenario.id).cases) {
         benchmarkCase.setup?.();
-        counters?.resetWorkCounters();
         const work = new Map<string, Record<string, number>>();
-        let counted: BenchmarkCounters | undefined;
         workLog = work;
         try {
           benchmarkCase.run();
-          if (counters) counted = compactCounters(counters.snapshotWorkCounters());
           benchmarkCase.inspect?.();
           pass.cases[benchmarkCase.id] = { work: [...work.values()] };
         } catch (error) {
           pass.cases[benchmarkCase.id] = { message: error instanceof Error ? error.message : String(error) };
         } finally {
           workLog = null;
-        }
-        /* A case that threw carries what was counted up to the throw. */
-        if (counters) {
-          pass.cases[benchmarkCase.id].counters = counted ?? compactCounters(counters.snapshotWorkCounters());
         }
       }
     }
@@ -1580,7 +1554,7 @@ export const BEST_FOCUS_PROFILE_FRACTIONS = [
  * rays that are not clipped, and it answers with the layout's image plane when fewer than four of them give a hit.
  * So the inspection traces that ray set as the solve does and marks every ray as completed work, and it solves once
  * more and tallies whether the answer is that fallback. It does not see the rays the case itself traced: a solve
- * that traced fewer and still answered with a focus of its own shows only in the work counters.
+ * that traced fewer and still answered with a focus of its own is not flagged.
  *
  * @param snapshot - the cell's prepared state
  * @returns the inspection, or undefined for a moved lens

@@ -36,7 +36,6 @@ import type {
   SurfaceData,
   SurfaceSpectral,
 } from "../types/optics.js";
-import { OPTICS_COUNTERS_ENABLED, workCounters } from "./diagnostics/workCounters.js";
 import { evaluateSellmeier, LINE_NM, resolveCompatibleGlass, type GlassEntry } from "./glassCatalog.js";
 
 /** Wavelength (nm) used when tracing each chromatic channel. */
@@ -209,7 +208,6 @@ export function makeSurfaceDispersion(
   //    coordinates that don't match the real catalog glass — in which case the
   //    "probable" tag is wrong and the authored (nd, vd) pair should win.
   if (element?.glass) {
-    if (OPTICS_COUNTERS_ENABLED) workCounters.materialResolutions++;
     const entry = resolveCompatibleGlass(element.glass, surface.nd, element.vd, element.indexReference);
     if (entry && element.indexReference === "e") {
       // Native e-line element: same lines as the Abbe tier, anchored to the

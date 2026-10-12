@@ -13,8 +13,6 @@
  * fewer samples per row than a regression verdict needs, no row is marked regressed, and the table and the JSON
  * say so.
  *
- * The script has no build step, so it cannot set the engine's compile-time counter flag, and it counts nothing.
- *
  * Usage:
  *   node --import ./scripts/ts-js-specifier-hook-register.mjs scripts/benchmark-mtf.mjs [--method=geometric|diffraction]
  *     [--spectrum=reference|cdf|photopic] [--fields=N] [--sweep] [--stopped-down] [--finite] [--iterations=N]

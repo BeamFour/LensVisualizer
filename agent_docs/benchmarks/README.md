@@ -44,9 +44,8 @@ under `runs/`, and the trend report rebuilt.
 2. It copies the working tree's `src/benchmarks/` into that worktree, so the same benchmark entry runs on both engines,
    and links this checkout's `node_modules` there. The entry imports React and the component tree, so the base needs
    dependencies: a base whose `package-lock.json` differs from the working tree's stops the run with a message.
-3. It builds two bundles per side with this checkout's Vite and config: one with the engine's work counters off, which is
-   timed, and one with them on, which is not.
-4. The timed pass runs in two child processes, one after the other. Each loads both timed bundles and samples every
+3. It builds one bundle per side with this checkout's Vite and config. Every pass of the run loads those two bundles.
+4. The timed pass runs in two child processes, one after the other. Each loads both bundles and samples every
    case as pairs, one call per side. The base goes first in the first pair and the order swaps with every pair
    (base>head, head>base, base>head, …). Warmup pairs alternate the same way and are counted apart from the measured
    pairs, so the first measured pair is base-first whatever the number of warmups.
@@ -59,9 +58,8 @@ under `runs/`, and the trend report rebuilt.
      first process alone.
    - The pairs of both processes are pooled: a case's `samplesMs` lists the first process's samples and then the
      second's, and `config.timedProcesses` says how many pairs each gave.
-5. The untimed pass loads each counting bundle into a child process of its own and calls every case once. It records
-   what each case completed and, where that side's engine has them, its work counters. A base that predates
-   `src/optics/diagnostics.ts` has none: only the head is counted and the record's `counters.base` is `null`.
+5. The untimed pass loads each side's bundle into a child process of its own and calls every case once. It records
+   what each case completed.
 
 The measured passes run in `scripts/benchmark-child.mjs`, in processes that import prebuilt bundles and build nothing.
 The process that ran the builds is not measured in: the bundler's objects share V8's shape tree with the engine's, and a
@@ -82,14 +80,12 @@ it always has.
 - A run with fewer than 9 measured samples per case is a check that the tool works; its summary says so. The plan's
   method asks for at least 2 warmups and 9 samples, and 15 samples for cases above 100 ms. `--iterations=15` with
   `--warmups=2` gives every case that.
-- Where both sides are counted, the record lists the cases whose counters differ and those with a counter higher on the
-  head. The summary counts the first and names the second.
 
-A run of a ref against itself (`--base HEAD` on a clean tree) checks the tool: no case may be unequal work, none may be
-work not verified, and the counters of the two sides must be equal. It also shows the method's own offset: the interval
-measures the noise between the pairs it was given and not what differs between two loaded copies of one engine, so some
-cases still come out up to a few percent apart with an interval that excludes 1.0, on either side of it. Read the small
-ratios of a paired run against that, and run a flagged case again before reading it as a regression.
+A run of a ref against itself (`--base HEAD` on a clean tree) checks the tool: no case may be unequal work, and none may
+be work not verified. It also shows the method's own offset: the interval measures the noise between the pairs it was
+given and not what differs between two loaded copies of one engine, so some cases still come out up to a few percent
+apart with an interval that excludes 1.0, on either side of it. Read the small ratios of a paired run against that, and
+run a flagged case again before reading it as a regression.
 
 ### What the Work Comparison Checks
 
@@ -129,8 +125,8 @@ Three kinds of case return too little for the tallies above, and get facts of th
   which solve best focus on the way, tally two things. The untimed pass traces the 44 on-axis profile rays that best
   focus is fitted to, as the solve traces them, and tallies each ray as it tallies any other result: clipped or not,
   at the image plane or not. And it solves once more and tallies whether the answer is the layout's image plane, which
-  is what the solve returns when too few rays survive. This runs after the case's counters are read, so the case's
-  counters are its own. The ray set is a copy of the engine's list, and a test holds the two equal.
+  is what the solve returns when too few rays survive. The ray set is a copy of the engine's list, and a test holds the
+  two equal.
 - **`render.aberrationsTab` and `render.comaTab`** compute their data inside the render. The untimed pass hands the tab
   a wrapped analysis context and tallies each data section the tab computes through it, as it tallies any other result.
 - **Every render case** tallies the number of elements in its markup, which the printed coordinates do not move.
@@ -139,10 +135,9 @@ What the comparison does not check:
 
 - any float. Two sides that trace the same rays to different places are equal work;
 - how much the engine computed to reach an outcome. Two sides whose results hold the same counts, flags and statuses
-  are equal work, however many surface evaluations or solver steps each took. Only the work counters show that, and a
-  base that predates the counters has none to compare;
+  are equal work, however many surface evaluations or solver steps each took;
 - that a case traced the rays it should have. The best-focus tally re-traces the ray set and does not watch the solve:
-  a solve that traced fewer rays and still returned a focus of its own shows only in the counters too;
+  a solve that traced fewer rays and still returned a focus of its own is not flagged;
 - the text of a string that is not a status, and the values inside a list of numbers;
 - anything a result holds more than four levels down.
 
@@ -237,8 +232,7 @@ the head side where a plain record has its only side, and adds:
   second's, each in run order;
 - `config.timedProcesses`: the timed processes in the order they ran, each with the side it loaded and prepared first
   and the measured pairs it gave. Pair i of a case came from the first process when i is below that process's `pairs`;
-- `work` and `counters` on every entry, from the untimed pass, and the top-level `counters` block naming the counters
-  each side's engine has (`null` for a side that was not counted);
+- `work` on every entry, from the untimed pass;
 - `workTallies`: the tallies that `work` points into. An entry's `work` lists, for each result the case computed, the
   place of that result's tallies in this list. Equal tallies are kept once: the same result is tallied in several
   cases of a cell, and alike on both sides when they completed the same work;
@@ -247,8 +241,8 @@ the head side where a plain record has its only side, and adds:
   category, and the lists of regressed, unequal-work, unverified (`workNotVerified`) and thrown cases, and of the
   members only the head's results have (`headOnlyMembers`);
 - `config.cells` and `config.caseSet` on a subset run;
-- `environment.totalMemoryBytes`, `environment.osRelease` and `environment.timedBundleCounters` (always `false`),
-  beside the Node, V8, platform, architecture and CPU fields every record has. The sample counts are in `config`;
+- `environment.totalMemoryBytes` and `environment.osRelease`, beside the Node, V8, platform, architecture and CPU
+  fields every record has. The sample counts are in `config`;
 - `memory` on a memory run, which has no timed results, and `config.memorySession` in place of scenarios.
 
 ## MTF Benchmark
@@ -278,8 +272,7 @@ side under `base` and a `comparison` with the ratio, its interval and the verdic
 sides disagree on the support verdict or on a field's status, reason or grid size; an image height and a convergence
 delta may differ in their last bits. A paired run also prints a Markdown table to stderr. With fewer than 9 measured
 samples per row, no row is marked regressed: the table carries the notice the rendering summary prints, and the JSON
-carries it as `comparison.notice`. The script times in one process and has no build step, so it runs with the engine's
-counters off and counts nothing.
+carries it as `comparison.notice`. The script times in one process and has no build step.
 
 Redirect stdout to JSON; `mtf-geometric.json`, `mtf-diffraction.json`, `mtf-spectral.json` and `mtf-finite.json` retain
 the latest corresponding unpaired measurements, not a branch history. A rejected field is not a completed MTF timing.

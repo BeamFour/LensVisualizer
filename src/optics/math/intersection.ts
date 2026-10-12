@@ -12,7 +12,6 @@ import {
   VECTOR_EPSILON,
 } from "../constants.js";
 import type { Ray3, SurfaceProfile, Vec3 } from "../types.js";
-import { OPTICS_COUNTERS_ENABLED, workCounters } from "../diagnostics/workCounters.js";
 import { clamp } from "./numerics.js";
 import { dot, normalize, subtract } from "./vector.js";
 import { planeResidualRoundoff, sagResidualRoundoff } from "./intersectionTolerance.js";
@@ -99,10 +98,6 @@ export function intersectSurfaceProfile(
   vertexZ: number,
   options: SurfaceIntersectionOptions = {},
 ): SurfaceIntersectionResult {
-  if (OPTICS_COUNTERS_ENABLED && profile.kind === "flat") workCounters.preparedFlatIntersections++;
-  if (OPTICS_COUNTERS_ENABLED && profile.kind === "spherical") workCounters.preparedSphericalIntersections++;
-  if (OPTICS_COUNTERS_ENABLED && profile.kind === "aspheric") workCounters.preparedAsphericIntersections++;
-  if (OPTICS_COUNTERS_ENABLED && profile.kind === "tilted-plane") workCounters.preparedTiltedPlaneIntersections++;
   const hit = intersectProfile(ray, profile, vertexZ, options);
   if (!hit.ok) return hit;
   return selectAsphericCapHit(ray, profile, vertexZ, options, hit);
@@ -151,7 +146,6 @@ export function selectAsphericCapHit(
       transverseSpeed * Math.max(Math.abs(requestedMinT), Math.abs(hit.t), Math.abs(maxT)));
   const geometryCertain =
     Number.isFinite(geometryError) && geometryError <= (options.tolerance ?? INTERSECTION_TOLERANCE);
-  if (OPTICS_COUNTERS_ENABLED && !geometryCertain) workCounters.capCertificateRefusals++;
   const monotoneWithinRadius = (radialBound: number): boolean => {
     if (!geometryCertain) return false;
     const conservativeRadius = radialBound * (1 + 1e-12) + geometryError + 1e-12;
@@ -281,7 +275,6 @@ function intersectProfile(
     if (newtonT === t) {
       const effectiveTolerance = roundoffTolerance(current);
       if (Math.abs(current.value) <= effectiveTolerance) {
-        if (OPTICS_COUNTERS_ENABLED) workCounters.preparedFloorAssistedAcceptances++;
         return makeSuccess(current, profile, vertexZ, effectiveTolerance, refractiveIndex, iterations);
       }
     }
@@ -293,7 +286,6 @@ function intersectProfile(
     if (nextT === t) {
       const effectiveTolerance = roundoffTolerance(current);
       if (Math.abs(current.value) <= effectiveTolerance) {
-        if (OPTICS_COUNTERS_ENABLED) workCounters.preparedFloorAssistedAcceptances++;
         return makeSuccess(current, profile, vertexZ, effectiveTolerance, refractiveIndex, iterations);
       }
     }
@@ -310,12 +302,10 @@ function intersectProfile(
   if (isFiniteEvaluation(finalEval) && t - finalEval.value / finalEval.derivative === t) {
     const effectiveTolerance = roundoffTolerance(finalEval);
     if (Math.abs(finalEval.value) <= effectiveTolerance) {
-      if (OPTICS_COUNTERS_ENABLED) workCounters.preparedFloorAssistedAcceptances++;
       return makeSuccess(finalEval, profile, vertexZ, effectiveTolerance, refractiveIndex, maxIterations);
     }
   }
 
-  if (OPTICS_COUNTERS_ENABLED) workCounters.preparedExhaustionFailures++;
   return failure("noConvergedIntersection", isFiniteValueEvaluation(finalEval) ? finalEval.value : null, maxIterations);
 }
 
@@ -349,7 +339,6 @@ function intersectProfilePlane(
   if (!Number.isFinite(residual) || !(Math.abs(residual) <= effectiveTolerance)) {
     return failure("noConvergedIntersection", residual, 0);
   }
-  if (OPTICS_COUNTERS_ENABLED && effectiveTolerance > tolerance) workCounters.preparedFloorAssistedAcceptances++;
   return {
     ok: true,
     t: clampedT,
@@ -375,8 +364,6 @@ function evaluateProfile(
   const point = addRay(origin, direction, t);
   const radius = Math.hypot(point[0], point[1]);
   if (domainRadius !== null && radius > domainRadius) return { t, point, radius, value: NaN, derivative: NaN };
-  // Counted past the out-of-domain return: only a point that evaluates sag and slope is an evaluation.
-  if (OPTICS_COUNTERS_ENABLED) workCounters.preparedProfileEvaluations++;
   const slope = profile.slope(radius);
   /* Chain rule for f(t) = z_ray(t) - z_surface(r(t)):
    * df/dt = dz/dt - (dz/dr) * dr/dt. */

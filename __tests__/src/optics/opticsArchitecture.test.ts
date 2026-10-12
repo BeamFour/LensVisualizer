@@ -63,7 +63,6 @@ const SEAM_REGISTRY: readonly SeamRegistryEntry[] = [
   { module: "src/optics/buildLens.ts" },
   { module: "src/optics/cardinalElements.ts" },
   { module: "src/optics/chiefRayDiagnostics.ts" },
-  { module: "src/optics/diagnostics.ts" },
   { module: "src/optics/diagramGeometry.ts" },
   { module: "src/optics/fieldGeometry.ts" },
   { module: "src/optics/mtf.ts" },

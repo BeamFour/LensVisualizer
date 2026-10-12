@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   BENCHMARK_SCHEMA_VERSION,
   HEADLINE_CASE_IDS,
@@ -28,7 +28,33 @@ import {
   type PairedBenchmarkBase,
 } from "../../../src/benchmarks/opticsRenderingBenchmark.js";
 import { PROFILE_FRACS } from "../../../src/optics/aberration/shared.js";
-import { resetWorkCounters, snapshotWorkCounters } from "../../../src/optics/diagnostics.js";
+
+/* Tallies of three engine calls the benchmark makes itself, each passed through unchanged: a lens build, a prepared
+ * state and a spherical-aberration job. The head side of a paired run is the benchmark's own and takes no stand-in,
+ * so the paired tests read these to tell what the head has done by the time the base is called. */
+const engineCalls = vi.hoisted(() => ({ lensBuilds: 0, preparedStates: 0, sphericalAberrationJobs: 0 }));
+
+vi.mock("../../../src/optics/compat.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../../src/optics/compat.js")>();
+  const buildLens2: typeof actual.buildLens2 = (...args) => {
+    engineCalls.lensBuilds++;
+    return actual.buildLens2(...args);
+  };
+  const prepareRuntimeState: typeof actual.prepareRuntimeState = (...args) => {
+    engineCalls.preparedStates++;
+    return actual.prepareRuntimeState(...args);
+  };
+  const computeSphericalAberration: typeof actual.analysisJobsForState2.computeSphericalAberration = (...args) => {
+    engineCalls.sphericalAberrationJobs++;
+    return actual.analysisJobsForState2.computeSphericalAberration(...args);
+  };
+  return {
+    ...actual,
+    buildLens2,
+    prepareRuntimeState,
+    analysisJobsForState2: { ...actual.analysisJobsForState2, computeSphericalAberration },
+  };
+});
 
 const NIKON_PC_19 = "nikon-pc-nikkor-19mm-f4e-ed";
 const CANON_TSE_50 = "canon-tse-50f28l-macro";
@@ -247,7 +273,7 @@ describe("optics rendering benchmark records", () => {
       }
       expect(entry.status, `${id}: ${entry.message}`).toBe("ok");
       expect(Object.keys(entry), id).toEqual(["status", "stats", "output"]);
-      /* No raw samples, completed-work tallies or counters: those belong to records under paired/. */
+      /* No raw samples or completed-work tallies: those belong to records under paired/. */
       expect(Object.keys(entry.stats ?? {}), id).toEqual([
         "min",
         "median",
@@ -286,8 +312,8 @@ describe("optics rendering benchmark records", () => {
   });
 
   it("samples a paired case on both sides, alternating which goes first", async () => {
-    /* The stand-in base does no engine work, so the lens builds counted between two of its calls are the head's
-     * calls of the `build` case in between. */
+    /* The stand-in base builds no lens when it is sampled, so the lens builds between two of its calls are the
+     * head's calls of the `build` case in between. */
     const buildsAtBaseCall: number[] = [];
     const base: PairedBenchmarkBase = {
       ...SELF_BASE,
@@ -301,7 +327,7 @@ describe("optics rendering benchmark records", () => {
               const isBuild = benchmarkCase.id.endsWith(":build");
               delete benchmarkCase.setup;
               benchmarkCase.run = () => {
-                if (isBuild) buildsAtBaseCall.push(snapshotWorkCounters().runtimeLensBuilds);
+                if (isBuild) buildsAtBaseCall.push(engineCalls.lensBuilds);
                 return {};
               };
             }
@@ -310,7 +336,6 @@ describe("optics rendering benchmark records", () => {
         };
       },
     };
-    resetWorkCounters();
     const record = await runOpticsRenderingBenchmark({
       ...METADATA,
       cells: [{ lensKey: SERENAR, scenarioId: "default" }],
@@ -328,25 +353,25 @@ describe("optics rendering benchmark records", () => {
   });
 
   it("prepares the side a process puts first before the other: its lens, its cells and its setups", async () => {
-    /* The stand-in base does no engine work of its own, so what the engine has counted when the base is asked for
-     * something is the head's work up to then. */
+    /* What the head has done by the time the base is asked for something. The stand-in base reads a tally before
+     * it does any work of its own. */
     const countedAtBase = async (firstSide: "base" | "head") => {
       const counted = { lens: -1, cell: -1, setup: -1 };
       const base: PairedBenchmarkBase = {
         ...SELF_BASE,
         firstSide,
         prepareBenchmarkLens: (lensKey) => {
-          counted.lens = snapshotWorkCounters().runtimeLensBuilds;
+          counted.lens = engineCalls.lensBuilds;
           const lens = prepareBenchmarkLens(lensKey);
           return {
             dataFingerprint: lens.dataFingerprint,
             prepareCell: (scenarioId) => {
-              counted.cell = snapshotWorkCounters().preparedStateConstructions;
+              counted.cell = engineCalls.preparedStates;
               const cell = lens.prepareCell(scenarioId);
               for (const benchmarkCase of cell.cases) {
                 if (benchmarkCase.setup) {
                   benchmarkCase.setup = () => {
-                    counted.setup = snapshotWorkCounters().fullTracesPreparedSequential;
+                    counted.setup = engineCalls.sphericalAberrationJobs;
                   };
                 }
                 benchmarkCase.run = () => ({});
@@ -356,7 +381,7 @@ describe("optics rendering benchmark records", () => {
           };
         },
       };
-      resetWorkCounters();
+      Object.assign(engineCalls, { lensBuilds: 0, preparedStates: 0, sphericalAberrationJobs: 0 });
       const record = await runOpticsRenderingBenchmark({
         ...METADATA,
         cells: [{ lensKey: SERENAR, scenarioId: "default" }],
@@ -374,146 +399,134 @@ describe("optics rendering benchmark records", () => {
     /* Base first: the base's lens is asked for before the head has built one. Head first: after. */
     expect(baseFirst.lens).toBe(0);
     expect(headFirst.lens).toBe(1);
-    /* The head's cell prepares a state and its setup traces rays, each before the base's when the head goes first. */
+    /* The head's cell prepares a state and its setup computes spherical aberration, each before the base's when the
+     * head goes first. A case sampled before the setup computes it too, so the tally is past zero either way. */
     expect(headFirst.cell).toBeGreaterThan(baseFirst.cell);
     expect(baseFirst.setup).toBeGreaterThan(0);
     expect(headFirst.setup).toBeGreaterThan(baseFirst.setup);
   });
 
-  it(
-    "builds a paired record with both sides, raw samples, completed work and counters",
-    { timeout: 120_000 },
-    async () => {
-      const cells = [{ lensKey: SERENAR, scenarioId: "default" }];
-      const progress: string[] = [];
-      /* The timed pass as the runner makes it: one process's share with each side first, pooled. */
-      const processes = planTimedProcesses(2);
-      const shares = [];
-      for (const { firstSide, pairs } of processes) {
-        shares.push(
-          await runOpticsRenderingBenchmark({
-            ...METADATA,
-            cells,
-            warmups: 1,
-            iterations: pairs,
-            keepSamples: true,
-            base: { ...SELF_BASE, firstSide },
-            onCell: ({ lensKey, scenarioId, index, count }) => {
-              progress.push(`${firstSide} first ${index + 1}/${count} ${lensKey} ${scenarioId}`);
-            },
-          }),
-        );
-      }
-      const record = poolTimedRecords(shares);
-      finishBenchmarkRecord(record, {
-        head: await runUntimedBenchmarkPass({ cells }),
-        base: await runUntimedBenchmarkPass({ cells }),
-      });
+  it("builds a paired record with both sides, raw samples and completed work", { timeout: 120_000 }, async () => {
+    const cells = [{ lensKey: SERENAR, scenarioId: "default" }];
+    const progress: string[] = [];
+    /* The timed pass as the runner makes it: one process's share with each side first, pooled. */
+    const processes = planTimedProcesses(2);
+    const shares = [];
+    for (const { firstSide, pairs } of processes) {
+      shares.push(
+        await runOpticsRenderingBenchmark({
+          ...METADATA,
+          cells,
+          warmups: 1,
+          iterations: pairs,
+          keepSamples: true,
+          base: { ...SELF_BASE, firstSide },
+          onCell: ({ lensKey, scenarioId, index, count }) => {
+            progress.push(`${firstSide} first ${index + 1}/${count} ${lensKey} ${scenarioId}`);
+          },
+        }),
+      );
+    }
+    const record = poolTimedRecords(shares);
+    finishBenchmarkRecord(record, {
+      head: await runUntimedBenchmarkPass({ cells }),
+      base: await runUntimedBenchmarkPass({ cells }),
+    });
 
-      expect(progress).toEqual([`base first 1/1 ${SERENAR} default`, `head first 1/1 ${SERENAR} default`]);
-      expect(record.schemaVersion).toBe(3);
-      expect(record.config).toMatchObject({ warmups: 1, iterations: 2, lensKeys: [SERENAR], scenarios: ["default"] });
-      expect(record.config.timedProcesses).toEqual(processes);
-      expect(record.config.cells).toEqual(cells);
-      expect(record.config.caseSet).toBe("custom");
-      expect(record.base).toMatchObject({ ref: "self", commit: "b".repeat(40), shortCommit: "bbbbbbbb" });
-      expect(record.warnings).toEqual([]);
+    expect(progress).toEqual([`base first 1/1 ${SERENAR} default`, `head first 1/1 ${SERENAR} default`]);
+    expect(record.schemaVersion).toBe(3);
+    expect(record.config).toMatchObject({ warmups: 1, iterations: 2, lensKeys: [SERENAR], scenarios: ["default"] });
+    expect(record.config.timedProcesses).toEqual(processes);
+    expect(record.config.cells).toEqual(cells);
+    expect(record.config.caseSet).toBe("custom");
+    expect(record.base).toMatchObject({ ref: "self", commit: "b".repeat(40), shortCommit: "bbbbbbbb" });
+    expect(record.warnings).toEqual([]);
 
-      const headCases = listBenchmarkCases(record);
-      const baseCases = listBenchmarkCases(record.base!);
-      expect(baseCases.map(({ id }) => id)).toEqual(headCases.map(({ id }) => id));
-      const measured = (entry: BenchmarkEntry) => entry.status !== "skipped";
-      for (const { id, entry } of [...headCases, ...baseCases].filter(({ entry }) => measured(entry))) {
-        expect(entry.status, `${id}: ${entry.message}`).toBe("ok");
-        expect(Object.keys(entry), id).toEqual(["status", "stats", "output", "work", "counters"]);
-        /* One pair from each process, and no raw heap delta left behind by the pooling. */
-        expect(entry.stats?.iterations, id).toBe(2);
-        expect(entry.stats?.samplesMs, id).toHaveLength(2);
-        expect(entry.stats?.heapDeltaSamplesBytes, id).toBeUndefined();
-        expect(
-          entry.stats?.samplesMs?.every((sample) => Number.isFinite(sample) && sample >= 0),
-          id,
-        ).toBe(true);
-      }
-      /* An entry points at the tallies of each result it marked; the record keeps equal tallies once. */
-      const workOf = (entry: BenchmarkEntry | undefined) => (entry ? completedWorkOf(record, entry) : undefined);
-      for (const tallies of record.workTallies ?? []) {
-        for (const [fact, tally] of Object.entries(tallies)) expect(Number.isInteger(tally), fact).toBe(true);
-      }
-      const places = [...headCases, ...baseCases].flatMap(({ entry }) => entry.work ?? []);
-      expect(new Set(places).size).toBe(record.workTallies?.length);
-      expect(new Set(places).size).toBeLessThan(places.length / 2);
+    const headCases = listBenchmarkCases(record);
+    const baseCases = listBenchmarkCases(record.base!);
+    expect(baseCases.map(({ id }) => id)).toEqual(headCases.map(({ id }) => id));
+    const measured = (entry: BenchmarkEntry) => entry.status !== "skipped";
+    for (const { id, entry } of [...headCases, ...baseCases].filter(({ entry }) => measured(entry))) {
+      expect(entry.status, `${id}: ${entry.message}`).toBe("ok");
+      expect(Object.keys(entry), id).toEqual(["status", "stats", "output", "work"]);
+      /* One pair from each process, and no raw heap delta left behind by the pooling. */
+      expect(entry.stats?.iterations, id).toBe(2);
+      expect(entry.stats?.samplesMs, id).toHaveLength(2);
+      expect(entry.stats?.heapDeltaSamplesBytes, id).toBeUndefined();
+      expect(
+        entry.stats?.samplesMs?.every((sample) => Number.isFinite(sample) && sample >= 0),
+        id,
+      ).toBe(true);
+    }
+    /* An entry points at the tallies of each result it marked; the record keeps equal tallies once. */
+    const workOf = (entry: BenchmarkEntry | undefined) => (entry ? completedWorkOf(record, entry) : undefined);
+    for (const tallies of record.workTallies ?? []) {
+      for (const [fact, tally] of Object.entries(tallies)) expect(Number.isInteger(tally), fact).toBe(true);
+    }
+    const places = [...headCases, ...baseCases].flatMap(({ entry }) => entry.work ?? []);
+    expect(new Set(places).size).toBe(record.workTallies?.length);
+    expect(new Set(places).size).toBeLessThan(places.length / 2);
 
-      /* Vitest runs with the counters on, so both untimed passes count. */
-      expect(record.counters?.head).toEqual(Object.keys(snapshotWorkCounters()));
-      expect(record.counters?.base).toEqual(record.counters?.head);
-      const rays = record.results[SERENAR].default.rays;
-      /* The eleven diagram rays, and the traces that place the off-axis fan. */
-      expect(rays.counters?.fullTracesPreparedSequential).toBeGreaterThanOrEqual(11);
-      /* Every traced ray is tallied once, clipped or not. */
-      expect((workOf(rays)?.["ray.clipped=false"] ?? 0) + (workOf(rays)?.["ray.clipped=true"] ?? 0)).toBe(11);
-      expect(workOf(record.results[SERENAR].default.analysis)).toMatchObject({
-        "summary.surfaceCount": 11,
-        "distortionCurve.length": 21,
-        "bokehPair.infinity.usableFieldCount": 4,
-      });
+    const rays = record.results[SERENAR].default.rays;
+    /* Every one of the eleven diagram rays is tallied once, clipped or not. */
+    expect((workOf(rays)?.["ray.clipped=false"] ?? 0) + (workOf(rays)?.["ray.clipped=true"] ?? 0)).toBe(11);
+    expect(workOf(record.results[SERENAR].default.analysis)).toMatchObject({
+      "summary.surfaceCount": 11,
+      "distortionCurve.length": 21,
+      "bokehPair.infinity.usableFieldCount": 4,
+    });
 
-      const comparison = record.comparison!;
-      const measuredIds = headCases.filter(({ entry }) => measured(entry)).map(({ id }) => id);
-      expect(Object.keys(comparison.cases)).toEqual(measuredIds);
-      for (const id of measuredIds) {
-        const timing = comparison.cases[id];
-        expect(timing.pairs, id).toBe(2);
-        expect(timing.unequalWork, id).toBe(false);
-        expect(timing.ci95?.[0], id).toBeLessThanOrEqual(timing.ci95?.[1] ?? Number.NaN);
-      }
-      /* One engine on both sides completes the same work and counts the same. */
-      expect(comparison.unequalWork).toEqual([]);
-      expect(comparison.headOnlyMembers).toEqual([]);
-      /* Every case of the matrix reports some fact of its work, so none is taken on trust. */
-      expect(comparison.workNotVerified).toEqual([]);
-      expect(comparison.thrown).toEqual([]);
+    const comparison = record.comparison!;
+    const measuredIds = headCases.filter(({ entry }) => measured(entry)).map(({ id }) => id);
+    expect(Object.keys(comparison.cases)).toEqual(measuredIds);
+    for (const id of measuredIds) {
+      const timing = comparison.cases[id];
+      expect(timing.pairs, id).toBe(2);
+      expect(timing.unequalWork, id).toBe(false);
+      expect(timing.ci95?.[0], id).toBeLessThanOrEqual(timing.ci95?.[1] ?? Number.NaN);
+    }
+    /* One engine on both sides completes the same work. */
+    expect(comparison.unequalWork).toEqual([]);
+    expect(comparison.headOnlyMembers).toEqual([]);
+    /* Every case of the matrix reports some fact of its work, so none is taken on trust. */
+    expect(comparison.workNotVerified).toEqual([]);
+    expect(comparison.thrown).toEqual([]);
 
-      /* Best focus returns one position: its case tallies the profile rays it is fitted to and whether it fell back. */
-      const bestFocus = record.results[SERENAR].default.analysisBreakdown?.bestFocus;
-      expect(workOf(bestFocus)).toMatchObject({ "bestFocus.z=number": 1, "bestFocus.isLayoutImagePlane=false": 1 });
-      const focusRays = (flag: string) => workOf(bestFocus)?.[`bestFocusRay.clipped=${flag}`] ?? 0;
-      expect(focusRays("false") + focusRays("true")).toBe(2 * BEST_FOCUS_PROFILE_FRACTIONS.length);
-      /* The benchmark's copy of the ray set is the engine's. */
-      expect(BEST_FOCUS_PROFILE_FRACTIONS).toEqual(PROFILE_FRACS);
-      /* The inspection traces those rays after the case's counters are read: the case's own 44 are all it counts. */
-      expect(bestFocus?.counters?.fullTracesPreparedSequential).toBe(44);
-      /* A tab computes its own data, and tallies each section it asked for and the elements it drew. */
-      const { render } = record.aberrationPanels[SERENAR].default;
-      const sections = (work: Record<string, number> | undefined) => [
-        ...new Set(
-          Object.keys(work ?? {})
-            .filter((fact) => fact.startsWith("compute"))
-            .map((fact) => fact.split(/[.=]/)[0]),
-        ),
-      ];
-      expect(sections(workOf(render.aberrationsTab))).toEqual([
-        "computeSphericalAberration",
-        "computeSAProfile",
-        "computeSphericalAberrationBlurCharacter",
-        "computeFieldCurvatureBundle",
-      ]);
-      expect(sections(workOf(render.comaTab))).toEqual(["computeComaAnalysis"]);
-      for (const [name, entry] of Object.entries(render)) {
-        expect(workOf(entry)?.["markup.elements"], name).toBeGreaterThan(0);
-      }
-      expect(workOf(record.results[SERENAR].default.svgRender)?.["markup.elements"]).toBeGreaterThan(0);
-      expect(comparison.counters).toEqual({ comparedCases: measuredIds.length, differingCases: [], risenCases: [] });
-      expect(Object.keys(comparison.categories)).toContain("analysis.bokehPair");
+    /* Best focus returns one position: its case tallies the profile rays it is fitted to and whether it fell back. */
+    const bestFocus = record.results[SERENAR].default.analysisBreakdown?.bestFocus;
+    expect(workOf(bestFocus)).toMatchObject({ "bestFocus.z=number": 1, "bestFocus.isLayoutImagePlane=false": 1 });
+    const focusRays = (flag: string) => workOf(bestFocus)?.[`bestFocusRay.clipped=${flag}`] ?? 0;
+    expect(focusRays("false") + focusRays("true")).toBe(2 * BEST_FOCUS_PROFILE_FRACTIONS.length);
+    /* The benchmark's copy of the ray set is the engine's. */
+    expect(BEST_FOCUS_PROFILE_FRACTIONS).toEqual(PROFILE_FRACS);
+    /* A tab computes its own data, and tallies each section it asked for and the elements it drew. */
+    const { render } = record.aberrationPanels[SERENAR].default;
+    const sections = (work: Record<string, number> | undefined) => [
+      ...new Set(
+        Object.keys(work ?? {})
+          .filter((fact) => fact.startsWith("compute"))
+          .map((fact) => fact.split(/[.=]/)[0]),
+      ),
+    ];
+    expect(sections(workOf(render.aberrationsTab))).toEqual([
+      "computeSphericalAberration",
+      "computeSAProfile",
+      "computeSphericalAberrationBlurCharacter",
+      "computeFieldCurvatureBundle",
+    ]);
+    expect(sections(workOf(render.comaTab))).toEqual(["computeComaAnalysis"]);
+    for (const [name, entry] of Object.entries(render)) {
+      expect(workOf(entry)?.["markup.elements"], name).toBeGreaterThan(0);
+    }
+    expect(workOf(record.results[SERENAR].default.svgRender)?.["markup.elements"]).toBeGreaterThan(0);
+    expect(Object.keys(comparison.categories)).toContain("analysis.bokehPair");
 
-      const summary = buildPairedSummary(record);
-      expect(summary).toContain("## Benchmark: base bbbbbbbb (self) against head ffffffff");
-      expect(summary).toContain("- Cases: custom set, 1 lens/scenario cells");
-      expect(summary).toContain("the head was counted in an untimed pass, and so was the base");
-      expect(summary).toContain(`| ${SERENAR} default analysis |`);
-      expect(summary).toContain("- Unequal work, left out of the regression verdict: 0");
-    },
-  );
+    const summary = buildPairedSummary(record);
+    expect(summary).toContain("## Benchmark: base bbbbbbbb (self) against head ffffffff");
+    expect(summary).toContain("- Cases: custom set, 1 lens/scenario cells");
+    expect(summary).toContain(`| ${SERENAR} default analysis |`);
+    expect(summary).toContain("- Unequal work, left out of the regression verdict: 0");
+  });
 
   it("reports a case that throws on one side and goes on sampling the other", async () => {
     const base: PairedBenchmarkBase = {
@@ -546,7 +559,7 @@ describe("optics rendering benchmark records", () => {
       keepSamples: true,
       base,
     });
-    finishBenchmarkRecord(record, { head: { counterNames: null, cases: {} }, base: { counterNames: null, cases: {} } });
+    finishBenchmarkRecord(record, { head: { cases: {} }, base: { cases: {} } });
 
     expect(record.base?.results[SERENAR].default.svgRender).toEqual({ status: "error", message: "base cannot render" });
     expect(record.results[SERENAR].default.svgRender.stats?.samplesMs).toHaveLength(2);

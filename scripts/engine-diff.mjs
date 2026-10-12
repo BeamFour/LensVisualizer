@@ -19,11 +19,6 @@
  * engine can, is uncompared instead, and one that only the head's prescriptions permit is compared as a new lens.
  * A record that throws on both engines fails the run in any class.
  *
- * Both bundles are built with the engine's work counters on. Where both engines have them, a counter that is higher
- * on the head engine for the same request fails a run of Tier S or Tier F in any class, and a run of Tier P
- * reports it. A base that predates the counters has none, and the head's totals are reported alone. A head without
- * counters beside a base that has them fails a run of Tier S or Tier F, and a run of Tier P reports it.
- *
  * A tier too long for one run is split with `--shard i/n`: the tier's lenses are dealt into n parts, and the run
  * covers part i, counted from 1. The parts of a tier share no lens and together hold all of them, so n runs with
  * the same base, tier and class are one comparison of the tier.
@@ -168,9 +163,6 @@ async function loadCapture(root, outDir) {
   await build({
     configFile: false,
     root,
-    /* The compile-time flag of the engine's work counters, which a capture build runs with. A tree that never
-     * names the flag is unaffected. */
-    define: { __OPTICS_COUNTERS__: "true" },
     build: {
       ssr: join(root, CAPTURE_ENTRY),
       outDir,
@@ -374,7 +366,6 @@ export async function runEngineDiff(options, log = console.log, warn = console.e
 
     const run = headCapture.createDifferentialRun({
       changeClass: options.changeClass,
-      tier: options.tier,
       declaredExceptions: headCapture.parseDeclaredExceptions(declaredText),
       /* A shard, like a single lens, is part of a tier: a declared exception may be in another part. */
       restricted: options.lens !== null || options.shard !== null,
@@ -464,14 +455,6 @@ export async function runEngineDiff(options, log = console.log, warn = console.e
         `${summary.lenses} lenses, ${engine.records} records and ${engine.numbers} numbers compared, ` +
         `${engine.recordsDiffering} records differ; rays ok/clipped/failed ` +
         `${counts.headEngine.rays.ok}/${counts.headEngine.rays.clipped}/${counts.headEngine.rays.failed}.`,
-    );
-    const counted = summary.workCounters.records;
-    log(
-      counted.both > 0
-        ? `engine-diff: work counters compared in ${counted.both} pairs of records; they rose in ` +
-            `${summary.workCounters.risingRecords}.`
-        : `engine-diff: work counters were not compared: ${counted.base} base and ${counted.head} head records ` +
-            `carry them.`,
     );
     for (const failure of summary.failures) log(`engine-diff: ${failure}`);
     for (const warning of summary.warnings) warn(`engine-diff: warning: ${warning}`);

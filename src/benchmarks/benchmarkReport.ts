@@ -9,8 +9,8 @@
  *
  * A record under `agent_docs/benchmarks/paired/` is the same record with more in it: the
  * head side sits where an unpaired record keeps its only side, and the base side, the raw
- * samples, the completed-work facts, the work counters and the comparison are added. The
- * trend report reads `runs/` alone.
+ * samples, the completed-work facts and the comparison are added. The trend report reads
+ * `runs/` alone.
  *
  * The module imports nothing and uses only erasable type syntax, so the MTF benchmark can
  * load it under plain Node for the same statistics.
@@ -137,12 +137,6 @@ export interface BenchmarkStats extends NumericSummary {
 /** Small serializable facts about what one call of a case completed. */
 export type BenchmarkFacts = Record<string, number | string | boolean | null>;
 
-/**
- * Work-counter readings over one call of a case. A counter that read zero is left out, and a histogram keeps its
- * non-zero buckets; the record's `counters` block names every counter each side's engine has.
- */
-export type BenchmarkCounters = { [counter: string]: number | { [bucket: string]: number } };
-
 /** Persisted result for one category in one lens/scenario benchmark cell. */
 export interface BenchmarkEntry {
   status: BenchmarkStatus;
@@ -159,8 +153,6 @@ export interface BenchmarkEntry {
    * tallies in the record's `workTallies`. `completedWorkOf` reads them. Written to records under `paired/` only.
    */
   work?: number[];
-  /** The engine's work counters over one call of the case in the untimed pass, where that side's engine counts. */
-  counters?: BenchmarkCounters;
 }
 
 /** Explicit skip record for aberration-panel sections that are intentionally not exercised. */
@@ -281,16 +273,6 @@ export interface ThrownCase {
   head: string | null;
 }
 
-/** Work counters of the two untimed passes, case by case, over the counters both engines have. */
-export interface CounterComparison {
-  /** Cases counted on both sides. */
-  comparedCases: number;
-  /** Cases with any counter or histogram bucket that differs. */
-  differingCases: string[];
-  /** Cases with a counter that is higher on the head. Histograms are not judged. */
-  risenCases: string[];
-}
-
 /** What a paired run concludes from its two sides. */
 export interface BenchmarkComparison {
   /** The side sampled first in pair 0, of the warmups and of the measured samples; the order swaps every pair. */
@@ -314,8 +296,6 @@ export interface BenchmarkComparison {
    */
   headOnlyMembers: HeadOnlyMember[];
   thrown: ThrownCase[];
-  /** Null unless both sides were counted. */
-  counters: CounterComparison | null;
 }
 
 /**
@@ -361,15 +341,12 @@ export interface BenchmarkMemoryReport {
 export interface UntimedCaseResult {
   /** The tallies of each result the case marked, one set per label. Absent when the case threw. */
   work?: Record<string, number>[];
-  counters?: BenchmarkCounters;
   /** Set when the case threw in the untimed pass. */
   message?: string;
 }
 
-/** One side's untimed pass: every case called once, for its completed work and its counters. */
+/** One side's untimed pass: every case called once, for its completed work. */
 export interface UntimedBenchmarkPass {
-  /** Names of the counters this side's engine has; null where it does not count. */
-  counterNames: string[] | null;
   cases: Record<string, UntimedCaseResult>;
 }
 
@@ -399,8 +376,6 @@ export interface BenchmarkRunRecord {
     /* The rest is written to records under `paired/` only. */
     totalMemoryBytes?: number;
     osRelease?: string;
-    /** Compile-time counter flag of the bundles the timed passes and the memory sessions ran; always false. */
-    timedBundleCounters?: boolean;
   };
   /** Benchmark input set and sampling counts used for this record. */
   config: {
@@ -448,8 +423,6 @@ export interface BenchmarkRunRecord {
    * computes it, and alike on two sides that completed the same work, so one set here stands for all of them.
    */
   workTallies?: Record<string, number>[];
-  /** Which side's untimed pass counted, by the counter names its engine has; null for a side that does not count. */
-  counters?: { head: string[] | null; base: string[] | null };
   comparison?: BenchmarkComparison;
   memory?: BenchmarkMemoryReport;
 }
@@ -1143,60 +1116,6 @@ export function completedWorkOf(
   return Object.assign({}, ...entry.work.map((place) => record.workTallies?.[place]));
 }
 
-/* ── Paired runs: counters ── */
-
-/**
- * Reduce a work-counter snapshot to what a case's entry carries.
- *
- * @param snapshot - the engine's counters, each a number or a histogram with one count per bucket
- * @returns the counters that are not zero, with each histogram as its non-zero buckets
- */
-export function compactCounters(snapshot: Readonly<Record<string, number | readonly number[]>>): BenchmarkCounters {
-  const counters: BenchmarkCounters = {};
-  for (const [name, value] of Object.entries(snapshot)) {
-    if (typeof value === "number") {
-      if (value !== 0) counters[name] = value;
-      continue;
-    }
-    const buckets: { [bucket: string]: number } = {};
-    value.forEach((count, bucket) => {
-      if (count !== 0) buckets[bucket] = count;
-    });
-    if (Object.keys(buckets).length > 0) counters[name] = buckets;
-  }
-  return counters;
-}
-
-/** Compare two sides' counters case by case, over the counter names both engines have. */
-function compareCounters(
-  record: BenchmarkRunRecord,
-  baseCases: ReadonlyMap<string, BenchmarkCaseRef>,
-): CounterComparison | null {
-  const headNames = record.counters?.head;
-  const baseNames = record.counters?.base;
-  if (!headNames || !baseNames) return null;
-  const shared = headNames.filter((name) => baseNames.includes(name));
-  const comparison: CounterComparison = { comparedCases: 0, differingCases: [], risenCases: [] };
-  for (const { id, entry } of listBenchmarkCases(record)) {
-    const base = baseCases.get(id)?.entry.counters;
-    if (!base || !entry.counters) continue;
-    comparison.comparedCases++;
-    let differs = false;
-    let risen = false;
-    for (const name of shared) {
-      const baseValue = base[name] ?? 0;
-      const headValue = entry.counters[name] ?? 0;
-      if (typeof baseValue === "number" && typeof headValue === "number") {
-        differs ||= baseValue !== headValue;
-        risen ||= headValue > baseValue;
-      } else differs ||= JSON.stringify(baseValue) !== JSON.stringify(headValue);
-    }
-    if (differs) comparison.differingCases.push(id);
-    if (risen) comparison.risenCases.push(id);
-  }
-  return comparison;
-}
-
 /* ── Paired runs: the record ── */
 
 /**
@@ -1308,7 +1227,6 @@ function attachUntimedPass(
     const found = pass.cases[id];
     if (!found) continue;
     if (found.work) entry.work = found.work.map(place);
-    if (found.counters) entry.counters = found.counters;
     /* A case that threw when it was timed is in the record already, as its entry. */
     if (found.message !== undefined && entry.status !== "error") thrown.push(`${id}: ${found.message}`);
   }
@@ -1346,7 +1264,6 @@ export function finishBenchmarkRecord(
     }
   }
   record.workTallies = workTallies;
-  record.counters = { head: passes.head.counterNames, base: passes.base?.counterNames ?? null };
   if (record.base) record.comparison = comparePairedRun(record);
 }
 
@@ -1374,7 +1291,6 @@ export function comparePairedRun(record: BenchmarkRunRecord): BenchmarkCompariso
     workNotVerified: [],
     headOnlyMembers: [],
     thrown: [],
-    counters: compareCounters(record, baseCases),
   };
   const byCategory = new Map<
     string,
@@ -1491,8 +1407,8 @@ export function formatPairedRunFileName(record: BenchmarkRunRecord): string {
 /**
  * Serialize a record under `paired/` with one line per entry.
  *
- * Such a record carries samples, tallies and counters for every case on two sides. Indented member by member, as
- * the records under `runs/` are, it would be several times the size for no gain in what a diff shows.
+ * Such a record carries samples and tallies for every case on two sides. Indented member by member, as the
+ * records under `runs/` are, it would be several times the size for no gain in what a diff shows.
  *
  * @param record - the record to write
  * @returns JSON text ending in a newline; `JSON.parse` reads back what `JSON.stringify` would have written
@@ -1563,7 +1479,6 @@ export function buildPairedSummary(record: BenchmarkRunRecord): string {
         `${regressionRule.ratioLowerBound} and median up by more than ${regressionRule.medianGrowthMs} ms`,
     );
   }
-  lines.push(`- Counters: timed bundles built with counters off; ${describeCountedSides(record)}`);
   const tooFewSamples = comparison ? tooFewSamplesNotice(config.iterations) : null;
   if (tooFewSamples !== null) lines.push(`- ${tooFewSamples} Read the flags below as a check that the run works`);
   lines.push("");
@@ -1643,8 +1558,8 @@ function caseRow(
 }
 
 /**
- * Appends the regressed, unequal-work, unverified and thrown cases of a paired run, the members it compared with
- * nothing, and its counter comparison.
+ * Appends the regressed, unequal-work, unverified and thrown cases of a paired run, and the members it compared
+ * with nothing.
  */
 function appendVerdict(lines: string[], comparison: BenchmarkComparison, row: (id: string) => string): void {
   lines.push("### Verdict");
@@ -1660,13 +1575,6 @@ function appendVerdict(lines: string[], comparison: BenchmarkComparison, row: (i
       (comparison.headOnlyMembers.length > 0 ? " (listed below)" : ""),
   );
   lines.push(`- Threw: ${comparison.thrown.length}`);
-  const { counters } = comparison;
-  lines.push(
-    counters
-      ? `- Counters: ${counters.comparedCases} cases counted on both sides; ${counters.differingCases.length} ` +
-          `differ, ${counters.risenCases.length} with a counter higher on the head`
-      : "- Counters: not compared, because only one side counts",
-  );
   lines.push("");
 
   if (comparison.regressed.length > 0) {
@@ -1728,12 +1636,6 @@ function appendVerdict(lines: string[], comparison: BenchmarkComparison, row: (i
     }
     lines.push("");
   }
-  if (counters && counters.risenCases.length > 0) {
-    lines.push("### Counters higher on the head");
-    lines.push("");
-    for (const id of counters.risenCases) lines.push(`- ${id}`);
-    lines.push("");
-  }
 }
 
 /** Says how the measured pairs of a paired run were shared between its timed processes. */
@@ -1746,15 +1648,6 @@ function describeTimedProcesses(processes: readonly TimedProcess[]): string {
     (shares.length > 0 ? ` (${shares.join(", ")})` : "") +
     `, alternating which side runs first from pair to pair`
   );
-}
-
-/** Says which sides' untimed pass counted, and why a side did not. */
-function describeCountedSides(record: BenchmarkRunRecord): string {
-  const counted = record.counters;
-  if (!counted) return "no untimed pass has run";
-  const head = counted.head ? "the head was counted in an untimed pass" : "the head's engine has no counters";
-  if (!record.base) return head;
-  return `${head}, ${counted.base ? "and so was the base" : "the base was not: its engine has no counters"}`;
 }
 
 /** Appends the heap table of a memory record and the comparison the memory gate reads. */

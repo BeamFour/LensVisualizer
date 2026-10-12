@@ -14,11 +14,10 @@
  * entry once per side, so one entry drives both engines. A child process then loads both bundles and samples
  * every case on both, the side that goes first alternating from pair to pair. The timed pass is two such
  * processes, which share the measured pairs: the first loads and prepares the base's bundle before the head's, the
- * second the head's before the base's, and their pairs are pooled. Those two bundles are built with the engine's
- * work counters off. A second bundle per side, built with them on, runs every case once in a process of its own,
- * untimed, for the counters and for what each case completed. `--heavy` runs the heavy set of cells in place of
- * the whole matrix. `--memory` runs the scripted memory session and no timed pass: one child process per side,
- * started with `--expose-gc`.
+ * second the head's before the base's, and their pairs are pooled. Each side's bundle then runs every case once
+ * more in a process of its own, untimed, for what each case completed. `--heavy` runs the heavy set of cells in
+ * place of the whole matrix. `--memory` runs the scripted memory session and no timed pass: one child process per
+ * side, started with `--expose-gc`.
  *
  * Every pass of such a run is measured by `scripts/benchmark-child.mjs`, in a process that has imported prebuilt
  * bundles and built nothing; that file says why. A paired, heavy or memory run writes its record under
@@ -181,10 +180,9 @@ function environmentInfo() {
 }
 
 /**
- * The environment of a record under `paired/`: the machine in enough detail to tell two machines apart, and the
- * counter flag the timed bundles were built with. The host's name stays out of a file that is committed. The heap
- * mode is the measuring child's, whatever this process was started with: a timed pass runs without `--expose-gc`,
- * and a memory session with it.
+ * The environment of a record under `paired/`: the machine in enough detail to tell two machines apart. The host's
+ * name stays out of a file that is committed. The heap mode is the measuring child's, whatever this process was
+ * started with: a timed pass runs without `--expose-gc`, and a memory session with it.
  *
  * @param {boolean} memory - whether the record is a memory session's
  */
@@ -194,7 +192,6 @@ function pairedEnvironmentInfo(memory) {
     heapMode: memory ? "gc" : "raw",
     totalMemoryBytes: os.totalmem(),
     osRelease: os.release(),
-    timedBundleCounters: false,
   };
 }
 
@@ -235,18 +232,16 @@ function readRunRecords() {
  * Bundle a tree's benchmark entry.
  *
  * Both sides of a paired run are built by this checkout's Vite under this checkout's config, so the two bundles
- * differ by their tree alone. The inline `define` overrides the config's.
+ * differ by their tree alone.
  *
  * @param {string} root - the tree to build: this checkout, or the base worktree
  * @param {string} outDir - an empty directory for the bundle
- * @param {boolean} counters - the compile-time flag of the engine's work counters: off for a bundle that is timed
  * @returns {Promise<string>} the URL to import the bundle from
  */
-async function buildBundle(root, outDir, counters) {
+async function buildBundle(root, outDir) {
   await build({
     configFile: join(ROOT, "vite.config.js"),
     root,
-    define: { __OPTICS_COUNTERS__: JSON.stringify(counters) },
     build: {
       ssr: join(root, ENTRY),
       outDir,
@@ -334,7 +329,7 @@ async function runChildPass(pass, request, resultPath, running) {
 
 /** The whole matrix on the working tree: one record under `runs/`, and the trend report rebuilt from them. */
 async function runPlain(args, createdAt, outDir) {
-  const benchmarkModule = await import(await buildBundle(ROOT, outDir, false));
+  const benchmarkModule = await import(await buildBundle(ROOT, outDir));
   if (args.reportOnly) {
     const removedRunPaths = pruneOldBenchmarkRunFiles(RUNS_DIR);
     const records = readRunRecords();
@@ -390,15 +385,10 @@ async function runPlain(args, createdAt, outDir) {
  * @param {{ current: import("node:child_process").ChildProcess | null }} running - the child pass under way
  */
 async function runPaired(args, createdAt, tempDir, baseTree, base, running) {
-  /* Every bundle is built before anything is measured, so a tree that cannot be bundled stops the run at once. */
-  const headUrl = await buildBundle(ROOT, join(tempDir, "head-timed"), false);
-  const baseUrl = baseTree ? await buildBundle(baseTree.worktree, join(tempDir, "base-timed"), false) : null;
-  const countingUrls = args.memory
-    ? null
-    : {
-        head: await buildBundle(ROOT, join(tempDir, "head-counting"), true),
-        base: baseTree ? await buildBundle(baseTree.worktree, join(tempDir, "base-counting"), true) : null,
-      };
+  /* One bundle per side serves every pass. Both are built before anything is measured, so a tree that cannot be
+   * bundled stops the run at once. */
+  const headUrl = await buildBundle(ROOT, join(tempDir, "head"));
+  const baseUrl = baseTree ? await buildBundle(baseTree.worktree, join(tempDir, "base")) : null;
   const metadata = { createdAt, git: gitInfo(), environment: pairedEnvironmentInfo(args.memory) };
   const { heavy } = args;
   const pass = (name, request) => runChildPass(name, { heavy, ...request }, join(tempDir, `${name}.json`), running);
@@ -449,10 +439,8 @@ async function runPaired(args, createdAt, tempDir, baseTree, base, running) {
     }
     record = head.poolTimedRecords(records);
     passes = {
-      head: await pass("untimed", { bundleUrl: countingUrls.head, options: { label: "untimed head" } }),
-      ...(countingUrls.base
-        ? { base: await pass("untimed", { bundleUrl: countingUrls.base, options: { label: "untimed base" } }) }
-        : {}),
+      head: await pass("untimed", { bundleUrl: headUrl, options: { label: "untimed head" } }),
+      ...(baseUrl ? { base: await pass("untimed", { bundleUrl: baseUrl, options: { label: "untimed base" } }) } : {}),
     };
   }
 

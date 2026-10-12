@@ -664,68 +664,13 @@ work, static SVG rendering, and aberration-panel data/rendering.
 
 `--base <ref>` compares the working tree with a base ref in one run: the same benchmark entry is bundled against both
 engines, every case is sampled on both in alternating order, and the record carries each case's raw samples, the ratio
-of medians with a bootstrap interval, what each side completed, and the work counters. `--heavy` runs a seven-cell
-subset and `--memory` a scripted session that reports retained heap. These records go to a `paired/` folder beside
-`runs/`, which the trend report does not read. `agent_docs/benchmarks/README.md` has the commands, the statistics and
-the output policy.
+of medians with a bootstrap interval, and what each side completed. `--heavy` runs a seven-cell subset and `--memory`
+a scripted session that reports retained heap. These records go to a `paired/` folder beside `runs/`, which the trend
+report does not read. `agent_docs/benchmarks/README.md` has the commands, the statistics and the output policy.
 
 The engine-migration baseline is kept in `agent_docs/records/optics-2-stage-05-performance.md`. There is no in-tree
 old-vs-new engine selector or `*Legacy.ts` fallback: performance work profiles the current `src/optics` engine
 directly, and rollback is an ordinary git revert or a focused fix with regression coverage.
-
-### Work Counters
-
-`src/optics/diagnostics/workCounters.ts` counts structural work, so a benchmark or a differential run can show that a
-request does no more work than before without relying on a timing. It holds one fixed record of numbers and two
-fixed-length histograms:
-
-- surface-profile evaluations (one sag and one slope) per kernel; a point outside a conic's domain evaluates neither
-  and is not counted;
-- intersections by kind (flat, spherical, aspheric, tilted plane) for the prepared kernel in `math/intersection.ts` and
-  for the legacy kernel, `intersectRayPlane` landings on the image and sensor planes, and the legacy tracer's
-  image-plane tests;
-- floor-assisted acceptances and exhaustion failures per kernel, and asphere cap-certificate refusals. The asphere cap
-  search runs in the prepared kernel for both tracers, so its outcomes count under the prepared kernel even for a
-  legacy request, and its refusals go to one shared counter;
-- traces by tracer: prepared sequential, prepared generalized, and the legacy stack. Every trace records full hits and
-  diagnostics, so "full" is the only capture;
-- full chief-ray solves and their stop traces, the field walk's seeded re-solves and theirs, and image-height inversion
-  targets with the chief solves they request;
-- `solveScalarRoot` calls and evaluations;
-- prepared-state constructions, `EngineLens` compiles, `RuntimeLens` builds, catalog material resolutions, and
-  sensor-locked solves.
-
-The histograms record stop traces per full chief solve and evaluations per root solve: bucket _i_ counts the solves
-that used exactly _i_, and the last bucket takes everything larger, so a run yields a median as well as a mean. A
-direct call to the exported bounding-sphere solver, `solveChiefRayBoundingSphere`, counts its stop traces without
-counting a solve, so the stop-trace total then exceeds what the histogram accounts for.
-
-Engine code only feeds the counters. Every statement that touches one is guarded by `OPTICS_COUNTERS_ENABLED` and
-stands on its own line, so counting cannot reorder arithmetic or change a result. That constant reads the
-`__OPTICS_COUNTERS__` global once, when the module loads. `define` in `vite.config.js` sets it `false` for the client
-build and the SSR prerender build, which drop the guarded statements, and for the dev server; it is `true` under
-Vitest. A build that wants counts passes its own inline `define`. Scripts that load `src/optics` under plain Node (the
-audit scripts and `scripts/benchmark-mtf.mjs`) get no define, so they run with counters off; a call site must test the
-constant and never the bare global, which does not exist there.
-
-The counter record is allocated only while the flag is on. Built unconditionally it would stay in the app as a
-cross-chunk export, because call sites in other chunks name it. A statement that touches the record outside the guard
-therefore throws when counting is off; `__tests__/src/optics/diagnostics/workCounters.test.ts` scans the engine
-sources for one, and runs a request list that reaches every counter with the flag off. The same file pins what the
-main call sites count, with exact counts for requests small enough to count by hand.
-
-Tooling outside `src/optics/` reads the counters through `src/optics/diagnostics.ts`: `OPTICS_COUNTERS_ENABLED`,
-`snapshotWorkCounters()` and `resetWorkCounters()`. With the flag off a snapshot is all zeros. A request's counts
-depend on which caches are warm, so compare runs that start from freshly built lenses.
-
-The engine differential harness is one such reader: its capture bundles are built with the flag on, and each payload
-record carries the counters of its own capture. Rule 7 under "What a Run Compares" in
-`agent_docs/architecture/testing.md` says how a run judges them.
-
-The rendering benchmark is another. The bundles it times are built with the flag off, so counting costs a timed sample
-nothing. A paired or heavy run builds a second bundle per side with the flag on and calls every case once in it, untimed;
-each case's entry carries the counters of that one call. Its entry reaches this facade through a glob, so a base that
-predates the counters still builds, and then only the head is counted.
 
 ## Cardinal Elements
 

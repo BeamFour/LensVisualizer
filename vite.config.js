@@ -11,13 +11,9 @@ export const TOOLING_TESTS = [
   "__tests__/scripts/engineDiffScript.test.ts",
 ];
 
-export default defineConfig(({ isSsrBuild, mode }) => ({
+export default defineConfig(({ isSsrBuild }) => ({
   plugins: [react()],
   base: "/",
-  /* Optics work counters (src/optics/diagnostics/workCounters.ts) are off in the client build, the SSR prerender
-   * build and the dev server, and on under Vitest, which loads this config in "test" mode and sets the value as a
-   * runtime global. A build that wants them on passes its own inline `define`, which overrides this one. */
-  define: { __OPTICS_COUNTERS__: JSON.stringify(mode === "test") },
   /* Cloudflare Pages (CF_PAGES=1) has dropped the ~900-line per-asset build
    * listing mid-stream and then failed the build stage with "an internal error
    * occurred", so keep the client build quiet there. Warnings and errors still

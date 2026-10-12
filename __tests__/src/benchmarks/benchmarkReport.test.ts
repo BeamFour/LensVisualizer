@@ -8,7 +8,6 @@ import {
   bootstrapSeedFor,
   buildBenchmarkReport,
   buildPairedSummary,
-  compactCounters,
   compareCompletedWork,
   compareMemorySessions,
   comparePairedSamples,
@@ -530,12 +529,6 @@ describe("completed work", () => {
     ]);
     expect(compareCompletedWork(skipped, { ...skipped })).toEqual([]);
   });
-
-  it("keeps the counters that are not zero, and a histogram's non-zero buckets", () => {
-    expect(
-      compactCounters({ chiefSolves: 2, legacyExhaustionFailures: 0, histogram: [0, 3, 0, 1], empty: [0, 0] }),
-    ).toEqual({ chiefSolves: 2, histogram: { 1: 3, 3: 1 } });
-  });
 });
 
 /** A paired record of one lens under one scenario, with the samples of its `analysis` case chosen by the test. */
@@ -568,14 +561,10 @@ function makePairedRecord(headAnalysisMs: readonly number[], headRays = 6): Benc
   return record;
 }
 
-function untimedPass(counterNames: string[] | null, chiefSolves: number): UntimedBenchmarkPass {
+function untimedPass(): UntimedBenchmarkPass {
   return {
-    counterNames,
     cases: {
-      "lens-a:default:analysis": {
-        work: [{ "summary.surfaceCount": 12 }],
-        ...(counterNames ? { counters: { chiefSolves } } : {}),
-      },
+      "lens-a:default:analysis": { work: [{ "summary.surfaceCount": 12 }] },
       "lens-a:default:rays": { message: "threw untimed" },
     },
   };
@@ -607,7 +596,7 @@ describe("paired benchmark record", () => {
 
   it("adds the untimed passes and the comparison, and keeps the head side where an unpaired record has it", () => {
     const record = makePairedRecord(HEAD_MS.map((sample) => sample + 3));
-    finishBenchmarkRecord(record, { head: untimedPass(["chiefSolves"], 5), base: untimedPass(["chiefSolves"], 4) });
+    finishBenchmarkRecord(record, { head: untimedPass(), base: untimedPass() });
 
     expect(Object.keys(record)).toEqual([
       "schemaVersion",
@@ -621,7 +610,6 @@ describe("paired benchmark record", () => {
       "warnings",
       "base",
       "workTallies",
-      "counters",
       "comparison",
     ]);
     expect(Object.keys(record.base ?? {})).toEqual([
@@ -632,14 +620,12 @@ describe("paired benchmark record", () => {
       "aberrationPanels",
       "summary",
     ]);
-    expect(record.counters).toEqual({ head: ["chiefSolves"], base: ["chiefSolves"] });
     /* The two sides tallied alike, so one set of tallies stands for both. */
     expect(record.workTallies).toEqual([{ "summary.surfaceCount": 12 }]);
-    expect(record.results["lens-a"].default.analysis).toMatchObject({ work: [0], counters: { chiefSolves: 5 } });
+    expect(record.results["lens-a"].default.analysis.work).toEqual([0]);
     expect(record.base?.results["lens-a"].default.analysis.work).toEqual([0]);
     expect(completedWorkOf(record, record.results["lens-a"].default.analysis)).toEqual({ "summary.surfaceCount": 12 });
     expect(completedWorkOf(record, record.results["lens-a"].default.rays)).toBeUndefined();
-    expect(record.base?.results["lens-a"].default.analysis.counters).toEqual({ chiefSolves: 4 });
     expect(record.warnings).toContain("Untimed pass threw on the head: lens-a:default:rays: threw untimed");
 
     const comparison = record.comparison!;
@@ -654,7 +640,6 @@ describe("paired benchmark record", () => {
       "workNotVerified",
       "headOnlyMembers",
       "thrown",
-      "counters",
     ]);
     expect(comparison.firstSide).toBe("base");
     expect(comparison.bootstrap).toEqual({ resamples: 10_000, seed: BOOTSTRAP_SEED, confidence: 0.95 });
@@ -681,11 +666,6 @@ describe("paired benchmark record", () => {
       unequalWorkCases: 0,
       workNotVerifiedCases: 0,
     });
-    expect(comparison.counters).toEqual({
-      comparedCases: 1,
-      differingCases: ["lens-a:default:analysis"],
-      risenCases: ["lens-a:default:analysis"],
-    });
   });
 
   it("flags unequal work, shows both sides and leaves the case out of the regression verdict", () => {
@@ -698,7 +678,7 @@ describe("paired benchmark record", () => {
       samplesMs: fasterRays,
     });
     record.results["lens-a"].default.totalWarm = { status: "error", message: "no root" };
-    finishBenchmarkRecord(record, { head: untimedPass(["chiefSolves"], 4), base: untimedPass(null, 0) });
+    finishBenchmarkRecord(record, { head: untimedPass(), base: untimedPass() });
     const comparison = record.comparison!;
 
     expect(comparison.unequalWork).toEqual([
@@ -712,13 +692,8 @@ describe("paired benchmark record", () => {
     expect(comparison.thrown).toEqual([{ id: "lens-a:default:totalWarm", base: null, head: "no root" }]);
     expect(comparison.cases["lens-a:default:totalWarm"]).toBeUndefined();
     expect(comparison.categories.rays).toBeUndefined();
-    /* A base that predates the counters is not counted, and nothing is compared. */
-    expect(record.counters).toEqual({ head: ["chiefSolves"], base: null });
-    expect(comparison.counters).toBeNull();
-    expect(record.base?.results["lens-a"].default.analysis.counters).toBeUndefined();
 
     const summary = buildPairedSummary(record);
-    expect(summary).toContain("the base was not: its engine has no counters");
     expect(summary).toContain("| lens-a default rays | output.onAxisRays | 6 | 4 |");
     expect(summary).toContain('- lens-a:default:totalWarm: base ran, head threw "no root"');
     expect(summary).toMatch(/\| lens-a default rays \| 100\.40 \| 74\.25 \| 0\.740 \| [^|]+ \| unequal work \|/);
@@ -732,7 +707,7 @@ describe("paired benchmark record", () => {
     /* The build case reports a markup length alone, which describes a result and counts nothing. */
     for (const side of [record, record.base!]) side.results["lens-a"].default.build.output = { markupLength: 9120 };
     record.results["lens-a"].default.build.stats!.samplesMs = HEAD_MS.map((sample) => sample + 30);
-    finishBenchmarkRecord(record, { head: untimedPass(null, 0), base: untimedPass(null, 0) });
+    finishBenchmarkRecord(record, { head: untimedPass(), base: untimedPass() });
     const comparison = record.comparison!;
 
     /* The analysis case has a tally on both sides and the rays case a count in its output; nothing else has a fact. */
@@ -758,7 +733,7 @@ describe("paired benchmark record", () => {
     expect(section).not.toContain("| lens-a default analysis |");
     /* A case the comparison found a difference in is unequal work, and is not listed a second time. */
     const unequal = makePairedRecord(HEAD_MS, 4);
-    finishBenchmarkRecord(unequal, { head: untimedPass(null, 0), base: untimedPass(null, 0) });
+    finishBenchmarkRecord(unequal, { head: untimedPass(), base: untimedPass() });
     expect(unequal.comparison?.workNotVerified).not.toContain("lens-a:default:rays");
     expect(unequal.comparison?.unequalWork.map(({ id }) => id)).toEqual(["lens-a:default:rays"]);
   });
@@ -766,7 +741,6 @@ describe("paired benchmark record", () => {
   it("lists the members only the head's results have, by category, and compares them with nothing", () => {
     const record = makePairedRecord(HEAD_MS);
     const pass = (work: Record<string, number>): UntimedBenchmarkPass => ({
-      counterNames: null,
       cases: { "lens-a:default:analysis": { work: [work] }, "lens-a:default:totalWarm": { work: [work] } },
     });
     finishBenchmarkRecord(record, {
@@ -845,7 +819,7 @@ describe("paired benchmark record", () => {
     });
     expect(pooled.base?.results["lens-a"].default.svgRender.stats?.samplesMs).toHaveLength(5);
 
-    finishBenchmarkRecord(pooled, { head: untimedPass(null, 0), base: untimedPass(null, 0) });
+    finishBenchmarkRecord(pooled, { head: untimedPass(), base: untimedPass() });
     expect(pooled.comparison?.cases["lens-a:default:analysis"]).toMatchObject({
       pairs: 5,
       baseMedianMs: 12,
@@ -882,7 +856,7 @@ describe("paired benchmark record", () => {
       side.aberrationPanels[nikon] = { default: structuredClone(side.aberrationPanels["lens-a"].default) };
     }
     record.config.lensKeys = ["lens-a", nikon];
-    finishBenchmarkRecord(record, { head: untimedPass(null, 0), base: untimedPass(null, 0) });
+    finishBenchmarkRecord(record, { head: untimedPass(), base: untimedPass() });
     const summary = buildPairedSummary(record);
     const lines = summary.split("\n");
 
@@ -922,7 +896,7 @@ describe("paired benchmark record", () => {
 
   it("serializes one entry per line and reads back unchanged", () => {
     const record = makePairedRecord(HEAD_MS);
-    finishBenchmarkRecord(record, { head: untimedPass(["chiefSolves"], 4), base: untimedPass(["chiefSolves"], 4) });
+    finishBenchmarkRecord(record, { head: untimedPass(), base: untimedPass() });
     const text = serializeBenchmarkRecord(record);
 
     expect(JSON.parse(text)).toEqual(JSON.parse(JSON.stringify(record)));

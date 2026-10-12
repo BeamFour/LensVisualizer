@@ -3,7 +3,6 @@
  */
 
 import { dot, subtract } from "./vector.js";
-import { OPTICS_COUNTERS_ENABLED, workCounters } from "../diagnostics/workCounters.js";
 import type { Plane3, Ray3, Vec3 } from "../types.js";
 
 /** Intersection of a forward ray with a plane. */
@@ -34,7 +33,6 @@ export function intersectRayPlane(
   plane: Plane3,
   options: RayPlaneIntersectionOptions = {},
 ): RayPlaneIntersection | null {
-  if (OPTICS_COUNTERS_ENABLED) workCounters.rayPlaneIntersections++;
   const minT = options.minT ?? 1e-7;
   const denominator = dot(plane.normal, ray.direction);
   if (!Number.isFinite(denominator) || Math.abs(denominator) <= 1e-12) return null;
