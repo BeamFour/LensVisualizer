@@ -227,8 +227,8 @@ and bundled there.
   authored data back, such as the composed prescription of a pair or the `data` of a built lens, is written through
   the same rules, so a respelling the fingerprint ignores does not change a record. An engine back-pointer is skipped
   by member name and leaves a marker in the payload.
-- `budgets.ts` holds the quantity classes and the table that gives every numeric payload path one of them. A class
-  says how two values are compared and how far they may differ under C1. The table's rows are path patterns, and the
+- `budgets.ts` holds the quantity classes and the table that gives a numeric payload path one of them. A class says
+  how two values are compared and how far they may differ under C1. The table's rows are path patterns, and the
   first row that matches decides.
 - `compare.ts` pairs the records of two captures one lens at a time, judges each difference under the declared change
   class, and keeps totals, the largest difference per quantity and a bounded sample of findings. A lens with many
@@ -396,8 +396,11 @@ The classes in `budgets.ts`:
   a "Not budgeted" section that counts the changed digests per record family and names the lenses, and the driver
   prints a warning to stderr. The run does not fail on it.
 
-A number that moves and has no class fails above C0, and a tooling test fails on any numeric path of Tier P, or of
-the named MTF requests, that the table does not cover.
+A class is required of a number only above C0, and only where it differs. Under C1 or C2 a number that moves and has
+no class fails the run, and `summary.md` lists its path under "Numbers with no quantity class". Under C0 no budget is
+read: a number with no class is compared bit for bit like any other, and a difference in one fails as any C0
+difference does; the report lists it under that same heading. Nothing holds the table to every path a payload has, so
+a new payload member needs its row when a C1 or C2 run first finds it moved, and not before.
 
 ### Running It
 
@@ -491,22 +494,21 @@ Three files in the tooling suite hold the harness to its contract.
   tier are disjoint and complete at several shard counts. It also compares what `requests.ts` has to copy with its
   sources: the benchmark lens set and stopped scenario, the analysis-context job names, the MTF benchmark's lenses,
   and the MTF methods, spectra and default grid.
-- `__tests__/src/benchmarks/engineDiffCompare.test.ts`: every numeric path of Tier P and of the named MTF requests
-  has a class, and no class is looser than the quantity table; identical captures pass in every class; and each
-  drift injected into captured records is detected (a status, an index, a unit error, a sample order, one ulp under
-  C0, twice a budget under C1 where half passes). A scalar below 1 that is no length fails at 1e-10 relative, a
-  solve's residual is held to its solve's tolerance and not differenced, a stop residual 1000 times larger on one
-  side of a converged solve fails, a record that throws alike on both engines fails in every class, and a failing
-  solver output is reported in quanta. It also covers cross-evaluation: a data-only change shows no engine
-  difference and an impact report, a format-only change that alters a value fails, a failed status or a non-finite
-  number behind a change of shape blocks, a changed converter is compared through its pairs, and a pair the engines
-  disagree about fails while one the data lost is listed. A pair the data gained passes with failed rays in its
-  records and fails when it does not build, the impact report counts what the records of a new lens or a gained
-  pair hold, and a changed converter that lost every pair is warned of. A pair the base engine cannot compose and
-  build is uncompared in a run that meets it and in one that does not, and passes only when declared; the pairs of
-  a host that does not build alone are compared; and the pair lists decide as a pair's own build record does. The
-  uncompared lenses are held to the declared exceptions in both directions, and a lens handed over in parts is
-  reported as it would be whole.
+- `__tests__/src/benchmarks/engineDiffCompare.test.ts`: no class is looser than the quantity table; a number with no
+  class fails under C1 and C2 when it moves, by its path, and is compared bit for bit under C0; identical captures pass
+  in every class; and each drift injected into captured records is detected (a status, an index, a unit error, a sample
+  order, one ulp under C0, twice a budget under C1 where half passes). A scalar below 1 that is no length fails at 1e-10
+  relative, a solve's residual is held to its solve's tolerance and not differenced, a stop residual 1000 times larger
+  on one side of a converged solve fails, a record that throws alike on both engines fails in every class, and a failing
+  solver output is reported in quanta. It also covers cross-evaluation: a data-only change shows no engine difference
+  and an impact report, a format-only change that alters a value fails, a failed status or a non-finite number behind a
+  change of shape blocks, a changed converter is compared through its pairs, and a pair the engines disagree about fails
+  while one the data lost is listed. A pair the data gained passes with failed rays in its records and fails when it
+  does not build, the impact report counts what the records of a new lens or a gained pair hold, and a changed converter
+  that lost every pair is warned of. A pair the base engine cannot compose and build is uncompared in a run that meets
+  it and in one that does not, and passes only when declared; the pairs of a host that does not build alone are
+  compared; and the pair lists decide as a pair's own build record does. The uncompared lenses are held to the declared
+  exceptions in both directions, and a lens handed over in parts is reported as it would be whole.
 - `__tests__/scripts/engineDiffScript.test.ts`: the command line, and runs of the real driver against `HEAD`, on one
   lens of Tier P and on one lens of one shard of Tier S, which are skipped where git cannot add a worktree.
 

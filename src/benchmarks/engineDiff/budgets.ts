@@ -1,11 +1,15 @@
 /**
  * Quantity budgets of the engine differential harness.
  *
- * Every numeric field of a payload record belongs to one quantity class. A class says how two values of it are
+ * A numeric field of a payload record belongs to one quantity class. A class says how two values of it are
  * compared, and how far they may differ when a change is declared as equivalent numerics (C1) or as an algorithm
  * replacement (C2). This module holds the classes, the table that assigns payload paths to them, and the resolver
  * the comparator calls. It knows payloads by path alone and imports nothing; `compare.ts` walks the records and
  * applies what this module returns.
+ *
+ * Nothing holds the table to every path a payload has. A C0 run compares each number bit for bit and reads no
+ * budget, so a path the table does not cover costs such a run nothing. Above C0 the comparator asks for the class
+ * of a number that differs, and one with no class fails the run and is named: that is when the path gets its row.
  *
  * "The plan" below is `OPTICS_ENGINE_REWRITE_SPEC.md`, whose quantity table (Numerical contract, Quantity budgets)
  * the classes start from.

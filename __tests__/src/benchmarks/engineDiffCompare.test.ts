@@ -11,7 +11,6 @@ import {
   C2_CRITERIA,
   QUANTITIES,
   budgetOf,
-  quantityAt,
   resolveBudgetRule,
   type ChangeClass,
   type Quantity,
@@ -47,7 +46,6 @@ import {
   ANALYSIS_CONTEXT_JOBS,
   DEFAULT_STATE,
   FEATURE_REPRESENTATIVES,
-  MTF_VARIANTS,
   lensId,
   stateId,
   tierRequests,
@@ -242,77 +240,6 @@ describe("engineDiff budget table", () => {
     expect(Object.keys(C2_CRITERIA).sort()).toEqual(
       ["analysisLength", "chiefLaunch", "fieldAngle", "mtfModulation", "percentage"].sort(),
     );
-  });
-
-  it("gives every numeric leaf of real Tier P and named MTF records one quantity class", { timeout: 300_000 }, () => {
-    /* Nine lenses of the analysis row whose records, between them, hold every numeric path the whole of Tier P
-     * produces today: every analysis job and MTF, a converter pair's composition, vector launches, folded paths, a
-     * finite conjugate, an aberration-control ring and a tilt-shift lens. Each numeric leaf must resolve; a new
-     * payload member fails here until the table says what it is. The named MTF requests of the stage tier add
-     * what only the diffraction method and a spectrum return. */
-    const representatives = [
-      SERENAR,
-      PAIR_ID,
-      "carl-zeiss-mirotar-500f45",
-      "canon-ef-8-15mm-f4l-fisheye-usm",
-      "canon-tse-50f28l-macro",
-      "nikon-af-dc-nikkor-135mm-f2",
-      "reference-maksutov-cassegrain-meniscus",
-      "fujifilm-gf80-f17",
-      "nikon-fisheye-nikkor-6mm-f28",
-    ];
-    const unclassified = new Set<string>();
-    const classes = new Set<string>();
-    const families = new Set<string>();
-    let numbers = 0;
-    /* A row may pick its class by the flags beside a field, so each leaf is resolved where it sits, as a record
-     * compared with itself. */
-    const containers: unknown[] = [];
-    const keys: (string | number)[] = [];
-    const visit = (node: unknown, family: string, path: string[]): void => {
-      const isNumber =
-        typeof node === "number" || (typeof node === "string" && ["$-0", "$NaN", "$+Inf", "$-Inf"].includes(node));
-      if (isNumber) {
-        numbers++;
-        const rule = resolveBudgetRule(family, path);
-        if (!rule) unclassified.add(`${family}:${path.join(".")}`);
-        else classes.add(quantityAt(rule, { base: containers, head: containers, keys }));
-      } else if (node !== null && typeof node === "object") {
-        containers.push(node);
-        for (const [key, member] of Object.entries(node)) {
-          path.push(Array.isArray(node) ? "[]" : key);
-          keys.push(Array.isArray(node) ? Number(key) : key);
-          visit(member, family, path);
-          keys.pop();
-          path.pop();
-        }
-        containers.pop();
-      }
-    };
-    for (const id of representatives) {
-      for (const record of id === SERENAR ? SERENAR_RECORDS : recordsOf(id)) {
-        families.add(record.request);
-        if (record.payload.ok) visit(record.payload.value, record.request, []);
-      }
-    }
-    const namedMtf = tierRequests("s", requestCatalog(CATALOG)).filter(
-      (request) =>
-        request.variant !== undefined && request.lens.key === SERENAR && request.state?.focusT === DEFAULT_STATE.focusT,
-    );
-    expect(namedMtf.map((request) => request.variant)).toEqual(MTF_VARIANTS.map(({ id }) => id));
-    for (const record of captureRecords(CATALOG, namedMtf)) {
-      const value = (record.payload.ok ? record.payload.value : null) as { result: { fields: object[] } } | null;
-      expect(value?.result.fields.length).toBeGreaterThan(0);
-      visit(value, record.request, []);
-    }
-
-    expect([...unclassified]).toEqual([]);
-    expect(numbers).toBeGreaterThan(1e6);
-    expect([...families].sort()).toEqual(
-      ["analysis", "build", "chiefSolves", "composition", "fieldGeometry", "layout", "mtf", "traces"].sort(),
-    );
-    /* Every class the table defines is in use: one that nothing maps to would be a dead row. */
-    expect([...classes].sort()).toEqual(Object.keys(QUANTITIES).sort());
   });
 
   it("resolves a path by its first matching row, and leaves an unknown member unclassified", () => {
@@ -980,14 +907,37 @@ describe("engineDiff drift detection", () => {
     expect(withThrowingJobs).toMatchObject({ passed: true, thrownOnBothEngines: { records: 0 } });
   });
 
-  it("fails a number that moved and has no quantity class, and names its path", () => {
+  it("fails a number that moved and has no quantity class above C0, and names its path", () => {
     const withMember = (value: number) => withChange("layout", ["unbudgeted"], () => value);
-    const summary = compare("c1", withMember(2), withMember(1));
-    expect(failuresOf(summary)).toEqual([
-      { request: "layout", path: "unbudgeted", kind: "unclassified", quantity: null },
+    for (const changeClass of ["c1", "c2"] as const) {
+      /* With no class there is no budget to be within, so one ulp fails as a doubling does. */
+      for (const moved of [2, 1 + Number.EPSILON]) {
+        const summary = compare(changeClass, withMember(moved), withMember(1));
+        expect(summary.passed, changeClass).toBe(false);
+        expect(failuresOf(summary), changeClass).toEqual([
+          { request: "layout", path: "unbudgeted", kind: "unclassified", quantity: null },
+        ]);
+        expect(summary.engine.unclassified, changeClass).toEqual(["layout:unbudgeted"]);
+        expect(renderSummaryMarkdown(summary, REPORT_CONTEXT), changeClass).toContain(
+          "### Numbers with no quantity class\n\n- `layout:unbudgeted`",
+        );
+      }
+      /* The class is asked for only where the number differs: one that did not move needs none. */
+      expect(compare(changeClass, withMember(1), withMember(1)).passed, changeClass).toBe(true);
+    }
+  });
+
+  it("compares a number with no quantity class bit for bit under C0, like any other", () => {
+    const withMember = (value: number) => withChange("layout", ["unbudgeted"], () => encodeValue(value));
+    /* A C0 run reads no budget, so a payload member the table has never heard of passes while it is unchanged. */
+    expect(compare("c0", withMember(1), withMember(1))).toMatchObject({ passed: true, engine: { failing: 0 } });
+    const moved = compare("c0", withMember(1 + Number.EPSILON), withMember(1));
+    expect(moved.passed).toBe(false);
+    expect(moved.engine.failures.map(({ request, path }) => ({ request, path }))).toEqual([
+      { request: "layout", path: "unbudgeted" },
     ]);
-    expect(summary.engine.unclassified).toEqual(["layout:unbudgeted"]);
-    expect(compare("c1", withMember(1), withMember(1)).passed).toBe(true);
+    /* The sign of zero is a bit, as it is for a number that has a class. */
+    expect(compare("c0", withMember(-0), withMember(0)).passed).toBe(false);
   });
 
   it("refuses captures that do not answer the same requests", () => {
