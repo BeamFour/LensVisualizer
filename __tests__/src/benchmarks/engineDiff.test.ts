@@ -695,9 +695,8 @@ describe("engineDiff Tier P requests", () => {
       .map((lens) => lens.key)
       .find((key) => !familiesAt(key, stateId(DEFAULT_STATE)).includes("analysis"))!;
     const changed = tierRequests("p", { ...requestCatalog(CATALOG), changedLensKeys: [plain, SERENAR, plain] });
-    const added = changed.filter(
-      (request) => !TIER_P.some((existing) => JSON.stringify(existing) === JSON.stringify(request)),
-    );
+    const known = new Set(TIER_P.map((request) => JSON.stringify(request)));
+    const added = changed.filter((request) => !known.has(JSON.stringify(request)));
     expect(added).toEqual([
       { lens: { key: plain }, state: DEFAULT_STATE, family: "analysis" },
       { lens: { key: plain }, state: DEFAULT_STATE, family: "mtf" },

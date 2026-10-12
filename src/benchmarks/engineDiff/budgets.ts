@@ -119,7 +119,7 @@ const ANALYSIS_HALF_FIELD_QUANTUM_DEG = 5 / 2 ** 8;
 /**
  * The quantity classes.
  *
- * The first nine are the plan's rows with the values the plan proposes, and `count` and `requested` are its tenth
+ * The first nine are the plan's rows with the plan's values, and `count` and `requested` are its tenth
  * row (statuses, counts, sample positions) for the numbers among them. A budget here is a ceiling for a declared
  * class of change, not a measurement: the C1 noise floor is measured by running the harness against a commit that
  * reorders one sum.

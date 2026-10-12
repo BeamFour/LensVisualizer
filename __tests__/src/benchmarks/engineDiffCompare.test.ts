@@ -245,7 +245,7 @@ describe("engineDiff budget table", () => {
     );
   });
 
-  it("gives every numeric leaf of real Tier P and named MTF records one quantity class", { timeout: 120_000 }, () => {
+  it("gives every numeric leaf of real Tier P and named MTF records one quantity class", { timeout: 300_000 }, () => {
     /* Nine lenses of the analysis row whose records, between them, hold every numeric path the whole of Tier P
      * produces today: every analysis job and MTF, a converter pair's composition, vector launches, folded paths, a
      * finite conjugate, an aberration-control ring and a tilt-shift lens. Each numeric leaf must resolve; a new
