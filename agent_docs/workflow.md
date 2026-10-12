@@ -87,7 +87,8 @@ GitHub Pages is an active mirror/backup.
   builds keep the full listing. If that error recurs, retry the deployment from the Cloudflare dashboard before
   debugging the build.
 - Base path set to `/` in `vite.config.js` because Cloudflare Pages serves the production site from the domain root
-- Quality checks run on PRs via `.github/workflows/quality.yml` (lint, format, typecheck, test, npm audit, build)
+- Quality checks run on PRs via `.github/workflows/quality.yml` (lint, format, typecheck, test, npm audit, build),
+  for `main` and for `engine-next`, the integration branch of the optics engine rewrite; only `main` deploys
 - The same workflow's `engine-diff` job compares the optics engine with the PR's merge-base when engine, lens-data or
   harness paths change; see `agent_docs/architecture/testing.md` (Engine Differential Harness)
 - `.github/workflows/engine-diff-stage.yml` runs the harness's larger tiers as a matrix of shards. It is dispatched by

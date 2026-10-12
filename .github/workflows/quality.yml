@@ -1,10 +1,12 @@
 name: Quality Checks
 
+# engine-next is the integration branch of the optics engine rewrite (OPTICS_ENGINE_REWRITE_SPEC.md, Integration
+# model). Its pull requests and pushes get the same checks as main's; only main deploys.
 on:
   pull_request:
-    branches: [main]
+    branches: [main, engine-next]
   push:
-    branches: [main]
+    branches: [main, engine-next]
 
 jobs:
   lint-format:
@@ -76,11 +78,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      # HEAD is the merge of the pull request into main, so this merge-base is the main commit it would land on and
-      # the diff is the pull request's own change. The harness's own files count, so a change to it runs it.
+      # HEAD is the merge of the pull request into its base branch, so this merge-base is the commit of that branch
+      # it would land on and the diff is the pull request's own change. The harness's own files count, so a change
+      # to it runs it.
       - id: scope
+        env:
+          BASE_REF: ${{ github.base_ref }}
         run: |
-          base="$(git merge-base origin/main HEAD)"
+          base="$(git merge-base "origin/$BASE_REF" HEAD)"
           echo "base=$base" >> "$GITHUB_OUTPUT"
           if git diff --quiet "$base" HEAD -- \
             src/optics src/types src/utils/catalog src/utils/featureFlags.ts \

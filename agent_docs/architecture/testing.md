@@ -435,7 +435,7 @@ the named MTF requests, that the table does not cover.
 ### Running It
 
 ```bash
-node scripts/engine-diff.mjs --base "$(git merge-base origin/main HEAD)"
+node scripts/engine-diff.mjs --base "$(git merge-base origin/engine-next HEAD)"
 node scripts/engine-diff.mjs --base origin/main --class c1 --lens canon-serenar-50f18 --out tmp/engine-diff
 ```
 
@@ -469,8 +469,8 @@ exceptions in either direction.
 ### CI
 
 The `engine-diff` job in `.github/workflows/quality.yml` runs on pull requests only, and `build` does not wait for it.
-Its first step compares the pull request with its merge-base on `main` and skips the rest unless a path changed
-under `src/optics/`, `src/types/`, `src/utils/catalog/` or `src/lens-data/` (Markdown aside), in
+Its first step compares the pull request with its merge-base on the branch it targets and skips the rest unless a
+path changed under `src/optics/`, `src/types/`, `src/utils/catalog/` or `src/lens-data/` (Markdown aside), in
 `src/utils/featureFlags.ts`, which the engine reads a flag from, or in the harness, its driver or its workflows.
 Otherwise it runs Tier P against that merge-base, with the pull request description as the declared exceptions, adds
 `summary.md` to the job summary and uploads the `reports` folder as the `engine-diff-tier-p` artifact.
