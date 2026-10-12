@@ -70,10 +70,12 @@ under `runs/`, and the trend report rebuilt.
    what each case completed.
 
 The measured passes run in `scripts/benchmark-child.mjs`, in processes that import prebuilt bundles and build nothing.
-The process that ran the builds is not measured in: the bundler's objects share V8's shape tree with the engine's, and a
-build of a base worktree in the measuring process left `evaluateAperture` deoptimizing in a loop, which slowed the heavy
-cases on both sides and made two copies of one engine differ. A plain run still builds and measures in one process, as
-it always has.
+The process that ran the builds is not measured in. V8 keeps one root map for every object literal of a given property
+count, and it holds at most 1,536 transitions. A Vite build leaves about a thousand on the root that four-property
+literals share, one per lazily imported chunk, and a second build of a tree at another path fills it. The engine's own
+four-property results, first created after that, become dictionary-mode objects and `evaluateAperture` deoptimizes in a
+loop, which slows the heavy cases on both sides. A plain run still builds and measures in one process, as it always has:
+one build leaves that root at about 1,190 of 1,536, and each lazily imported `*.analysis.md` adds one.
 
 ### Statistic and Verdicts
 
