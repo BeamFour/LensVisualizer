@@ -196,6 +196,12 @@ export interface BenchmarkBaseSide {
   ref: string;
   commit: string;
   shortCommit: string;
+  /**
+   * Set when the base's package-lock.json differs from the working tree's. The base was then bundled with packages
+   * installed in its own worktree by `npm ci`, so the two sides differ by their dependencies as well as by their
+   * source. Absent when both sides were bundled with the working tree's packages.
+   */
+  ownDependencies?: true;
   results: BenchmarkRunRecord["results"];
   aberrationPanels: BenchmarkRunRecord["aberrationPanels"];
   summary: BenchmarkRunRecord["summary"];
@@ -1458,6 +1464,12 @@ export function buildPairedSummary(record: BenchmarkRunRecord): string {
     `- Machine: ${environment.cpuModel ?? "unknown CPU"} x ${environment.cpuCount ?? "?"}, ` +
       `${environment.platform}/${environment.arch}, Node ${environment.node}, V8 ${environment.v8}`,
   );
+  if (base?.ownDependencies) {
+    lines.push(
+      "- Dependencies: the base's package-lock.json differs from the working tree's, so the base used its own, " +
+        "installed in its worktree by npm ci. The two sides differ by their packages as well as by their source",
+    );
+  }
   if (record.memory) {
     appendMemorySummary(lines, record);
     return `${lines.join("\n")}\n`;

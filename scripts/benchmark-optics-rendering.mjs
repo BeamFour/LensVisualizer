@@ -11,7 +11,9 @@
  *
  * `--base <ref>` is a paired run. It adds a detached git worktree at the base in the system temp directory, as
  * `scripts/engine-diff.mjs` does, copies the working tree's `src/benchmarks/` into it, and bundles the benchmark
- * entry once per side, so one entry drives both engines. A child process then loads both bundles and samples
+ * entry once per side, so one entry drives both engines. The base is bundled with this checkout's node_modules
+ * while its package-lock.json is the working tree's, and with its own, installed by `npm ci` in the worktree, when
+ * the lockfile differs; the record and the summary then say so. A child process then loads both bundles and samples
  * every case on both, the side that goes first alternating from pair to pair. The timed pass is two such
  * processes, which share the measured pairs: the first loads and prepares the base's bundle before the head's, the
  * second the head's before the base's, and their pairs are pooled. Each side's bundle then runs every case once
@@ -30,18 +32,7 @@
  */
 
 import { execFileSync, spawn } from "node:child_process";
-import {
-  cpSync,
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  readdirSync,
-  readFileSync,
-  realpathSync,
-  rmSync,
-  symlinkSync,
-  writeFileSync,
-} from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
@@ -49,8 +40,8 @@ import { build } from "vite";
 import {
   addBaseWorktree,
   cleanUpOnSignal,
-  lockfileUnchangedSince,
   otherBaseWorktrees,
+  provideBaseDependencies,
   resolveBaseCommit,
 } from "./base-worktree.mjs";
 
@@ -232,7 +223,7 @@ function readRunRecords() {
  * Bundle a tree's benchmark entry.
  *
  * Both sides of a paired run are built by this checkout's Vite under this checkout's config, so the two bundles
- * differ by their tree alone.
+ * differ by their tree alone: its source, and its packages where the base has installed its own.
  *
  * @param {string} root - the tree to build: this checkout, or the base worktree
  * @param {string} outDir - an empty directory for the bundle
@@ -260,29 +251,20 @@ async function buildBundle(root, outDir) {
 }
 
 /**
- * Put the working tree's benchmark harness and dependencies in a new base worktree.
+ * Put dependencies and the working tree's benchmark harness in a new base worktree.
  *
+ * @param {string} worktree - the worktree `addBaseWorktree` made
  * @param {string} commit - the base commit
- * @param {string} ref - the base as it was given, for the message
- * @returns {(worktree: string) => void} what `addBaseWorktree` runs on the worktree it made
+ * @returns {"linked" | "installed"} whose packages the base is bundled with: this checkout's, or its own
  */
-function prepareBaseWorktree(commit, ref) {
-  return (worktree) => {
-    /* The entry imports React and the component tree, so the base cannot be bundled without dependencies, and
-     * this checkout's are the base's own only while the lockfile is the same. */
-    const nodeModules = join(ROOT, "node_modules");
-    if (!existsSync(nodeModules)) throw new Error(`${LABEL}: this checkout has no node_modules; run npm install.`);
-    if (!lockfileUnchangedSince(ROOT, commit)) {
-      throw new Error(
-        `${LABEL}: package-lock.json differs between ${ref} and the working tree, so the base cannot be built ` +
-          `with this checkout's node_modules. A paired run needs a base with the same lockfile.`,
-      );
-    }
-    symlinkSync(realpathSync(nodeModules), join(worktree, "node_modules"), "dir");
-    /* Both engines run the working tree's entry: the base's own may be older, and would measure something else. */
-    rmSync(join(worktree, HARNESS_DIR), { recursive: true, force: true });
-    cpSync(join(ROOT, HARNESS_DIR), join(worktree, HARNESS_DIR), { recursive: true });
-  };
+function prepareBaseWorktree(worktree, commit) {
+  /* The entry imports React and the component tree, so the base cannot be bundled without dependencies, and this
+   * checkout's are the base's own only while the lockfile is the same. */
+  const dependencies = provideBaseDependencies({ root: ROOT, worktree, commit, label: LABEL });
+  /* Both engines run the working tree's entry: the base's own may be older, and would measure something else. */
+  rmSync(join(worktree, HARNESS_DIR), { recursive: true, force: true });
+  cpSync(join(ROOT, HARNESS_DIR), join(worktree, HARNESS_DIR), { recursive: true });
+  return dependencies;
 }
 
 /* ── Child passes ── */
@@ -381,7 +363,8 @@ async function runPlain(args, createdAt, outDir) {
  * @param {string} createdAt - the run's timestamp
  * @param {string} tempDir - a directory for the bundles and the passes' results
  * @param {{ worktree: string } | null} baseTree - the base worktree of a paired run
- * @param {{ ref: string, commit: string, shortCommit: string } | null} base - the base it was made from
+ * @param {{ ref: string, commit: string, shortCommit: string, ownDependencies?: true } | null} base - the base it
+ *   was made from, and whether it is bundled with packages installed in its own worktree
  * @param {{ current: import("node:child_process").ChildProcess | null }} running - the child pass under way
  */
 async function runPaired(args, createdAt, tempDir, baseTree, base, running) {
@@ -403,7 +386,8 @@ async function runPaired(args, createdAt, tempDir, baseTree, base, running) {
     const dryRun = await head.runOpticsRenderingBenchmark(options);
     console.log(
       `Benchmark dry run succeeded for ${dryRun.config.lensKeys.length} lenses` +
-        `${base ? ` on the working tree and on ${base.shortCommit}` : ""}.`,
+        `${base ? ` on the working tree and on ${base.shortCommit}` : ""}` +
+        `${base?.ownDependencies ? ", the base with its own dependencies, installed by npm ci" : ""}.`,
     );
     return;
   }
@@ -490,15 +474,27 @@ async function main() {
             `remove it with: git worktree remove --force ${path}`,
         );
       }
+      let dependencies;
       baseTree = addBaseWorktree({
         root: ROOT,
         commit,
         label: LABEL,
         prefix: BASE_WORKTREE_PREFIX,
-        prepare: prepareBaseWorktree(commit, args.base),
+        prepare: (worktree) => {
+          dependencies = prepareBaseWorktree(worktree, commit);
+        },
       });
-      base = { ref: args.base, commit, shortCommit: gitValue(["rev-parse", "--short", commit]) ?? commit.slice(0, 8) };
-      console.error(`${LABEL}: base ${base.shortCommit} (${args.base}) in ${baseTree.worktree}`);
+      base = {
+        ref: args.base,
+        commit,
+        shortCommit: gitValue(["rev-parse", "--short", commit]) ?? commit.slice(0, 8),
+        /* Its packages are then no part of what the two sides share, and the record has to say so. */
+        ...(dependencies === "installed" ? { ownDependencies: true } : {}),
+      };
+      console.error(
+        `${LABEL}: base ${base.shortCommit} (${args.base}) in ${baseTree.worktree}` +
+          `${base.ownDependencies ? ", with its own dependencies" : ""}`,
+      );
     }
     await runPaired(args, createdAt, tempDir, baseTree, base, running);
   } finally {

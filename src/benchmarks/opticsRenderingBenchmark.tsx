@@ -274,7 +274,10 @@ export interface OpticsRenderingBenchmarkOptions extends BenchmarkMetadata {
 export type BenchmarkCellHook = (progress: BenchmarkCellRef & { index: number; count: number }) => void | Promise<void>;
 
 /** The base ref of a paired run and the entry point of the bundle built from its tree. */
-export interface PairedBenchmarkBase extends Pick<BenchmarkBaseSide, "ref" | "commit" | "shortCommit"> {
+export interface PairedBenchmarkBase extends Pick<
+  BenchmarkBaseSide,
+  "ref" | "commit" | "shortCommit" | "ownDependencies"
+> {
   /** `prepareBenchmarkLens` of the base bundle: this same file, bundled against the base engine. */
   prepareBenchmarkLens: (lensKey: string) => PreparedBenchmarkLens;
   /**
@@ -477,8 +480,15 @@ export async function runOpticsRenderingBenchmark(
 
   record.summary = summarizeRun(record);
   if (options.base) {
-    const { ref, commit, shortCommit } = options.base;
-    record.base = { ref, commit, shortCommit, ...base, summary: summarizeRun(base) };
+    const { ref, commit, shortCommit, ownDependencies } = options.base;
+    record.base = {
+      ref,
+      commit,
+      shortCommit,
+      ...(ownDependencies ? { ownDependencies } : {}),
+      ...base,
+      summary: summarizeRun(base),
+    };
     record.config.timedProcesses = [{ firstSide, pairs: iterations }];
   }
   return record;
@@ -679,7 +689,7 @@ async function settledHeap(): Promise<HeapReading> {
 export function createMemoryBenchmarkRecord(
   options: BenchmarkMetadata &
     Pick<OpticsRenderingBenchmarkOptions, "lensKeys" | "cells"> & {
-      base?: Pick<BenchmarkBaseSide, "ref" | "commit" | "shortCommit">;
+      base?: Pick<BenchmarkBaseSide, "ref" | "commit" | "shortCommit" | "ownDependencies">;
     },
   sessions: { head: MemorySessionReport; base?: MemorySessionReport },
 ): BenchmarkRunRecord {
@@ -701,8 +711,16 @@ export function createMemoryBenchmarkRecord(
   };
   record.summary = summarizeRun(record);
   if (options.base) {
-    const { ref, commit, shortCommit } = options.base;
-    record.base = { ref, commit, shortCommit, results: {}, aberrationPanels: {}, summary: record.summary };
+    const { ref, commit, shortCommit, ownDependencies } = options.base;
+    record.base = {
+      ref,
+      commit,
+      shortCommit,
+      ...(ownDependencies ? { ownDependencies } : {}),
+      results: {},
+      aberrationPanels: {},
+      summary: record.summary,
+    };
   }
   record.memory = compareMemorySessions(sessions.head, sessions.base);
   return record;

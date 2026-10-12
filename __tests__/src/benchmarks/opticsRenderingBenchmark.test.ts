@@ -440,6 +440,8 @@ describe("optics rendering benchmark records", () => {
     expect(record.config.cells).toEqual(cells);
     expect(record.config.caseSet).toBe("custom");
     expect(record.base).toMatchObject({ ref: "self", commit: "b".repeat(40), shortCommit: "bbbbbbbb" });
+    /* Both sides were bundled with one set of packages, and the record then says nothing of them. */
+    expect(record.base).not.toHaveProperty("ownDependencies");
     expect(record.warnings).toEqual([]);
 
     const headCases = listBenchmarkCases(record);
@@ -528,6 +530,28 @@ describe("optics rendering benchmark records", () => {
     expect(summary).toContain("- Unequal work, left out of the regression verdict: 0");
   });
 
+  it("says in the record when the base was bundled with dependencies of its own", async () => {
+    const record = await runOpticsRenderingBenchmark({
+      ...METADATA,
+      cells: [{ lensKey: SERENAR, scenarioId: "default" }],
+      warmups: 0,
+      iterations: 1,
+      keepSamples: true,
+      base: { ...SELF_BASE, ownDependencies: true },
+    });
+
+    expect(Object.keys(record.base ?? {})).toEqual([
+      "ref",
+      "commit",
+      "shortCommit",
+      "ownDependencies",
+      "results",
+      "aberrationPanels",
+      "summary",
+    ]);
+    expect(record.base?.ownDependencies).toBe(true);
+  });
+
   it("reports a case that throws on one side and goes on sampling the other", async () => {
     const base: PairedBenchmarkBase = {
       ...SELF_BASE,
@@ -600,7 +624,7 @@ describe("optics rendering benchmark records", () => {
       {
         ...METADATA,
         cells: HEAVY_BENCHMARK_CELLS,
-        base: { ref: "self", commit: "b".repeat(40), shortCommit: "bbbbbbbb" },
+        base: { ref: "self", commit: "b".repeat(40), shortCommit: "bbbbbbbb", ownDependencies: true },
       },
       { head: session(101 * megabyte), base: session(100 * megabyte) },
     );
@@ -632,7 +656,7 @@ describe("optics rendering benchmark records", () => {
         sweeps: { focusT: [0.5, 1], zoomT: [0.5, 1], stopdownT: [0.5, 1], shiftMm: [6, -6], tiltDeg: [4, -4] },
       },
     });
-    expect(record.base).toMatchObject({ ref: "self", results: {} });
+    expect(record.base).toMatchObject({ ref: "self", ownDependencies: true, results: {} });
     expect(record.memory).toMatchObject({ retainedHeapRatio: 1.01, withinLimit: true });
     expect(record.memory?.head.retainedGrowthBytes).toBe(21 * megabyte);
   });

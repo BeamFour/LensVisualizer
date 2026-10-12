@@ -882,6 +882,24 @@ describe("paired benchmark record", () => {
     expect(buildPairedSummary(record)).toContain("- Too few samples for a verdict: a regression needs at least 9");
   });
 
+  it("says when the base was bundled with its own installed dependencies, in a timed and in a memory summary", () => {
+    const line =
+      "- Dependencies: the base's package-lock.json differs from the working tree's, so the base used its own, " +
+      "installed in its worktree by npm ci. The two sides differ by their packages as well as by their source";
+    const record = makePairedRecord(HEAD_MS);
+    finishBenchmarkRecord(record, { head: untimedPass(), base: untimedPass() });
+    expect(buildPairedSummary(record)).not.toContain("- Dependencies:");
+
+    record.base!.ownDependencies = true;
+    const lines = buildPairedSummary(record).split("\n");
+    expect(lines[3]).toBe(line);
+    /* The flag is the base side's, and is written with it. */
+    expect(JSON.parse(serializeBenchmarkRecord(record)).base.ownDependencies).toBe(true);
+
+    record.memory = compareMemorySessions(memorySession(100, 110), memorySession(100, 108));
+    expect(buildPairedSummary(record).split("\n")[3]).toBe(line);
+  });
+
   it("names a record by its timestamp, both commits and its kind", () => {
     const record = makePairedRecord(HEAD_MS);
     expect(formatPairedRunFileName(record)).toBe("2026-10-12T08-00-00Z-base-d49857ae-head-abcdef1.json");

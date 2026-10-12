@@ -41,10 +41,18 @@ under `runs/`, and the trend report rebuilt.
 
 1. The runner adds a detached git worktree of the base in the system temp directory, as `scripts/engine-diff.mjs` does
    (the two share `scripts/base-worktree.mjs`), and removes it when the run ends or is interrupted.
-2. It copies the working tree's `src/benchmarks/` into that worktree, so the same benchmark entry runs on both engines,
-   and links this checkout's `node_modules` there. The entry imports React and the component tree, so the base needs
-   dependencies: a base whose `package-lock.json` differs from the working tree's stops the run with a message.
-3. It builds one bundle per side with this checkout's Vite and config. Every pass of the run loads those two bundles.
+2. It copies the working tree's `src/benchmarks/` into that worktree, so the same benchmark entry runs on both engines.
+   The entry imports React and the component tree, so the base needs dependencies, and which it gets depends on its
+   `package-lock.json`:
+   - While that file is the working tree's, the runner links this checkout's `node_modules` into the worktree. Both
+     sides are then bundled with one set of packages.
+   - When it differs, the runner runs `npm ci` in the worktree, so the base is bundled with the packages its own
+     lockfile names. A comparison against an older base therefore still runs after a dependency of the working tree is
+     bumped, and its two sides differ by their packages as well as by their source. The record says so with
+     `base.ownDependencies: true`, and the summary with a "Dependencies" line under the machine. npm's output goes to
+     stderr. If the install fails, the run stops with a message and the worktree is removed.
+3. It builds one bundle per side with this checkout's Vite and config, whichever packages the base has. Every pass of
+   the run loads those two bundles.
 4. The timed pass runs in two child processes, one after the other. Each loads both bundles and samples every
    case as pairs, one call per side. The base goes first in the first pair and the order swaps with every pair
    (base>head, head>base, base>head, …). Warmup pairs alternate the same way and are counted apart from the measured
@@ -236,7 +244,9 @@ the head side where a plain record has its only side, and adds:
 - `workTallies`: the tallies that `work` points into. An entry's `work` lists, for each result the case computed, the
   place of that result's tallies in this list. Equal tallies are kept once: the same result is tallied in several
   cases of a cell, and alike on both sides when they completed the same work;
-- `base`: the ref as given, its commit, and the base side's `results`, `aberrationPanels` and `summary`;
+- `base`: the ref as given, its commit, and the base side's `results`, `aberrationPanels` and `summary`, with
+  `ownDependencies: true` when the base was bundled with packages installed in its own worktree. The member is absent
+  when both sides were bundled with the working tree's packages;
 - `comparison`: the alternation, the bootstrap's resamples and seed, the regression rule, one entry per case and per
   category, and the lists of regressed, unequal-work, unverified (`workNotVerified`) and thrown cases, and of the
   members only the head's results have (`headOnlyMembers`);
@@ -272,7 +282,8 @@ side under `base` and a `comparison` with the ratio, its interval and the verdic
 sides disagree on the support verdict or on a field's status, reason or grid size; an image height and a convergence
 delta may differ in their last bits. A paired run also prints a Markdown table to stderr. With fewer than 9 measured
 samples per row, no row is marked regressed: the table carries the notice the rendering summary prints, and the JSON
-carries it as `comparison.notice`. The script times in one process and has no build step.
+carries it as `comparison.notice`. The script times in one process and has no build step. The engine it loads imports
+no package, so the base worktree needs no `node_modules`, and a base with another lockfile runs like any other.
 
 Redirect stdout to JSON; `mtf-geometric.json`, `mtf-diffraction.json`, `mtf-spectral.json` and `mtf-finite.json` retain
 the latest corresponding unpaired measurements, not a branch history. A rejected field is not a completed MTF timing.
