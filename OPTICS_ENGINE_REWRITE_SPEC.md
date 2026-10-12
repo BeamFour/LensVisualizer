@@ -132,8 +132,8 @@ Serenar 50mm f/1.8 show 5.3 and 5.0 evaluations per intersection, so the pattern
 ## Baseline and accuracy contract
 
 - **#774 merged on its own, ahead of the program,** as `79899f4d`.
-- **R0** is its parent, `d49857ae`. **A0** is the Stage 1 PR's merge commit, tagged `optics-rewrite/s1`; it contains
-  #774.
+- **R0** is its parent, `d49857ae`. **A0** is the Stage 1 PR's merge commit on `engine-next`, tagged
+  `optics-rewrite/s1`; it contains #774.
 - Every differential comparison and speed measurement uses A0 or a later anchor (see
   [Anchors and comparison coverage](#anchors-and-comparison-coverage)). R0 is measured once, in S1.P1.T1, only to
   size the contract's own cost.
@@ -178,24 +178,40 @@ The Stage 1 fixtures added one more, which Stage 3 also closes:
 
 ## Integration model
 
-All work merges to `main` through ordinary squash-merged PRs. This is trunk-based development with
+Stages 1 to 5 merge to an integration branch, `engine-next`, through ordinary squash-merged PRs. `engine-next` merges
+into `main` once, after the Stage 5 gate, and Stages 6 to 8 then merge to `main`. On either branch this is
 [branch by abstraction](https://martinfowler.com/bliki/BranchByAbstraction.html): there is one engine at every commit.
 
 - **Replacing something too large for one step.** Put the new implementation behind the existing function, move the
   callers over in later steps, then delete the old implementation in the phase's last step.
   - There is no parallel candidate package, no engine selector and no `traceMode`.
-  - A step leaves `main` releasable. Production uses the restructured code as soon as the step merges, and each step
-    can be reverted on its own.
-- **Why not a long-lived branch.**
-  - `main` takes lens and audit PRs almost daily, and engine features every few days.
-  - An alternative-main branch would need continuous merges into a moving `src/optics/`.
-  - It would defer review to one promotion PR. The optics-2 migration ended as
-    [#518](https://github.com/ronbuening/LensVisualizer/pull/518), a 193-file PR.
-  - It would need two engines in order to compare them. Trunk development compares every PR against its true
-    merge-base instead.
-- **Other engine work during the program** lands in the one engine and passes the same gates. An intentional engine
-  behavior change moves the anchor only under the rule in
-  [Anchors and comparison coverage](#anchors-and-comparison-coverage).
+  - A step leaves its branch releasable, and each step can be reverted on its own.
+- **Why an integration branch through Stage 5.**
+  - Production stays on the engine it has until Stages 1 to 5 are verified together. No intermediate C1 or C2
+    change reaches users, and the program can be paused or dropped at no cost to `main`.
+  - `main` takes lens and audit PRs almost daily. They do not run the harness, and a harness failure cannot block
+    one.
+  - The branch's engine can be compared with `main`'s at any time, which measures drift against production itself.
+  - The branch ends at Stage 5 because Stages 1 to 5 are internal to the engine. Stages 7 and 8 rewrite the analysis
+    hooks and about a hundred importing files, which would collide with UI work on `main`.
+- **What keeps the branch from becoming one large unreviewed change.** The optics-2 migration ended as
+  [#518](https://github.com/ronbuening/LensVisualizer/pull/518), a 193-file PR.
+  - Steps stay one PR each, into `engine-next`, under the same gates.
+  - `main` is merged into `engine-next` weekly, as a merge commit, through a PR whose own `engine-diff` job checks
+    the merge. Tier P of `engine-next` against `main` is then run, and its result recorded in that PR.
+  - The catalog stays V1 on both branches until promotion: Phases 2.5 and 2.6 run on `main` afterwards. A lens
+    audit on `main` therefore never conflicts with a converted file.
+- **Other engine work during the program** may still land on `main`. It reaches `engine-next` with the weekly merge,
+  whose PR declares the change class and passes the same gates as a step. An intentional engine behavior change moves
+  the anchor only under the rule in [Anchors and comparison coverage](#anchors-and-comparison-coverage).
+- **Promotion.** After the Stage 5 gate, `engine-next` merges into `main` as a merge commit, never a squash, so the
+  anchor tags stay reachable from `main`. The promotion PR carries:
+  - Tier F of `engine-next` against `main`, under the loosest change class merged;
+  - the benchmark and memory comparison against `main`;
+  - a check of the branch's preview deployment;
+  - the changelog entries for what users will see.
+
+  `engine-next` is deleted once it has merged.
 - **One step per PR.**
   - Title: `S<stage>.P<phase>.T<step> <behavior>`.
   - The body states the change class (C0–C3), the gate tier and anchor used, payload and status counts, every
@@ -221,8 +237,8 @@ All work merges to `main` through ordinary squash-merged PRs. This is trunk-base
 
 ### Anchors and comparison coverage
 
-An anchor is a `main` commit whose **engine** the stage gates compare against. Anchors track engine revisions only;
-lens data never moves one.
+An anchor is a commit of the branch the program merges to, `engine-next` through Stage 5 and `main` after it, whose
+**engine** the stage gates compare against. Anchors track engine revisions only; lens data never moves one.
 
 **Semantic fingerprint.** Each prescription has a semantic fingerprint: a hash of every canonical value the engine or
 UI reads, taken after the engine's own authority rules.
@@ -347,7 +363,9 @@ How `budgets.ts` applies the table:
 | Every PR | CI (`.github/workflows/quality.yml`) | lint, format, typecheck, `npm run test`, the tooling suite, build and `seo:audit` (all existing) |
 | Engine or lens-data PR: touches `src/optics/**`, `src/types/**`, `src/lens-data/**` other than `*.md`, `src/utils/catalog/**`, `src/utils/featureFlags.ts`, or the harness itself | CI job `engine-diff` (S1.P2.T2) | Tier P against the merge-base under the PR's change class, plus every changed or new lens through every Tier P request |
 | Phase end | The PR that ends the phase | Every test the phase's steps added, run together; the phase exit criteria |
-| Stage end | GitHub Actions: `engine-diff-stage.yml` by `workflow_dispatch`, sharded as a matrix (S1.P2.T3). A PR that adds or changes the workflow pushes its head to `engine-diff-stage/<name>` instead. Timing runs on the maintainer's machine. | Tier S against the current anchor; the full suites; build; the stage's efficiency report; then the tag |
+| Weekly merge of `main` into `engine-next` | The merge PR's CI, then a run of the driver | The merge PR's own `engine-diff` job under its declared class; then Tier P of `engine-next` against `main`, recorded in that PR |
+| Stage end | GitHub Actions: `engine-diff-stage.yml` by `workflow_dispatch`, sharded as a matrix (S1.P2.T3). Dispatch needs the workflow file on `main`, so a stub of it lands there before the Stage 2 gate; a run on `engine-next` then uses that branch's version. A push to `engine-diff-stage/<name>` runs Tier S of the pushed commit against itself, which is what the Stage 1 gate and a PR that changes the workflow need. Timing runs on the maintainer's machine. | Tier S against the current anchor; the full suites; build; the stage's efficiency report; then the tag |
+| Promotion, after the Stage 5 gate | `engine-diff-stage.yml`, sharded; timing on the maintainer's machine | Tier F of `engine-next` against `main`; the benchmark and memory comparison; the preview deployment; then the merge commit |
 | Before S8.P2 deletes code | `engine-diff-stage.yml`, sharded | Tier F against the current anchor |
 
 ### Differential harness
@@ -847,6 +865,9 @@ flowchart LR
 Stage 2 and Stages 3–4 touch disjoint modules and can run in parallel. Stage 5 needs both S2.P1 and S4; it does not
 need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
 
+Phases 2.1 to 2.4 run on `engine-next`. Phases 2.5 and 2.6 run on `main` after promotion, so the catalog is V1 on
+both branches for as long as there are two.
+
 ### Stage 1 — Contract, evidence and guards
 
 **Phase 1.1 — Contract and anchors**
@@ -888,8 +909,8 @@ need the S2.P5 catalog migration. Phase 2.6 needs S2.P5 and blocks nothing.
     - add the budget table and comparator;
     - add `scripts/engine-diff.mjs`;
     - add an `engine-diff` job to `.github/workflows/quality.yml`. It first checks the changed paths, then runs Tier P
-      against `origin/main`'s merge-base, with the class taken from the PR label and the exceptions from the PR
-      description.
+      against the PR's merge-base with its base branch, with the class taken from the PR label and the exceptions
+      from the PR description.
   - **Tests:**
     - Each of these must fail detection: a status, an index, a unit, a sample order, a coordinate perturbed by 1 ulp
       under C0, and a coordinate perturbed by twice the budget under C1.
@@ -1188,6 +1209,8 @@ the maintainer tags the merge commit `optics-rewrite/s1`.
 
 **Phase 2.5 — Catalog migration**
 
+This phase runs on `main`, after `engine-next` has been promoted.
+
 - **S2.P5.T1–T8 Convert by maker batches.**
   - **Batches:** eight PRs, one per alphabetical group of maker directories under `src/lens-data/`. Each runs
     `convert-lens-data --write` on its batch and attaches the batch's conversion report.
@@ -1469,6 +1492,9 @@ Each step is its own PR after S2.P5 and blocks nothing else.
 `src/optics/internal/` is gone (its last files leave in S5.P1.T1 and S5.P1.T3); the cycle guard's legacy list has
 shrunk.
 
+**Promotion:** once the Stage 5 gate has passed, `engine-next` merges into `main` under the rule in
+[Integration model](#integration-model). Stages 6 to 8, and Phases 2.5 and 2.6, follow on `main`.
+
 ### Stage 6 — Fields, chief rays and solvers
 
 - **S6.P1.T1 Field module on prepared geometry.**
@@ -1684,12 +1710,25 @@ The maintainer settled these on 2026-10-09. Each is recorded where it applies; t
 | 13 | Single-lens corpus rules move into the validator, two of them once their exception lists are empty; rules that compare files stay tests | S2.P6.T2 |
 | 14 | The app reads only V2 after S8; the converter is permanent and runs on arrival and on demand | [Ingest, conversion and comments](#ingest-conversion-and-comments); S2.P5.T9; S8.P2.T2 |
 
+The maintainer settled these on 2026-10-11 and 2026-10-12, during Stage 1:
+
+| # | Decision | Where |
+| --- | --- | --- |
+| 15 | Stages 1 to 5 land on an integration branch, `engine-next`, promoted to `main` after the Stage 5 gate | [Integration model](#integration-model) |
+| 16 | `main` merges into `engine-next` weekly, and Tier P of the branch against `main` is recorded each time | [Integration model](#integration-model); [Gates by level](#gates-by-level) |
+| 17 | The catalog conversion and its follow-ups wait until after promotion | [Stage dependencies](#stage-dependencies); S2.P5 |
+| 18 | The differential harness, the paired benchmark mode and the work counters are deleted at the close | S8.P2.T3; S8.P2.T4 |
+| 19 | A commit that adds or changes the stage workflow gets its Tier S run through a push to `engine-diff-stage/**` | S1.P2.T3 |
+| 20 | The Planar generator is a re-derivation, and the comparator export waits for Stage 3 | S1.P4.T2; [Independent references](#independent-references) |
+
 Left to evidence gathered during the program: the final barrel list (S8.P1.T1), the two focus-infinity thresholds
-(S5.P2.T2), the quantity budgets (S1.P2.T2) and Tier P's lens coverage (S1.P2.T3).
+(S5.P2.T2) and the items S1.P2.T2 leaves open.
 
 ## Rollback
 
 - Every step reverts on its own, and anchors show which outputs a revert changes.
+- Until promotion, `main` runs the engine it had before the program. Not promoting `engine-next` rolls back
+  everything on it.
 - Until S8.P2.T2, catalog batches also revert with `convert-lens-data --to-version 1`. After it, the app reads only
   V2, and a revert of S8.P2.T2 restores V1 ingest.
 - There is no in-tree old engine to fall back to. A failing step is fixed or reverted, never routed around.
