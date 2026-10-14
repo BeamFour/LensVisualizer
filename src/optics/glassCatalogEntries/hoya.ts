@@ -1523,7 +1523,7 @@ export const HOYA_GLASS_ENTRIES: readonly GlassEntry[] = [
   {
     name: "LAFL4",
     vendor: "Hoya",
-    polynomial: [2.8554713, -0.0096096763, 0.029421326, -0.001076041, 0.00023612368, -0.000010372733],
+    polynomial: [2.8554713, -0.0096096763, 0.029421326, -0.001076041, 0.00023612388, -0.000010372073],
     nd: 1.712704,
     vd: 43.295113,
     code6: "713433",
@@ -1911,5 +1911,17 @@ export const HOYA_GLASS_ENTRIES: readonly GlassEntry[] = [
     PgF: 0.5743,
     source:
       "HOYA Zemax catalog 2026-07-07 including obsolete glasses (HOYA20260707_include_obsolete.agf); vendor formula-1 polynomial for E-FL6. It shares a six-digit code with another vendor's row, so code6 is omitted.",
+  },
+  /* October 2026 patent-batch coverage addition (US 2026/0036794 A1 L6). */
+  {
+    name: "E-FD80",
+    vendor: "Hoya",
+    polynomial: [2.7659751, -0.01262138, 0.02715647, 0.0020389447, -0.00016485416, 0.000019350106],
+    nd: 1.6896,
+    vd: 31.14,
+    PgF: 0.6032,
+    code6: "690311",
+    source:
+      "HOYA Zemax catalog 2026-07-07 including obsolete glasses (HOYA20260707_include_obsolete.agf); vendor formula-1 polynomial for E-FD80.",
   },
 ];
