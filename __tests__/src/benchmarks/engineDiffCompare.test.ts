@@ -557,7 +557,7 @@ describe("engineDiff comparison of identical captures", () => {
     expect(ok + clipped + failed).toBe(22);
     expect(ok).toBeGreaterThan(0);
     expect(counts.headEngine.digestedTraces.ok).toBeGreaterThan(0);
-    /* The context's jobs, six beside them, and the four readouts the viewer computes outside the context. */
+    /* The context's jobs, the split corner metadata, six beside them, and the viewer's four readouts. */
     expect(counts.headEngine.jobs).toEqual({ returned: ANALYSIS_CONTEXT_JOBS.length + 10, threw: 0 });
   });
 });
