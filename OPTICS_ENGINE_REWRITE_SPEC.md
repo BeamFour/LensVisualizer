@@ -1241,8 +1241,8 @@ The stop radius has exactly one authority per lens:
     const where it declares it (`export const X`, as `SigmaDGDNA35mmf14` does) loses that `export`. Any other top-level
     const sits in that header and stays as written.
   - **Gap order.** Fields print in the field order above. Gaps print in surface order from the canonical list, because
-    a JavaScript object lists integer-like keys first and would move `STO` and `14A` after every numbered gap (200
-    files); `var` prints the same way going to V1.
+    a JavaScript object lists integer-like keys first and would move `STO` and `14A` after every numbered gap (210
+    files at anchor A5); `var` prints the same way going to V1.
   - **Blank lines.** One blank line separates the top-level groups, as in the Shape excerpt, and a row of a list of
     rows (`surfaces`, `elements`) keeps a blank line its source had before it or before one of its leading comments.
   - **A V2 source** keeps its comments and number tokens at the same paths, its media's ids, names and order, its
@@ -1298,6 +1298,8 @@ The stop radius has exactly one authority per lens:
     the line (a line comment, or a block comment spanning lines). When two such comments come to one node, as a V1
     surface's `nd` and `elemId` both come to its `medium`, the first trails the node and each later one leads it,
     after its own leading comments, in source order.
+  - In a list of numbers, which Prettier fills, the one-line block comments that end an item's leading comments share
+    its line before it, where Prettier keeps them; on a line of their own, Prettier would join them to the item before.
   - The reader attaches by position, as Prettier does: a block comment with nothing but spaces between it and the next
     entry, on the same line, leads that entry. A comment inside a spread, whose items are never read, is refused, as a
     comment outside the object is.
@@ -1344,8 +1346,11 @@ The stop radius has exactly one authority per lens:
     `aperture`, would come back on `nominalFno`.
   - Any other comment on a V2 node V1 has no counterpart for (a station record, a medium) moves, prefixed, to the V1
     node of its nearest mapped ancestor, or to the first V1 container whose home holds it (`zoomPositions` first,
-    then file order); the report lists each move, with the node it went to, and each medium name V1 cannot hold. A
-    restored flat radius prints `1e15`, not `String(1e15)`.
+    then file order); the report lists each move, with the node it went to, and each medium V1 cannot hold, whose id,
+    name and place in the list drop. A
+    restored flat radius prints `1e15`, not `String(1e15)`, and a value V1 holds twice (a surface's `nd` beside its
+    medium, a gap surface's `d` beside its gap) or zero padding V1 requires prints from its value, not from a source
+    text (Q23.4).
 - **The converter is permanent.** Lens files waiting in an archive for a later release, and files on external
   branches, may still be V1 long after migration. The converter, its V1 reader and its tests stay after the program,
   and V1 files enter the catalog only through it:
@@ -1924,7 +1929,9 @@ the maintainer tags the merge commit `optics-rewrite/s1`.
   - **Change:** add `scripts/convert-lens-data.mjs` and its `npm run convert:lens-data` script
     (`scripts/lens-data-convert/cli.mjs`), and the library's V1 direction.
   - **Flags:**
-    - `--input <file|dir>`: a file, or every `*.data.ts` and `*.teleconverter.ts` under a directory, in path order
+    - `--input <file|dir>`: a file, or every `*.data.ts` and `*.teleconverter.ts` under a directory, in path order;
+      symbolic links under a directory are not followed, and a file input that is one is refused before anything
+      converts, since a write would replace the link with a file
     - `--to-version 1|2` (default 2)
     - `--dry-run` (the default), `--check` or `--write`, one at most: all three convert, check and print the same
       report, and only `--write` writes
@@ -1932,14 +1939,17 @@ the maintainer tags the merge commit `optics-rewrite/s1`.
       file input: its name). The directory holds only the converted files.
   - **Exit codes,** each listed in the usage text with what gives it: 0; 1 for `--check` when an input would convert
     and none is refused; 2 for a refused input, a type diagnostic outside the converted files or a failure of the
-    type-check itself, a collision, a failed write or rename, SIGINT or SIGTERM while writing, and a usage error.
+    type-check itself, a collision, a failed write or rename, SIGINT or SIGTERM while writing, a usage error, and an
+    error writing stdout or stderr, once the run is over. A reader closing its pipe (`EPIPE`) is no error: the run
+    goes on and its exit code is unchanged.
   - **Version:** the engine's rule, `lensDataVersion` beside `isV1File` in `ingestV2.ts`, through
     `lensDataConversion.ts`: no `schema` is V1, `schema: 2` is V2, and any other `schema` is no version, refused as
     ingest refuses it. An input already at `--to-version` is left as it is in every mode: not reprinted, rewritten
     or ingested, and given no line; the closing count says how many were left. `--to-version 1` restores a file's
     prescription, not its bytes; git restores bytes.
   - **Output:** stdout is the conversion report and nothing else, the same bytes in every mode; stderr has a line for
-    each file converted or refused, and one closing count.
+    each file converted or refused, and one closing count, after a failed write too. An input that cannot be read is
+    that file's refusal; a directory under `--input` that cannot be listed refuses the run before anything converts.
   - **Line endings:** the command line reads a CR LF source as LF, whole, header included, says so on that file's
     line, and writes LF. A lone CR is a refusal. No catalog file has either.
   - **Collisions,** each exit 2 before anything converts, naming both paths: two destinations that are one path
@@ -1954,11 +1964,13 @@ the maintainer tags the merge commit `optics-rewrite/s1`.
     converted file refuses it.
   - **Writes,** under `--write` and only when no input is refused: each converted text to a temp file beside its
     destination (`.<name>.<pid>.convert-tmp`); in place, each input's bytes beside it (`.<name>.<pid>.convert-bak`),
-    each temp file renamed over its input, and the backups removed; under `--output`, each temp file linked to its
+    each temp file renamed over its input, and the backups removed (one that cannot be removed then is a warning and
+    stays, the run being done); under `--output`, each temp file linked to its
     destination, failing if the destination exists, then removed. Temp files and backups are created exclusively
-    (`wx`), and a run removes only files it created. When a write, rename or link fails, or SIGINT or SIGTERM arrives
+    (`wx`) with their input's permissions, so a converted file keeps them, and a run removes only files it created. When a write, rename or link fails, or SIGINT or SIGTERM arrives
     while writing, the run puts back every input already replaced (under `--output`, removes every file and
-    directory it wrote), removes its temp files and backups, and exits 2. A SIGKILL can leave them: `*.convert-tmp`
+    directory it wrote), removes its temp files and backups, and exits 2. Before the write phase a signal stops the
+    run as it stops any process, with nothing written. A SIGKILL can leave them: `*.convert-tmp`
     and `*.convert-bak` are in `.gitignore`, and the next run refuses while a backup sits beside an input.
   - **V2 to V1:** the V1 view without catalog defaults, its top-level members printed in `V1_PRINT_ORDER` (the
     declaration order of `LensData` and `TeleconverterData`; the view writes a lens's tail in another order, and
@@ -1966,7 +1978,7 @@ the maintainer tags the merge commit `optics-rewrite/s1`.
     lists `V1_ROW_LISTS` names keeping their source's blank lines, all in `toLensData.ts`. A record below the top prints as the view writes it (a surface's `elemId` before its `sd`, as
     all 17,933 catalog surface rows write it), a record keyed by surface label in surface order. The comment mapping is engine-owned, `v1SourceMap` in `src/optics/prescription/`, as
     [V2 to V1](#ingest-conversion-and-comments) states it, and the report lists each moved comment and each medium
-    name V1 cannot hold.
+    V1 cannot hold, with its id and any name.
   - **A stop without `sd`, going to V1:** V1's `SurfaceData.sd` is required, so the converter writes the engine's
     radius, to 0.001 mm, from `buildLens` on the source: a prime's radius, a zoom's at the wide station (a fixed-iris
     zoom's one radius), a scheduled zoom's first schedule value. `v1StopRadius` names the surface and how the engine
@@ -1975,10 +1987,16 @@ the maintainer tags the merge commit `optics-rewrite/s1`.
     cannot be derived is refused. `LensDataInput` is unchanged.
   - **Files:**
     - `scripts/convert-lens-data.mjs`; `scripts/lens-data-convert/{cli, typecheck, convert, comments, print,
-      report}.mjs` and their `.d.mts`; `scripts/{lens-data-ast, lens-summaries}.mjs` and their `.d.mts`
+      report}.mjs`, and the `.d.mts` of each but `print`; `scripts/{lens-data-ast, lens-summaries}.mjs` and their
+      `.d.mts`
     - `src/optics/prescription/{ingestV2, toLensData, toLensDataV2, sourcePaths}.ts`, and `v1SourceMap.ts` beside
-      them; `src/optics/lensDataConversion.ts`
-    - `package.json`, `.gitignore`, `agent_docs/workflow.md`, `agent_docs/architecture/testing.md`
+      them; `src/optics/lensDataConversion.ts`; `src/optics/prescription/improvementsuggestions.md`
+    - `package.json`, `.gitignore`, `agent_docs/workflow.md`,
+      `agent_docs/architecture/{testing, optics-engine, public-functions}.md`, and the generated readmes of
+      `src/optics/`, `src/optics/prescription/` and `src/types/`
+    - tests: `__tests__/scripts/{convertLensDataCli, convertLensData, lensDataV2Readers}.test.ts`,
+      `__tests__/scripts/convertLensDataFixtures.ts`, `__tests__/src/optics/prescription/ingestV2Fixtures.ts`,
+      `__tests__/src/optics/prescription/toLensDataV2.test.ts` and `__tests__/node-builtins.d.ts`
   - **Tests:** its tests cover each of those behaviors, plus an interrupted write and V2 → V1 → V2 identity:
     `__tests__/scripts/convertLensDataCli.test.ts`, and the V1 direction in `convertLensData.test.ts`, in `npm test`
     beside the library's. The round trip asserts semantic identity and that every comment appears once, as written
@@ -2893,7 +2911,7 @@ The maintainer settled these on 2026-10-11 and 2026-10-12, during Stage 1 and on
 | --- | --- | --- |
 | 15 | Stages 1 to 5 land on an integration branch, `engine-next`, promoted to `main` after the Stage 5 gate | [Integration model](#integration-model) |
 | 16 | `main` merges into `engine-next` weekly, and Tier P of the branch against `main` is recorded each time | [Integration model](#integration-model); [Gates by level](#gates-by-level) |
-| 17 | The catalog conversion and its follow-ups wait until after promotion, and the V2 authoring documents land on `main` with them | [Stage dependencies](#stage-dependencies); S2.P4; S2.P5 |
+| 17 | The catalog conversion and its follow-ups wait until after promotion. Row 89 (Q57) supersedes the rest, that the V2 authoring documents land on `main` with them: they reach `main` with promotion | [Stage dependencies](#stage-dependencies); S2.P4; S2.P5 |
 | 18 | The differential harness and the paired benchmark mode are deleted at the close | S8.P2.T3 |
 | 21 | The work counters are withdrawn from Stage 1 and from the program; count-based targets are measured with a throwaway instrumented build | [Efficiency](#efficiency-secondary) |
 | 22 | Every engine change goes to `engine-next` while the branch lives | [Integration model](#integration-model) |
@@ -2980,7 +2998,8 @@ Settled on 2026-10-16, by maintainer ruling on S5.P2.T2:
 | --- | --- | --- |
 | 62 | Use one 0.003 cutoff for treating focus as infinity, including traced conjugate correction; restore the pre-optics-2 behavior (maintainer ruling) | S5.P2.T2; `src/optics/focusDistance.ts` |
 
-The maintainer also settled these on 2026-10-15, answering the S2.P3.T2 questions:
+The maintainer also settled these on 2026-10-15, answering the S2.P3.T2 questions, and rows 73, 75 and 78 on
+2026-10-16:
 
 | # | Decision | Where |
 | --- | --- | --- |
