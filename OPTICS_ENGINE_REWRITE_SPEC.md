@@ -1174,7 +1174,8 @@ The stop radius has exactly one authority per lens:
 | Published schedule | Zooms whose source prints the stop diameter per station (today the Sony FE 12-24 GM and Canon RF 15-35) | `zoom.stations[i].stopSemiDiameter` |
 | Authored | Folded systems and stops embedded inside an element (16 lenses) | `sd` on the `STO` surface |
 
-- **A prime's stop radius is always derived from its design f-number.**
+- **A prime never takes its radius from a published diameter:** an ordinary prime derives it from its design
+  f-number, and a folded or inside-glass prime authors it.
   - A published stop diameter that agrees with the f-number is recorded in a comment.
   - One that disagrees beyond rounding is a source-consistency question under the source-errata standard
     (`agent_docs/lens-patent-audit.md`). It is not settled by letting the diameter override the f-number.
@@ -1387,9 +1388,10 @@ Phase 2.5 closes, and the Stage 2 gate passes, before the Stage 6 gate: the comm
 the Stage 6 gate compares against.
 
 Phases 2.1 to 2.3 run on `engine-next`. Phases 2.5 and 2.6 run on `main` after promotion, so the catalog is V1 on
-both branches for as long as there are two. Phase 2.4 is documents only: it is written on a branch of its own, off
-the critical path, and merges to `main` after promotion, beside Phase 2.5. `main` cannot read a V2 file before
-promotion, so the V2 authoring documents must not reach it earlier.
+both branches for as long as there are two. Phase 2.4 is documents only, off the critical path: it is drafted on
+`engine-next`, stacked on the converter stack (Phase 2.3), and reaches `main` with promotion. `main` cannot read a V2
+file before promotion, so the V2 authoring documents must not reach it earlier, and no V2-independent correction to the
+V1 spec goes to `main` separately.
 
 ### Stage 1 — Contract, evidence and guards
 
@@ -2005,47 +2007,62 @@ the maintainer tags the merge commit `optics-rewrite/s1`.
 
 **Phase 2.4 — Authoring documents**
 
-This phase merges to `main` after promotion. Corrections to the V1 spec that do not depend on V2, such as the
-spec–code contradictions below, may go to `main` at any time as ordinary documentation PRs.
+This phase is drafted on `engine-next`, stacked on the converter stack, and reaches `main` with promotion. No
+correction to the V1 spec goes to `main` separately: the spec–code contradictions below are fixed in the V2 rewrite.
 
 - **S2.P4.T1 V2 lens-data spec and templates.** Rewrite `src/lens-data/LENS_DATA_SPEC.md` in authoring order:
   1. quick start;
-  2. file shape;
-  3. identity and catalog;
-  4. source and errata;
-  5. elements and media;
-  6. surfaces (geometry, aspheres, diffractive, interactions and annuli);
-  7. stop and aperture, including the three stop-radius authorities and the prime rule from
+  2. scope: what to include;
+  3. file shape;
+  4. identity and catalog;
+  5. source and errata;
+  6. elements and media;
+  7. surfaces (geometry, aspheres, diffractive, interactions and annuli);
+  8. stop and aperture, including the three stop-radius authorities and the prime rule from
      [Stop radius](#stop-radius);
-  8. states (zoom stations, focus keyframes, gaps, conjugates, published stations, aberration control);
-  9. projection;
-  10. folded paths;
-  11. perspective control;
-  12. rear plates;
-  13. annotations;
-  14. layout, rays and checks;
-  15. validation rules, each with its code pointer;
-  16. glass identification;
-  17. data-sourcing checklist;
-  18. examples (prime, zoom, folded);
-  19. "Reading V1 audits".
+  9. states (zoom stations, focus keyframes, gaps, conjugates, published stations, aberration control);
+  10. projection;
+  11. folded paths;
+  12. perspective control;
+  13. rear plates;
+  14. annotations;
+  15. layout, rays and checks;
+  16. validation rules, each with its code pointer;
+  17. glass identification;
+  18. data-sourcing checklist;
+  19. examples (prime, zoom, folded);
+  20. "Reading V1 audits".
 
-  Fix the ten spec–code contradictions while rewriting. They include:
-  - the stop `sd`;
-  - `zoomCloseFocusM` listed as required;
+  Fix these spec–code contradictions while rewriting, each by making the spec say what the code does:
+  - the stop `sd`: derived from the design f-number or a schedule, and authored only for a folded system or a stop
+    inside an element; the entrance pupil comes from the f-number for every lens;
+  - `zoomCloseFocusM` listed as required: a station's close focus is optional, and refused on a prime;
   - the `lensShiftFrac` default: 0.08 in the defaults table (the dead `|| 0` reader fallback was removed in S5.P2.T3);
   - the `offAxisFieldFrac` default, found in S2.P1.T1: 0.6 in the table (the dead `?? 0.7` chromatic ray-fan
     fallback was removed in S5.P2.T3);
-  - the `zoomStep` default;
-  - stale `var` pair wording;
-  - "groups are purely visual".
+  - stale `var` pair wording: a prime's gap holds one thickness per focus keyframe;
+  - "groups are purely visual": authored groups are also the group-movement analysis's moving groups;
+  - a gap surface's `d`: exact equality with the gap's first value, as ingest requires, not a 1e-6 tolerance;
+  - `zoomLabels`: compiled to `L.zoomLabels`, which nothing displays, not a slider label;
+  - glass mismatches: the dispersion engine does not log them; the glass reports list them;
+  - smaller errors: `K > 0` is an oblate ellipsoid, not a hyperboloid; the minimal example's focal length; the
+    corpus sweeps' shrink-only lists; `catalog.imageFormat` required with `perspectiveControl`; the
+    `maxInteractions` image-plane allowance only with `imagePlane`.
 
-  The canonical defaults table carries the catalog's values, 0.08 and 0.6, which every catalog lens gets today.
+  The canonical defaults table carries the catalog's values, 0.08 and 0.6, which every catalog lens gets today. The
+  spec gives those values.
   - **Also update:**
     - `src/lens-data/TEMPLATE.data.ts.template`
     - `src/lens-data/TEMPLATE.teleconverter.ts.template`
     - `src/lens-data/TELECONVERTER_DATA_SPEC.md`
     - `src/lens-data/LENS_MOUNT_FORMAT_OPTIONS.md`
+    - `src/lens-data/LENS_ANALYSIS_SPEC.md` (the patent fields, as `source.*`)
+  - **Tests:** `__tests__/docDrift.test.ts` reads the spec's three example blocks, ingests each and builds it.
+  - **As built:** the spec has 20 sections. "Scope: What to Include" keeps its own section, under the same heading,
+    after Quick Start, so the sections lens files cite still resolve. The spec is V2 only; "Reading V1 audits" maps
+    each V1 field to its V2 path and states the V1 conventions an audit may assume. Each validation rule names its
+    function and file. The `zoomStep` default was dropped from the contradictions: spec and code agree on 0.004.
+  - **Gate:** C0.
 - **S2.P4.T2 Recipes and procedures.** Update these to V2 vocabulary:
   - `agent_docs/adding_a_lens.md`
   - `agent_docs/adding_a_teleconverter.md`
@@ -2659,7 +2676,8 @@ The commit the gate passes on is then tagged `optics-rewrite/s2` and becomes the
 shrunk.
 
 **Promotion:** once the Stage 5 gate has passed and Phases 2.1 to 2.3 have merged, `engine-next` merges into `main`
-under the rule in [Integration model](#integration-model). Stages 6 to 8, and Phases 2.4 to 2.6, follow on `main`.
+under the rule in [Integration model](#integration-model), carrying Phase 2.4. Stages 6 to 8, and Phases 2.5 and 2.6,
+follow on `main`.
 
 ### Stage 6 — Fields, chief rays and solvers
 
@@ -2988,6 +3006,18 @@ The maintainer also settled these on 2026-10-16, answering the S2.P3.T3 question
 | 80 | The corpus sweep runs in the tooling suite | S2.P3.T3 |
 | 81 | The corpus sweep converts each file to the other version and back to its own | S2.P3.T3 |
 | 82 | A case the corpus sweep finds stops it; its C3 data correction is a separate PR on `main` | S2.P3.T3 |
+
+The maintainer also settled these on 2026-10-16, answering the S2.P4.T1 questions:
+
+| # | Decision | Where |
+| --- | --- | --- |
+| 83 | `LENS_DATA_SPEC.md` keeps "Scope: What to Include" as its own section, under the same heading, after Quick Start, so the sections lens files cite still resolve | S2.P4.T1 |
+| 84 | `LENS_ANALYSIS_SPEC.md` names the patent fields by their V2 `source.*` paths, updated with the spec | S2.P4.T1 |
+| 85 | The spec gives the defaults table's `lensShiftFrac` and `offAxisFieldFrac`; the two unreachable code fallbacks, and the `defaults.ts` reader strings that quoted them, were removed in S5.P2.T3 | S2.P4.T1; S5.P2.T3 |
+| 86 | The spec's three examples are ingested and built in `docDrift.test.ts`, with no assertion beyond that | S2.P4.T1 |
+| 87 | The spec is V2 only, with the V1 → V2 field map in "Reading V1 audits"; it reaches `main` with promotion | S2.P4.T1 |
+| 88 | The spec says what the code does at each contradiction S2.P4.T1 names; the plan names them and gives no count | S2.P4.T1 |
+| 89 | Phase 2.4 is drafted on `engine-next`, stacked on the converter stack, and reaches `main` with promotion; no V2-independent correction to the V1 spec goes to `main` separately (Q57) | [Stage dependencies](#stage-dependencies); Phase 2.4 |
 
 Left to evidence gathered during the program: the final barrel list (S8.P1.T1) and the items S1.P2.T2 leaves open.
 
