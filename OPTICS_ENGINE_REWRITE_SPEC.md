@@ -146,7 +146,9 @@ catalog on 2026-10-13, lens and teleconverter files together; the plan was first
   S3.P2.T1's three approved divergences, as ruled. **A3** is `fd9c6f48`, the merge commit of #815 (the first engine
   C3: the distortion curve keeps invalid chief rays off it), tagged `optics-rewrite/a3`. Its cumulative Tier S
   against A2, under C2 with the 90 lines declared since A2, failed only on the approved divergences of S3.P2.T1,
-  S3.P2.T3 and S4.P2.T1, after #816 and #817 settled the build pupils' budget.
+  S3.P2.T3 and S4.P2.T1, after #816 and #817 settled the build pupils' budget. **A4** is `a4183c54`, the merge commit
+  of #835 (S5.P2.T2's C3: one focus-infinity cutoff), tagged `optics-rewrite/a4`. Its cumulative Tier S against A3,
+  under C3 with no transition declared since A3, passed in all 8 shards: 221 records differ, all inside their budgets.
 - Every differential comparison and speed measurement uses A0 or a later anchor (see
   [Anchors and comparison coverage](#anchors-and-comparison-coverage)), or the promotion merge commit for the
   Stage 2 gate alone. R0 is measured once, in S1.P1.T1, only to size the contract's own cost.
