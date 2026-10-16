@@ -32,6 +32,7 @@ import { formatSharedFocusDist, sharedFNumber } from "./comparisonSliders.js";
 import type { FocusPairResult, AperturePairResult, ZoomPairResult, MovementPairResult } from "./comparisonSliders.js";
 import { formatDist, formatFNumber, eflAtZoom } from "../optics/optics.js";
 import { getGroupMovementAvailability } from "../optics/groupMovement.js";
+import { focusFromControl, focusToControl } from "../optics/focusDistance.js";
 import { isMovementAxisEnabled } from "../optics/lensMovement.js";
 import { snapToZeroStop } from "../utils/style/sliderStops.js";
 import type { RuntimeLens } from "../types/optics.js";
@@ -110,7 +111,16 @@ export default function SharedSlidersBar({
   const { commonPoint: apertureCP, widerFOPEN, sharedMaxFstop, fNumberA, fNumberB } = aperturePair;
   const fNum = sharedFNumber(sharedStopdownT, widerFOPEN, sharedMaxFstop);
   const apertureLimited = Math.abs(fNumberA - fNum) > 0.005 || Math.abs(fNumberB - fNum) > 0.005;
-  const focusDistStr = formatSharedFocusDist(sharedFocusT, minCloseFocus);
+  const focusPositions = focusPair.controlPositions ?? [0, 1];
+  const focusControlT = focusToControl(sharedFocusT, focusPositions);
+  const stationFocus = focusPair.controlPositions !== undefined;
+  const referenceIsA = LA.data?.focusControl === "stations";
+  const focusReference = referenceIsA ? LA : LB;
+  const referenceFocusT = referenceIsA ? focusPair.focusA : focusPair.focusB;
+  const referenceZoomT = (referenceIsA ? zoomPair?.zoomA : zoomPair?.zoomB) ?? 0;
+  const focusDistStr = stationFocus
+    ? formatDist(referenceFocusT, focusReference, referenceZoomT)
+    : formatSharedFocusDist(sharedFocusT, minCloseFocus);
   /* Only show the common-point marker when it falls in a visible range
    * (not at the extreme ends of the slider where it would be meaningless) */
   const showFocusCP = focusCP > 0.01 && focusCP < 0.99;
@@ -341,15 +351,27 @@ export default function SharedSlidersBar({
           label="FOCUS"
           valueLabel={focusEnabled ? focusDistStr : "Not modeled"}
           minLabel={"\u221e"}
-          maxLabel={focusEnabled ? `${minCloseFocus} m` : "Not modeled"}
-          sliderValue={focusEnabled ? sharedFocusT : 0}
+          maxLabel={
+            focusEnabled
+              ? stationFocus
+                ? formatDist(1, focusReference, referenceZoomT, true)
+                : formatSharedFocusDist(1, minCloseFocus)
+              : "Not modeled"
+          }
+          sliderValue={focusEnabled ? focusControlT : 0}
+          /* Keep every station reachable even when the shared scale has three or more intervals. */
+          sliderStep={stationFocus ? 1 / ((focusPositions.length - 1) * 125) : undefined}
           disabled={!focusEnabled}
           disabledReason="No modeled focus travel data"
-          onSliderChange={onSharedFocusChange}
-          onDirectChange={(value) => onSharedFocusChange(value, true)}
+          onSliderChange={(value) =>
+            stationFocus
+              ? onSharedFocusChange(focusFromControl(value, focusPositions), true)
+              : onSharedFocusChange(value)
+          }
+          onDirectChange={(value) => onSharedFocusChange(focusFromControl(value, focusPositions), true)}
           onPointerDown={() => onFocusPointerDown(sharedFocusT)}
           onPointerUp={onSliderPointerUp}
-          markerPositions={showFocusCP ? [focusCP] : []}
+          markerPositions={showFocusCP ? [focusToControl(focusCP, focusPositions)] : []}
           action={
             movementAvailabilityA.focus || movementAvailabilityB.focus ? motionButton("focus", "focus") : undefined
           }

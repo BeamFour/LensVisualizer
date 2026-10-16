@@ -1268,6 +1268,9 @@ export default function validateLensData(data: UntrustedLensData): string[] {
   }
 
   /* ── Focus interpolation positions ── */
+  if (data.focusControl !== undefined && data.focusControl !== "stations") {
+    errors.push('"focusControl" must be "stations" when supplied');
+  }
   const focusPositionCount =
     Array.isArray(data.focusPositions) && data.focusPositions.length >= 2 ? data.focusPositions.length : 2;
   if (data.focusPositions !== undefined) {
@@ -1319,6 +1322,11 @@ export default function validateLensData(data: UntrustedLensData): string[] {
           );
           continue;
         }
+        if (
+          c.nominalMagnification !== undefined &&
+          (!Number.isFinite(c.nominalMagnification) || c.nominalMagnification <= 0)
+        )
+          errors.push('"finiteConjugates.nominalMagnification" must be a positive finite reproduction ratio');
         if (
           !Array.isArray(focusStations) ||
           !focusStations.some((f: number) => Math.abs(f - c.focusT) < 1e-8) ||

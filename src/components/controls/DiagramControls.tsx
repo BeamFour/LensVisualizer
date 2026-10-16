@@ -10,7 +10,13 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { eflAtZoom, formatDist, formatFNumber, marketedApertureNote } from "../../optics/optics.js";
 import { fisheyeProjectionFocalLengthAtZoom, isFisheyeProjection } from "../../optics/projection.js";
-import { closeFocusAtZoom, remapFocusDistance } from "../../optics/focusDistance.js";
+import {
+  closeFocusAtZoom,
+  focusControlPositions,
+  focusFromControl,
+  focusToControl,
+  remapFocusDistance,
+} from "../../optics/focusDistance.js";
 import { getGroupMovementAvailability } from "../../optics/groupMovement.js";
 import { isMovementAxisEnabled, perspectiveControlSteps } from "../../optics/lensMovement.js";
 import {
@@ -151,9 +157,9 @@ export default function DiagramControls({
   const handleFocusChange = useCallback(
     (v: number) => {
       onChangeActivity();
-      onFocusChange?.(v);
+      onFocusChange?.(focusFromControl(v, focusControlPositions(L)));
     },
-    [onChangeActivity, onFocusChange],
+    [onChangeActivity, onFocusChange, L],
   );
 
   const handleAberrationChange = useCallback(
@@ -348,13 +354,14 @@ export default function DiagramControls({
           labelMinWidth={85}
           /* A lens with no modeled focus travel stays at infinity whatever focusT a shared URL carries. */
           displayValue={groupMovementAvailability.focus ? formatDist(focusT, L, zoomT) : "\u221e"}
-          value={focusT}
+          displayValueStyle={{ whiteSpace: "nowrap" }}
+          value={focusToControl(focusT, focusControlPositions(L))}
           step={L.focusStep}
           onPointerDown={beginInteraction}
           onChange={handleFocusChange}
           onPointerUp={handlePointerUp}
           minLabel={"\u221e"}
-          maxLabel={groupMovementAvailability.focus ? formatDist(1, L, zoomT) : "Not modeled"}
+          maxLabel={groupMovementAvailability.focus ? formatDist(1, L, zoomT, true) : "Not modeled"}
           disabled={!groupMovementAvailability.focus}
           disabledReason="No modeled focus travel data"
           flexBasis="260px"
