@@ -13,6 +13,7 @@ declare module "node:child_process" {
 
 declare module "node:fs" {
   export function chmodSync(path: string, mode: number): void;
+  export function copyFileSync(source: string, destination: string): void;
   export function existsSync(path: string): boolean;
   export function linkSync(existingPath: string, newPath: string): void;
   export function mkdirSync(path: string, options?: { recursive?: boolean }): string | undefined;
@@ -47,6 +48,7 @@ declare module "node:path" {
   export function dirname(path: string): string;
   export function join(...paths: string[]): string;
   export function relative(from: string, to: string): string;
+  export function resolve(...paths: string[]): string;
 }
 
 declare module "node:stream" {
