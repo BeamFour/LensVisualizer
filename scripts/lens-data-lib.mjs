@@ -8,6 +8,8 @@ import {
   mapLimit,
 } from "./build-metadata-lib.mjs";
 import { evaluateLensDataSource, readLensIdentity } from "./lens-data-ast.mjs";
+import { runConversion } from "./lens-data-convert/cli.mjs";
+import { loadLensDataConversion } from "./lens-summaries.mjs";
 import { MAKER_PREFIXES } from "./maker-prefixes.mjs";
 
 /** Derive a URL-safe maker slug from a maker field or lens display name. */
@@ -69,14 +71,19 @@ function analysisRelativePathForDataPath(relativeDataPath) {
  * Rewrite a lens file's type imports to match its location under src/lens-data: `types/optics.js` for a V1 file,
  * `types/lensDataV2.js` for a V2 one.
  */
-function rewriteLensDataTypesImport(filePath, { readFile = readFileSync, writeFile = writeFileSync } = {}) {
-  const content = readFile(filePath, "utf-8");
+function normalizeLensDataTypesImport(content, filePath) {
   const relativeDepth = filePath.split("/src/lens-data/")[1]?.split("/").length ?? 1;
   const typesDir = relativeDepth > 1 ? "../../types" : "../types";
-  const updatedContent = content.replace(
+  return content.replace(
     /from "\.\.\/(?:\.\.\/)?types\/(optics|lensDataV2)\.js";/g,
     (_match, module) => `from "${typesDir}/${module}.js";`,
   );
+}
+
+/** Apply the same import normalization after filing an accepted conversion in its destination folder. */
+function rewriteLensDataTypesImport(filePath, { readFile = readFileSync, writeFile = writeFileSync } = {}) {
+  const content = readFile(filePath, "utf-8");
+  const updatedContent = normalizeLensDataTypesImport(content, filePath);
 
   if (updatedContent !== content) {
     writeFile(filePath, updatedContent, "utf-8");
@@ -236,10 +243,27 @@ async function collectLensDataAsync({
   return lenses.filter(Boolean);
 }
 
+/** Reject an unconverted catalog before metadata creates or writes any output. */
+async function assertV2Catalog(lensDataDir) {
+  const { lensDataVersion } = await loadLensDataConversion();
+  const files = readdirSync(lensDataDir, { recursive: true })
+    .filter((file) => typeof file === "string" && /\.(data|teleconverter)\.ts$/.test(file))
+    .sort();
+  for (const file of files) {
+    const path = join(lensDataDir, file);
+    const version = lensDataVersion(evaluateLensDataSource(readFileSync(path, "utf-8"), path));
+    if (version !== 2) {
+      throw new Error(
+        `Catalog file ${path} is ${version === 1 ? "V1" : "an unsupported schema"}; run npm run organize:lens-data and review the conversion report.`,
+      );
+    }
+  }
+}
+
 /** Build the planned move set for any root-level lens data files that still need maker folders. */
 function collectRootLensMovePlan(lensDataDir, { exists = existsSync, readdir = readdirSync } = {}) {
   const rootFiles = readdir(lensDataDir)
-    .filter((file) => typeof file === "string" && file.endsWith(".data.ts"))
+    .filter((file) => typeof file === "string" && /\.(data|teleconverter)\.ts$/.test(file))
     .sort();
 
   return rootFiles.map((dataFile) => {
@@ -258,18 +282,19 @@ function collectRootLensMovePlan(lensDataDir, { exists = existsSync, readdir = r
         from: fromDataPath,
         to: join(targetDir, dataFile),
       },
-      analysis: exists(fromAnalysisPath)
-        ? {
-            from: fromAnalysisPath,
-            to: join(targetDir, analysisFile),
-          }
-        : null,
+      analysis:
+        dataFile.endsWith(".data.ts") && exists(fromAnalysisPath)
+          ? {
+              from: fromAnalysisPath,
+              to: join(targetDir, analysisFile),
+            }
+          : null,
     };
   });
 }
 
-/** Move any root-level lens files into their maker folders. */
-function organizeRootLensFiles(
+/** Convert archived V1 files before moving root-level lenses and converters into their maker folders. */
+async function organizeRootLensFiles(
   lensDataDir,
   {
     exists = existsSync,
@@ -277,14 +302,11 @@ function organizeRootLensFiles(
     rename = renameSync,
     log = console.log,
     rewriteImport = rewriteLensDataTypesImport,
+    stdout = process.stdout,
+    stderr = process.stderr,
   } = {},
 ) {
   const movePlan = collectRootLensMovePlan(lensDataDir, { exists });
-
-  if (movePlan.length === 0) {
-    log("Lens-data organizer: no root-level lens files to move.");
-    return { movePlan, movedLensCount: 0, movedFileCount: 0 };
-  }
 
   for (const plannedMove of movePlan) {
     if (exists(plannedMove.data.to)) {
@@ -293,6 +315,20 @@ function organizeRootLensFiles(
     if (plannedMove.analysis && exists(plannedMove.analysis.to)) {
       throw new Error(`Lens-data organizer collision: destination already exists: ${plannedMove.analysis.to}`);
     }
+  }
+
+  const code = await runConversion({
+    argv: ["--input", lensDataDir, "--write"],
+    stdout,
+    stderr,
+    // Archived maker-folder imports must resolve at the arrival location before conversion can be accepted.
+    normalizeSource: normalizeLensDataTypesImport,
+  });
+  if (code !== 0) throw new Error("Lens-data organizer: conversion refused; see the converter diagnostics above.");
+
+  if (movePlan.length === 0) {
+    log("Lens-data organizer: no root-level lens files to move.");
+    return { movePlan, movedLensCount: 0, movedFileCount: 0 };
   }
 
   let movedFileCount = 0;
@@ -315,6 +351,7 @@ function organizeRootLensFiles(
 
 export {
   MAKER_PREFIXES,
+  assertV2Catalog,
   analysisRelativePathForDataPath,
   collectLensData,
   collectLensDataAsync,
