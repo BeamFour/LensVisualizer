@@ -1,3 +1,4 @@
+import { registerRuntimeFixture } from "./testLensFixtures.js";
 import { describe, it, expect } from "vitest";
 import {
   createCoordinateTransforms,
@@ -7,15 +8,9 @@ import {
 } from "../../../src/optics/diagramGeometry.js";
 import buildLens from "../../../src/optics/buildLens.js";
 import nikonPf500Data from "../../../src/lens-data/nikon/NikonAFSNikkor500mmf56EPFEDVR.data.js";
-import LENS_DEFAULTS from "../../../src/lens-data/defaults.js";
+import { catalogLensData } from "./testLensFixtures.js";
 import { doLayout, SVG_PATH_SUBDIVISIONS } from "../../../src/optics/optics.js";
-import type {
-  RuntimeLens,
-  AsphericCoefficients,
-  ElementSpan,
-  SurfaceData,
-  LensData,
-} from "../../../src/types/optics.js";
+import type { RuntimeLens, AsphericCoefficients, ElementSpan, SurfaceData } from "../../../src/types/optics.js";
 import { LENS_CATALOG } from "../../../src/utils/catalog/lensCatalog.js";
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -199,7 +194,7 @@ describe("computeElementShapes", () => {
       toSurface: surfaces[s2].label,
     }));
     const imageZ = surfaces.reduce((sum, surface) => sum + surface.d, 0);
-    return {
+    return registerRuntimeFixture({
       ...partial,
       data: {
         key: "diagram-geometry-fixture",
@@ -266,7 +261,7 @@ describe("computeElementShapes", () => {
       maxAspectRatio: 1.6,
       lensShiftFrac: 0,
       rayLeadFrac: 0.35,
-    } as RuntimeLens;
+    } as RuntimeLens);
   }
 
   /**
@@ -310,7 +305,7 @@ describe("computeElementShapes", () => {
   }
 
   it("returns empty array for empty ES", () => {
-    const L = { ...makeSingleElementLens(), ES: [] };
+    const L = registerRuntimeFixture({ ...makeSingleElementLens(), ES: [] });
     expect(computeElementShapes(L, [0, 5], sx, sy)).toEqual([]);
   });
 
@@ -622,10 +617,10 @@ describe("computeElementShapes", () => {
   });
 
   it("samples slope-trimmed surfaces only to the diagnostic render SD", () => {
-    const L = {
+    const L = registerRuntimeFixture({
       ...makeSingleElementLens({ R1: 32.975, sd1: 24, R2: 84.15, sd2: 20 }),
       maxRimTan: 0.95,
-    } as RuntimeLens;
+    } as RuntimeLens);
     const zPos = [0, 8.01];
     const diagnostics = computeElementRenderDiagnostics(L, zPos);
     const shape = computeElementShapes(L, zPos, sx, sy)[0];
@@ -676,7 +671,7 @@ describe("computeElementShapes", () => {
         { label: "L2F", R: 1e15, d: 3, nd: 1.5, elemId: 2, sd: 8 },
         { label: "L2R", R: 12, d: 0.3, nd: 1.0, elemId: 0, sd: 8 },
         { label: "M1F", R: 1e15, d: 1, nd: 1.5, elemId: 1, sd: 20, innerSd: 10 },
-        { label: "BYPASS", R: 1e15, d: 1, nd: 1.0, elemId: 1, sd: 8 },
+        { label: "BYPASS", R: 1e15, d: 1, nd: 1.0, elemId: 0, sd: 8 },
         {
           label: "M1R",
           R: 1e15,
@@ -750,7 +745,7 @@ describe("computeElementShapes", () => {
         { label: "L2F", R: 1e15, d: 3, nd: 1.5, elemId: 2, sd: 8 },
         { label: "L2R", R: 12, d: 0.3, nd: 1.0, elemId: 0, sd: 8 },
         { label: "M1F", R: 1e15, d: 1, nd: 1.5, elemId: 1, sd: 20 },
-        { label: "BYPASS", R: 1e15, d: 1, nd: 1.0, elemId: 1, sd: 8 },
+        { label: "BYPASS", R: 1e15, d: 1, nd: 1.0, elemId: 0, sd: 8 },
         {
           label: "M1R",
           R: 1e15,
@@ -830,7 +825,7 @@ describe("computeElementShapes", () => {
   });
 
   it("emits a semantic phase accent without changing the authored spherical profile", () => {
-    const L = buildLens({ ...LENS_DEFAULTS, ...nikonPf500Data } as LensData);
+    const L = buildLens(catalogLensData(nikonPf500Data));
     const layout = doLayout(0, 0, L);
     const shapes = computeElementShapes(L, layout.z, sx, sy);
     const phaseSurfaceIndex = L.labelIdx["8"];
@@ -883,6 +878,7 @@ describe("standalone reflecting surfaces", () => {
     const L = { ...base, ES: [], S: base.S.map((surface) => ({ ...surface })) };
     const primary = L.S.findIndex((surface) => surface.label === "M1");
     L.S[primary].innerSd = 5;
+    registerRuntimeFixture(L);
     const layout = doLayout(0, 0, L);
     const paths = computeStandaloneMirrorPaths(
       L,

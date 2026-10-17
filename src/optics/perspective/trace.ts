@@ -6,12 +6,12 @@ import type { ChromaticChannel, TiltPivot } from "../../types/optics.js";
 import { CHANNEL_WAVELENGTH_NM_2, channelIndexResolverForState2 } from "../chromatic/indexResolver.js";
 import type { LensMovementState } from "../lensMovement.js";
 import { formatCacheNumber } from "../math/numerics.js";
-import { intersectRayPlane, type RayPlaneIntersection } from "../math/plane.js";
+import { intersectRayPlane, type RayPlaneIntersection } from "../geometry/intersectPlane.js";
 import { directionFromMeridionalSlope, directionFromSkewSlope, dot, subtract } from "../math/vector.js";
 import type { Plane3, PreparedOpticalState, Ray3, Vec3 } from "../types.js";
 import { bulkTransmissionForTrace } from "../trace/bulkAbsorption.js";
-import { shouldUseGeneralizedTrace } from "../trace/generalizedTrace.js";
-import { stateWithRuntimeZ, traceEngineRay2 } from "../trace/rayAdapters.js";
+import { traceEngineRay2 } from "../trace/rayAdapters.js";
+import { stateWithZ } from "../state/preparedGeometry.js";
 import type { EngineTraceResult, TraceHit, TraceOptions } from "../trace/types.js";
 import { directionSlopes } from "../trace/utils.js";
 import { createPerspectivePose, type PerspectivePose } from "./pose.js";
@@ -91,7 +91,7 @@ export function createPerspectiveTraceContext({
   movement,
   tiltPivot,
 }: CreatePerspectiveTraceContextParams): PerspectiveTraceContext {
-  const state = cameraZPos ? stateWithRuntimeZ(preparedState, cameraZPos) : preparedState;
+  const state = cameraZPos ? stateWithZ(preparedState, cameraZPos) : preparedState;
   const pose = createPerspectivePose({ movement, sensorPlane: requestedSensorPlane ?? state.imagePlane, tiltPivot });
   const sensorPlane = pose.sensorPlane;
   const sensorBasis = createSensorBasis(sensorPlane);
@@ -124,7 +124,11 @@ export function tracePerspectiveRay(
   input: Ray3,
   options: PerspectiveTraceOptions = {},
 ): PerspectiveTraceResult {
-  if (context.pose.active && options.stopAt === undefined && shouldUseGeneralizedTrace(context.state, undefined)) {
+  if (
+    context.pose.active &&
+    options.stopAt === undefined &&
+    context.state.traceGeometry.traversal.kind === "generalized"
+  ) {
     throw new PerspectiveTraceUnsupportedError(
       "Full perspective-control tracing currently supports sequential optical paths only",
     );
@@ -143,7 +147,7 @@ export function tracePerspectiveRay(
     cameraReturnPoint,
     sensorIntersection,
     reachedSensor: sensorIntersection !== null,
-    transmission: bulkTransmissionForTrace(context.state.lens.runtime, localTrace.hits),
+    transmission: bulkTransmissionForTrace(context.state.lens, localTrace.hits),
   };
 }
 
@@ -156,7 +160,7 @@ export function tracePerspectiveMeridional(
   u0: number,
   options: PerspectiveTraceOptions = {},
 ): PerspectiveTraceResult {
-  const lead = context.state.lens.runtime.rayLead ?? 0;
+  const lead = context.state.lens.constants.rayLead ?? 0;
   const firstZ = context.state.z[0] ?? 0;
   const direction = directionFromMeridionalSlope(u0) ?? invalidDirection();
   return tracePerspectiveRay(
@@ -180,7 +184,7 @@ export function tracePerspectiveSkew(
   uy0: number,
   options: PerspectiveTraceOptions = {},
 ): PerspectiveTraceResult {
-  const lead = context.state.lens.runtime.rayLead ?? 0;
+  const lead = context.state.lens.constants.rayLead ?? 0;
   const firstZ = context.state.z[0] ?? 0;
   const direction = directionFromSkewSlope(ux0, uy0) ?? invalidDirection();
   return tracePerspectiveRay(

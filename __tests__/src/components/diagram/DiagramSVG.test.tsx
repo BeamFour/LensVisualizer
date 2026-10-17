@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { registerRuntimeFixture } from "../../optics/testLensFixtures.js";
 
 /**
  * DiagramSVG behavior tests.
@@ -13,7 +14,7 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { ComponentProps } from "react";
 import DiagramSVG from "../../../../src/components/diagram/DiagramSVG.js";
 import nikonPf500Data from "../../../../src/lens-data/nikon/NikonAFSNikkor500mmf56EPFEDVR.data.js";
-import LENS_DEFAULTS from "../../../../src/lens-data/defaults.js";
+import { catalogLensData } from "../../optics/testLensFixtures.js";
 import buildLens from "../../../../src/optics/buildLens.js";
 import { computeElementShapes } from "../../../../src/optics/diagramGeometry.js";
 import { createLensMovementTransform } from "../../../../src/optics/lensMovement.js";
@@ -612,7 +613,7 @@ describe("DiagramSVG", () => {
   });
 
   it("renders standalone mirrors and packs repeated folded hit-order labels", () => {
-    const L = { ...buildLens(LENS_CATALOG["reference-newtonian-side-focus"]), ES: [] };
+    const L = registerRuntimeFixture({ ...buildLens(LENS_CATALOG["reference-newtonian-side-focus"]), ES: [] });
     const layout = doLayout(0, 0, L);
 
     const { container } = render(
@@ -732,7 +733,7 @@ describe("DiagramSVG", () => {
   });
 
   it("renders a distinct semantic accent for a diffractive phase surface", () => {
-    const L = buildLens({ ...LENS_DEFAULTS, ...nikonPf500Data } as LensData);
+    const L = buildLens(catalogLensData(nikonPf500Data));
     const layout = doLayout(0, 0, L);
     const sx = (z: number) => z + 100;
     const sy = (y: number) => 300 + y;

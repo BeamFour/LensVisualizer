@@ -1,13 +1,14 @@
 /**
  * Chromatic dispersion adapter — legacy RuntimeLens wrappers over compiled surface dispersions.
  *
- * Keeps public chromatic helpers stable while the normalized prescription layer owns dispersion compilation.
+ * Keeps public chromatic helpers stable while the chromatic table builder owns dispersion compilation.
  */
 
 import type { ElementData, RuntimeLens, SurfaceData, SurfaceSpectral } from "../../types/optics.js";
 import { makeSurfaceDispersion } from "../dispersion.js";
 import type { CompiledSurfaceDispersion } from "../types.js";
-import { compileSurfaceDispersions } from "../prescription/dispersion.js";
+import { compiledLensFromRuntime } from "../prescription/identity.js";
+import { compileSurfaceDispersions } from "./dispersionTable.js";
 
 export { compileSurfaceDispersions };
 
@@ -34,5 +35,5 @@ export function makeSurfaceDispersion2(
  * @returns one dispersion descriptor per physical surface
  */
 export function dispersionTableFromRuntime2(L: RuntimeLens): readonly CompiledSurfaceDispersion[] {
-  return compileSurfaceDispersions(L.S, L.data.elements, L.spectralByIdx);
+  return compiledLensFromRuntime(L).dispersion;
 }

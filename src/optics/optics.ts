@@ -5,10 +5,10 @@
  * implementation files only when needed.
  */
 
-export { FLAT_R_THRESHOLD, conicPolySag, sag, sagSlopeRaw } from "./internal/surfaceMath.js";
+export { traceChiefRelativeSkewRay, traceChiefRelativeSkewRayChromatic } from "./trace/chiefRelative.js";
 export { anchorLayoutToCamera, type CameraAnchoredLayout } from "./cameraLayout.js";
 export {
-  FOCUS_INFINITY_THRESHOLD,
+  FOCUS_INFINITY_CUTOFF,
   SVG_PATH_SUBDIVISIONS,
   bAtZoom,
   epZRelStopAtZoom,
@@ -22,6 +22,7 @@ export {
   xpZRelLastSurfAtZoom,
   yRatioAtZoom,
 } from "./layout.js";
+export { interpolateStationTable } from "./state/stationTables.js";
 export {
   doLayout2 as doLayout,
   effectiveFNumber2 as effectiveFNumber,
@@ -34,6 +35,8 @@ export {
 export {
   chiefRayImageHeight2 as chiefRayImageHeight,
   chiefRayImageHeightAccurate2 as chiefRayImageHeightAccurate,
+  invertChiefRayImageHeights,
+  type ImageHeightInversionResult,
   computeAnalysisFieldGeometryAtState2 as computeAnalysisFieldGeometryAtState,
   computeBoundingSphereLaunchRadiusMm2 as computeBoundingSphereLaunchRadiusMm,
   computeBoundingSphereVectorFieldLaunch2 as computeBoundingSphereVectorFieldLaunch,
@@ -81,14 +84,11 @@ export {
   DEFAULT_ORTHOGONAL_PUPIL_FAN_SAMPLE_COUNT,
   sampleCircularPupil,
   sampleOrthogonalPupilFan,
-  skewImagePlaneIntercept,
-  traceChiefRelativeSkewRay,
-  traceChiefRelativeSkewRayChromatic,
-  traceToImage,
   type CircularPupilSample,
   type OrthogonalPupilSample,
-  type SkewImagePlaneIntercept,
-  type SkewRayTraceResult,
-} from "./rayTrace.js";
+} from "./analysis/sampling.js";
+export { skewImagePlaneIntercept, type SkewImagePlaneIntercept } from "./trace/rayAdapters.js";
 export { stopInnerBlockedSemiDiameter } from "./stopObstruction.js";
 export { formatDist, formatFNumber, formatPetzvalRadius, marketedApertureNote } from "./opticsFormat.js";
+
+export type { RuntimeSkewRayTraceResult as SkewRayTraceResult } from "./trace/runtimeRayResult.js";

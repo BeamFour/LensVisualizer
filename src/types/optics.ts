@@ -7,6 +7,7 @@
 
 import type { ImageFormatId, LensMountId } from "../utils/catalog/lensTaxonomy.js";
 import type { AsphericCoefficients } from "./asphericSchema.js";
+import type { SurfaceDispersion } from "./dispersion.js";
 import type { AttachedTeleconverterInfo } from "./teleconverter.js";
 
 /** One sparse coefficient in a rotationally symmetric optical-path polynomial W(h). */
@@ -486,7 +487,7 @@ export interface LensData {
   apertureBladeRoundedness?: number;
 }
 
-/** Fields provided by LENS_DEFAULTS — optional in raw lens data files */
+/** Fields the schema's catalog defaults supply (`src/optics/prescription/defaults.ts`) — optional in raw lens data files */
 type DefaultedFields =
   | "rayFractions"
   | "rayLeadFrac"
@@ -543,7 +544,7 @@ export interface RuntimeLens {
   readonly varByIdx: Record<number, VarRange>;
   readonly vdByIdx: Record<number, number>;
   readonly spectralByIdx: Record<number, SurfaceSpectral>;
-  readonly indexByIdx: Record<number, import("../optics/dispersion.js").SurfaceDispersion>;
+  readonly indexByIdx: Record<number, SurfaceDispersion>;
   readonly varLabels: [number, string][];
   readonly groups: ResolvedAnnotation[];
   readonly doublets: ResolvedAnnotation[];

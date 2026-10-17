@@ -5,70 +5,45 @@
  * implementation lives in focused prescription, state, trace, field, and analysis modules.
  */
 
-import buildRuntimeLens from "./runtimeLens.js";
+import { layoutFromPrepared } from "./state/layout.js";
+import { eflAtZoom, epAtZoom, fopenAtZoom, clampStationControl } from "./state/stationTables.js";
+import { runtimeView } from "./prescription/runtimeView.js";
 import type { LayoutResult, LensData, RuntimeLens } from "../types/optics.js";
-import type { EngineLens, PreparedOpticalState } from "./types.js";
-import { normalizeRuntimeLens, withLensDefaults } from "./prescription/normalizeLensData.js";
-import { prepareState } from "./state/prepareState.js";
-import type { PreparedStateCache } from "./state/cache.js";
-
-const PREPARED_STATE_CACHE_BY_RUNTIME = new WeakMap<RuntimeLens, PreparedStateCache>();
-const PREPARED_STATE_CACHE_LIMIT = 96;
-
-function preparedStateCacheForRuntime(L: RuntimeLens): PreparedStateCache {
-  const cached = PREPARED_STATE_CACHE_BY_RUNTIME.get(L);
-  if (cached) return cached;
-
-  const byKey = new Map<string, PreparedOpticalState>();
-  const cache: PreparedStateCache = {
-    get(cacheKey) {
-      const state = byKey.get(cacheKey);
-      if (state) {
-        byKey.delete(cacheKey);
-        byKey.set(cacheKey, state);
-      }
-      return state;
-    },
-    set(cacheKey, state) {
-      if (byKey.has(cacheKey)) byKey.delete(cacheKey);
-      byKey.set(cacheKey, state);
-      while (byKey.size > PREPARED_STATE_CACHE_LIMIT) {
-        const oldestKey = byKey.keys().next().value;
-        if (oldestKey === undefined) break;
-        byKey.delete(oldestKey);
-      }
-    },
-    clear() {
-      byKey.clear();
-    },
-  };
-  PREPARED_STATE_CACHE_BY_RUNTIME.set(L, cache);
-  return cache;
-}
-
+import type { CanonicalLens, IngestedPrescription } from "./prescription/canonical.js";
+import type { CompiledLens, PreparedOpticalState } from "./types.js";
+import { compiledLensFromRuntime, compileLensData, compileLens } from "./prescription/compile.js";
+import { prepareState } from "./state/preparedGeometry.js";
 /**
  * Build and register a RuntimeLens from defaulted lens data.
  *
  * @param data - lens prescription after catalog defaults are acceptable
- * @returns frozen RuntimeLens plus a cached normalized EngineLens for state work
+ * @returns the shared frozen RuntimeLens for the canonical identity
  */
 export function buildLens2(data: LensData): RuntimeLens {
-  const runtime = buildRuntimeLens(withLensDefaults(data));
-  normalizeRuntimeLens(runtime);
-  return runtime;
+  return runtimeView(compileLensData(data));
 }
 
 /**
- * Retrieve or create the normalized engine lens for a RuntimeLens.
+ * Compile a transported canonical input and publish its compatibility view.
  *
- * The cache is keyed by object identity; callers must not mutate a RuntimeLens in
+ * @param input - canonical lens and source provenance, before rear-plate expansion
+ * @returns frozen runtime sharing one successful compilation per prescription identity
+ */
+export function buildCanonicalLens(input: IngestedPrescription<CanonicalLens>): RuntimeLens {
+  return runtimeView(compileLens(input));
+}
+
+/**
+ * Retrieve the compiled owner of a RuntimeLens.
+ *
+ * The association is lookup-only; callers must not mutate a RuntimeLens in
  * place because prepared-state caches assume a fresh object for changed optics.
  *
  * @param L - runtime lens object returned by buildLens
  * @returns normalized engine lens used by prepared-state modules
  */
-export function engineLensFromRuntime(L: RuntimeLens): EngineLens {
-  return normalizeRuntimeLens(L);
+export function engineLensFromRuntime(L: RuntimeLens): CompiledLens {
+  return compiledLensFromRuntime(L);
 }
 
 /**
@@ -86,9 +61,7 @@ export function prepareRuntimeState(
   zoomT: number,
   aberrationT = 0,
 ): PreparedOpticalState {
-  return prepareState(engineLensFromRuntime(L), focusT, zoomT, aberrationT, {
-    cache: preparedStateCacheForRuntime(L),
-  });
+  return prepareState(engineLensFromRuntime(L), focusT, zoomT, aberrationT);
 }
 
 /**
@@ -102,11 +75,7 @@ export function prepareRuntimeState(
  */
 export function doLayout2(focusT: number, zoomT: number, L: RuntimeLens, aberrationT = 0): LayoutResult {
   const state = prepareRuntimeState(L, focusT, zoomT, aberrationT);
-  return {
-    z: [...state.z],
-    th: state.surfaces.map((surface) => surface.d),
-    imgZ: state.imgZ,
-  };
+  return layoutFromPrepared(state);
 }
 
 /**
@@ -131,8 +100,7 @@ export function thick2(i: number, focusT: number, zoomT: number, L: RuntimeLens,
  * @returns effective focal length in mm
  */
 export function eflAtZoom2(zoomT: number, L: RuntimeLens): number {
-  if (!L.isZoom) return L.EFL;
-  return interpolateZoomArray2(zoomT, L.zoomEFLs!);
+  return eflAtZoom(clampStationControl(zoomT), L);
 }
 
 /**
@@ -143,8 +111,7 @@ export function eflAtZoom2(zoomT: number, L: RuntimeLens): number {
  * @returns entrance-pupil semi-diameter in mm
  */
 export function epAtZoom2(zoomT: number, L: RuntimeLens): number {
-  if (!L.isZoom) return L.EP.epSD;
-  return interpolateZoomArray2(zoomT, L.zoomEPs!);
+  return epAtZoom(clampStationControl(zoomT), L);
 }
 
 /**
@@ -155,17 +122,7 @@ export function epAtZoom2(zoomT: number, L: RuntimeLens): number {
  * @returns wide-open f-number for the selected zoom state
  */
 export function fopenAtZoom2(zoomT: number, L: RuntimeLens): number {
-  if (!L.isZoom || !L.zoomFOPENs) return L.FOPEN;
-  return interpolateZoomArray2(zoomT, L.zoomFOPENs);
-}
-
-function interpolateZoomArray2(zoomT: number, values: readonly number[]): number {
-  if (values.length === 1) return values[0];
-  const t = Math.max(0, Math.min(1, Number.isFinite(zoomT) ? zoomT : 0));
-  const pos = t * (values.length - 1);
-  const idx = Math.min(Math.floor(pos), values.length - 2);
-  const frac = pos - idx;
-  return values[idx] + (values[idx + 1] - values[idx]) * frac;
+  return fopenAtZoom(clampStationControl(zoomT), L);
 }
 
 export {
@@ -184,6 +141,8 @@ export { traceToStopViaGeneralized2 } from "./trace/stopTrace.js";
 export {
   chiefRayImageHeight2,
   chiefRayImageHeightAccurate2,
+  invertChiefRayImageHeights,
+  type ImageHeightInversionResult,
   computeAnalysisFieldGeometryAtState2,
   computeBoundingSphereLaunchRadiusMm2,
   computeBoundingSphereVectorFieldLaunch2,

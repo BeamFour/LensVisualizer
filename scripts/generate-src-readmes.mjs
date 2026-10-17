@@ -30,6 +30,10 @@ const folderRoleOverrides = new Map([
     "src/benchmarks",
     "optics/rendering benchmark helpers that exercise runtime viewer paths outside normal app rendering",
   ],
+  [
+    "src/benchmarks/engineDiff",
+    "engine differential harness: the capture entry, seam adapter, request tiers, payload normalization, quantity budgets, and comparison of two engine revisions",
+  ],
   ["src/comparison", "comparison-mode state, shared sliders, URL metadata, and two-lens layout composition"],
   [
     "src/components",
@@ -72,7 +76,7 @@ const folderRoleOverrides = new Map([
   ],
   [
     "src/lens-data",
-    "auto-discovered lens prescription data, companion analysis notes, audit notes, authoring specs, and shared lens-data defaults",
+    "auto-discovered lens prescription data, companion analysis notes, audit notes, and authoring specs",
   ],
   ["src/mounts", "mount interface data specs and schema consumed by the pure mount renderer and mount pages"],
   [
@@ -88,12 +92,19 @@ const folderRoleOverrides = new Map([
     "src/optics/first-order",
     "first-order optical calculations for cardinals, pupils, f-number, focus breathing, and system matrices",
   ],
-  ["src/optics/internal", "private exact surface-tracing implementation details for the optics engine"],
-  ["src/optics/math", "low-level vector, numerical, paraxial, surface profile, and intersection math"],
+  [
+    "src/optics/geometry",
+    "the single implementation of surface sag, slope, and profiles, with the profile normal, conic domain, and slope bound, and the ray-surface intersection kernel with its roundoff envelopes and plane landings",
+  ],
+  ["src/optics/math", "low-level vector, numerical, and paraxial math"],
   ["src/optics/mount", "pure mount-diagram geometry, SVG document emission, validation, styling, and JSON helpers"],
   [
     "src/optics/prescription",
-    "lens prescription normalization, variable gaps, labels, groups, dispersion, interactions, and aspheric helpers",
+    "canonical prescription ingest, compilation, composition, identity ownership, and control helpers",
+  ],
+  [
+    "src/optics/prescription/validate",
+    "authored shape, canonical facts, diagnostic paths, and compiled geometry validation",
   ],
   ["src/optics/state", "engine-native prepared optical state and cache helpers"],
   [

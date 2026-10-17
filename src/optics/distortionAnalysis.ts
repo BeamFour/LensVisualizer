@@ -10,6 +10,7 @@
  * current state in a hook rather than embedding in a component.
  */
 
+import { prepareRayTrace, type PreparedRayTrace } from "./trace/rayAdapters.js";
 import {
   chiefRayImageHeight,
   chiefRayImageHeightAccurate,
@@ -18,10 +19,9 @@ import {
   computeFieldGeometryAtState,
   skewImagePlaneIntercept,
   solveChiefRay,
-  solveFieldAnglesForImageHeightsAccurate,
+  invertChiefRayImageHeights,
+  type ImageHeightInversionResult,
   thick,
-  traceSkewRay,
-  traceSkewRayVector,
 } from "./optics.js";
 import {
   distortionProjectionReferenceForLens,
@@ -37,13 +37,14 @@ import {
 import type { FieldGeometryState, SkewRayTraceResult } from "./optics.js";
 import { isHeavyLensForRayWork } from "./raySampling.js";
 import type { AnalysisSamplingOptions } from "./analysis/analysisQuality.js";
+import { resolveImageFormatMetadata } from "../utils/catalog/lensTaxonomy.js";
 import type { RuntimeLens } from "../types/optics.js";
 
 /** A single sample point on the distortion curve. */
 export interface DistortionSample {
   /** Object-space field angle in degrees (0 = on-axis). */
   fieldAngleDeg: number;
-  /** Normalized image height from center to current edge (0..1). */
+  /** Normalized height to the historical edge (0..1). */
   normalizedImageHeight: number;
   /** Current image height on the sensor/image plane (mm, signed). */
   imageHeight: number;
@@ -59,6 +60,13 @@ export interface DistortionSample {
   referenceKind?: ProjectionReferenceKind;
   /** Human-readable ideal-reference label. */
   referenceLabel?: string;
+}
+
+/** Independently validated historical edge samples and corner inversion status. */
+export interface DistortionCurveResult {
+  samples: DistortionSample[];
+  corner: ImageHeightInversionResult;
+  cornerImageHeight: number;
 }
 
 /** One point in the traced 2D distortion field grid. */
@@ -114,6 +122,7 @@ function computeDistortionReference(
   zoomT: number,
   fieldGeometry?: FieldGeometryState,
   aberrationT = 0,
+  allowFailedEdge = false,
 ): DistortionReference | null {
   if (L.N < 1) return null;
 
@@ -158,7 +167,7 @@ function computeDistortionReference(
     geometry,
     aberrationT,
   );
-  if (!isFinite(edgeImageHeight) || Math.abs(edgeImageHeight) < 1e-9) return null;
+  if (!allowFailedEdge && (!isFinite(edgeImageHeight) || Math.abs(edgeImageHeight) < 1e-9)) return null;
 
   const scaleProbeAngleDeg = Math.min(Math.max(geometry.halfFieldDeg * 0.01, 0.02), 0.5);
   const probeImageHeight = chiefRayImageHeight(scaleProbeAngleDeg, zPos, focusT, zoomT, L, geometry, aberrationT);
@@ -201,7 +210,7 @@ function computeDistortionReference(
  * @param zoomT           — zoom slider [0..1]
  * @param dynamicEFL      — retained for compatibility with existing callers
  * @param currentPhysStopSD — retained for compatibility with existing callers
- * @returns                  array of DistortionSample, or empty if tracing fails
+ * @returns                  valid historical edge samples and independent corner status
  */
 export function computeDistortionCurve(
   L: RuntimeLens,
@@ -213,19 +222,28 @@ export function computeDistortionCurve(
   fieldGeometry?: FieldGeometryState,
   aberrationT = 0,
   sampling: AnalysisSamplingOptions = {},
-): DistortionSample[] {
-  const reference = computeDistortionReference(L, zPos, focusT, zoomT, fieldGeometry, aberrationT);
-  if (reference === null) return [];
+): DistortionCurveResult {
+  const cornerImageHeight = (L.data?.imageCircleMm ?? resolveImageFormatMetadata(L.data?.imageFormat).diagonalMm) / 2;
+  const reference = computeDistortionReference(L, zPos, focusT, zoomT, fieldGeometry, aberrationT, !L.isFoldedOptics);
+  if (reference === null)
+    return {
+      samples: [],
+      corner: { status: "unreachable", reason: "field-limit" },
+      cornerImageHeight,
+    };
 
   const samples: DistortionSample[] = [];
   const sampleCount = clampedSampleCount(sampling.distortionCurveSampleCount, SAMPLE_COUNT, 3);
-  const edgeAbsHeight = Math.abs(reference.edgeImageHeight);
+  const edgeAbsHeight = Number.isFinite(reference.edgeImageHeight)
+    ? Math.abs(reference.edgeImageHeight)
+    : cornerImageHeight;
   const targetImageHeights = Array.from(
     { length: sampleCount - 1 },
     (_, index) => -edgeAbsHeight * ((index + 1) / (sampleCount - 1)),
   );
-  const solvedFieldAngles = solveFieldAnglesForImageHeightsAccurate(
-    targetImageHeights,
+  const separateCorner = !isFisheyeProjection(L.projection) && Math.abs(edgeAbsHeight - cornerImageHeight) >= 1e-4;
+  const inversions = invertChiefRayImageHeights(
+    separateCorner ? [...targetImageHeights, -cornerImageHeight] : targetImageHeights,
     zPos,
     focusT,
     zoomT,
@@ -234,6 +252,30 @@ export function computeDistortionCurve(
     aberrationT,
   );
 
+  // The historic Edge is the last target for which the old inversion returned an
+  // angle, including an invalid ray now rejected. Unbracketed outer targets were
+  // already omitted by the original curve and must not rename a valid Edge.
+  const edge =
+    inversions.slice(0, sampleCount - 1).findLast((result) => result.fieldAngleDeg !== undefined) ??
+    inversions[sampleCount - 2];
+  let formatCorner = separateCorner ? inversions.at(-1)! : edge;
+  if (separateCorner && formatCorner.status === "unreachable" && formatCorner.reason === "field-limit") {
+    const rawGeometry = computeFieldGeometryAtState(focusT, zoomT, L, aberrationT);
+    if (rawGeometry.halfFieldDeg > reference.geometry.halfFieldDeg) {
+      [formatCorner] = invertChiefRayImageHeights(
+        [-cornerImageHeight],
+        zPos,
+        focusT,
+        zoomT,
+        L,
+        rawGeometry,
+        aberrationT,
+      );
+    }
+  }
+  // Preserve ordinary design/aperture-limited Edge reporting. A numerical failure
+  // only suppresses the corner when the corner's own inversion has no valid ray.
+  const corner = formatCorner.status === "unreachable" && formatCorner.reason === "field-limit" ? edge : formatCorner;
   for (let i = 0; i < sampleCount; i++) {
     const normalizedImageHeight = i / (sampleCount - 1);
     if (i === 0) {
@@ -253,8 +295,9 @@ export function computeDistortionCurve(
 
     const targetIndex = i - 1;
     const realHeight = targetImageHeights[targetIndex];
-    const fieldAngleDeg = solvedFieldAngles[targetIndex];
-    if (fieldAngleDeg == null || !isFinite(fieldAngleDeg)) continue;
+    const inversion = inversions[targetIndex];
+    if (inversion.status === "unreachable") continue;
+    const fieldAngleDeg = inversion.fieldAngleDeg;
 
     const thetaRad = (fieldAngleDeg * Math.PI) / 180;
     const idealHeight = -projectionImageHeightForAngle(reference.projectionReference, thetaRad);
@@ -277,7 +320,7 @@ export function computeDistortionCurve(
     });
   }
 
-  return samples;
+  return { samples, corner, cornerImageHeight };
 }
 
 /**
@@ -403,11 +446,9 @@ type DistortionGridLaunchSlope = Extract<DistortionGridLaunch, { kind: "slope" }
 function traceDistortionGridPointVector(
   launch: DistortionGridLaunchVector,
   reference: DistortionReference,
-  focusT: number,
-  zoomT: number,
-  currentPhysStopSD: number,
   L: RuntimeLens,
   aberrationT: number,
+  vectorAdapter: (bound: number) => PreparedRayTrace,
 ): SkewRayTraceResult | null {
   const vectorLaunch = computeBoundingSphereVectorFieldLaunch(
     L,
@@ -417,7 +458,7 @@ function traceDistortionGridPointVector(
     aberrationT,
   );
   if (vectorLaunch === null) return null;
-  return traceSkewRayVector(vectorLaunch, reference.zPos, currentPhysStopSD, true, L, focusT, zoomT, aberrationT);
+  return vectorAdapter(vectorLaunch.launchBoundT).skewVector(vectorLaunch);
 }
 
 // The slope launch starts from the paraxial EP; pupil aberration is applied
@@ -427,41 +468,25 @@ function traceDistortionGridPointVector(
 function traceDistortionGridPointSlope(
   launch: DistortionGridLaunchSlope,
   reference: DistortionReference,
-  focusT: number,
-  zoomT: number,
-  currentPhysStopSD: number,
-  L: RuntimeLens,
   pupilCorrection: PupilCorrectionEntry[],
-  aberrationT: number,
+  adapter: PreparedRayTrace,
 ): SkewRayTraceResult {
   const correction = interpolatePupilCorrection(pupilCorrection, launch.equivalentAngleDeg);
   const correctedEpRatio = reference.geometry.epRatio * correction;
   const chiefLaunchX = -correctedEpRatio * launch.fieldSlopeX;
   const chiefLaunchY = -correctedEpRatio * launch.fieldSlopeY;
-  return traceSkewRay(
-    chiefLaunchX,
-    chiefLaunchY,
-    launch.fieldSlopeX,
-    launch.fieldSlopeY,
-    focusT,
-    zoomT,
-    currentPhysStopSD,
-    true,
-    L,
-    aberrationT,
-  );
+  return adapter.skew(chiefLaunchX, chiefLaunchY, launch.fieldSlopeX, launch.fieldSlopeY);
 }
 
 function traceDistortionGridPoint(
   xNormalized: number,
   yNormalized: number,
   reference: DistortionReference,
-  focusT: number,
-  zoomT: number,
-  currentPhysStopSD: number,
   L: RuntimeLens,
   pupilCorrection: PupilCorrectionEntry[],
-  aberrationT = 0,
+  aberrationT: number,
+  adapter: PreparedRayTrace,
+  vectorAdapter: (bound: number) => PreparedRayTrace,
 ): DistortionGridPoint {
   const radiusNormalized = Math.hypot(xNormalized, yNormalized);
   const insideImageCircle = radiusNormalized <= 1 + 1e-9;
@@ -497,17 +522,8 @@ function traceDistortionGridPoint(
 
   const trace =
     launch.kind === "vector"
-      ? traceDistortionGridPointVector(launch, reference, focusT, zoomT, currentPhysStopSD, L, aberrationT)
-      : traceDistortionGridPointSlope(
-          launch,
-          reference,
-          focusT,
-          zoomT,
-          currentPhysStopSD,
-          L,
-          pupilCorrection,
-          aberrationT,
-        );
+      ? traceDistortionGridPointVector(launch, reference, L, aberrationT, vectorAdapter)
+      : traceDistortionGridPointSlope(launch, reference, pupilCorrection, adapter);
 
   if (trace === null) {
     return {
@@ -600,6 +616,12 @@ export function computeDistortionFieldGrid(
     aberrationT,
     sampling.distortionPupilCorrectionSampleCount,
   );
+  const request = { focusT, zoomT, stopSD: currentPhysStopSD, ghost: true, aberrationT };
+  const adapter = prepareRayTrace(L, request);
+  // Bounding-sphere launch bounds are constant across this field grid.
+  let vectorTrace: PreparedRayTrace | undefined;
+  const vectorAdapter = (launchBoundT: number): PreparedRayTrace =>
+    (vectorTrace ??= prepareRayTrace(L, { ...request, zPos, launchBoundT }));
   const gridLineCoordinates = sampling.distortionGridLineCoordinates ?? DISTORTION_GRID_LINE_COORDINATES;
 
   return {
@@ -611,34 +633,14 @@ export function computeDistortionFieldGrid(
         orientation: "vertical",
         idealCoordinate: coordinate,
         points: axisSamples.map((y) =>
-          traceDistortionGridPoint(
-            coordinate,
-            y,
-            reference,
-            focusT,
-            zoomT,
-            currentPhysStopSD,
-            L,
-            pupilCorrection,
-            aberrationT,
-          ),
+          traceDistortionGridPoint(coordinate, y, reference, L, pupilCorrection, aberrationT, adapter, vectorAdapter),
         ),
       };
       const horizontal: DistortionGridLine = {
         orientation: "horizontal",
         idealCoordinate: coordinate,
         points: axisSamples.map((x) =>
-          traceDistortionGridPoint(
-            x,
-            coordinate,
-            reference,
-            focusT,
-            zoomT,
-            currentPhysStopSD,
-            L,
-            pupilCorrection,
-            aberrationT,
-          ),
+          traceDistortionGridPoint(x, coordinate, reference, L, pupilCorrection, aberrationT, adapter, vectorAdapter),
         ),
       };
       return [vertical, horizontal];

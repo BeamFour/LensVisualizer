@@ -1,5 +1,7 @@
 /** Projection, image-format, and fixed-sensor geometry for perspective fields. */
 
+import { interpolateStationTable } from "../state/stationTables.js";
+import { runtimeView } from "../prescription/runtimeView.js";
 import { IMAGE_FORMAT_BY_ID, isImageFormatId, type ImageFormatMetadata } from "../../utils/catalog/lensTaxonomy.js";
 import {
   projectionFieldAngleForImageHeight2,
@@ -8,7 +10,7 @@ import {
 } from "../field/projection.js";
 import { eflAtFocus2 } from "../first-order/focusBreathing.js";
 import { xpZRelLastSurfAtZoom } from "../layout.js";
-import { intersectRayPlane } from "../math/plane.js";
+import { intersectRayPlane } from "../geometry/intersectPlane.js";
 import { add, dot, normalize, scale, subtract } from "../math/vector.js";
 import type { Plane3, Vec3 } from "../types.js";
 import { isPerspectiveDirectionInsideProjectionDomain } from "./chiefRay.js";
@@ -52,7 +54,7 @@ export function requirePerspectiveImageFormatMetadata(context: PerspectiveTraceC
 export function resolvePerspectiveFocalLength(context: PerspectiveTraceContext, override: number | undefined): number {
   const focalLengthMm =
     override ??
-    eflAtFocus2(context.state.focusT, context.state.zoomT, context.state.lens.runtime, context.state.aberrationT);
+    eflAtFocus2(context.state.focusT, context.state.zoomT, runtimeView(context.state.lens), context.state.aberrationT);
   if (!Number.isFinite(focalLengthMm) || Math.abs(focalLengthMm) <= 1e-9) {
     throw new PerspectiveFieldSamplingError("Perspective field sampling requires a finite non-zero focal length");
   }
@@ -207,7 +209,7 @@ export function idealCoordinatesForDirection(
 
 export function paraxialExitPupilCenterLens(context: PerspectiveTraceContext): Vec3 {
   const lastSurfaceZ = context.state.z[context.state.z.length - 1] ?? 0;
-  const relative = xpZRelLastSurfAtZoom(context.state.zoomT, context.state.lens.runtime);
+  const relative = xpZRelLastSurfAtZoom(context.state.zoomT, runtimeView(context.state.lens));
   return [0, 0, lastSurfaceZ + (Number.isFinite(relative) ? relative : 0)];
 }
 
@@ -215,8 +217,5 @@ function projectionValue(context: PerspectiveTraceContext, value: number | reado
   if (typeof value === "number") return value;
   if (value.length === 0) return NaN;
   if (value.length === 1) return value[0];
-  const scaled = Math.max(0, Math.min(1, context.state.zoomT)) * (value.length - 1);
-  const lo = Math.floor(scaled);
-  const hi = Math.min(value.length - 1, lo + 1);
-  return value[lo] + (value[hi] - value[lo]) * (scaled - lo);
+  return interpolateStationTable(Math.max(0, Math.min(1, context.state.zoomT)), value, "last");
 }

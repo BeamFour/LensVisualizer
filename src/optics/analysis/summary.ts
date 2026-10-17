@@ -2,6 +2,7 @@
  * Current-state optical summary derived from a prepared engine state.
  */
 
+import { runtimeView } from "../prescription/runtimeView.js";
 import { focusDistanceAt } from "../focusDistance.js";
 
 import type { FieldGeometryState } from "../optics.js";
@@ -63,7 +64,7 @@ export function computeOpticalSummaryForState2(
   currentPhysStopSD: number,
   fieldGeometry?: FieldGeometryState,
 ): OpticalSummaryMetrics2 {
-  const L = state.lens.runtime;
+  const L = runtimeView(state.lens);
   const currentEFLMm = finiteOrNull(dynamicEFL);
   const infinityEFLMm = finiteOrNull(eflAtZoom(state.zoomT, L));
   const breathingPercent =

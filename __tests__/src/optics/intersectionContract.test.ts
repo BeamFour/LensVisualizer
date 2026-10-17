@@ -1,31 +1,26 @@
 import { describe, expect, it } from "vitest";
 import { prepareRuntimeState } from "../../../src/optics/compat.js";
-import { traceExactSurfaceStackVector } from "../../../src/optics/internal/exactSurfaceTrace.js";
-import {
-  intersectSagSurface,
-  normalizeVector3,
-  type SurfaceIntersectionRay,
-} from "../../../src/optics/internal/surfaceIntersection.js";
-import { sag } from "../../../src/optics/internal/surfaceMath.js";
-import { intersectSurfaceProfile } from "../../../src/optics/math/intersection.js";
-import { planeResidualRoundoff, sagResidualRoundoff } from "../../../src/optics/math/intersectionTolerance.js";
-import { createSurfaceProfile, createTiltedPlaneProfile } from "../../../src/optics/math/surfaceProfile.js";
+import { normalize as normalizeVector3 } from "../../../src/optics/math/vector.js";
+import type { Ray3 as SurfaceIntersectionRay } from "../../../src/optics/types.js";
+import { createSurfaceProfile, createTiltedPlaneProfile, sag } from "../../../src/optics/geometry/surfaceProfile.js";
+import { intersectSurfaceProfile } from "../../../src/optics/geometry/intersect.js";
+import { planeResidualRoundoff, sagResidualRoundoff } from "../../../src/optics/geometry/intersectTolerance.js";
 import { doLayout } from "../../../src/optics/optics.js";
 import { traceEngineRay2 } from "../../../src/optics/trace/rayAdapters.js";
 import type { AsphericCoefficients } from "../../../src/types/optics.js";
 import { buildSimplePositiveElementLens } from "./testLensFixtures.js";
 
 /**
- * Intersection accuracy contract (architecture/optics-engine.md, Exact Surface Trace), pinned for every solver that
- * implements it. The legacy arm goes when internal/surfaceIntersection.ts is deleted.
+ * Intersection accuracy contract (architecture/optics-engine.md, Exact Surface Trace), pinned for the
+ * production intersection kernel and traversal.
  */
 
 function axialRay(y: number, z = -5): SurfaceIntersectionRay {
   return { origin: [0, y, z], direction: [0, 0, 1] };
 }
 
-// Keep these analytic cases shared by both engines: the default accuracy is a shipped contract.
-describe.each(["production", "legacy"] as const)("%s intersection accuracy", (engine) => {
+// The default accuracy is a shipped contract.
+describe("production intersection accuracy", () => {
   const intersect = (
     ray: SurfaceIntersectionRay,
     R: number,
@@ -33,10 +28,7 @@ describe.each(["production", "legacy"] as const)("%s intersection accuracy", (en
     options: { minT?: number; maxT: number; maxIterations?: number; tolerance?: number },
     asphere?: AsphericCoefficients,
     sd?: number,
-  ) =>
-    engine === "production"
-      ? intersectSurfaceProfile(ray, createSurfaceProfile({ R }, asphere), vertexZ, { ...options, clearRadius: sd })
-      : intersectSagSurface(ray, 0, vertexZ, { S: [{ R, sd }], asphByIdx: asphere ? { 0: asphere } : {} }, options);
+  ) => intersectSurfaceProfile(ray, createSurfaceProfile({ R }, asphere), vertexZ, { ...options, clearRadius: sd });
 
   it("refines a bracket endpoint that met the former 1e-9 default", () => {
     const root = 5 + sag(1, 5);
@@ -84,6 +76,32 @@ describe.each(["production", "legacy"] as const)("%s intersection accuracy", (en
     expect(hit.residual).toBe(1.8189894035458565e-12);
     expect(hit.effectiveTolerance).toBeGreaterThan(1e-12);
     expect(Math.abs(hit.residual)).toBeLessThanOrEqual(hit.effectiveTolerance);
+  });
+
+  it("tries the next safeguarded point before accepting a creep under the envelope", () => {
+    const hit = intersect(
+      { origin: [1.70000013, 0, 8352.099999999999], direction: [-1, 0, 0] },
+      1e15,
+      0,
+      { maxT: 3e-7 },
+      { K: 0, A4: 1000, A6: 0, A8: 0, A10: 0, A12: 0, A14: 0 },
+    );
+    expect(hit).toMatchObject({ ok: true, residual: 0, effectiveTolerance: 1e-12, iterations: 4 });
+  });
+
+  it("checks the safeguarded midpoint fixed point on the pending final step", () => {
+    const ray: SurfaceIntersectionRay = { origin: [1.1, 0, 10000.000000000002], direction: [-1, 0, 0] };
+    const asphere = { K: 0, A4: 10000, A6: 0, A8: 0, A10: 0, A12: 0, A14: 0 };
+    const full = intersect(ray, 1e15, 0, { maxT: 0.2 }, asphere);
+    expect(full.ok).toBe(true);
+    if (!full.ok) return;
+    expect(intersect(ray, 1e15, 0, { maxT: 0.2, maxIterations: 2 }, asphere)).toMatchObject({
+      ok: true,
+      t: full.t,
+      residual: 1.8189894035458565e-12,
+      effectiveTolerance: full.effectiveTolerance,
+      iterations: 2,
+    });
   });
 
   it("uses the tightened parametric bounds for an analytic plane", () => {
@@ -168,26 +186,26 @@ describe.each(["production", "legacy"] as const)("%s intersection accuracy", (en
     });
   });
 
-  it("collapses the bracket on a roundoff-limited rim root within the default budget", () => {
-    // Exterior hit at a hemisphere's rim. Newton's steps there are a few ulps, never zero, so the root is
-    // accepted only once bisection reaches adjacent floats; 48 iterations were too few in both solvers.
+  it("converges on a roundoff-limited rim root without bisecting to adjacent floats", () => {
+    /* Exterior hit at a hemisphere's rim. The residual rounds in steps of about 6e-12 mm on 36 mm coordinates, so
+     * Newton's corrections are 19 and 95 ulps of t, under one ulp of those coordinates, and never zero. Two in a
+     * row that point the same way and do not halve are a stall. Bisecting the 5.8 mm scan bracket to adjacent
+     * floats instead took 50 iterations, and failed at 48. */
     const R = -36.4652369171381;
     const sd = 32.1266972069614;
     const ray: SurfaceIntersectionRay = {
       origin: [0, 36.90213507972658, -36.573912873864174],
       direction: [0, -0.9558022906274851, 0.2940101719860258],
     };
-    expect(intersect(ray, R, 0, { maxT: 150, maxIterations: 48 }, undefined, sd)).toMatchObject({
-      ok: false,
-      failureReason: "noConvergedIntersection",
-    });
     const hit = intersect(ray, R, 0, { maxT: 150 }, undefined, sd);
     expect(hit.ok).toBe(true);
     if (!hit.ok) return;
-    expect(hit.iterations).toBeGreaterThan(48);
+    expect(hit.iterations).toBeLessThanOrEqual(25);
     expect(hit.radius).toBeGreaterThan(sd);
     expect(hit.effectiveTolerance).toBeGreaterThan(1e-12);
     expect(Math.abs(hit.residual)).toBeLessThanOrEqual(hit.effectiveTolerance);
+    // The bisection-only answer was 50 ulps of t from the exact root (0.45711046816240262); the stall's is nearer.
+    expect(Math.abs(hit.t - 0.4571104681624026)).toBeLessThan(Math.abs(0.4571104681624054 - 0.4571104681624026));
   });
 });
 
@@ -199,19 +217,8 @@ describe("tilted mirror accuracy", () => {
   ])("checks normal-distance residual without dividing by normal.z ($z)", (normal) => {
     const ray: SurfaceIntersectionRay = { origin: [0, 1, 3], direction: [0, -1, 0] };
     const production = intersectSurfaceProfile(ray, createTiltedPlaneProfile(normal), 1, { maxT: 10 });
-    const legacy = traceExactSurfaceStackVector(
-      {
-        S: [{ label: "M", R: 1e15, nd: 1, d: 1, sd: 10, interaction: { type: "reflect", normal } }],
-        asphByIdx: {},
-        opticalPath: { mode: "sequential", surfaceOrder: [0], surfaceLabels: ["M"], maxInteractions: 4 },
-        isFoldedOptics: true,
-      },
-      ray,
-      { zPos: [1], launchBoundT: 10 },
-    );
     expect(production.ok).toBe(true);
-    expect(legacy.hits).toHaveLength(1);
-    const points = [...(production.ok ? [production.point] : []), legacy.hits[0].point];
+    const points = production.ok ? [production.point] : [];
     for (const point of points) {
       const residual = (normal.y * point[1] + normal.z * (point[2] - 1)) / Math.hypot(normal.y, normal.z);
       expect(Math.abs(residual)).toBeLessThanOrEqual(1e-12);
@@ -235,10 +242,15 @@ describe("roundoff envelope authorization", () => {
     { bound: "NaN", maxAbsSlope: () => NaN },
     { bound: "infinite", maxAbsSlope: () => Infinity },
     { bound: "negative", maxAbsSlope: () => -1 },
-  ])("never accepts it with a $bound slope bound", ({ maxAbsSlope }) => {
+  ])("never accepts it with a $bound slope bound, and fails on the iteration it stalls", ({ maxAbsSlope }) => {
+    const accepted = intersectSurfaceProfile(ray, profile, 0, { maxT: 0.2 });
+    expect(accepted.ok).toBe(true);
+    // The same stall with no usable envelope: nothing after it can do better, so the solve ends there.
     expect(intersectSurfaceProfile(ray, { ...profile, maxAbsSlope }, 0, { maxT: 0.2 })).toMatchObject({
       ok: false,
       failureReason: "noConvergedIntersection",
+      residual: accepted.ok ? accepted.residual : NaN,
+      iterations: accepted.iterations,
     });
   });
 });
@@ -273,10 +285,8 @@ describe("trace hit records", () => {
     const zPos = doLayout(0, 0, L).z;
     const ray: SurfaceIntersectionRay = { origin: [0, 1, zPos[0] - 5], direction: [0, 0, 1] };
     const engine = traceEngineRay2(prepareRuntimeState(L, 0, 0), ray, { checkSemiDiameter: true });
-    const legacy = traceExactSurfaceStackVector(L, ray, { zPos, checkSemiDiameter: true });
     expect(engine.hits.length).toBeGreaterThan(1);
-    expect(legacy.hits).toHaveLength(engine.hits.length);
-    for (const hit of [...engine.hits, ...legacy.hits]) {
+    for (const hit of engine.hits) {
       expect(hit.effectiveTolerance).toBeGreaterThanOrEqual(1e-12);
       expect(Math.abs(hit.residual!)).toBeLessThanOrEqual(hit.effectiveTolerance!);
     }

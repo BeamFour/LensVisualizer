@@ -6,14 +6,21 @@
  */
 
 import { wideOpenStopAtZoom } from "../apertureStop.js";
+import { FOCUS_INFINITY_CUTOFF } from "../focusDistance.js";
 
 import type { ParaxialTraceResult, RayTraceResult, RuntimeLens } from "../../types/optics.js";
 import { resolveImageFormatMetadata } from "../../utils/catalog/lensTaxonomy.js";
-import { normalizeRuntimeLens } from "../prescription/normalizeLensData.js";
-import { prepareState } from "../state/prepareState.js";
+import { compiledLensFromRuntime } from "../prescription/compile.js";
+import { prepareState } from "../state/preparedGeometry.js";
 import type { Plane3, PreparedOpticalState, Ray3, Vec3 } from "../types.js";
 import { traceParaxialSurfaces2 } from "../math/paraxial.js";
-import { traceEngineRay2, traceRay2, traceRayVector2 } from "../trace/rayAdapters.js";
+import {
+  prepareEngineTrace,
+  prepareRayTrace,
+  type PreparedRayTrace,
+  traceRay2,
+  traceRayVector2,
+} from "../trace/rayAdapters.js";
 import { traceToStopViaGeneralized2 } from "../trace/stopTrace.js";
 import type { TraceOptions } from "../trace/types.js";
 import { obstructionAwareRayFractionsForDensity } from "../raySampling.js";
@@ -46,7 +53,6 @@ const CHIEF_RAY_RESIDUAL_TOLERANCE = 1e-7;
 const OBJECT_PLANE_BRACKET_SCAN_SAMPLES = 96;
 const BOUNDING_SPHERE_BRACKET_SCAN_SAMPLES = 96;
 const CONJUGATE_REFERENCE_PUPIL_FRACTION = 0.1;
-const FOCUS_INFINITY_THRESHOLD = 0.0001;
 /** Step bounds, in degrees, for walking the real chief ray out toward the format corner. */
 const ANALYSIS_FIELD_MIN_STEP_DEG = 0.25;
 const ANALYSIS_FIELD_MAX_STEP_DEG = 5;
@@ -105,7 +111,7 @@ export function computeFieldGeometryAtState2(
   L: RuntimeLens,
   aberrationT = 0,
 ): FieldGeometryState2 {
-  const state = prepareState(normalizeRuntimeLens(L), focusT, zoomT, aberrationT);
+  const state = prepareState(compiledLensFromRuntime(L), focusT, zoomT, aberrationT);
   const stopIndex = state.lens.stop.surfaceIndex;
   const delta = 1e-4;
 
@@ -142,11 +148,12 @@ export function computeFieldGeometryAtState2(
 
   /* The paraxial aperture estimate can overstate the real field. Bisect it down
    * until an exact chief ray reaches the image side without clipping. */
+  const traceChief = prepareStateSurfacesReal(state, { checkSemiDiameter: true });
   const testChief = (deg: number): boolean => {
     const launch = projectionLaunchSlopeForField2(L, deg);
     if (launch.status === "out-of-domain") return false;
     const yChiefIn = -epRatio * launch.uField;
-    const trace = traceStateSurfacesReal2(state, yChiefIn, launch.uField, { checkSemiDiameter: true });
+    const trace = traceChief(yChiefIn, launch.uField);
     return Number.isFinite(trace.y) && !trace.clipped;
   };
 
@@ -220,14 +227,11 @@ export function computeAnalysisFieldGeometryAtState2(
   );
   if (!Number.isFinite(edgeImageHeight) || Math.abs(edgeImageHeight) <= maxImageHeight + 1e-9) return bounded;
 
-  const formatHalfFieldDeg = solveFieldAngleForImageHeightAccurate2(
+  // Field geometry retains its historic inversion; distortion validates individual
+  // rays later without changing the geometry or target heights of other analyses.
+  const formatHalfFieldDeg = solveFieldAngleForImageHeightLookup2(
     maxImageHeight,
-    zPos,
-    focusT,
-    zoomT,
-    L,
-    bounded,
-    aberrationT,
+    buildAccurateFieldHeightLookup2(zPos, focusT, zoomT, L, bounded, aberrationT),
   );
   if (formatHalfFieldDeg === null || !Number.isFinite(formatHalfFieldDeg)) return bounded;
 
@@ -266,8 +270,9 @@ function realChiefRayFieldLimit2(
   cornerHeight: number,
   seeded: boolean,
 ): { fieldDeg: number; settled: boolean } | null {
-  const state = prepareState(normalizeRuntimeLens(L), focusT, zoomT, aberrationT);
+  const state = prepareState(compiledLensFromRuntime(L), focusT, zoomT, aberrationT);
   const imageTransfer = state.surfaces[state.surfaces.length - 1]?.d ?? 0;
+  const traceChief = prepareStateSurfacesReal(state, { checkSemiDiameter: true });
   let seed: ChiefRaySolveResult2 | null = null;
   const probe = (deg: number): RealChiefRayProbe2 | null => {
     const solve =
@@ -275,7 +280,7 @@ function realChiefRayFieldLimit2(
       computeChiefRaySolve2(deg, focusT, zoomT, L, geometry, aberrationT);
     if (solve.status !== "converged" || solve.vectorLaunch) return null;
     seed = solve;
-    const trace = traceStateSurfacesReal2(state, solve.yLaunch, solve.uField, { checkSemiDiameter: true });
+    const trace = traceChief(solve.yLaunch, solve.uField);
     if (!Number.isFinite(trace.y) || !Number.isFinite(trace.u)) return null;
     return { clears: !trace.clipped, height: Math.abs(trace.y + trace.u * imageTransfer) };
   };
@@ -431,8 +436,9 @@ function solveChiefRayFromSeed2(
   if (launch.status === "out-of-domain" || !(Math.abs(seed.uField) > 0)) return null;
   const uField = launch.uField;
   const stopIndex = state.lens.stop.surfaceIndex;
+  const traceStop = prepareStateSurfacesReal(state, { stopAt: stopIndex });
   const heightAtStop = (yLaunch: number): number | null => {
-    const result = traceStateSurfacesReal2(state, yLaunch, uField, { stopAt: stopIndex });
+    const result = traceStop(yLaunch, uField);
     return Number.isFinite(result.y) ? result.y : null;
   };
   const converged = (yLaunch: number, iterations: number): ChiefRaySolveResult2 => ({
@@ -498,12 +504,15 @@ export function traceChiefRayAtAngle2(
   L: RuntimeLens,
   geometry?: FieldGeometryState2,
   aberrationT = 0,
+  prepared?: PreparedRayTrace,
 ): RayTraceResult {
   const geom = geometry ?? computeFieldGeometryAtState2(focusT, zoomT, L, aberrationT);
   const launch = projectionLaunchSlopeForField2(L, fieldAngleDeg);
   const uField = launch.uField;
   const yChief = -geom.epRatio * uField;
-  return traceRay2(yChief, uField, zPos, focusT, zoomT, undefined, true, L, aberrationT);
+  return prepared
+    ? prepared.ray(yChief, uField)
+    : traceRay2(yChief, uField, zPos, focusT, zoomT, undefined, true, L, aberrationT);
 }
 
 /**
@@ -523,7 +532,7 @@ export function traceParaxialRay2(
   zoomT: number,
   L: RuntimeLens,
 ): Pick<ParaxialTraceResult, "y" | "u"> {
-  const state = prepareState(normalizeRuntimeLens(L), focusT, zoomT, 0);
+  const state = prepareState(compiledLensFromRuntime(L), focusT, zoomT, 0);
   const result = traceParaxialSurfaces2(state.surfaces, y0, u0, { skipLastTransfer: true });
   return { y: result.y, u: result.u };
 }
@@ -548,8 +557,9 @@ export function chiefRayImageHeight2(
   L: RuntimeLens,
   geometry?: FieldGeometryState2,
   aberrationT = 0,
+  prepared?: PreparedRayTrace,
 ): number {
-  const trace = traceChiefRayAtAngle2(fieldAngleDeg, zPos, focusT, zoomT, L, geometry, aberrationT);
+  const trace = traceChiefRayAtAngle2(fieldAngleDeg, zPos, focusT, zoomT, L, geometry, aberrationT, prepared);
   if (L.isFoldedOptics && trace.reachedImagePlane) return foldedRayImagePlaneCoordinate2(trace, L);
   return trace.y + trace.u * lastThicknessAtState(focusT, zoomT, L, aberrationT);
 }
@@ -624,7 +634,7 @@ export function solveChiefRayBoundingSphere2(
   const direction = baseLaunch.direction;
   const baseOrigin = baseLaunch.origin;
   const uFieldEquivalent = Math.abs(cosTheta) > 1e-9 ? -sinTheta / cosTheta : NaN;
-  const state = prepareState(normalizeRuntimeLens(L), focusT, zoomT, aberrationT);
+  const state = prepareState(compiledLensFromRuntime(L), focusT, zoomT, aberrationT);
   const stopIndex = state.lens.stop.surfaceIndex;
   const launchBoundT = baseLaunch.launchBoundT;
 
@@ -638,15 +648,17 @@ export function solveChiefRayBoundingSphere2(
     return oy + t * direction[1];
   };
 
+  const stopOptions = { launchBoundT, checkSemiDiameter: true };
+  const traceStop = prepareEngineTrace(state, { capture: "terminal", stopAt: stopIndex, ...stopOptions });
   const heightAtStop = (yEP: number): number | null => {
     const origin: Vec3 = [baseOrigin[0], baseOrigin[1] + yEP * perpY, baseOrigin[2] + yEP * perpZ];
     const ray: Ray3 = { origin, direction };
     if (L.isFoldedOptics) {
-      const result = traceToStopViaGeneralized2(state, ray, stopIndex, { launchBoundT, checkSemiDiameter: true });
+      const result = traceToStopViaGeneralized2(state, ray, stopIndex, stopOptions);
       if (!result.found) return null;
       return result.y;
     }
-    const result = traceEngineRay2(state, ray, { stopAt: stopIndex, launchBoundT, checkSemiDiameter: true });
+    const result = traceStop(ray);
     if (result.failureReason !== null || result.status !== "ok") return null;
     return result.y;
   };
@@ -819,16 +831,28 @@ function chiefRayImageHeightAccurateWithTransfer2(
   geometry: FieldGeometryState2 | undefined,
   aberrationT: number,
   imagePlaneTransfer: number,
+  onFailure?: () => void,
+  prepared?: PreparedRayTrace,
+  vectorAdapter?: (bound: number) => PreparedRayTrace,
 ): number {
   const launch = projectionLaunchSlopeForField2(L, fieldAngleDeg);
   const solve = solveChiefRay2(fieldAngleDeg, focusT, zoomT, L, geometry, aberrationT);
   if (solve.vectorLaunch) {
-    const trace = traceRayVector2(solve.vectorLaunch, zPos, undefined, false, L, focusT, zoomT, aberrationT);
+    const trace = vectorAdapter
+      ? vectorAdapter(solve.vectorLaunch.launchBoundT).vector(solve.vectorLaunch)
+      : traceRayVector2(solve.vectorLaunch, zPos, undefined, false, L, focusT, zoomT, aberrationT);
+    if (!L.isFoldedOptics && (trace.diagnostics?.failureReason || trace.diagnostics?.terminalSurfaceIndex !== L.N - 1))
+      onFailure?.();
     if (trace.clipped) return NaN;
     if (L.isFoldedOptics && trace.reachedImagePlane) return foldedRayImagePlaneCoordinate2(trace, L);
     return trace.y + trace.u * imagePlaneTransfer;
   }
-  const trace = traceRay2(solve.yLaunch, launch.uField, zPos, focusT, zoomT, undefined, true, L, aberrationT);
+  const trace = prepared
+    ? prepared.ray(solve.yLaunch, launch.uField)
+    : traceRay2(solve.yLaunch, launch.uField, zPos, focusT, zoomT, undefined, true, L, aberrationT);
+  if (!L.isFoldedOptics && (trace.diagnostics?.failureReason || trace.diagnostics?.terminalSurfaceIndex !== L.N - 1)) {
+    onFailure?.();
+  }
   if (L.isFoldedOptics && trace.reachedImagePlane) return foldedRayImagePlaneCoordinate2(trace, L);
   return trace.y + trace.u * imagePlaneTransfer;
 }
@@ -854,51 +878,9 @@ export function solveFieldAngleForImageHeightAccurate2(
   geometry?: FieldGeometryState2,
   aberrationT = 0,
 ): number | null {
-  if (!Number.isFinite(targetImageHeight) || Math.abs(targetImageHeight) < 1e-12) return 0;
-  const geom = geometry ?? computeFieldGeometryAtState2(focusT, zoomT, L, aberrationT);
-  if (!Number.isFinite(geom.halfFieldDeg) || geom.halfFieldDeg <= 0) return null;
-  const target = -Math.abs(targetImageHeight);
-  const imageHeightAt = (deg: number) => chiefRayImageHeightAccurate2(deg, zPos, focusT, zoomT, L, geom, aberrationT);
-  const bracketSegments = Math.max(Math.ceil(geom.halfFieldDeg), 20);
-  const segmentAngles: number[] = [];
-  const segmentHeights: number[] = [];
-  for (let i = 0; i <= bracketSegments; i++) {
-    const angleDeg = (i / bracketSegments) * geom.halfFieldDeg;
-    const height = imageHeightAt(angleDeg);
-    if (!Number.isFinite(height)) continue;
-    segmentAngles.push(angleDeg);
-    segmentHeights.push(height);
-  }
-
-  let lo = -1;
-  let hi = -1;
-  for (let i = 0; i < segmentAngles.length - 1; i++) {
-    const hLo = segmentHeights[i];
-    const hHi = segmentHeights[i + 1];
-    if ((hLo >= target && hHi <= target) || (hLo <= target && hHi >= target)) {
-      lo = i;
-      hi = i + 1;
-      break;
-    }
-  }
-  if (lo < 0) return null;
-
-  let loAngle = segmentAngles[lo];
-  let hiAngle = segmentAngles[hi];
-  let loHeight = segmentHeights[lo];
-  for (let i = 0; i < 40; i++) {
-    const mid = (loAngle + hiAngle) / 2;
-    const yMid = imageHeightAt(mid);
-    if (!Number.isFinite(yMid)) return null;
-    if (Math.abs(yMid - target) < 1e-4) return mid;
-    if ((loHeight >= target && yMid <= target) || (loHeight <= target && yMid >= target)) {
-      hiAngle = mid;
-    } else {
-      loAngle = mid;
-      loHeight = yMid;
-    }
-  }
-  return (loAngle + hiAngle) / 2;
+  if (solveTrivialImageHeightTarget2(targetImageHeight) === 0) return 0;
+  const [result] = invertChiefRayImageHeights([targetImageHeight], zPos, focusT, zoomT, L, geometry, aberrationT);
+  return result.status === "reached" ? result.fieldAngleDeg : null;
 }
 
 /**
@@ -916,19 +898,59 @@ export function solveFieldAnglesForImageHeightsAccurate2(
   geometry?: FieldGeometryState2,
   aberrationT = 0,
 ): Array<number | null> {
+  return invertChiefRayImageHeights(targetImageHeights, zPos, focusT, zoomT, L, geometry, aberrationT).map((result) =>
+    result.status === "reached" ? result.fieldAngleDeg : null,
+  );
+}
+
+/** Each target is validated independently; earlier failed samples do not exclude later fields. */
+export type ImageHeightInversionResult =
+  | { status: "reached"; fieldAngleDeg: number }
+  | { status: "unreachable"; reason: "trace-failure" | "height-miss" | "field-limit"; fieldAngleDeg?: number };
+
+/** Preserve the original inversion path, then check its own ray against the existing height tolerance. */
+export function invertChiefRayImageHeights(
+  targetImageHeights: readonly number[],
+  zPos: number[],
+  focusT: number,
+  zoomT: number,
+  L: RuntimeLens,
+  geometry?: FieldGeometryState2,
+  aberrationT = 0,
+): ImageHeightInversionResult[] {
   const geom = geometry ?? computeFieldGeometryAtState2(focusT, zoomT, L, aberrationT);
   if (!Number.isFinite(geom.halfFieldDeg) || geom.halfFieldDeg <= 0) {
-    return targetImageHeights.map(solveTrivialImageHeightTarget2);
+    return targetImageHeights.map((target) =>
+      solveTrivialImageHeightTarget2(target) === 0
+        ? { status: "reached", fieldAngleDeg: 0 }
+        : { status: "unreachable", reason: "field-limit" },
+    );
   }
-
   const lookup = buildAccurateFieldHeightLookup2(zPos, focusT, zoomT, L, geom, aberrationT);
-  return targetImageHeights.map((targetImageHeight) => solveFieldAngleForImageHeightLookup2(targetImageHeight, lookup));
+  return targetImageHeights.map((target) => {
+    if (solveTrivialImageHeightTarget2(target) === 0) return { status: "reached", fieldAngleDeg: 0 };
+    const angle = solveFieldAngleForImageHeightLookup2(target, lookup);
+    if (angle === null)
+      return { status: "unreachable", reason: lookup.hasTraceFailure() ? "trace-failure" : "field-limit" };
+    // Folded distortion stays guarded in the UI; retain its existing inversion fallback.
+    if (L.isFoldedOptics) return { status: "reached", fieldAngleDeg: angle };
+    // Successful bisections already traced this exact angle. Only the exhausted 40-step
+    // fallback needs another ray, so ordinary samples keep their exact floats and ray work.
+    const ray = lookup.lastRay();
+    const height = ray.fieldAngleDeg === angle ? ray.imageHeight : lookup.imageHeightAt(angle);
+    if (lookup.lastRay().failed) return { status: "unreachable", reason: "trace-failure", fieldAngleDeg: angle };
+    if (!Number.isFinite(height) || Math.abs(height + Math.abs(target)) >= 1e-4)
+      return { status: "unreachable", reason: "height-miss", fieldAngleDeg: angle };
+    return { status: "reached", fieldAngleDeg: angle };
+  });
 }
 
 interface AccurateFieldHeightLookup2 {
   segmentAngles: number[];
   segmentHeights: number[];
   imageHeightAt: (fieldAngleDeg: number) => number;
+  lastRay: () => { fieldAngleDeg: number; imageHeight: number; failed: boolean };
+  hasTraceFailure: () => boolean;
 }
 
 function buildAccurateFieldHeightLookup2(
@@ -940,8 +962,16 @@ function buildAccurateFieldHeightLookup2(
   aberrationT: number,
 ): AccurateFieldHeightLookup2 {
   const imagePlaneTransfer = lastThicknessAtState(focusT, zoomT, L, aberrationT);
-  const imageHeightAt = (fieldAngleDeg: number): number =>
-    chiefRayImageHeightAccurateWithTransfer2(
+  const request = { zPos, focusT, zoomT, aberrationT };
+  const prepared = prepareRayTrace(L, { ...request, ghost: true });
+  let vectorTrace: PreparedRayTrace | undefined;
+  const vectorAdapter = (launchBoundT: number): PreparedRayTrace =>
+    (vectorTrace ??= prepareRayTrace(L, { ...request, ghost: false, launchBoundT }));
+  let lastRay = { fieldAngleDeg: NaN, imageHeight: NaN, failed: false };
+  let hasTraceFailure = false;
+  const imageHeightAt = (fieldAngleDeg: number): number => {
+    let failed = false;
+    const imageHeight = chiefRayImageHeightAccurateWithTransfer2(
       fieldAngleDeg,
       zPos,
       focusT,
@@ -950,11 +980,21 @@ function buildAccurateFieldHeightLookup2(
       geometry,
       aberrationT,
       imagePlaneTransfer,
+      () => {
+        failed = true;
+      },
+      prepared,
+      vectorAdapter,
     );
+    lastRay = { fieldAngleDeg, imageHeight, failed };
+    hasTraceFailure ||= failed;
+    return imageHeight;
+  };
   const bracketSegments = Math.max(Math.ceil(geometry.halfFieldDeg), 20);
   const segmentAngles: number[] = [];
   const segmentHeights: number[] = [];
-
+  // Keep even finite partial-trace heights in the historic bracket table. Removing
+  // them would change the bisection path (and floats) of otherwise valid targets.
   for (let i = 0; i <= bracketSegments; i++) {
     const angleDeg = (i / bracketSegments) * geometry.halfFieldDeg;
     const height = imageHeightAt(angleDeg);
@@ -962,8 +1002,13 @@ function buildAccurateFieldHeightLookup2(
     segmentAngles.push(angleDeg);
     segmentHeights.push(height);
   }
-
-  return { segmentAngles, segmentHeights, imageHeightAt };
+  return {
+    segmentAngles,
+    segmentHeights,
+    imageHeightAt,
+    lastRay: () => lastRay,
+    hasTraceFailure: () => hasTraceFailure,
+  };
 }
 
 function solveFieldAngleForImageHeightLookup2(
@@ -1031,16 +1076,17 @@ export function solveFieldAngleForImageHeight2(
   if (!Number.isFinite(targetImageHeight) || Math.abs(targetImageHeight) < 1e-12) return 0;
   const geom = geometry ?? computeFieldGeometryAtState2(focusT, zoomT, L, 0);
   if (!Number.isFinite(geom.halfFieldDeg) || geom.halfFieldDeg <= 0) return null;
+  const prepared = prepareRayTrace(L, { zPos, focusT, zoomT, ghost: true });
   const target = -Math.abs(targetImageHeight);
   let lo = 0;
   let hi = geom.halfFieldDeg;
-  const yLo = chiefRayImageHeight2(lo, zPos, focusT, zoomT, L, geom, 0);
-  const yHi = chiefRayImageHeight2(hi, zPos, focusT, zoomT, L, geom, 0);
+  const yLo = chiefRayImageHeight2(lo, zPos, focusT, zoomT, L, geom, 0, prepared);
+  const yHi = chiefRayImageHeight2(hi, zPos, focusT, zoomT, L, geom, 0, prepared);
   if (!Number.isFinite(yLo) || !Number.isFinite(yHi)) return null;
   if (target > yLo || target < yHi) return null;
   for (let i = 0; i < 40; i++) {
     const mid = (lo + hi) / 2;
-    const yMid = chiefRayImageHeight2(mid, zPos, focusT, zoomT, L, geom, 0);
+    const yMid = chiefRayImageHeight2(mid, zPos, focusT, zoomT, L, geom, 0, prepared);
     if (!Number.isFinite(yMid)) return null;
     if (Math.abs(yMid - target) < 1e-4) return mid;
     if (yMid > target) lo = mid;
@@ -1083,7 +1129,7 @@ export function entrancePupilAtState2(
  * @returns relative conjugate correction, zero at infinity focus
  */
 export function conjugateK2(focusT: number, zoomT: number, L: RuntimeLens, aberrationT = 0): number {
-  if (focusT < FOCUS_INFINITY_THRESHOLD) return 0;
+  if (focusT < FOCUS_INFINITY_CUTOFF) return 0;
   const du = 1e-5;
   const currentEP = entrancePupilAtState2(wideOpenStopAtZoom(zoomT, L), focusT, zoomT, L, undefined, aberrationT).epSD;
   const infinityEP = entrancePupilAtState2(wideOpenStopAtZoom(zoomT, L), 0, zoomT, L, undefined, 0).epSD;
@@ -1152,10 +1198,11 @@ function computeChiefRaySolve2(
     return { yLaunch: paraxialYChief, uField, status: "converged", iterations: 0, launchSurface };
   }
 
-  const state = prepareState(normalizeRuntimeLens(L), focusT, zoomT, aberrationT);
+  const state = prepareState(compiledLensFromRuntime(L), focusT, zoomT, aberrationT);
   const stopIndex = state.lens.stop.surfaceIndex;
+  const traceStop = prepareStateSurfacesReal(state, { stopAt: stopIndex });
   const heightAtStop = (yLaunch: number): number | null => {
-    const result = traceStateSurfacesReal2(state, yLaunch, uField, { stopAt: stopIndex });
+    const result = traceStop(yLaunch, uField);
     return Number.isFinite(result.y) ? result.y : null;
   };
 
@@ -1252,37 +1299,49 @@ function traceStateSurfacesReal2(
   u0: number,
   traceOptions: TraceOptions = {},
 ): RealSurfaceTraceResult2 {
-  const ray = slopeRayForState(state, y0, u0);
+  return prepareStateSurfacesReal(state, traceOptions)(y0, u0);
+}
+
+function prepareStateSurfacesReal(
+  state: PreparedOpticalState,
+  traceOptions: TraceOptions,
+): (y0: number, u0: number) => RealSurfaceTraceResult2 {
+  const lead = inferLeadDistance2(state);
   if (state.lens.flags.isFoldedOptics && traceOptions.stopAt !== undefined) {
-    const stop = traceToStopViaGeneralized2(state, ray, traceOptions.stopAt, {
-      checkSemiDiameter: traceOptions.checkSemiDiameter,
-    });
-    return {
-      y: stop.found ? stop.y : NaN,
-      u: stop.found ? stop.uy : NaN,
-      n: stop.n,
-      clipped: !stop.found,
-      heights: null,
-      reachedImagePlane: false,
-      terminalPoint: stop.point ?? [0, stop.y, 0],
+    const stopIndex = traceOptions.stopAt;
+    const stopOptions = { checkSemiDiameter: traceOptions.checkSemiDiameter };
+    return (y0, u0) => {
+      const ray = slopeRayForState(state, y0, u0, lead);
+      const stop = traceToStopViaGeneralized2(state, ray, stopIndex, stopOptions);
+      return {
+        y: stop.found ? stop.y : NaN,
+        u: stop.found ? stop.uy : NaN,
+        n: stop.n,
+        clipped: !stop.found,
+        heights: null,
+        reachedImagePlane: false,
+        terminalPoint: stop.point ?? [0, stop.y, 0],
+      };
     };
   }
 
-  const result = traceEngineRay2(state, ray, traceOptions);
-  const failed = result.failureReason !== null;
-  return {
-    y: failed ? NaN : result.y,
-    u: failed ? NaN : result.uy,
-    n: result.finalMedium,
-    clipped: result.status !== "ok",
-    heights: result.heights,
-    reachedImagePlane: result.reachedImagePlane,
-    terminalPoint: result.terminalPoint,
+  const trace = prepareEngineTrace(state, { ...traceOptions, capture: "terminal" });
+  return (y0, u0) => {
+    const result = trace(slopeRayForState(state, y0, u0, lead));
+    const failed = result.failureReason !== null;
+    return {
+      y: failed ? NaN : result.y,
+      u: failed ? NaN : result.uy,
+      n: result.finalMedium,
+      clipped: result.status !== "ok",
+      heights: result.heights,
+      reachedImagePlane: result.reachedImagePlane,
+      terminalPoint: result.terminalPoint,
+    };
   };
 }
 
-function slopeRayForState(state: PreparedOpticalState, y0: number, u0: number): Ray3 {
-  const lead = inferLeadDistance2(state);
+function slopeRayForState(state: PreparedOpticalState, y0: number, u0: number, lead = inferLeadDistance2(state)): Ray3 {
   const invMag = 1 / Math.hypot(0, u0, 1);
   return {
     origin: [0, y0 - u0 * lead, (state.z[0] ?? 0) - lead],
@@ -1331,12 +1390,12 @@ function foldedRayImagePlaneCoordinate2(trace: RayTraceResult, L: RuntimeLens): 
 }
 
 function zPositionsForState(focusT: number, zoomT: number, L: RuntimeLens, aberrationT: number): number[] {
-  const state = prepareState(normalizeRuntimeLens(L), focusT, zoomT, aberrationT);
+  const state = prepareState(compiledLensFromRuntime(L), focusT, zoomT, aberrationT);
   return [...state.z];
 }
 
 function lastThicknessAtState(focusT: number, zoomT: number, L: RuntimeLens, aberrationT: number): number {
-  const state = prepareState(normalizeRuntimeLens(L), focusT, zoomT, aberrationT);
+  const state = prepareState(compiledLensFromRuntime(L), focusT, zoomT, aberrationT);
   return state.surfaces[state.surfaces.length - 1]?.d ?? 0;
 }
 
@@ -1348,7 +1407,7 @@ function traceToImageReal2(
   L: RuntimeLens,
   aberrationT = 0,
 ): number {
-  const state = prepareState(normalizeRuntimeLens(L), focusT, zoomT, aberrationT);
+  const state = prepareState(compiledLensFromRuntime(L), focusT, zoomT, aberrationT);
   const trace = traceStateSurfacesReal2(state, y0, u0, {});
   if (!Number.isFinite(trace.y) || trace.clipped) return NaN;
   if (state.lens.flags.isFoldedOptics && trace.reachedImagePlane) {

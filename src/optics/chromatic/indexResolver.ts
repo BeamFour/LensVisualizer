@@ -5,23 +5,17 @@
  */
 
 import type { ChromaticChannel, RuntimeLens } from "../../types/optics.js";
-import type { CompiledSurfaceDispersion, EngineLens, PreparedOpticalState } from "../types.js";
-import { normalizeRuntimeLens } from "../prescription/normalizeLensData.js";
+import type { CompiledSurfaceDispersion, CompiledLens, PreparedOpticalState } from "../types.js";
+import { compiledLensFromRuntime } from "../prescription/compile.js";
 import { abbeLineIndices } from "../dispersion.js";
 import { evaluateSellmeier } from "../glassCatalog.js";
 import { LINE_NM } from "../spectralLines.js";
-import { CHROMATIC_CHANNEL_METADATA, CHROMATIC_CHANNEL_ORDER } from "./channels.js";
+import { CHROMATIC_CHANNEL_WAVELENGTH_NM, CHROMATIC_CHANNEL_ORDER } from "./channels.js";
 
 /** Chromatic channels traced by the engine: C, d, F, and g spectral lines. */
 export const CHROMATIC_CHANNELS_2 = CHROMATIC_CHANNEL_ORDER;
 
-/** Per-channel wavelength in nanometers, keyed to standard Fraunhofer lines. */
-export const CHANNEL_WAVELENGTH_NM_2: Readonly<Record<ChromaticChannel, number>> = Object.freeze({
-  R: CHROMATIC_CHANNEL_METADATA.R.wavelengthNm,
-  G: CHROMATIC_CHANNEL_METADATA.G.wavelengthNm,
-  B: CHROMATIC_CHANNEL_METADATA.B.wavelengthNm,
-  V: CHROMATIC_CHANNEL_METADATA.V.wavelengthNm,
-});
+export { CHROMATIC_CHANNEL_WAVELENGTH_NM as CHANNEL_WAVELENGTH_NM_2 } from "./channels.js";
 
 /**
  * Surface-index callback used by exact tracers when a channel changes refraction.
@@ -73,8 +67,8 @@ export function indexAtPreparedSurface2(
 /**
  * Resolve a RuntimeLens surface index for a chromatic channel.
  *
- * Runtime lenses are normalized and cached in a WeakMap so repeated chromatic
- * traces reuse the same dispersion descriptors without mutating `L`.
+ * The lookup reads the compiled lens the compiler associated with `L` (`compiledLensFromRuntime`), so repeated
+ * chromatic traces reuse its dispersion descriptors; a runtime lens the compiler did not build throws.
  *
  * @param L - runtime lens object
  * @param surfaceIndex - physical surface index
@@ -89,7 +83,7 @@ export function indexAtRuntimeSurface2(
   const surface = L.S[surfaceIndex];
   if (!surface) return 1;
   if (!channel) return surface.nd === 1 ? 1 : surface.nd;
-  const engineLens = normalizeRuntimeLens(L);
+  const engineLens = compiledLensFromRuntime(L);
   return (
     engineLens.dispersion[surfaceIndex]?.indexAt(channel) ?? wavelengthNd2(surface.nd, L.vdByIdx[surfaceIndex], channel)
   );
@@ -113,10 +107,9 @@ export function channelIndexResolverForState2(
 /* ── Arbitrary-wavelength indices anchored to the authored reference ── */
 
 /** Channel nodes (µm) of the C/d/F/g interpolation used for line-index and Abbe surfaces. */
-const CAUCHY_CHANNELS = ["R", "G", "B", "V"] as const;
-const CAUCHY_NODES_UM = [LINE_NM.C, LINE_NM.d, LINE_NM.F, LINE_NM.g].map((nm) => nm / 1000);
+const CAUCHY_NODES_UM = CHROMATIC_CHANNEL_ORDER.map((channel) => CHROMATIC_CHANNEL_WAVELENGTH_NM[channel] / 1000);
 const cauchyCoefficientsByDispersion = new WeakMap<CompiledSurfaceDispersion, readonly number[]>();
-const referenceLineByLens = new WeakMap<EngineLens, ReadonlyMap<number, number>>();
+const referenceLineByLens = new WeakMap<CompiledLens, ReadonlyMap<number, number>>();
 
 /**
  * Refractive index of one prepared surface at an arbitrary wavelength, anchored to its authored index.
@@ -167,7 +160,7 @@ export function anchoredIndexTable(state: PreparedOpticalState, wavelengthNm: nu
   return Float64Array.from(state.surfaces, (_, index) => anchoredIndexAtWavelength(state, index, wavelengthNm));
 }
 
-function elementReferenceLineNm(lens: EngineLens, elementId: number | undefined): number {
+function elementReferenceLineNm(lens: CompiledLens, elementId: number | undefined): number {
   let byElement = referenceLineByLens.get(lens);
   if (!byElement) {
     byElement = new Map(
@@ -185,7 +178,7 @@ function channelCauchyCoefficients(dispersion: CompiledSurfaceDispersion): reado
   const size = CAUCHY_NODES_UM.length;
   const rows = CAUCHY_NODES_UM.map((lambda, row) => [
     ...Array.from({ length: size }, (_, power) => (1 / (lambda * lambda)) ** power),
-    dispersion.indexAt(CAUCHY_CHANNELS[row]),
+    dispersion.indexAt(CHROMATIC_CHANNEL_ORDER[row]),
   ]);
   for (let pivot = 0; pivot < size; pivot++) {
     let best = pivot;

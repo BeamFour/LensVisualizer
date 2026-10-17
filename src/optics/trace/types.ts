@@ -9,8 +9,8 @@ import type {
   FoldedPathTraceDiagnostics,
   FoldedPathTraceTermination,
 } from "../../types/optics.js";
-import type { SurfaceIntersectionFailureReason } from "../math/intersection.js";
-import type { Ray3, Vec3 } from "../types.js";
+import type { SurfaceIntersectionFailureReason } from "../geometry/intersect.js";
+import type { CompiledStateSurface, PathSpec, Plane3, Ray3, Vec3 } from "../types.js";
 
 /** Failure reason emitted by exact tracing after intersection and interaction steps. */
 export type TraceFailureReason =
@@ -39,12 +39,15 @@ export interface TraceHit {
   clipReason?: FoldedPathClipReason;
 }
 
-/** Full engine trace result before conversion to RuntimeLens-compatible ray shapes. */
-export interface EngineTraceResult {
+/** Observation storage requested independently of traversal and optical state. */
+export type TraceCapture = "terminal" | "hits" | "diagnostics";
+
+/** Terminal ray state with the histories requested before traversal. */
+export interface EngineTraceResult<C extends TraceCapture = "diagnostics"> {
   /** Sequential capture only: OPL from input origin to the last exact surface hit, in mm. */
   opticalPathLengthMm?: number;
   input: Ray3;
-  hits: readonly TraceHit[];
+  hits: C extends "terminal" ? undefined : readonly TraceHit[];
   terminalPoint: Vec3;
   terminalDirection: Vec3;
   terminalSurfaceIndex: number;
@@ -53,7 +56,7 @@ export interface EngineTraceResult {
   status: "ok" | "clipped" | "failed";
   failureReason: TraceFailureReason | null;
   reachedImagePlane: boolean;
-  diagnostics: FoldedPathTraceDiagnostics;
+  diagnostics: C extends "diagnostics" ? FoldedPathTraceDiagnostics : undefined;
   heights: readonly number[] | null;
   x: number;
   y: number;
@@ -67,7 +70,9 @@ export interface EngineTraceResult {
  * Distances and `launchBoundT` are in millimeters because vector directions are
  * normalized. `stopAt` is a physical surface index for sequential-style partial traces.
  */
-export interface TraceOptions {
+export interface TraceOptions<C extends TraceCapture = "diagnostics"> {
+  /** Observation policy selected before traversal; defaults to full diagnostics. */
+  capture?: C;
   /** Opt-in sequential OPL capture; unavailable for generalized paths until phase-aware validation. */
   recordOpticalPath?: boolean;
   stopAt?: number;
@@ -97,4 +102,25 @@ export interface TraceDiagnosticsInput {
   clipEvents: import("../../types/optics.js").FoldedPathClipEvent[];
   autoSteps: import("../../types/optics.js").FoldedPathAutoStepDiagnostics[];
   loopKey: string | null;
+}
+
+/** Exact traversal over indexed optical geometry, independent of lens ownership. */
+export type TraceTraversal = <C extends TraceCapture = "diagnostics">(
+  geometry: TraceGeometry,
+  input: Ray3,
+  options?: TraceOptions<C>,
+) => EngineTraceResult<C>;
+
+/** Immutable view of prepared coordinates and the traversal selected for their lifetime. */
+export interface TraceGeometry {
+  readonly surfaces: readonly CompiledStateSurface[];
+  readonly z: readonly number[];
+  readonly stopSurfaceIndex: number;
+  readonly imagePlane: Plane3;
+  readonly pathPlan: PathSpec;
+  readonly traversal: Readonly<{
+    kind: "sequential" | "generalized";
+    full: TraceTraversal;
+    partial: TraceTraversal;
+  }>;
 }

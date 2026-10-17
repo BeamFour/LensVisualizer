@@ -1,3 +1,4 @@
+import { registerRuntimeFixture } from "./testLensFixtures.js";
 import { describe, it, expect } from "vitest";
 import {
   COMA_PREVIEW_CIRCULAR_PUPIL_RING_SAMPLES,
@@ -51,13 +52,13 @@ import {
 /* ── Helpers ── */
 
 function withImageFormat(L: RuntimeLens, imageFormat: LensData["imageFormat"]): RuntimeLens {
-  return {
+  return registerRuntimeFixture({
     ...L,
     data: {
       ...L.data,
       imageFormat,
     },
-  } as RuntimeLens;
+  } as RuntimeLens);
 }
 
 function axialIntercept(y: number, u: number, lastSurfZ: number): number {
@@ -1107,7 +1108,7 @@ describe("computeSagittalComa", () => {
 
     // ApoLanthar has offAxisFieldFrac that should give a non-zero field angle,
     // but a lens with zero field angle should return null
-    const emptyLens = { ...L, offAxisFieldFrac: 0 } as RuntimeLens;
+    const emptyLens = registerRuntimeFixture({ ...L, offAxisFieldFrac: 0 } as RuntimeLens);
     const result = computeSagittalComa(emptyLens, zPos, 0, 0, currentEPSD, currentPhysStopSD);
     // At field fraction 0, fieldAngleDeg is 0, so it should return null
     expect(result).toBeNull();
@@ -1615,5 +1616,69 @@ describe("entrancePupilAtState", () => {
 
     expect(Math.abs(atCloseFocus.epSD - atInfinity.epSD)).toBeGreaterThan(1e-4);
     expect(Math.abs(atCloseFocus.epSD - epAtZoom(0, L))).toBeGreaterThan(1e-4);
+  });
+});
+
+describe("analytic chief-relative parabasal focus", () => {
+  it.each([200, 4000])("matches a plano-convex Snell crossing with R=%s mm", (radius) => {
+    const base = buildSimplePositiveElementLens();
+    const n = 1.5;
+    const L = build({
+      ...base.data,
+      focalLengthDesign: 2 * radius,
+      elements: [{ ...base.data.elements[0], nd: n }],
+      surfaces: [
+        { label: "STO", R: 1e15, nd: 1, sd: 15, d: 1, elemId: 0 },
+        { label: "1", R: radius, nd: n, sd: 15, d: 5, elemId: 1 },
+        { label: "2", R: 1e15, nd: 1, sd: 15, d: 2 * radius, elemId: 0 },
+      ],
+    });
+    const { z } = doLayout(0, 0, L);
+    const result = computeFieldCurvature(
+      L,
+      z,
+      0,
+      0,
+      1,
+      15,
+      true,
+      0,
+      { halfFieldDeg: 0.001, yRatio: 1, b: 1, epRatio: 1 },
+      { fieldCurvatureFieldFractions: [0, 0.001], fieldCurvatureCurveFieldFractions: [0, 0.001] },
+    );
+    expect(result).not.toBeNull();
+    const center = result!.fields[0];
+    // Exact Snell refraction at a spherical entrance and a planar exit, independent of the tracer.
+    const h = 0.01;
+    const cosIncident = Math.sqrt(1 - (h / radius) ** 2);
+    const cosGlass = Math.sqrt(1 - (h / (n * radius)) ** 2);
+    const normalScale = cosIncident / n - cosGlass;
+    const dy = (normalScale * h) / radius;
+    const dz = 1 / n - normalScale * cosIncident;
+    const frontZ = 1 + (h * h) / (radius * (1 + cosIncident));
+    const rearHeight = h + (dy / dz) * (6 - frontZ);
+    const exitDy = n * dy;
+    const expected = 6 - (rearHeight * Math.sqrt(1 - exitDy * exitDy)) / exitDy;
+    const budget = Math.max(1e-7, 1e-10 * Math.abs(expected));
+    expect(center.usable).toBe(true);
+    expect(center.validSampleCount).toBe(4);
+    expect(center.clippedSampleCount).toBe(0);
+    expect(Math.abs(center.tangentialBestFocusZ - expected)).toBeLessThanOrEqual(budget);
+    expect(Math.abs(center.sagittalBestFocusZ - expected)).toBeLessThanOrEqual(budget);
+    expect(center.sagittalBestFocusZ).toBe(center.tangentialBestFocusZ);
+    expect(center.chromaticFieldShifts?.map(({ channel }) => channel)).toEqual(["R", "G", "B", "V"]);
+    const clipped = computeFieldCurvature(
+      L,
+      z,
+      0,
+      0,
+      1,
+      0.005,
+      false,
+      0,
+      { halfFieldDeg: 0.001, yRatio: 1, b: 1, epRatio: 1 },
+      { fieldCurvatureFieldFractions: [0, 0.001], fieldCurvatureCurveFieldFractions: [0, 0.001] },
+    );
+    expect(clipped).toBeNull();
   });
 });

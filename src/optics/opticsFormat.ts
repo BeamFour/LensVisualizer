@@ -6,7 +6,7 @@
 
 import { focusDistanceAt } from "./focusDistance.js";
 import type { RuntimeLens } from "../types/optics.js";
-import { FOCUS_INFINITY_THRESHOLD } from "./layout.js";
+import { FOCUS_INFINITY_CUTOFF } from "./layout.js";
 
 /**
  * Format an f-number as the aperture control shows it: hundredth-stop patent apertures keep their
@@ -53,7 +53,7 @@ export function marketedApertureNote(
  * @returns compact distance string in meters, centimeters, or infinity
  */
 export function formatDist(t: number, L: RuntimeLens, zoomT = 0): string {
-  if (t < FOCUS_INFINITY_THRESHOLD) return "\u221e";
+  if (t < FOCUS_INFINITY_CUTOFF) return "\u221e";
   const d = focusDistanceAt(t, L, zoomT);
   if (d === null) return "\u2014";
   if (d >= 100) return `${Math.round(d)} m`;

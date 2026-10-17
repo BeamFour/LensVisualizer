@@ -1,3 +1,4 @@
+import { createTraceGeometry } from "../../../src/optics/trace/geometry.js";
 import { describe, expect, it } from "vitest";
 import {
   build,
@@ -102,7 +103,7 @@ describe("MTF support", () => {
   it("rejects mixed reference glasses without physical wavelength conversion", () => {
     const mixed = build({
       ...L.data,
-      elements: [...L.elements, { ...L.elements[0], id: 2, indexReference: "e" }],
+      elements: [...L.elements, { ...L.elements[0], id: 2, nd: 1.6, indexReference: "e" }],
       surfaces: L.data.surfaces.map((s, i) => (i === 2 ? { ...s, nd: 1.6, elemId: 2 } : s)),
     });
     expect(assessMtfSupport(prepareRuntimeState(mixed, 0, 0), mtfTestOptions).reason).toBe("mixed-reference");
@@ -167,6 +168,11 @@ describe("geometric MTF", () => {
           : s,
       ),
     };
+    aspheric.traceGeometry = createTraceGeometry({
+      ...state.traceGeometry,
+      surfaces: aspheric.surfaces,
+      isFoldedOptics: state.lens.flags.isFoldedOptics,
+    });
     // Aspheric caps use the Lipschitz interval proof: outside the aperture cylinder is a miss, a real rim hit is not.
     expect(mtfTraceClassification(miss, aspheric)).toBe("blocked");
     expect(mtfTraceClassification({ ...miss, terminalPoint: [2.5, 0, -10] }, aspheric)).toBe("failed");
@@ -335,10 +341,10 @@ function buildRetrofocusLens() {
     ],
     surfaces: [
       { label: "1", R: 40, nd: 1.6, sd: 12, d: 1.5, elemId: 1 },
-      { label: "2", R: 12, nd: 1, sd: 9, d: 12, elemId: 1 },
+      { label: "2", R: 12, nd: 1, sd: 9, d: 12, elemId: 0 },
       { label: "STO", R: 1e15, nd: 1, sd: 3, d: 2, elemId: 0 },
       { label: "3", R: 20, nd: 1.6, sd: 6, d: 4, elemId: 2 },
-      { label: "4", R: -20, nd: 1, sd: 6, d: 30, elemId: 2 },
+      { label: "4", R: -20, nd: 1, sd: 6, d: 30, elemId: 0 },
     ],
   });
 }

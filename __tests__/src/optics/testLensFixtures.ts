@@ -1,6 +1,8 @@
-import buildLens, { paraxialTrace } from "../../../src/optics/buildLens.js";
+import { associateRuntimeView } from "../../../src/optics/prescription/runtimeView.js";
+import { compilePrescription, completeCompilation } from "../../../src/optics/prescription/compileCanonical.js";
+import { compileConstruction } from "../../../src/optics/prescription/compileConstruction.js";
+import buildLens, { ingestLens, paraxialTrace, toLensData } from "../../../src/optics/buildLens.js";
 import { epAtZoom, fopenAtZoom } from "../../../src/optics/optics.js";
-import LENS_DEFAULTS from "../../../src/lens-data/defaults.js";
 import ApoLantharRaw from "../../../src/lens-data/voigtlander/VoigtlanderApoLanthar50f2.data.js";
 import Nikkor105Raw from "../../../src/lens-data/nikon/NikonNikkor105f14E.data.js";
 import NikkorRaw from "../../../src/lens-data/nikon/NikonNikkorZ50f18S.data.js";
@@ -8,12 +10,30 @@ import NikkorZ70200Raw from "../../../src/lens-data/nikon/NikonNikkorZ70200f28.d
 import NoktonRaw from "../../../src/lens-data/voigtlander/VoigtlanderNokton50f1.data.js";
 import Sonnar50f15Raw from "../../../src/lens-data/carl-zeiss-jena/ZeissSonnar50f15.data.js";
 import { rearPlateAirEquivalentMm } from "../../../src/optics/prescription/rearPlates.js";
-import type { LensData, RearPlateData, RuntimeLens, SurfaceData, VarRange } from "../../../src/types/optics.js";
+import type {
+  LensData,
+  LensDataInput,
+  RearPlateData,
+  RuntimeLens,
+  SurfaceData,
+  VarRange,
+} from "../../../src/types/optics.js";
 import type { TeleconverterData } from "../../../src/types/teleconverter.js";
 
-/** Merge project defaults and build — the canonical test-side `buildLens` wrapper. */
+/**
+ * A lens file of either version as the catalog hands it on: read through canonical ingest, whose V1 view applies the
+ * schema defaults. Test helpers take merged lens data from here, never by spreading a defaults table.
+ */
+export function catalogLensData(raw: object): LensData {
+  return toLensData(ingestLens(raw as LensDataInput));
+}
+
+/**
+ * Build a lens file or a composed pair — the canonical test-side `buildLens` wrapper. `buildLens` applies the schema
+ * defaults through canonical ingest, and builds a composed pair through its canonical association.
+ */
 export function build(raw: object): RuntimeLens {
-  return buildLens({ ...LENS_DEFAULTS, ...raw } as LensData);
+  return buildLens(raw as LensData);
 }
 
 /**
@@ -38,7 +58,7 @@ export function apertureAt(
 /* ── Shared pre-built production lenses ──────────────────────────────────
  *
  * buildLens returns a frozen RuntimeLens, and the prepared-state/chief-ray
- * helpers cache by lens object identity (src/optics/compat.ts), so sharing
+ * helpers cache by compiled/state identity (src/optics/state/preparedGeometry.ts), so sharing
  * one instance per file makes repeated analysis calls cheap — rebuilding the
  * same production lens per test was a dominant suite cost. Lazily memoized so
  * files only pay for the lenses they use. Never mutate a shared lens
@@ -66,8 +86,7 @@ const BASE_ELEMENT = {
 };
 
 function buildFixture(overrides: Partial<LensData>): RuntimeLens {
-  const data = {
-    ...LENS_DEFAULTS,
+  const data = catalogLensData({
     key: "test-optics-fixture",
     name: "Test optics fixture",
     closeFocusM: 0.5,
@@ -77,7 +96,7 @@ function buildFixture(overrides: Partial<LensData>): RuntimeLens {
     elements: [BASE_ELEMENT],
     surfaces: simplePositiveSurfaces(),
     ...overrides,
-  } as LensData;
+  });
   return buildLens(data);
 }
 
@@ -85,7 +104,7 @@ function simplePositiveSurfaces(stopGap = 1, frontGap = 5, imageGap = 80): Surfa
   return [
     { label: "STO", R: 1e15, nd: 1.0, sd: 15, d: stopGap, elemId: 0 },
     { label: "1", R: 50, nd: 1.5168, sd: 15, d: frontGap, elemId: 1 },
-    { label: "2", R: -50, nd: 1.0, sd: 15, d: imageGap, elemId: 1 },
+    { label: "2", R: -50, nd: 1.0, sd: 15, d: imageGap, elemId: 0 },
   ];
 }
 
@@ -125,7 +144,7 @@ export function buildLayoutLens(thicknesses: readonly [number, number, number]):
     surfaces: [
       { label: "STO", R: 1e15, nd: 1.0, sd: 15, d: thicknesses[0], elemId: 0 },
       { label: "1", R: 100, nd: 1.5168, sd: 15, d: thicknesses[1], elemId: 1 },
-      { label: "2", R: -100, nd: 1.0, sd: 15, d: thicknesses[2], elemId: 1 },
+      { label: "2", R: -100, nd: 1.0, sd: 15, d: thicknesses[2], elemId: 0 },
     ],
   });
 }
@@ -138,7 +157,7 @@ export function buildTirLens(key = "test-tir-lens"): RuntimeLens {
     surfaces: [
       { label: "STO", R: 1e15, nd: 1.0, sd: 20, d: 1, elemId: 0 },
       { label: "1", R: 10, nd: 2.0, sd: 8, d: 5, elemId: 1 },
-      { label: "2", R: 1e15, nd: 1.0, sd: 8, d: 10, elemId: 1 },
+      { label: "2", R: 1e15, nd: 1.0, sd: 8, d: 10, elemId: 0 },
     ],
   });
 }
@@ -226,10 +245,11 @@ export function buildGhostClippingLens(key = "test-ghost-clipping-lens"): Runtim
   return buildFixture({
     key,
     nominalFno: 4,
+    elements: [{ ...BASE_ELEMENT, nd: 1.5 }],
     surfaces: [
       { label: "STO", R: 1e15, nd: 1.0, sd: 5, d: 1, elemId: 0 },
       { label: "1", R: 50, nd: 1.5, sd: 20, d: 10, elemId: 1 },
-      { label: "2", R: -50, nd: 1.0, sd: 20, d: 50, elemId: 1 },
+      { label: "2", R: -50, nd: 1.0, sd: 20, d: 50, elemId: 0 },
     ],
   });
 }
@@ -238,10 +258,11 @@ export function buildMissAfterFirstHitLens(key = "test-miss-after-first-hit-lens
   return buildFixture({
     key,
     nominalFno: 4,
+    elements: [{ ...BASE_ELEMENT, nd: 1.5 }],
     surfaces: [
       { label: "STO", R: 1e15, nd: 1.0, sd: 100, d: 10, elemId: 0 },
       { label: "1", R: 20, nd: 1.5, sd: 10, d: 8, elemId: 1 },
-      { label: "2", R: -20, nd: 1.0, sd: 10, d: 50, elemId: 1 },
+      { label: "2", R: -20, nd: 1.0, sd: 10, d: 50, elemId: 0 },
     ],
   });
 }
@@ -366,8 +387,7 @@ export function teleconverterHostData({
   const airBackFocus = paraxialImageDistance(surfaces);
   const lastGap = airBackFocus - (plates ? rearPlateAirEquivalentMm(plates) : 0);
   surfaces[2].d = lastGap;
-  return {
-    ...LENS_DEFAULTS,
+  return catalogLensData({
     key: "test-teleconverter-host",
     name: "Test converter host",
     closeFocusM: 0.5,
@@ -385,7 +405,7 @@ export function teleconverterHostData({
       ? { var: { "2": [lastGap + lastGapFocusOffsets[0], lastGap + lastGapFocusOffsets[1]] }, varLabels: [["2", "BF"]] }
       : {}),
     ...overrides,
-  } as LensData;
+  });
 }
 
 /**
@@ -412,8 +432,7 @@ export function teleconverterZoomHostData(overrides: Partial<LensData> = {}): Le
   });
   const surfaces = stationSurfaces(separations[0]);
   surfaces[4].d = backFocus[0];
-  return {
-    ...LENS_DEFAULTS,
+  return catalogLensData({
     key: "test-teleconverter-zoom-host",
     name: "Test converter zoom host",
     closeFocusM: 0.5,
@@ -434,5 +453,51 @@ export function teleconverterZoomHostData(overrides: Partial<LensData> = {}): Le
       ["4", "BF"],
     ],
     ...overrides,
-  } as LensData;
+  });
+}
+
+/** Explicit compiler records for synthetic probes that intentionally bypass full-lens validation/constants. */
+export function registerRuntimeFixture(runtime: RuntimeLens): RuntimeLens {
+  const input = compileConstruction(
+    { ...runtime.data, lensShiftFrac: runtime.lensShiftFrac, surfaces: runtime.S },
+    runtime.data,
+  );
+  input.stopIdx = runtime.stopIdx;
+  input.projection = runtime.projection;
+  input.opticalPath = runtime.opticalPath;
+  input.isFoldedOptics = runtime.isFoldedOptics;
+  const {
+    data: _data,
+    S: _S,
+    N: _N,
+    ES: _ES,
+    elements: _elements,
+    lastLensSurfaceIdx: _lastLensSurfaceIdx,
+    asphByIdx: _asphByIdx,
+    varByIdx: _varByIdx,
+    vdByIdx: _vdByIdx,
+    spectralByIdx: _spectralByIdx,
+    indexByIdx: _indexByIdx,
+    varLabels: _varLabels,
+    groups: _groups,
+    doublets: _doublets,
+    perspectiveControl: _perspectiveControl,
+    aberrationControl: _aberrationControl,
+    projection: _projection,
+    opticalPath: _opticalPath,
+    stopIdx: _stopIdx,
+    labelIdx: _labelIdx,
+    ...constants
+  } = runtime;
+  const prescription = compilePrescription(input);
+  const compiled = completeCompilation(
+    {
+      ...prescription,
+      lastLensSurfaceIndex: runtime.lastLensSurfaceIdx ?? runtime.N - 1,
+      displayElementSpans: runtime.ES,
+    },
+    Object.freeze(constants),
+  );
+  associateRuntimeView(compiled, runtime);
+  return runtime;
 }

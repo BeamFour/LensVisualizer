@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { ingestLens, ingestTeleconverter, toLensData, toTeleconverterData } from "../../../src/optics/buildLens.js";
 import type { LensDataInput } from "../../../src/types/optics.js";
 import {
   docdbPublicationNumber,
@@ -6,11 +7,24 @@ import {
   patentJurisdiction,
 } from "../../../src/utils/catalog/patentRecords.js";
 
-const modules = import.meta.glob<{ default: LensDataInput }>("../../../src/lens-data/**/*.data.ts", { eager: true });
-const patentModules = import.meta.glob<{ default: Pick<LensDataInput, "key" | "patentNumber"> }>(
-  ["../../../src/lens-data/**/*.data.ts", "../../../src/lens-data/**/*.teleconverter.ts"],
-  { eager: true },
+/* Each lens file of either version, read as its V1 view gives its fields. */
+const modules = Object.fromEntries(
+  Object.entries(
+    import.meta.glob<{ default: LensDataInput }>("../../../src/lens-data/**/*.data.ts", { eager: true }),
+  ).map(([path, module]) => [path, { default: toLensData(ingestLens(module.default)) }]),
 );
+/* Lens and converter files of either version, read through their V1 views for the patent number. */
+const patentModules: Record<string, { default: { key: string; patentNumber?: string } }> = {
+  ...modules,
+  ...Object.fromEntries(
+    Object.entries(
+      import.meta.glob<{ default: Parameters<typeof ingestTeleconverter>[0] }>(
+        "../../../src/lens-data/**/*.teleconverter.ts",
+        { eager: true },
+      ),
+    ).map(([path, module]) => [path, { default: toTeleconverterData(ingestTeleconverter(module.default)) }]),
+  ),
+};
 
 function expectCleanNames(path: string, field: "patentAuthors" | "patentAssignees", values: string[]): void {
   expect(new Set(values).size, `${path}: ${field} entries must be unique`).toBe(values.length);

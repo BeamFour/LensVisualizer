@@ -1,7 +1,11 @@
 import { describe, it, expect, vi } from "vitest";
-import validateLensData from "../../../src/optics/validateLensData.js";
-import LENS_DEFAULTS from "../../../src/lens-data/defaults.js";
-import { MAX_RIM_SLOPE_TAN } from "../../../src/optics/internal/surfaceMath.js";
+import validateLensData, { validateCanonicalLens, validateLensInput } from "../../../src/optics/validateLensData.js";
+import { ingestLens } from "../../../src/optics/prescription/ingestV2.js";
+import { FIXTURE_PAIRS } from "./prescription/ingestV2Fixtures.js";
+import type { LensDataInput } from "../../../src/types/optics.js";
+import type { LensDataV2Input } from "../../../src/types/lensDataV2.js";
+import { v1CatalogDefaults } from "../../../src/optics/prescription/defaults.js";
+import { MAX_RIM_SLOPE_TAN } from "../../../src/optics/geometry/surfaceProfile.js";
 import { ASPHERIC_COEFFICIENT_SCHEMA } from "../../../src/types/asphericSchema.js";
 import { attachTeleconverter } from "../../../src/optics/prescription/teleconverter.js";
 import { teleconverterFixture, teleconverterHostData } from "./testLensFixtures.js";
@@ -11,8 +15,8 @@ import { teleconverterFixture, teleconverterHostData } from "./testLensFixtures.
  * folded image-plane guard's catch branch is only reachable this way. */
 const asphereIndexControl = vi.hoisted(() => ({ failNextBuild: false }));
 
-vi.mock("../../../src/optics/internal/lensState.js", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("../../../src/optics/internal/lensState.js")>();
+vi.mock("../../../src/optics/prescription/compileAspheres.js", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../../../src/optics/prescription/compileAspheres.js")>();
   return {
     ...actual,
     buildAsphereIndex: (...args: Parameters<typeof actual.buildAsphereIndex>) => {
@@ -25,9 +29,10 @@ vi.mock("../../../src/optics/internal/lensState.js", async (importOriginal) => {
   };
 });
 
+/* The validator's cases include data ingest refuses, so this spreads the raw catalog defaults rather than ingesting. */
 function makeValid(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
-    ...LENS_DEFAULTS,
+    ...v1CatalogDefaults(),
     key: "test",
     name: "Test Lens",
     nominalFno: 2.0,
@@ -64,6 +69,133 @@ function makeValid(overrides: Record<string, unknown> = {}): Record<string, unkn
 }
 
 describe("validateLensData", () => {
+  it("validates canonical prescriptions in both formats without changing them", () => {
+    for (const pair of FIXTURE_PAIRS) {
+      if (pair.kind !== "lens") continue;
+      for (const file of [pair.v1, pair.v2]) {
+        const ingested = ingestLens(file);
+        const before = structuredClone(ingested);
+        expect(validateCanonicalLens(ingested), `${pair.family} V${ingested.provenance.format}`).toEqual([]);
+        expect(ingested).toEqual(before);
+      }
+    }
+  });
+
+  it("reads omitted catalog defaults individually, preserving explicit undefined and refused spellings", () => {
+    const authored = makeValid();
+    for (const field of Object.keys(v1CatalogDefaults())) delete authored[field];
+    const before = structuredClone(authored);
+    expect(validateLensInput(authored)).toEqual([]);
+    expect(authored).toEqual(before);
+    expect(validateLensData(authored)).toContain('Missing or non-finite required number field: "focusStep"');
+    expect(validateLensInput({ ...authored, focusStep: undefined })).toEqual([
+      'Missing or non-finite required number field: "focusStep"',
+    ]);
+    // The compiler reads lensShiftFrac without a fallback, so a non-finite value is refused here.
+    expect(validateLensInput({ ...authored, lensShiftFrac: NaN })).toEqual([
+      'Missing or non-finite required number field: "lensShiftFrac"',
+    ]);
+    expect(validateLensInput({ ...authored, publishedStations: {} })).toEqual([
+      '"publishedStations" must declare "zoom" and/or "focus"',
+    ]);
+    // Ingest intentionally canonicalizes this empty declaration; authored validation must still refuse it.
+    expect(() => ingestLens({ ...authored, publishedStations: {} } as LensDataInput)).not.toThrow();
+  });
+
+  it("preserves reference and aperture diagnostics for canonical V1/V2 counterparts", () => {
+    const pair = FIXTURE_PAIRS.find((pair) => pair.family === "prime");
+    if (!pair || pair.kind !== "lens") throw new Error("missing prime fixture");
+    for (const file of [pair.v1, pair.v2]) {
+      const ingested = ingestLens(file);
+      ingested.prescription.groups = [{ text: "test", fromSurface: "missing", toSurface: "2" }];
+      ingested.prescription.surfaces[1].innerSd = ingested.prescription.surfaces[1].sd;
+      expect(validateCanonicalLens(ingested)).toEqual([
+        'surfaces[1] ("1"): innerSd must be smaller than sd',
+        'groups[0] ("test"): fromSurface "missing" not found',
+      ]);
+    }
+  });
+
+  it("keeps geometry refusals and numeric messages identical for canonical V1/V2 counterparts", () => {
+    const pair = FIXTURE_PAIRS.find((pair) => pair.family === "prime");
+    if (!pair || pair.kind !== "lens") throw new Error("missing prime fixture");
+    const errors = [pair.v1, pair.v2].map((file) => {
+      const ingested = ingestLens(file);
+      delete ingested.prescription.surfaces[1].asphere;
+      ingested.prescription.surfaces[1].sd = 49;
+      ingested.prescription.surfaces[2].sd = 49;
+      return validateCanonicalLens(ingested);
+    });
+    expect(errors[0]).toEqual(errors[1]);
+    expect(errors[0].some((error) => error.includes("negative edge thickness"))).toBe(true);
+    expect(errors[0].filter((error) => error.includes("rim slope"))).toHaveLength(2);
+  });
+
+  it("names a V2 zoom's own station fields in unpublished-station diagnostics", () => {
+    const pair = FIXTURE_PAIRS.find((pair) => pair.family === "published stations");
+    if (!pair || pair.kind !== "lens") throw new Error("missing published stations fixture");
+    const file = structuredClone(pair.v2) as LensDataV2Input;
+    file.zoom!.stations[1].publishedFocus = [1];
+    file.focus = {
+      ...file.focus!,
+      conjugates: [
+        { zoomStation: 1, keyframe: 1, objectDistanceMm: 500, distanceReference: "first-surface", source: "Fixture" },
+      ],
+    };
+    expect(validateCanonicalLens(ingestLens(file))).toEqual(
+      expect.arrayContaining([
+        '"zoom.stations[1].publishedFocus" must be empty: "zoom.stations[1].published" omits that zoom station',
+        '"focus.conjugates" names zoom station 1, which "zoom.stations[1].published" omits',
+      ]),
+    );
+  });
+
+  it("maps canonical control and nested scalar paths to their authored format", () => {
+    const pair = FIXTURE_PAIRS.find((pair) => pair.family === "published stations (prime)");
+    if (!pair || pair.kind !== "lens") throw new Error("missing gap fixture");
+    for (const file of [pair.v1, pair.v2]) {
+      const ingested = ingestLens(file);
+      ingested.prescription.gaps[0].values[0][1] = -1;
+      ingested.prescription.focus.step = NaN;
+      const errors = validateCanonicalLens(ingested);
+      expect(errors).toContain(
+        ingested.provenance.format === 1
+          ? 'var["2"][1]: thickness=-1 is negative'
+          : 'gaps["2"].values[0][1]: thickness=-1 is negative',
+      );
+      expect(errors).toContain(
+        ingested.provenance.format === 1
+          ? 'Missing or non-finite required number field: "focusStep"'
+          : 'Missing or non-finite required number field: "focus.step"',
+      );
+    }
+  });
+
+  it("names authored V2 span endpoints for a zero-length element span", () => {
+    const pair = FIXTURE_PAIRS.find((pair) => pair.family === "prime");
+    if (!pair || pair.kind !== "lens") throw new Error("missing prime fixture");
+    const ingested = ingestLens(pair.v2);
+    ingested.prescription.elements[0].span = ["1", "1"];
+    expect(validateCanonicalLens(ingested)).toEqual([
+      'Element 1 ("L1"): elements[0].span[0] "1" must come before elements[0].span[1] "1"',
+    ]);
+  });
+
+  it("maps source and published-station paths without rewriting authored surface labels", () => {
+    const pair = FIXTURE_PAIRS.find((pair) => pair.family === "published stations (prime)");
+    if (!pair || pair.kind !== "lens") throw new Error("missing gap fixture");
+    const ingested = ingestLens(pair.v2);
+    ingested.prescription.source.errata = [{ status: "unresolved", note: "" }];
+    ingested.prescription.gaps[0].values[0][1] = ingested.prescription.gaps[0].values[0][0];
+    ingested.prescription.surfaces[1].label = "focusStep";
+    ingested.prescription.surfaces[1].sd = -1;
+    expect(validateCanonicalLens(ingested)).toEqual([
+      'surfaces[1] ("focusStep"): sd must be a positive finite number',
+      '"source.errata[0]" needs a non-empty note',
+      '"focus.published": focus keyframe 1 has no focus travel in "gaps"',
+    ]);
+  });
+
   it("requires finite-conjugate source evidence, distance conventions and authored stations", () => {
     const station = {
       focusT: 1,
@@ -232,6 +364,14 @@ describe("validateLensData", () => {
     expect(errors.some((error) => error.includes('"clips" is engine-generated'))).toBe(true);
   });
 
+  it("reserves IMG, the image plane's label, as a surface label", () => {
+    const valid = makeValid();
+    const surfaces = valid.surfaces as Record<string, unknown>[];
+    expect(
+      validateLensData({ ...valid, surfaces: [surfaces[0], surfaces[1], { ...surfaces[2], label: "IMG" }] }),
+    ).toContain('surfaces[2] ("IMG"): the label IMG is reserved for the image plane');
+  });
+
   it("reserves the teleconverter label prefix for composed systems and checks their descriptor", () => {
     const valid = makeValid();
     const surfaces = valid.surfaces as Record<string, unknown>[];
@@ -387,7 +527,7 @@ describe("validateLensData", () => {
   it("rejects gapSagFrac values that would allow visible overlap", () => {
     const errors = validateLensData(makeValid({ gapSagFrac: 1.1 }));
 
-    expect(LENS_DEFAULTS.gapSagFrac).toBe(0.9);
+    expect(v1CatalogDefaults().gapSagFrac).toBe(0.9);
     expect(errors.some((e) => e.includes('"gapSagFrac"'))).toBe(true);
   });
 
@@ -1098,6 +1238,15 @@ describe("validateLensData", () => {
     expect(errors.some((error) => error.includes("must fit inside annular central opening"))).toBe(true);
   });
 
+  it("reports malformed phase data before compiling the folded validation probe", () => {
+    const data = makeValid({
+      opticalPath: { surfaceOrder: ["1", "STO", "2"], imagePlane: { z: 60 } },
+    });
+    (data.surfaces as Record<string, unknown>[])[0].diffractive = null;
+
+    expect(validateLensData(data)).toContain('surfaces[0] ("1"): diffractive must be an object when provided');
+  });
+
   it("reports an error instead of silently skipping folded image-plane validation when asphere indexing fails", () => {
     const data = makeValid({
       opticalPath: {
@@ -1795,7 +1944,7 @@ describe("validateLensData — conic h_max", () => {
 
 describe("validateLensData — rim slope check", () => {
   it("keeps the renderer default rim angle synchronized with validation", () => {
-    expect(Math.tan(((LENS_DEFAULTS.maxRimAngleDeg as number) * Math.PI) / 180)).toBeCloseTo(MAX_RIM_SLOPE_TAN);
+    expect(Math.tan(((v1CatalogDefaults().maxRimAngleDeg as number) * Math.PI) / 180)).toBeCloseTo(MAX_RIM_SLOPE_TAN);
   });
 
   it("catches high slope on spherical surface (sd/|R| = 0.92)", () => {
@@ -1945,6 +2094,18 @@ describe("source errata", () => {
       validateLensData(makeValid({ asph, sourceErrata: [coefficient] })).filter((e) => e.includes("sourceErrata")),
     ).toEqual([]);
   });
+  it("reads an asphere term the file leaves out as zero, so a correction may apply 0 to it", () => {
+    const zeroed = { ...corrected, field: "A6", printed: 2e-9, applied: 0 };
+    const asph = { "1": { K: 0, A4: -1e-6 } };
+    expect(
+      validateLensData(makeValid({ asph, sourceErrata: [zeroed] })).filter((e) => e.includes("sourceErrata")),
+    ).toEqual([]);
+    expect(
+      validateLensData(makeValid({ asph, sourceErrata: [{ ...zeroed, applied: 1e-9 }] }))
+        .filter((e) => e.includes("sourceErrata"))
+        .join(" "),
+    ).toContain("must carry the applied value 1e-9");
+  });
   it("requires the applied value to be the one in the file", () => {
     expect(errataErrors([{ ...corrected, applied: 90 }]).join(" ")).toContain("must carry the applied value 90");
     expect(errataErrors([{ ...corrected, field: "A4" }]).join(" ")).toContain("must carry the applied value");
@@ -1961,7 +2122,7 @@ describe("source errata", () => {
     const first = host.surfaces[0];
     const wrong = [{ ...corrected, surface: first.label, field: "R", printed: first.R + 1, applied: first.R + 2 }];
     expect(
-      validateLensData(attachTeleconverter({ ...host, sourceErrata: wrong } as typeof host, teleconverterFixture()))
+      validateLensData({ ...composed, sourceErrata: wrong })
         .filter((e) => e.includes("sourceErrata"))
         .join(" "),
     ).toContain("must carry the applied value");
@@ -1985,5 +2146,44 @@ describe("source errata", () => {
     ["a non-finite value", [{ ...corrected, printed: NaN }], "printed must be a finite number"],
   ])("rejects %s", (_label, sourceErrata, message) => {
     expect(errataErrors(sourceErrata).join(" ")).toContain(message);
+  });
+});
+
+describe("stop semi-diameter", () => {
+  /** Stop first, in air, then one element: a stop whose radius the engine derives unless something else decides it. */
+  const stopFirst = (stop: Record<string, unknown>, overrides: Record<string, unknown> = {}) =>
+    makeValid({
+      surfaces: [
+        { label: "STO", R: 1e15, d: 2, nd: 1.0, elemId: 0, ...stop },
+        { label: "1", R: 100, d: 5, nd: 1.5, elemId: 1, sd: 10 },
+        { label: "2", R: -100, d: 50, nd: 1.0, elemId: 0, sd: 10 },
+      ],
+      ...overrides,
+    });
+  const sdErrors = (data: Record<string, unknown>) => validateLensData(data).filter((e) => e.includes("sd"));
+
+  it("accepts a stop without sd where the engine derives its radius or takes it from a schedule", () => {
+    expect(validateLensData(stopFirst({}))).toEqual([]);
+    expect(
+      sdErrors(stopFirst({}, { zoomPositions: [20, 35, 50], nominalFno: 2, zoomStopSemiDiameters: [8, 10, 12] })),
+    ).toEqual([]);
+  });
+
+  it("still checks a derived stop's sd where the file writes one", () => {
+    expect(sdErrors(stopFirst({ sd: -1 }))).toEqual(['surfaces[0] ("STO"): sd must be a positive finite number']);
+  });
+
+  it("requires the sd of a stop whose radius is authored: inside glass, or on a folded system", () => {
+    const embedded = makeValid({
+      elements: [{ id: 1, name: "L1", label: "E1", type: "test", nd: 1.5, vd: 50, fromSurface: "1", toSurface: "2" }],
+      surfaces: [
+        { label: "1", R: 100, d: 2.5, nd: 1.5, elemId: 1, sd: 10 },
+        { label: "STO", R: 1e15, d: 2.5, nd: 1.5, elemId: 1, stopPlacement: "inside-element" },
+        { label: "2", R: -100, d: 50, nd: 1.0, elemId: 0, sd: 10 },
+      ],
+    });
+    expect(sdErrors(embedded)).toContain('surfaces[1] ("STO"): missing or invalid sd');
+    const folded = stopFirst({}, { opticalPath: { mode: "auto", imagePlane: { z: 57 } } });
+    expect(sdErrors(folded)).toContain('surfaces[0] ("STO"): missing or invalid sd');
   });
 });

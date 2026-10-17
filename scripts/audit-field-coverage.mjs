@@ -46,13 +46,10 @@ const ROOT = join(import.meta.dirname, "..");
 const LENS_DIR = join(ROOT, "src", "lens-data");
 const load = async (path) => import(pathToFileURL(join(ROOT, path)).href);
 
-const buildLens = (await load("src/optics/buildLens.ts")).default;
-const LENS_DEFAULTS = (await load("src/lens-data/defaults.ts")).default;
+const { default: buildLens, ingestLens, toLensData, prepareRuntimeState } = await load("src/optics/buildLens.ts");
 const { computeAnalysisFieldGeometryAtState2, computeFieldGeometryAtState2, solveChiefRay2 } =
   await load("src/optics/field/chiefRay.ts");
 const { isFisheyeProjection2, rectilinearProjectionMaxTraceField2 } = await load("src/optics/field/projection.ts");
-const { normalizeRuntimeLens } = await load("src/optics/prescription/normalizeLensData.ts");
-const { prepareState } = await load("src/optics/state/prepareState.ts");
 const { traceEngineRay2 } = await load("src/optics/trace/rayAdapters.ts");
 const { IMAGE_FORMAT_BY_ID } = await load("src/utils/catalog/lensTaxonomy.ts");
 
@@ -215,7 +212,7 @@ function fieldStop(L, tracer, modeledDeg, edgeHeight) {
 
 function auditStation(lens, L, zoomT, stationLabel) {
   const corner = (lens.imageCircleMm ?? IMAGE_FORMAT_BY_ID[lens.imageFormat].diagonalMm) / 2;
-  const state = prepareState(normalizeRuntimeLens(L), 0, zoomT, 0);
+  const state = prepareRuntimeState(L, 0, zoomT);
   const raw = computeFieldGeometryAtState2(0, zoomT, L, 0);
   const modeledDeg = computeAnalysisFieldGeometryAtState2(0, zoomT, L, 0).halfFieldDeg;
   const tracer = chiefRayTracer(L, state, zoomT, raw);
@@ -262,10 +259,18 @@ function stationLabel(L, index) {
 }
 
 async function auditLens(file, includeHidden) {
-  const lens = { ...LENS_DEFAULTS, ...(await import(pathToFileURL(file).href)).default };
+  const authored = (await import(pathToFileURL(file).href)).default;
   const rel = relative(LENS_DIR, file);
-  const base = { rel, key: lens.key, name: lens.name };
-  if (lens.visible === false && !includeHidden) return { ...base, skipped: "hidden" };
+  const base = { rel, key: authored.key, name: authored.name };
+  if (authored.visible === false && !includeHidden) return { ...base, skipped: "hidden" };
+  let lens;
+  try {
+    /* Canonical ingest's V1 view applies the schema defaults, as the catalog does, and reads a file of either
+     * version in V1 field names. */
+    lens = toLensData(ingestLens(authored));
+  } catch (error) {
+    return { ...base, skipped: `buildLens failed: ${error.message}` };
+  }
   if (lens.opticalPath) return { ...base, skipped: "folded optical path" };
   if (!(IMAGE_FORMAT_BY_ID[lens.imageFormat] || lens.imageCircleMm))
     return { ...base, skipped: `no usable imageFormat (${String(lens.imageFormat)})` };

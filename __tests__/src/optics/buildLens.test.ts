@@ -1,22 +1,29 @@
 import { describe, it, expect, vi } from "vitest";
-import buildLens, { paraxialTrace, realTraceToStop } from "../../../src/optics/buildLens.js";
+import buildLens, { ingestLensV1, paraxialTrace, realTraceToStop, toLensData } from "../../../src/optics/buildLens.js";
+import { PrescriptionIngestError } from "../../../src/optics/prescription/canonical.js";
+import { v1CatalogDefaults } from "../../../src/optics/prescription/defaults.js";
+import { withLensDefaults } from "../../../src/optics/prescription/compile.js";
+import { attachTeleconverter } from "../../../src/optics/teleconverter.js";
+import validateLensData from "../../../src/optics/validateLensData.js";
 import { wideOpenStopAtZoom } from "../../../src/optics/apertureStop.js";
 import { doLayout, traceRay } from "../../../src/optics/optics.js";
 import { computeCardinalElementsAtState } from "../../../src/optics/cardinalElements.js";
 import { computeFieldGeometryAtState } from "../../../src/optics/fieldGeometry.js";
-import LENS_DEFAULTS from "../../../src/lens-data/defaults.js";
 import {
   REAR_PLATE_FIXTURE,
   buildRearPlateAirEquivalentLens,
+  catalogLensData,
   buildRearPlateLens,
   sharedApoLanthar50f2,
   sharedNikkor105f14,
   sharedNikkorZ50f18,
   sharedNokton50f1,
   sharedSonnar50f15,
+  teleconverterFixture,
+  teleconverterHostData,
   teleconverterZoomHostData,
 } from "./testLensFixtures.js";
-import type { LensData, SurfaceData } from "../../../src/types/optics.js";
+import type { LensData, LensDataInput, SurfaceData } from "../../../src/types/optics.js";
 
 /* ── Load all production lens data files ── */
 import ApoLantharRaw from "../../../src/lens-data/voigtlander/VoigtlanderApoLanthar50f2.data.js";
@@ -28,23 +35,24 @@ import CanonEF815mmf4LFisheyeRaw from "../../../src/lens-data/canon/CanonEF815mm
 import Sonnar50f15Raw from "../../../src/lens-data/carl-zeiss-jena/ZeissSonnar50f15.data.js";
 import Hologon15f8Raw from "../../../src/lens-data/carl-zeiss-oberkochen/ZeissHologon15mmf8.data.js";
 import NikkorZ70200Raw from "../../../src/lens-data/nikon/NikonNikkorZ70200f28.data.js";
+import SonyFE1224Raw from "../../../src/lens-data/sony/SonyFE1224mmf28GM.data.js";
 
 vi.mock("../../../src/utils/featureFlags.js", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../../src/utils/featureFlags.js")>();
   return { ...actual, ENABLE_UNIFORM_SCALING: true };
 });
 
-const ApoLanthar = { ...LENS_DEFAULTS, ...ApoLantharRaw } as LensData;
-const Nokton = { ...LENS_DEFAULTS, ...NoktonRaw } as LensData;
-const Nikkor105 = { ...LENS_DEFAULTS, ...Nikkor105Raw } as LensData;
-const NikonFisheye6mmf28 = { ...LENS_DEFAULTS, ...NikonFisheye6mmf28Raw } as LensData;
-const NikonFisheye6mmf56 = { ...LENS_DEFAULTS, ...NikonFisheye6mmf56Raw } as LensData;
-const CanonEF815mmf4LFisheye = { ...LENS_DEFAULTS, ...CanonEF815mmf4LFisheyeRaw } as LensData;
-const Sonnar50f15 = { ...LENS_DEFAULTS, ...Sonnar50f15Raw } as LensData;
-const Hologon15f8 = { ...LENS_DEFAULTS, ...Hologon15f8Raw } as LensData;
+const ApoLanthar = catalogLensData(ApoLantharRaw);
+const Nokton = catalogLensData(NoktonRaw);
+const Nikkor105 = catalogLensData(Nikkor105Raw);
+const NikonFisheye6mmf28 = catalogLensData(NikonFisheye6mmf28Raw);
+const NikonFisheye6mmf56 = catalogLensData(NikonFisheye6mmf56Raw);
+const CanonEF815mmf4LFisheye = catalogLensData(CanonEF815mmf4LFisheyeRaw);
+const Sonnar50f15 = catalogLensData(Sonnar50f15Raw);
+const Hologon15f8 = catalogLensData(Hologon15f8Raw);
 
 /* Shared frozen instances of the same five production lenses (identical
- * LENS_DEFAULTS-merge + buildLens path) for loops that only read the built
+ * ingest + buildLens path) for loops that only read the built
  * lens — order matches [ApoLanthar, Nokton, Nikkor, Nikkor105, Sonnar50f15]. */
 const SHARED_PRODUCTION_LENSES = [
   sharedApoLanthar50f2,
@@ -281,10 +289,43 @@ describe("buildLens — RuntimeLens property shape", () => {
   });
 });
 
+describe("buildLens — canonical ingest", () => {
+  it("reads an authored file through ingest and its V1 view", () => {
+    expect(withLensDefaults(ApoLantharRaw as unknown as LensData)).toEqual(toLensData(ingestLensV1(ApoLantharRaw)));
+  });
+
+  it("builds a composed pair through its canonical association", () => {
+    const composed = attachTeleconverter(teleconverterHostData(), teleconverterFixture());
+    expect(composed.attachedTeleconverter).toBeDefined();
+    /* A copy loses the canonical association and cannot author the composer-only marker. */
+    expect(() => ingestLensV1(composed as unknown as LensDataInput)).toThrow(/attachedTeleconverter is written only/);
+    expect(() => buildLens({ ...composed })).toThrow(/attachedTeleconverter is written only/);
+    const forBuild = withLensDefaults(composed);
+    expect(forBuild).toEqual(composed);
+    expect(forBuild).not.toBe(composed);
+    expect(buildLens(composed).EFL).toBeGreaterThan(buildLens(teleconverterHostData()).EFL);
+  });
+
+  it("composes and builds a raw host that omits catalog defaults", () => {
+    const host: Partial<LensData> = { ...teleconverterHostData() };
+    for (const field of Object.keys(v1CatalogDefaults())) delete host[field as keyof LensData];
+    expect(host).not.toHaveProperty("focusStep");
+    const composed = attachTeleconverter(host as LensData, teleconverterFixture());
+    expect(buildLens(composed).EFL).toBeGreaterThan(buildLens(host as LensData).EFL);
+  });
+
+  it("refuses an explicitly undefined host default before ingest can repair it", () => {
+    const host = { ...teleconverterHostData(), focusStep: undefined } as unknown as LensData;
+    expect(() => attachTeleconverter(host, teleconverterFixture())).toThrow(
+      'Missing or non-finite required number field: "focusStep"',
+    );
+  });
+});
+
 describe("buildLens — error handling", () => {
+  /* Authored, without defaults: buildLens applies them, so its own error path is what these cases reach. */
   function makeMinimalData(overrides: Record<string, unknown> = {}): Record<string, unknown> {
     return {
-      ...LENS_DEFAULTS,
       key: "test",
       name: "Test Lens",
       nominalFno: 2.0,
@@ -331,6 +372,50 @@ describe("buildLens — error handling", () => {
       ],
     });
     expect(() => buildLens(data as unknown as LensData)).toThrow(/Duplicate surface label/);
+    /* Ingest refuses the repeated label too; the validator's message comes first, as it did before ingest. */
+    expect(() => ingestLensV1(data as unknown as LensDataInput)).toThrow(PrescriptionIngestError);
+  });
+
+  it("throws the validator's messages where ingest or the view fails on wrong-typed data", () => {
+    /* Ingest does not check types, so the view throws a bare TypeError on a number where a list belongs. */
+    const data = makeMinimalData({ fstopSeries: 2 });
+    expect(() => toLensData(ingestLensV1(data as unknown as LensDataInput))).toThrow(TypeError);
+    expect(() => buildLens(data as unknown as LensData)).toThrow(
+      /Missing or empty required array field: "fstopSeries"/,
+    );
+  });
+
+  it("asks the validator about every V1 file first, so the view repairs nothing it would refuse", () => {
+    /* Ingest and the view accept each of these, and the view would hand the validator a repaired file. */
+    const asLens = (data: unknown) => data as LensData;
+    const cases: [unknown, RegExp][] = [
+      [
+        makeMinimalData({ asph: { "1": { K: 0, A4: 1e-6, A6: 0, A8: 0, A10: 0, A12: 0 } } }),
+        /asph key "1" is missing finite numeric coefficient A14/,
+      ],
+      [
+        { ...SonyFE1224Raw, zoomStopSemiDiameters: [8.115, undefined, 11.815] },
+        /zoomStopSemiDiameters requires one positive finite radius per zoom station/,
+      ],
+      [
+        { ...SonyFE1224Raw, publishedStations: { zoom: [1, 0] } },
+        /"publishedStations.zoom" must be a non-empty, strictly/,
+      ],
+      [makeMinimalData({ maxFstop: undefined }), /Missing or non-finite required number field: "maxFstop"/],
+      [makeMinimalData({ fstopSeries: "248" }), /Missing or empty required array field: "fstopSeries"/],
+    ];
+    for (const [data, message] of cases) {
+      expect(() => toLensData(ingestLensV1(data as LensDataInput)), String(message)).not.toThrow();
+      expect(() => buildLens(asLens(data)), String(message)).toThrow(message);
+    }
+    expect(() => buildLens(asLens(undefined))).toThrow(/Lens data "\?" has 8 error\(s\)/);
+  });
+
+  it("throws ingest's refusal, naming the field and its path, for a file the validator accepts", () => {
+    const data = makeMinimalData({ zoomLabels: ["Wide", "Tele"] });
+    expect(validateLensData({ ...v1CatalogDefaults(), ...data })).toEqual([]);
+    expect(() => buildLens(data as unknown as LensData)).toThrow(PrescriptionIngestError);
+    expect(() => buildLens(data as unknown as LensData)).toThrow(/zoomLabels is a zoom field/);
   });
 
   it("builds successfully with valid minimal data", () => {
@@ -505,7 +590,7 @@ describe("scaleRatio for normalized comparison", () => {
  * ═══════════════════════════════════════════════════════════════════ */
 
 describe("buildLens — zoom lens (Nikkor Z 70-200mm f/2.8)", () => {
-  const NikkorZ70200 = { ...LENS_DEFAULTS, ...NikkorZ70200Raw } as LensData;
+  const NikkorZ70200 = catalogLensData(NikkorZ70200Raw);
   const L = buildLens(NikkorZ70200);
 
   it("builds successfully and is frozen", () => {
@@ -601,16 +686,45 @@ describe("bladeStubFrac — aberration-aware blade position", () => {
 });
 
 // Authored iris schedules are an engine contract, independent of a patent's values.
+describe("compiled first-order constants", () => {
+  it("matches a thick singlet's analytic EFL, back focus and pupil conjugates", () => {
+    // Reduced-angle matrix R2 T(t/n) R1 T(g): A=.96, B=4.96, C=-.0196, D=.9404.
+    const power = 0.01 + 0.01 - (6 / 1.5) * 0.01 * 0.01;
+    const efl = 1 / power;
+    const bfd = (1 - (6 / 1.5) * 0.01) / power;
+    const L = buildLens(
+      teleconverterHostData({
+        overrides: {
+          nominalFno: 4,
+          elements: [{ id: 1, name: "Singlet", label: "L1", type: "positive", nd: 1.5, vd: 60 }],
+          surfaces: [
+            { label: "STO", R: 1e15, d: 1, nd: 1, elemId: 0, sd: 15 },
+            { label: "1", R: 50, d: 6, nd: 1.5, elemId: 1, sd: 15 },
+            { label: "2", R: -50, d: bfd, nd: 1, elemId: 0, sd: 15 },
+          ],
+        },
+      }),
+    );
+    expect(L.EFL).toBeCloseTo(efl, 12);
+    const layout = doLayout(0, 0, L);
+    expect(computeCardinalElementsAtState(L, 0, 0, layout.z, layout.imgZ)!.distances.bfd.valueMm).toBeCloseTo(bfd, 12);
+    expect(L.stopPhysSD).toBe(efl / 8);
+    expect(L.EP.epSD).toBe(efl / 8);
+    expect(L.EP.yRatio).toBe(1);
+    expect(L.epZRelStop).toBe(0);
+    // Real basis rays use delta=1e-4; their paraxial limit is the stop's Gaussian conjugate.
+    expect(L.xpZRelLastSurf).toBeCloseTo(-4.96 / 0.9404, 7);
+    expect(L.xpSD).toBeCloseTo(efl / 8 / 0.9404, 7);
+  });
+});
+
 describe("published zoom iris schedule", () => {
   it("preserves supplied radii and interpolates between stations", () => {
     const zoomPositions = NikkorZ70200Raw.zoomPositions;
     const radii = zoomPositions.map((_, i) => 8 + 2 * i);
-    const L = buildLens({
-      ...LENS_DEFAULTS,
-      ...NikkorZ70200Raw,
-      zoomApertureModel: undefined,
-      zoomStopSemiDiameters: radii,
-    } as LensData);
+    const L = buildLens(
+      catalogLensData({ ...NikkorZ70200Raw, zoomApertureModel: undefined, zoomStopSemiDiameters: radii }),
+    );
     expect(L.stopPhysSD).toBe(radii[0]);
     expect(L.zoomStopSDs).toEqual(radii);
     expect(wideOpenStopAtZoom(0.5 / (radii.length - 1), L)).toBe(9);
@@ -675,6 +789,33 @@ describe("buildLens — rear plates", () => {
     for (const sd of plateSds(buildRearPlateLens({ imageFormat: "135-full-frame" }))) {
       expect(sd).toBeCloseTo((1.5 * 43.3) / 2, 10);
     }
+  });
+
+  /* V2 leaves a derived stop's `sd` out, so a generated rim must not grow with a value the engine never reads. */
+  it("sizes generated plate rims without a derived stop's sd", () => {
+    const plateSds = (stop: Partial<SurfaceData>) =>
+      buildLens(
+        catalogLensData({
+          key: "test-rear-plate-wide-stop",
+          name: "Test rear plate, wide stop",
+          closeFocusM: 0.5,
+          yScFill: 0.55,
+          nominalFno: 2,
+          fstopSeries: [2, 2.8, 4],
+          elements: [{ id: 1, name: "L1", label: "E1", type: "positive", nd: 1.5168, vd: 64.17 }],
+          surfaces: [
+            { label: "STO", R: 1e15, d: 1, nd: 1, elemId: 0, ...stop },
+            { label: "1", R: 50, d: 5, nd: 1.5168, elemId: 1, sd: 15 },
+            { label: "2", R: -50, d: 44, nd: 1, elemId: 0, sd: 15 },
+          ],
+          rearPlates: [REAR_PLATE_FIXTURE],
+        }),
+      )
+        .S.filter((surface) => surface.synthetic === "rearPlate")
+        .map((surface) => surface.sd);
+
+    expect(plateSds({ sd: 30 })).toEqual([22.5, 22.5]);
+    expect(plateSds({})).toEqual([22.5, 22.5]);
   });
 
   /* The fixture's generated 22.5 mm rim sits ~49 mm behind the lens, where the chief ray is near full image height;
