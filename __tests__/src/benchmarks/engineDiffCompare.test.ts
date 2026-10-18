@@ -6,7 +6,7 @@
  * each test names the drift it must detect. Real catalog lenses appear only as sources of realistic records.
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   C2_CRITERIA,
   QUANTITIES,
@@ -67,6 +67,7 @@ import {
 import { ingestLens, ingestTeleconverter, toTeleconverterData } from "../../../src/optics/buildLens.js";
 import { toLensDataInput } from "../../../src/optics/prescription/toLensData.js";
 import { INTERSECTION_TOLERANCE } from "../../../src/optics/constants.js";
+import * as perspectiveChromatic from "../../../src/optics/perspective/analysis/chromatic.js";
 import type { LensDataInput } from "../../../src/types/optics.js";
 import plainTwin from "./engineDiffFixtures/fingerprintTwinPlain.js";
 import restyledTwin from "./engineDiffFixtures/fingerprintTwinRestyled.js";
@@ -3071,28 +3072,35 @@ describe("engineDiff cross-evaluation", () => {
     );
   });
 
-  it("reports catalog glass-resolution sensor misses without inventing newly traced failures", () => {
-    /* This glass change formerly unlocked edge channels through sensor-lock residual noise. The physical format
-     * band keeps those reference locks usable on both data sets. Scene-locked chromatic channels can still move
-     * off the sensor, but no newly traced failures appear; the synthetic case above covers those separately. */
+  it("passes newly traced failures when chromatic samples move inside the sensor, on records of the real engine", () => {
+    /* Request points clearly outside and then inside the sensor. The newly available channels retain real ray
+     * failures, exercising the path-based data comparison without relying on a solver's exact-edge landing. */
     const id = "panasonic-lumix-s-pro-50-f14";
     const asked = tierRequests("p", { ...requestCatalog(CATALOG), changedLensKeys: [id] }).filter(
       (request) => lensId(request.lens) === id,
     );
     expect(asked.map((request) => request.family)).toContain("analysis");
-    const unresolved: SerializedCatalog = {
-      ...CATALOG,
-      lenses: CATALOG.lenses.map((entry) => {
-        if (entry.key !== id) return entry;
-        const data = toLensDataInput(ingestLens(decodeValue(entry.prescription) as LensDataInput));
-        const elements = data.elements.map((element, index) =>
-          index === data.elements.length - 1 ? { ...element, glass: "A glass no catalog holds" } : element,
+    const computeChromatic = perspectiveChromatic.computePerspectiveChromaticAnalysis;
+    const captureAtEdge = (edge: number): PayloadRecord[] => {
+      // Only the two endpoint requests move; 0.012 mm clearance is 1,200 times the lock tolerance.
+      const chromatic = vi
+        .spyOn(perspectiveChromatic, "computePerspectiveChromaticAnalysis")
+        .mockImplementation((context, options) =>
+          computeChromatic(context, {
+            ...options,
+            sensorUvs: options.sensorUvs?.map(({ u, v }) => ({ u, v: Math.abs(v) === 1 ? v * edge : v })),
+          }),
         );
-        return { ...entry, prescription: encodeValue({ ...data, elements }) };
-      }),
+      try {
+        return captureRecords(CATALOG, asked);
+      } finally {
+        chromatic.mockRestore();
+      }
     };
-    const [base, head] = [captureRecords(unresolved, asked), captureRecords(CATALOG, asked)];
-    expect(failedStatusCount(head)).toBe(failedStatusCount(base));
+    const [base, head] = [captureAtEdge(1.001), captureAtEdge(0.999)];
+    /* What the count compared: the head data's records hold more failed statuses than the base data's. */
+    const gained = failedStatusCount(head) - failedStatusCount(base);
+    expect(gained).toBeGreaterThan(0);
 
     const summary = evaluate("semantic", head, base);
     expect(summary).toMatchObject({
@@ -3101,17 +3109,24 @@ describe("engineDiff cross-evaluation", () => {
       dataImpact: [{ lens: id, blocking: 0, blockers: [] }],
     });
     const paths = pathsOf(summary);
-    expect(paths).toEqual({
-      ...NO_PATHS,
-      statusChanges: { "usable -> missed-sensor": expect.any(Number) },
+    /* Every one of those failures is at a path the base data has no status at, and nothing turned to a failure
+     * or stopped being finite at a path both sides have. */
+    expect(paths).toMatchObject({
+      statuses: { toFailure: 0, afterFirstClip: 0, fromFailure: 0 },
+      numbers: { toNonFinite: 0 },
+      outcomes: { toThrown: 0 },
+      baseOnly: { statuses: 0, failedStatuses: 0 },
+      headOnly: { failedStatuses: gained },
+      /* The real shape pairs every array as it is: a fan keeps its rays, and an untraced ray holds no trace. */
+      resized: { arrays: 0 },
     });
-    expect(paths.statusChanges["usable -> missed-sensor"]).toBeGreaterThan(0);
-    // The reverse data change restores those channel hits without adding any work or failures.
-    const reverse = evaluate("semantic", base, head);
-    expect(reverse).toMatchObject({ passed: true, dataImpact: [{ blocking: 0 }] });
-    expect(pathsOf(reverse)).toEqual({
-      ...NO_PATHS,
-      statusChanges: { "missed-sensor -> usable": paths.statusChanges["usable -> missed-sensor"] },
+    expect(paths.headOnly.statuses).toBeGreaterThan(gained);
+    expect(paths.statusChanges["outside-projection-domain -> usable"]).toBeGreaterThan(0);
+    expect(paths.statusChanges["absent -> failed"]).toBe(gained);
+    /* The other way round the same statuses are work no longer done, and that passes as well. */
+    expect(evaluate("semantic", base, head)).toMatchObject({
+      passed: true,
+      dataImpact: [{ blocking: 0, paths: { baseOnly: { failedStatuses: gained }, statuses: { toFailure: 0 } } }],
     });
   });
 
