@@ -7,7 +7,7 @@ makes available.
 
 Stages 1 to 5 and Phases 2.1 to 2.5 have merged to `main`: promotion #847, tagged `optics-rewrite/promotion`, and
 catalog migration #862. Stages 1 to 5 have passed their gates (tags `optics-rewrite/s1`, `optics-rewrite/s2`,
-`optics-rewrite/s3`, `optics-rewrite/s4` and `optics-rewrite/s5`). Phase 2.6 has merged except S2.P6.T5, which is deferred; Stages 6 to 8 are future work.
+`optics-rewrite/s3`, `optics-rewrite/s4` and `optics-rewrite/s5`). Phase 2.6 has merged except S2.P6.T5, which is deferred. Stage 6 is in progress; Stages 7 and 8 are future work.
 
 Priorities, in order: **maintainability**, then **accuracy** (the contract below), then **speed**. When they conflict,
 the higher priority wins and the PR description records the trade-off. Speed's gates and targets are under
@@ -143,6 +143,12 @@ Serenar 50mm f/1.8 show 5.3 and 5.0 evaluations per intersection, so the pattern
   - **Stage 2** is `20827483`, tagged `optics-rewrite/s2`: the merge commit of #862, which closes the catalog
     migration. Its Tier S against `optics-rewrite/promotion` (run 39078302227, 48 shards, C0) compares 1,019 lenses
     and pairs, 45,591 records and 308.7M numbers: 0 differ, all format-only, no declared exceptions.
+  - **A6** is `b0bbd895`, tagged `optics-rewrite/a6`: the squash commit of #869, the near-tangency C3 (#779). Its
+    cumulative Tier S against Stage 2 (run 39090631790, 48 shards, C3) compares 1,023 lenses and pairs, 48,757 records
+    and 224.3M numbers; the two Leica lenses the Stage 2 engine cannot build are declared exceptions. 21 records
+    differ and none fail: the Samyang XP 35mm f/1.2's raw half-field at close focus (+0.0005°, the chord the scan
+    missed) and the two lenses #872's glass rows now match (Minolta MD APO Tele 600mm, Schneider PA-Curtagon 35mm),
+    paired with #872. S6.P1.T1 (#870, C0) merged before it and changed nothing. The timing base stays Stage 2.
 - **The intersection contract** is #774's, and its documentation owns it: `agent_docs/architecture/optics-engine.md`
   (Exact Surface Trace) and `agent_docs/decisions.md` (2026-10-08). It covers the `1e-12` mm raw residual target, the
   72-iteration cap, the residual definitions, the raw-target-first roundoff envelope, and cap selection.
@@ -447,7 +453,7 @@ read as passing; the step names those divergences.
   - The Stage 2 anchor is the migration's closing merge commit, listed under
     [Baseline and accuracy contract](#baseline-and-accuracy-contract).
   - The Stage 6, 7 and 8 gates compare against the current anchor: `optics-rewrite/s2`, or a later one an engine C3
-    sets. The migration therefore closes before the Stage 6 gate.
+    sets, tagged `optics-rewrite/a<n>` in the same sequence (A6 is the first). The migration therefore closes before the Stage 6 gate.
   - The comparison from the old anchor is carried in three parts. The Stage 5 gate and the promotion's Tier F run on
     the V1 catalog, and the Stage 2 gate compares the new anchor with the promotion merge commit.
   - Budgets accumulate from the new anchor. A Stage 6 step that merges before it is judged in the Stage 2 gate under
@@ -1368,7 +1374,7 @@ flowchart LR
 - Promotion needs Phases 2.1 to 2.3.
 - Phase 2.6 needs S2.P5 and blocks only S8.P2.T3.
 - Phase 2.5 closes, and the Stage 2 gate passes, before the Stage 6 gate. The commit the Stage 2 gate passes on is the
-  Stage 6 gate's anchor ([Anchors and comparison coverage](#anchors-and-comparison-coverage)).
+  anchor Stage 6 starts from ([Anchors and comparison coverage](#anchors-and-comparison-coverage)).
 
 Phases 2.1 to 2.3 run on `engine-next`, so the catalog was V1 on both branches while there were two. Phase 2.5 runs
 after promotion on its own branch from `main`, `lens-v2-migration`, and Phase 2.6 on `main` after it. Phase 2.4 is documents only, off the critical path: it is drafted on
@@ -2490,13 +2496,20 @@ carrying Phase 2.4 ([Integration model](#integration-model)). Stages 6 to 8 and 
   - **Change:** the perspective context memoizes sensor-locked solves by sensor point, chief options and channel. Focus,
     vignetting (active and zero pose), field aberrations, chromatic, pupils and distortion all share them.
   - **Gate:** C0.
-- **S6.P3.T2 Warm-started sensor solves.**
-  - **Change:** the two-coordinate solve seeds from the neighboring converged sample.
-  - **Gate:** C2.
+- **S6.P3.T2 Warm-started sensor solves.** Dropped (decision 95).
+  - **Was:** the two-coordinate solve seeds from the neighboring converged sample, under C2.
+  - **Evidence:** every sensor-locked analysis samples nine points at `u = 0`, 3 mm apart, through the meridional
+    scalar solve, so the two-coordinate continuation never ran on a capture or benchmark call. Seeding those solves
+    with the nearest converged sample's correction (PC-Nikkor 19mm and Canon TS-E 50mm, on S6.P2.T1's solver) cost
+    more outer evaluations at zero shift (681 against 565) and saved about 2% at shift 6, tilt 4. Its 385 warm
+    solves changed 18 statuses and moved landings by up to 3 mm. A guard that the warm root is the cold solve's
+    needs the cold solve itself.
 - **S6.P3.T3 One set of sensor helpers.**
   - **Change:** merge `perspective/analysis/shared.ts` `sensorUvInsideFormat` and `sensorPointForUv` into
     `perspective/fieldGeometry.ts`.
   - **Gate:** C0.
+
+Merged: the near-tangency C3 (#869, which set A6), S6.P1.T1 (#870), S6.P3.T1 (#873) and S6.P3.T3 (#876).
 
 **Stage 6 gate:** Tier S against the anchor, under the loosest class merged since it; the Stage 6 targets are reported.
 
@@ -2823,6 +2836,7 @@ Settled on 2026-10-17, after promotion:
 | 92 | A PR adding or changing a glass catalog row on `main` carries `engine-diff:c3`; the next stage gate pairs each affected lens with that PR as a content change, and the anchor stays | [Anchors and comparison coverage](#anchors-and-comparison-coverage) |
 | 93 | The near-tangency root fix and wider solver-failure table go first in Stage 6 as an engine C3, with before/after evidence for the maintainer (#779) | Before S6.P1.T1 |
 | 94 | S8.P2.T1's Tier F stands in for the Stage 8 gate's Tier S only if no intervening merge changes engine output; otherwise Tier S runs against the anchor just before the harness is deleted | Stage 8 gate |
+| 95 | S6.P3.T2 (warm-started sensor solves) is dropped: on real calls it saved nothing or cost more, and moved results beyond C2 | S6.P3.T2 |
 
 The maintainer settled the Olympus Zuiko Auto-W 18mm's distortion on 2026-10-15; its engine C3 is #815, whose merge
 commit is anchor A3:
