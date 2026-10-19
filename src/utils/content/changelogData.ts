@@ -24,6 +24,11 @@ export const CHANGELOG: ChangelogEntry[] = [
     summary: "Fixed close-focus distortion readings, which were measured against an infinity reference",
   },
   {
+    date: "2026-10-19",
+    type: "lens",
+    summary: "Added Leica Noctilux-M 35mm, Olympus Zuiko 180mm, two Sigma and two Viltrox primes",
+  },
+  {
     date: "2026-10-18",
     type: "lens",
     summary: "Added the Carl Zeiss Jena PI-Flektogon 30mm f/2.8 e-line research reconstruction",
