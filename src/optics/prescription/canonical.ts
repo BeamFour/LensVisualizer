@@ -2,14 +2,14 @@
  * Canonical prescription — the version-independent semantic content of a lens or teleconverter file.
  *
  * App-authored V2 is ingested through `ingestV2.ts`; the permanent converter reads V1 through `v1/ingestV1.ts`. The shape
- * follows the V2 lens-data model of `OPTICS_ENGINE_REWRITE_SPEC.md` (Lens data V2): records grouped by consumer,
+ * follows the V2 lens-data model of `src/lens-data/LENS_DATA_SPEC.md`: records grouped by consumer,
  * one value per fact, indices carried by a surface's medium, sparse aspheres, a flat radius as a marker, and the
  * stop's radius authority stated once. Schema defaults are applied, so a default written out and a default left
  * out ingest to the same prescription, and the engine's authority rules are applied, so a value the engine never
  * reads is not part of it.
  *
  * Provenance is kept apart, beside the prescription: which values the schema supplied, the authored values the
- * engine ignores, and how the source spelled what the prescription holds once. The semantic fingerprint hashes the
+ * engine ignores, and how the source spelled what the prescription holds once. `prescriptionDifference` compares the
  * prescription alone; the V1 view (`toLensData.ts`) needs both to give a file back as it was written.
  *
  * A prescription and its provenance are plain data: no functions, class instances or shared references, so they can
@@ -400,7 +400,7 @@ export interface V1PublishedStationsSpelling {
 export interface V2Spelling {
   /**
    * The file's undrawn media as written, in its order, each with the id the prescription gives it. The prescription
-   * numbers media by first use, as V1 ingest does, so a medium's name never reaches the semantic fingerprint.
+   * numbers media by first use, as V1 ingest does, so a medium's name does not affect canonical equality.
    */
   media: { canonicalId: string; id: string; name?: string }[];
 }
@@ -499,7 +499,7 @@ export interface IngestedPrescription<Prescription extends CanonicalPrescription
 }
 
 /**
- * The first place two prescriptions differ, under the semantic fingerprint's rules: numbers bit for bit, except that
+ * The first place two prescriptions differ, under canonical semantic equality: numbers bit for bit, except that
  * -0 is 0; member order is ignored, and a member whose value is `undefined` counts as absent; list order counts.
  *
  * @param a - a canonical prescription, or any part of one

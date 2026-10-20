@@ -27,22 +27,22 @@ is `prescription/teleconverterCompatibility.ts`; `mount/` is outside this bounda
 
 | Module in `src/optics/` | Public surface |
 | --- | --- |
-| `buildLens.ts` | `buildLens` (named/default), canonical ingest, `canonicalInput`, `compileLens`, `buildCanonicalLens`, `canonicalLensFromRuntime`, `prepareRuntimeState` |
-| `teleconverter.ts` | Converter composition, compatibility, labels and validation |
+| `buildLens.ts` | `buildLens` (named/default), canonical ingest, `canonicalInput`, `compileLens`, `buildCanonicalLens`, `canonicalLensFromRuntime`, `compiledLensFromRuntime`, `lensDataVersion`, `prepareRuntimeState` |
+| `teleconverter.ts` | Converter composition, compatibility, geometry and labels |
 | `optics.ts` | Layout and station values, RuntimeLens state adapters, exact ray adapters, focus/aperture controls, pupil-ray density and display formatting |
 | `fieldGeometry.ts` | Field and pupil geometry, image-height inversion, RuntimeLens chief-ray adapters and bounded chief-ray diagnostic snapshots |
 | `projection.ts` | Projection domains, fisheye mapping, slopes and bounding-sphere launch vectors |
 | `analysis.ts` | Analysis requests, memoized contexts, movement availability, `analysisJobs`, `analysisPreviewJobs`, summary/cardinal and aberration/chromatic/bokeh/aspheric families |
 | `mtf.ts` | MTF support, spectrum, orchestration and the numerical helpers used by reports and benchmarks |
-| `perspective.ts` | Movement clamping, transforms, pose/trace contexts, field sampling, chief solving and diagram fans |
+| `perspective.ts` | Movement clamping, transforms, trace context, diagram fans, viewport and analysis types |
 | `diagramGeometry.ts` | SVG transforms, shapes, surface paths, display sag/trimming and folded-path labels |
 | `chromatic.ts` | Channel metadata, spectral lines, dispersion compilation/resolution/quality and chromatic ray tracing |
 | `glassCatalog.ts` | Glass entries, catalog resolution, tolerances and index evaluation |
 | `publishedStations.ts` | Published station grids, coordinates, labels and availability |
 | `validation.ts` | Named `validateLensData`, `validateCanonicalLens`, `validateTeleconverterData` and schema helpers |
-| `geometry.ts` | Surface profiles/sag, numerical geometry constants and shared vector helpers |
+| `geometry.ts` | Positional sag functions, numerical geometry constants and shared vector helpers |
 | `types.ts` | Engine types and preparation errors |
-| `lensDataConversion.ts` | Canonical/V1/V2 mapping, source paths and printers, loaded only by `scripts/lens-data-convert/load.mjs` outside focused tests |
+| `lensDataConversion.ts` | Canonical/V1/V2 mapping, source paths and printers; loaded only by `scripts/lens-data-convert/load.mjs` outside focused tests |
 
 ## Names And Runtime Adapters
 
@@ -66,13 +66,19 @@ claim. Channel/index helpers expose qualified dispersion data, not historical pr
 
 `ingestLens` and `ingestTeleconverter` accept authored V2 inputs only. `buildLens`, `canonicalInput`, and the internal
 `compileLensData` accept a `LensDataV2Input` or `CanonicalLens`; `attachTeleconverter` accepts those host types and a
-`TeleconverterDataV2Input` or `CanonicalTeleconverter`. Archived V1 files go through the permanent converter.
-`isV1File` remains internal; the `buildLens.ts` barrel exposes `lensDataVersion` for version detection.
+`TeleconverterDataV2Input` or `CanonicalTeleconverter`. Archived V1 handling is owned by
+[`workflow.md`, Adding Archived V1 Files](../workflow.md#adding-archived-v1-files).
+`isV1File` is internal; the `buildLens.ts` barrel exposes `lensDataVersion` for version detection.
 
-Call `buildLens()` once per lens/session state boundary, then pass the returned `RuntimeLens` (`L`) explicitly into
-pure optics helpers. Do not store runtime lens state in module globals, and keep slider-state-dependent analysis out
-of `buildLens()`; analysis helpers are pure and are called from memoized hooks or analysis components with the current
-slider state.
+`buildLens()` ingests V2 or accepts canonical input and returns the shared frozen read model for that canonical
+identity. A new same-key canonical object has a separate compilation. `L.source` is the unexpanded canonical
+prescription; provenance and the optional composition descriptor travel separately through `canonicalLensFromRuntime`.
+The engine never reconstructs a prescription from UI fields, and `RuntimeLens.data` does not exist.
+
+Use `prepareRuntimeState` to translate UI controls to cached `PreparedGeometry`, then `createAnalysisRequest` for
+current aperture, field, sampling and optional pose. Analysis families take that request; a lazy context memoizes its
+jobs by request identity. Low-level traversal takes `TraceGeometry`, independent of RuntimeLens ownership. Cache
+lifetimes and bounds are in [Optics Engine](optics-engine.md#cache-ownership-and-architecture-guards).
 
 For mirror or telescope data, inspect `L.opticalPath`, `L.imagePlane`, and `L.isFoldedOptics` instead of inferring
 behavior from surface order. Public `traceRay*` helpers report folded termination through `reachedImagePlane`; targeted
@@ -82,7 +88,8 @@ sequential partial tracing.
 
 ## Non-Optics Entry Points
 
-- Types: `src/types/optics.ts` (lens data, runtime lens, folded-path and projection metadata, result shapes),
+- Types: `src/types/lensDataV2.ts` (authored `LensDataV2Input` and `TeleconverterDataV2Input`),
+  `src/types/optics.ts` (internal construction projection, runtime lens, folded-path and projection metadata, result shapes),
   `src/types/state.ts` (reducer state, actions, preferences, `URLState`, UI unions with `is*` guards),
   `src/types/theme.ts`.
 - Catalog: `src/utils/catalog/lensCatalog.ts` exports the full `LENS_CATALOG`; index-style pages and search must use
@@ -110,5 +117,5 @@ sequential partial tracing.
 - Add or update focused tests for the behavior, especially for optics math, URL parsing, and build scripts.
 - Export from the stable module or barrel expected by callers; keep callers on the public seam.
 - Update this document only when an import boundary or a non-obvious contract changes, not for every new symbol.
-- For lens data shape changes, update `src/types/optics.ts`, `src/lens-data/LENS_DATA_SPEC.md`, templates, validation,
+- For lens data shape changes, update `src/types/lensDataV2.ts`, canonical ingest, `src/lens-data/LENS_DATA_SPEC.md`, templates, validation,
   and any generated-report scripts that inspect lens files.
