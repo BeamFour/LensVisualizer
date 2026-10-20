@@ -1,15 +1,16 @@
 /**
  * Teleconverter composition — builds the host + converter prescription that `buildLens()` consumes.
  *
- * `attachTeleconverter()` returns an ordinary `LensData`: host surfaces, the junction gap, then the converter's
+ * `attachTeleconverter()` returns a canonical lens: host surfaces, the junction gap, then the converter's
  * surfaces. Nothing downstream is converter-aware; the exact tracer, prepared states and every analysis see one
  * sequential lens whose stop is the host's. The composed data carries an `attachedTeleconverter` descriptor so the
- * UI can label the converter. Ingest precedes composition; the returned view retains canonical identity.
+ * UI can label the converter. Authored V2 inputs are ingested before composition.
  *
  * Fit rules and spacing live in `teleconverterCompatibility.ts`; this module does the merge and the first-order
  * rescale of the host metadata that `buildLens()` trusts (`nominalFno`, design focal length, f-stop series).
  */
 
+import type { LensDataV2Input, TeleconverterDataV2Input } from "../../types/lensDataV2.js";
 import type { AnnotationData, ElementData, LensData, LensProjectionConfig, SurfaceData } from "../../types/optics.js";
 import type {
   TeleconverterData,
@@ -23,7 +24,7 @@ import { buildStateSurfaces } from "../state/layout.js";
 import { buildVarIndex } from "./compileControls.js";
 import { zoomIndexToT } from "../state/stationTables.js";
 import { traceParaxialSurfaces as traceSurfacesParaxial } from "../math/paraxial.js";
-import { isV1File, ingestTeleconverter } from "./ingestV2.js";
+import { ingestTeleconverter } from "./ingestV2.js";
 import { canonicalForView } from "./identity.js";
 import { canonicalInput } from "./canonicalInput.js";
 import type { CanonicalLens, CanonicalTeleconverter, IngestedPrescription } from "./canonical.js";
@@ -102,7 +103,7 @@ function round(value: number, decimals: number): number {
  *   the junction becomes that plate's trailing gap instead.
  * - Converter labels get the reserved prefix and element ids continue after the host's, so every label- and
  *   id-keyed map (`asph`, `var`, annotations, element selection) stays unambiguous.
- * - Host `rearPlates` are kept: `expandRearPlates()` emits the `platesAhead` leading ones in front of the
+ * - Host `rearPlates` are kept: `expandCanonicalRearPlates()` emits the `platesAhead` leading ones in front of the
  *   converter and the rest behind its last surface.
  *
  * @param host - host lens data
@@ -336,28 +337,24 @@ function composedSpecs(
  * the exact paraxial ratio r = EFL(composed) / EFL(host): the entrance pupil EFL / (2·Fno) is then unchanged, and the
  * real trace to the stop — which only touches surfaces ahead of it — lands on the same radius.
  *
- * @param host - host lens data, with or without catalog defaults
- * @param tc - teleconverter data
- * @returns composed lens data ready for `buildLens()`
+ * @param host - authored V2 host or canonical lens
+ * @param tc - authored V2 converter or canonical converter
+ * @returns canonical lens ready for `buildLens()`
  * @throws TeleconverterAttachError when the pair fails a fit rule or has no finite focal ratio
  */
 export function attachTeleconverter(
-  host: LensData | CanonicalLens,
-  tc: TeleconverterData | CanonicalTeleconverter,
+  host: LensDataV2Input | CanonicalLens,
+  tc: TeleconverterDataV2Input | CanonicalTeleconverter,
 ): CanonicalLens {
-  const fit = teleconverterCompatibility(host, tc);
-  if (!fit.ok) throw new TeleconverterAttachError(host.key, tc.key, fit.reason);
-
-  /* Composition replaces host focal labels, including unused labels on a prime. */
-  const hostFile = { ...host };
-  if (isV1File(host) && "zoomLabels" in hostFile) delete hostFile.zoomLabels;
-  const hostInput = canonicalForView(host) ?? canonicalInput(hostFile);
+  const hostInput = canonicalForView(host) ?? canonicalInput(host);
   const converterInput =
     "kind" in tc
       ? { prescription: tc, provenance: { format: 2 as const, defaulted: [], ignored: {} } }
       : ingestTeleconverter(tc);
   const hostLens = hostInput.prescription;
   const converter = converterInput.prescription;
+  const fit = teleconverterCompatibility(hostLens, converter);
+  if (!fit.ok) throw new TeleconverterAttachError(host.key, tc.key, fit.reason);
   const pair = composeTeleconverter(hostInput, converterInput, fit.geometry);
   const hostFocalLengths = infinityFocalLengths(hostInput);
   const focalLengths = infinityFocalLengths(pair);

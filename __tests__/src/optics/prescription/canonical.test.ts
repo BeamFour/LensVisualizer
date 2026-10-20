@@ -10,7 +10,7 @@
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { buildLens } from "../../../../src/optics/prescription/buildRuntimeLens.js";
+import { buildFixtureLens as buildLens } from "../constructionFixtures.js";
 import { DEFAULT_MAX_RIM_ANGLE_DEG } from "../../../../src/optics/geometry/surfaceProfile.js";
 import { FLAT_RADIUS, PrescriptionIngestError } from "../../../../src/optics/prescription/canonical.js";
 import type { CanonicalLens, IngestedPrescription } from "../../../../src/optics/prescription/canonical.js";
@@ -22,9 +22,10 @@ import {
   v1CatalogDefaults,
 } from "../../../../src/optics/prescription/defaults.js";
 import type { SchemaDefault } from "../../../../src/optics/prescription/defaults.js";
-import { ingestLensV1, ingestTeleconverterV1 } from "../../../../src/optics/prescription/ingestV1.js";
-import { ingestLens, ingestTeleconverter, isV1File } from "../../../../src/optics/prescription/ingestV2.js";
-import { toLensData, toLensDataInput, toTeleconverterData } from "../../../../src/optics/prescription/toLensData.js";
+import { isV1File } from "../../../../src/optics/prescription/ingestV2.js";
+import { ingestLensV1, ingestTeleconverterV1 } from "../../../../src/optics/prescription/v1/ingestV1.js";
+import { ingestLens, ingestTeleconverter } from "../../../../src/optics/lensDataConversion.js";
+import { toLensData, toLensDataInput, toTeleconverterData } from "../../../../src/optics/prescription/v1/toLensData.js";
 import type { FiniteConjugate, LensData, LensDataInput } from "../../../../src/types/optics.js";
 import type { TeleconverterData } from "../../../../src/types/teleconverter.js";
 
@@ -795,7 +796,7 @@ describe("canonical prescription: refusals", () => {
     [
       "a field only the engine writes",
       () => edit(prime, (data) => ((data.surfaces[2] as unknown as Record<string, unknown>).synthetic = "rearPlate")),
-      /surfaces\[2\]\.synthetic is set only by expandRearPlates\(\)/,
+      /surfaces\[2\]\.synthetic is set only by expandCanonicalRearPlates\(\)/,
     ],
     [
       "half an element span",

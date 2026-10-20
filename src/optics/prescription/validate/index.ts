@@ -1,12 +1,10 @@
 /** Validation in diagnostic order: authored declarations, canonical facts, then compiled probe geometry. */
-import type { LensData, LensDataInput, SurfaceData } from "../../../types/optics.js";
+import type { LensData, SurfaceData } from "../../../types/optics.js";
 import type { CanonicalLens, IngestedPrescription } from "../canonical.js";
-import { canonicalForView } from "../identity.js";
-import { ingestLensV1 } from "../ingestV1.js";
 import { canonicalConstructionData } from "../constructionData.js";
 import { buildLabelIndex } from "../compileLabels.js";
 import type { UntrustedLensData } from "./context.js";
-import { catalogField, validateTopLevel, validateSurfaces, validateElements } from "./schema.js";
+import { validateTopLevel, validateSurfaces, validateElements } from "./schema.js";
 import { validateReferences, validateSpans, validateAnnotations } from "./references.js";
 import { validateStations, validateControls } from "./controls.js";
 import { validateStop, validatePairedInnerSdConsistency } from "./aperture.js";
@@ -30,26 +28,9 @@ function diagnosticRecords(ingested: IngestedPrescription<CanonicalLens>): LensD
   return data;
 }
 
-/** A diagnostic projection only: never compile, expand plates or resolve materials during validation. */
-function canonicalRecords(data: UntrustedLensData): LensData | UntrustedLensData {
-  if (canonicalForView(data)) return data;
-  // The converter validator's reference merge is generated data, not an authored file.
-  if (data.attachedTeleconverter !== undefined) return data;
-  try {
-    return diagnosticRecords(ingestLensV1(data as LensDataInput));
-  } catch {
-    // Ingest refuses ambiguity independently of validation. It must not add a new validator refusal or hide errors.
-    return data;
-  }
-}
-
-function validate(
-  data: UntrustedLensData,
-  catalogDefaults: boolean,
-  canonical?: IngestedPrescription<CanonicalLens>,
-): string[] {
+function validate(data: UntrustedLensData): string[] {
   const errors: string[] = [];
-  validateTopLevel(data, errors, catalogDefaults);
+  validateTopLevel(data, errors);
   validatePatentMetadata(data, errors);
   if (!Array.isArray(data.surfaces) || !Array.isArray(data.elements)) return errors;
   const surfaceLabels = validateSurfaces(data, errors);
@@ -66,28 +47,13 @@ function validate(
   validateStop(data.surfaces, labelToIdx, explicitSpans, errors);
   validateControls(data, surfaceLabels, labelToIdx, isZoom, focusPositionCount, errors);
   validateAnnotations(data, surfaceLabels, errors);
-  // Shape refusals retain their raw geometry diagnostics. Successful mapping supplies canonical geometry facts.
-  const geometryData = errors.length === 0 && !canonical ? canonicalRecords(data) : data;
-  validateGeometry(
-    geometryData,
-    labelToIdx,
-    explicitSpans,
-    isZoom,
-    errors,
-    catalogField(data, "gapSagFrac", catalogDefaults),
-    catalogField(data, "maxRimAngleDeg", catalogDefaults),
-  );
+  validateGeometry(data, labelToIdx, explicitSpans, isZoom, errors, data.gapSagFrac, data.maxRimAngleDeg);
   return errors;
 }
 
-/** Already-defaulted V1 compatibility API; missing runtime fields retain their historical diagnostics. */
+/** Raw numeric-column API; missing runtime fields retain their historical diagnostics. */
 export default function validateLensData(data: UntrustedLensData): string[] {
-  return validate(data, false);
-}
-
-/** Authored V1 file front door. Only omitted catalog fields read defaults; nothing is merged into the input. */
-export function validateLensInput(data: unknown): string[] {
-  return validate((data ?? {}) as UntrustedLensData, true);
+  return validate(data);
 }
 
 /** Canonical entry: provenance keeps ignored values and source spellings in diagnostics, outside the fingerprint. */
@@ -97,5 +63,5 @@ export function validateCanonicalLens(
 ): string[] {
   const data = diagnosticRecords(ingested);
   if (descriptor) data.attachedTeleconverter = descriptor;
-  return authoredMessages(validate(data, false, ingested), ingested);
+  return authoredMessages(validate(data), ingested);
 }

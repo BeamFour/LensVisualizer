@@ -1,9 +1,8 @@
 /** Canonical-first construction entry; validation precedes successful compilation. */
 import { validateCanonicalLens } from "./validate/index.js";
-import type { LensDataInput } from "../../types/optics.js";
 import type { LensDataV2Input } from "../../types/lensDataV2.js";
 import type { CompiledLens } from "../types.js";
-import type { CanonicalLens, IngestedPrescription } from "./canonical.js";
+import type { CanonicalLens, IngestedPrescription, IngestRequest } from "./canonical.js";
 import { assertValidLensData, canonicalInput } from "./canonicalInput.js";
 
 import { associateCanonical } from "./identity.js";
@@ -23,7 +22,7 @@ export function compileLens(ingested: IngestedPrescription<CanonicalLens>): Comp
   COMPILED_BY_CANONICAL.set(ingested.prescription, compiled);
   return compiled;
 }
-export function compileLensData(data: LensDataInput | LensDataV2Input | CanonicalLens): CompiledLens {
-  const ingested = canonicalInput(data);
+export function compileLensData(data: LensDataV2Input | CanonicalLens, request?: IngestRequest): CompiledLens {
+  const ingested = canonicalInput(data, request);
   return compileLens(ingested);
 }
